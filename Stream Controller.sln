@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29509.3
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stream Controller", "Stream Controller\Stream Controller.csproj", "{C0C6BAF1-99E3-4B3B-909B-A6797594B7CD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OBSWebSocketLibrary", "OBSWebSocketLibrary\OBSWebSocketLibrary.csproj", "{F80C62D2-091A-4E47-AF3A-482A05273231}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C0C6BAF1-99E3-4B3B-909B-A6797594B7CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C0C6BAF1-99E3-4B3B-909B-A6797594B7CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C0C6BAF1-99E3-4B3B-909B-A6797594B7CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C0C6BAF1-99E3-4B3B-909B-A6797594B7CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F80C62D2-091A-4E47-AF3A-482A05273231}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F80C62D2-091A-4E47-AF3A-482A05273231}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F80C62D2-091A-4E47-AF3A-482A05273231}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F80C62D2-091A-4E47-AF3A-482A05273231}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {594EE1CC-F298-4383-9A77-EF5B6240DD6F}
+	EndGlobalSection
+EndGlobal
