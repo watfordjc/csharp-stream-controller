@@ -13,17 +13,57 @@ namespace OBSWebSocketLibrary
 {
     public class ObsWsClient : IDisposable
     {
-        private static readonly ClientWebSocket _Client = new ClientWebSocket();
+        private ClientWebSocket _Client = new ClientWebSocket();
         private readonly Uri _ServerUrl = null;
         private WebSocketState _Status;
-        private System.Timers.Timer _ReconnectTimer;
-        private bool reconnect;
+        private CancellationTokenSource connectionCancellation;
         private bool disposedValue;
+        private int _RetrySeconds = 5;
+        private int _MaximumRetryMinutes = 10;
 
-        public struct ReceivedMessage
+        private struct ReceivedMessage
         {
             public WebSocketReceiveResult Result { get; set; }
             public byte[] Message { get; set; }
+        }
+
+        public delegate byte[] ReceivedBinaryMessage();
+        public delegate string ReceivedTextMessage();
+        public delegate WebSocketState StateChanged();
+
+        public event EventHandler<byte[]> ReceiveBinaryMessage;
+        public event EventHandler<string> ReceiveTextMessage;
+        public event EventHandler<WebSocketState> StateChange;
+
+        private void ParseMessage(ReceivedMessage receivedMessage)
+        {
+            if (receivedMessage.Result.MessageType == WebSocketMessageType.Text)
+            {
+                OnReceiveTextMessage(Encoding.UTF8.GetString(receivedMessage.Message));
+            }
+            else if (receivedMessage.Result.MessageType == WebSocketMessageType.Binary)
+            {
+                OnReceiveBinaryMessage(receivedMessage.Message);
+            }
+        }
+
+        protected virtual void OnReceiveBinaryMessage(byte[] message)
+        {
+            ReceiveBinaryMessage?.Invoke(this, message);
+        }
+
+        protected virtual void OnReceiveTextMessage(string message)
+        {
+            ReceiveTextMessage?.Invoke(this, message);
+        }
+
+        protected virtual void OnStateChange(WebSocketState newState)
+        {
+            if (_Status != newState)
+            {
+                _Status = newState;
+                StateChange?.Invoke(this, newState);
+            }
         }
 
         public ObsWsClient(Uri url)
@@ -32,18 +72,61 @@ namespace OBSWebSocketLibrary
             _ServerUrl = url;
         }
 
-        public async Task<bool> ConnectAsync()
+        public void SetExponentialBackoff(int initialRetrySeconds, int maximumRetryMinutes)
         {
+            _RetrySeconds = initialRetrySeconds;
+            _MaximumRetryMinutes = maximumRetryMinutes;
+        }
+
+        public async Task<bool> AutoReconnectConnectAsync()
+        {
+            bool connected = false;
+            connectionCancellation = new CancellationTokenSource();
+            int retryMs = (int)TimeSpan.FromSeconds(_RetrySeconds).TotalMilliseconds;
+            while (!connected)
+            {
+                try
+                {
+                    OnStateChange(WebSocketState.Connecting);
+                    connected = await ConnectAsync();
+                    if (!connected)
+                    {
+                        _Client = new ClientWebSocket();
+                        Trace.WriteLine("Attempting another reconnection attempt in " + retryMs + " milliseconds.");
+                        await Task.Delay(retryMs, connectionCancellation.Token);
+                        if (retryMs < TimeSpan.FromMinutes(_MaximumRetryMinutes).TotalMilliseconds)
+                        {
+                            retryMs *= 2;
+                        }
+                    }
+                }
+                catch (TaskCanceledException)
+                {
+                    OnStateChange(WebSocketState.Closed);
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private async Task<bool> ConnectAsync()
+        {
+            if (_Client == null)
+            {
+                _Client = new ClientWebSocket();
+                OnStateChange(_Client.State);
+            }
             if (_Status == WebSocketState.Open)
             {
-                return false;
+                return true;
             }
             try
             {
-                await _Client.ConnectAsync(_ServerUrl, CancellationToken.None);
-                _Status = _Client.State;
+                await _Client.ConnectAsync(_ServerUrl, connectionCancellation.Token);
+                OnStateChange(_Client.State);
                 return true;
-            } catch (Exception e)
+            }
+            catch (WebSocketException e)
             {
                 Trace.WriteLine("Connect error: " + e.GetBaseException() + " - " + e.InnerException.GetBaseException());
                 return false;
@@ -52,19 +135,29 @@ namespace OBSWebSocketLibrary
 
         public async Task<bool> DisconnectAsync()
         {
-            if (_Status == WebSocketState.Closed)
+            connectionCancellation.Cancel(true);
+            if (_Status == WebSocketState.Open)
             {
-                return false;
+                await _Client.CloseAsync(WebSocketCloseStatus.Empty, null, CancellationToken.None);
             }
-            await _Client.CloseAsync(WebSocketCloseStatus.Empty, "Closing connection", CancellationToken.None);
-            _Status = _Client.State;
+            if (_Client != null)
+            {
+                OnStateChange(_Client.State);
+                _Client.Abort();
+                _Client.Dispose();
+                _Client = null;
+            } else
+            {
+                OnStateChange(WebSocketState.Closed);
+            }
             return true;
         }
 
         public async Task ReconnectAsync()
         {
             await DisconnectAsync();
-            await ConnectAsync();
+            _Client = new ClientWebSocket();
+            await AutoReconnectConnectAsync();
         }
 
         public async Task<bool> SendMessageAsync(String message)
@@ -94,7 +187,6 @@ namespace OBSWebSocketLibrary
 
                 memoryStream.Seek(0, SeekOrigin.Begin);
                 receivedMessage.Message = memoryStream.ToArray();
-
             }
             return receivedMessage;
         }
@@ -103,16 +195,26 @@ namespace OBSWebSocketLibrary
         {
             while (_Status == WebSocketState.Open || _Status == WebSocketState.CloseReceived)
             {
-                ReceivedMessage receivedMessage = await ReceiveMessageAsync();
-                if (receivedMessage.Result.MessageType == WebSocketMessageType.Close)
+                ReceivedMessage receivedMessage;
+                try
                 {
-                    break;
-                } else if (receivedMessage.Result.MessageType == WebSocketMessageType.Text)
+                    receivedMessage = await ReceiveMessageAsync();
+                    if (receivedMessage.Result.MessageType == WebSocketMessageType.Close)
+                    {
+                        break;
+                    }
+                    else if (receivedMessage.Result.MessageType == WebSocketMessageType.Text || receivedMessage.Result.MessageType == WebSocketMessageType.Binary)
+                    {
+                        ParseMessage(receivedMessage);
+                    }
+                }
+                catch (WebSocketException e)
                 {
-                    // Handle text message
-                } else if (receivedMessage.Result.MessageType == WebSocketMessageType.Binary)
-                {
-                    throw new NotImplementedException("Binary WebSocket messages not implemented.");
+                    Trace.WriteLine(e.WebSocketErrorCode);
+                    if (e.WebSocketErrorCode == WebSocketError.ConnectionClosedPrematurely)
+                    {
+                        Trace.WriteLine("WS Error Code: " +e.WebSocketErrorCode);
+                    }
                 }
             }
         }
@@ -130,7 +232,8 @@ namespace OBSWebSocketLibrary
 
                 // TODO: free unmanaged resources (unmanaged objects) and override finalizer
                 // TODO: set large fields to null
-                _Client.CloseAsync(WebSocketCloseStatus.Empty, "Closing connection", CancellationToken.None).GetAwaiter().GetResult();
+                _Client.CloseAsync(WebSocketCloseStatus.Empty, null, CancellationToken.None).GetAwaiter().GetResult();
+                _Client.Abort();
                 _Client.Dispose();
                 disposedValue = true;
             }

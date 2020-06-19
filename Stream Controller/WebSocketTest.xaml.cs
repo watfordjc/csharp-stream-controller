@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Buffers.Text;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -8,16 +9,22 @@ using System.Net.Sockets;
 using System.Net.WebSockets;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Converters;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using OBSWebSocketLibrary;
 
 namespace Stream_Controller
 {
@@ -26,38 +33,101 @@ namespace Stream_Controller
     /// </summary>
     public partial class WebSocketTest : Window, IDisposable
     {
-        private ClientWebSocket webSocket = null;
+        private readonly ObsWsClient webSocket;
         private bool autoscroll = false;
+        private System.Timers.Timer heartBeatCheck = new System.Timers.Timer(8000);
+        private Guid enableHeartbeatMessageId;
         private bool disposedValue;
 
         public WebSocketTest()
         {
             InitializeComponent();
+            webSocket = new ObsWsClient(new Uri("ws://localhost:4444"));
+            webSocket.StateChange += WebSocket_StateChange;
+            webSocket.StateChange += WebSocket_EnableHeartBeat;
+            webSocket.ReceiveTextMessage += WebSocket_NewTextMessage;
+            heartBeatCheck.Elapsed += HeartBeatTimer_Elapsed;
         }
 
         private async void ButtonTest_Click(object sender, RoutedEventArgs e)
         {
-            webSocket = ClientWebSocket();
-            if (webSocket == null)
-            {
-                e.Handled = true;
-                return;
-            }
-            txtStatus.Text = webSocket.State.ToString();
-            if (webSocket.State == WebSocketState.Open)
             btnTest.IsEnabled = false;
+            await webSocket.AutoReconnectConnectAsync();
             e.Handled = true;
-            await Task.WhenAll(new[] { ReceiveMessages() });
-            btnTest.IsEnabled = true;
+        }
+
+        private void WebSocket_StateChange(object sender, WebSocketState e)
+        {
+            txtStatus.Text = e.ToString();
+            if (e == WebSocketState.Closed)
+            {
+                btnTest.IsEnabled = true;
+            }
+        }
+
+        private async void WebSocket_EnableHeartBeat(object sender, WebSocketState e)
+        {
+            if (e == WebSocketState.Open)
+            {
+                webSocket.StartMessageReceiveLoop();
+                enableHeartbeatMessageId = Guid.NewGuid();
+                Dictionary<string, object> jsonDictionary = new Dictionary<string, object>();
+                jsonDictionary.Add("request-type", "SetHeartbeat");
+                jsonDictionary.Add("message-id", enableHeartbeatMessageId.ToString());
+                jsonDictionary.Add("enable", true);
+                await webSocket.SendMessageAsync(System.Text.Json.JsonSerializer.Serialize(jsonDictionary));
+            }
+        }
+
+        private void WebSocket_NewTextMessage(object sender, string message)
+        {
+            txtOutput.Text += message + "\n\n";
+            if (autoscroll == true)
+            {
+                svScroll.ScrollToBottom();
+            }
+            using (JsonDocument document = JsonDocument.Parse(message))
+            {
+                JsonElement root = document.RootElement;
+                JsonElement jsonUpdateType, jsonStreamTimecode, jsonRecTimecode;
+                if (!root.TryGetProperty("update-type", out jsonUpdateType))
+                {
+                    root.TryGetProperty("message-id", out JsonElement messageId);
+                    if (messageId.GetString() == enableHeartbeatMessageId.ToString())
+                    {
+                        root.TryGetProperty("status", out JsonElement status);
+                        Trace.WriteLine("Server response to enabling HeartBeat: " + status.GetString());
+                    } else
+                    {
+                        Trace.WriteLine("Unexpected JSON.");
+                    }
+                    return;
+                }
+                bool isStreaming = root.TryGetProperty("stream-timecode", out jsonStreamTimecode);
+                bool isRecording = root.TryGetProperty("rec-timecode", out jsonRecTimecode);
+                switch (jsonUpdateType.GetString())
+                {
+                    case "Heartbeat":
+                        root.TryGetProperty("pulse", out JsonElement pulse);
+                        heartBeatCheck.Enabled = pulse.GetBoolean();
+                        heartBeatCheck.Enabled = true;
+
+                        break;
+                }
+            }
+        }
+
+        private void HeartBeatTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            heartBeatCheck.Stop();
+            Application.Current.Dispatcher.Invoke(
+                async () => await webSocket.ReconnectAsync()
+                );
         }
 
         private async void ButtonClose_Click(object sender, RoutedEventArgs e)
         {
-            if (webSocket != null && webSocket.State != WebSocketState.Closed)
-            {
-                await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Requested by user", CancellationToken.None);
-                txtStatus.Text = webSocket.State.ToString();
-            }
+            await webSocket.DisconnectAsync();
             e.Handled = true;
         }
 
@@ -65,7 +135,6 @@ namespace Stream_Controller
         {
             autoscroll = true;
             svScroll.ScrollToBottom();
-            svScroll.ScrollChanged += OnScrollChange;
         }
 
         private void AutoScroll_Unchecked(object sender, RoutedEventArgs e)
@@ -73,91 +142,12 @@ namespace Stream_Controller
             autoscroll = false;
         }
 
-        private void AutoScroll_Scrolled(object sender, RoutedEventArgs e)
+        private void txtOutput_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
-            cbAutoScroll.IsChecked = false;
-        }
-
-        private void OnScrollChange(object sender, ScrollChangedEventArgs e)
-        {
-            if (e.VerticalOffset < 0 && autoscroll == true)
+            if (svScroll.VerticalOffset < svScroll.ScrollableHeight)
             {
                 cbAutoScroll.IsChecked = false;
             }
-        }
-
-        private ClientWebSocket ClientWebSocket()
-        {
-            ClientWebSocket clientWebSocket = new ClientWebSocket();
-            try
-            {
-                clientWebSocket.Options.SetBuffer(8192, 8192);
-                clientWebSocket.ConnectAsync(new Uri("ws://localhost:4444"), CancellationToken.None).GetAwaiter().GetResult();
-            } catch (WebSocketException e)
-            {
-                txtOutput.Text = "An error occurred: " + e.Message + "\n\n" + e.InnerException.Message;
-                return null;
-            }
-            
-            return clientWebSocket;
-        }
-
-        private async Task ReceiveMessages()
-        {
-            while (webSocket.State == WebSocketState.Open)
-            {
-                await ReceiveAsync();
-            }
-        }
-
-        private async Task SendAsync(string message)
-        {
-            if (webSocket.State != WebSocketState.Open)
-            {
-                return;
-            }
-            ArraySegment<Byte> sendBuffer = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(message));
-            await webSocket.SendAsync(sendBuffer, WebSocketMessageType.Text, true, CancellationToken.None);
-        }
-
-        // TODO: Licensing - function derived from https://stackoverflow.com/questions/23773407/a-websockets-receiveasync-method-does-not-await-the-entire-message
-        private async Task<WebSocketReceiveResult> ReceiveAsync()
-        {
-            ArraySegment<Byte> receiveBuffer = new ArraySegment<Byte>(new Byte[8192]);
-            WebSocketReceiveResult result = null;
-
-            using (MemoryStream memoryStream = new MemoryStream())
-            {
-                try
-                {
-                    do
-                    {
-                        result = await webSocket.ReceiveAsync(receiveBuffer, CancellationToken.None);
-                        memoryStream.Write(receiveBuffer.Array, receiveBuffer.Offset, result.Count);
-                    } while (!result.EndOfMessage);
-                } catch (OutOfMemoryException e)
-                {
-                    txtOutput.Text += "Unable to receive a WebSocket message due to a buffer overflow.\n" + e.Message + "\n" + e.InnerException.Message + "\n";
-                }
-
-                memoryStream.Seek(0, SeekOrigin.Begin);
-
-                if (result.MessageType == WebSocketMessageType.Text)
-                {
-                    using StreamReader streamReader = new StreamReader(memoryStream, Encoding.UTF8);
-                    txtStatus.Text = webSocket.State.ToString();
-                    txtOutput.Text += streamReader.ReadToEnd() + "\n\n";
-                    if (autoscroll == true)
-                    {
-                        svScroll.ScrollToBottom();
-                    }
-                }
-                else if (result.MessageType == WebSocketMessageType.Binary)
-                {
-                    throw new NotImplementedException("Binary WebSocket messages not implemented.");
-                }
-            }
-            return result;
         }
 
         protected virtual void Dispose(bool disposing)
@@ -166,22 +156,22 @@ namespace Stream_Controller
             {
                 if (disposing)
                 {
+                    heartBeatCheck.Dispose();
                     // TODO: dispose managed state (managed objects)
                 }
 
-                webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Program exiting", CancellationToken.None).GetAwaiter().GetResult();
-                webSocket.Dispose();
-
+                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                // TODO: set large fields to null
                 disposedValue = true;
             }
         }
 
         // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
-        ~WebSocketTest()
-        {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: false);
-        }
+        // ~WebSocketTest()
+        // {
+        //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        //     Dispose(disposing: false);
+        // }
 
         public void Dispose()
         {
