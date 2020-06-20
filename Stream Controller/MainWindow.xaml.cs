@@ -256,9 +256,7 @@ namespace Stream_Controller
 
         private void MenuItemPreferences_Click(object sender, RoutedEventArgs e)
         {
-            Window window = WindowUtilityLibrary.GetWindow(WindowUtilityLibrary.PREFERENCES);
-            window.Show();
-            window.Activate();
+            WindowUtilityLibrary.MakeWindowActive(WindowUtilityLibrary.PREFERENCES);
         }
 
         private void MenuItemExit_Click(object sender, RoutedEventArgs e)
@@ -268,9 +266,7 @@ namespace Stream_Controller
 
         private void MenuItemObs_Click(object sender, RoutedEventArgs e)
         {
-            Window window = WindowUtilityLibrary.GetWindow(WindowUtilityLibrary.WEB_SOCKETS);
-            window.Show();
-            window.Activate();
+            WindowUtilityLibrary.MakeWindowActive(WindowUtilityLibrary.WEB_SOCKETS);
         }
     }
 }

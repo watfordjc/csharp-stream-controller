@@ -30,6 +30,22 @@ namespace Stream_Controller
         };
 
         /// <summary>
+        /// Show a new or existing Window and makes it active.
+        /// </summary>
+        /// <param name="windowType">A constant for the Window Type, defined in WindowUtilityLibrary.</param>
+        public static void MakeWindowActive(int windowType)
+        {
+            Debug.Assert(windowTypes.Contains(windowType), "Unrecognised window type.");
+            Window window = GetWindow(windowType);
+            if (window == null)
+            {
+                return;
+            }
+            window.Show();
+            window.Activate();
+        }
+
+        /// <summary>
         /// Get an existing Window or create a new one.
         /// </summary>
         /// <param name="windowType">A constant for the Window Type, defined in WindowUtilityLibrary.</param>

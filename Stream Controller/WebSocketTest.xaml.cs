@@ -59,9 +59,7 @@ namespace Stream_Controller
 
         private void MenuItemPreferences_Click(object sender, RoutedEventArgs e)
         {
-            Window window = WindowUtilityLibrary.GetWindow(WindowUtilityLibrary.PREFERENCES);
-            window.Show();
-            window.Activate();
+            WindowUtilityLibrary.MakeWindowActive(WindowUtilityLibrary.PREFERENCES);
         }
 
         private void MenuItemExit_Click(object sender, RoutedEventArgs e)
@@ -71,9 +69,7 @@ namespace Stream_Controller
 
         private void MenuItemAudioInterfaces_Click(object sender, RoutedEventArgs e)
         {
-            Window window = WindowUtilityLibrary.GetWindow(WindowUtilityLibrary.MAIN_WINDOW);
-            window.Show();
-            window.Activate();
+            WindowUtilityLibrary.MakeWindowActive(WindowUtilityLibrary.MAIN_WINDOW);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
