@@ -20,6 +20,7 @@ namespace OBSWebSocketLibrary
         private bool disposedValue;
         private int _RetrySeconds = 5;
         private int _MaximumRetryMinutes = 10;
+        private ErrorMessage errorMessage = new ErrorMessage();
 
         private struct ReceivedMessage
         {
@@ -27,13 +28,21 @@ namespace OBSWebSocketLibrary
             public byte[] Message { get; set; }
         }
 
+        public struct ErrorMessage
+        {
+            public Exception Error { get; set; }
+            public int ReconnectDelay { get; set; }
+        }
+
         public delegate byte[] ReceivedBinaryMessage();
         public delegate string ReceivedTextMessage();
         public delegate WebSocketState StateChanged();
+        public delegate string Error();
 
         public event EventHandler<byte[]> ReceiveBinaryMessage;
         public event EventHandler<string> ReceiveTextMessage;
         public event EventHandler<WebSocketState> StateChange;
+        public event EventHandler<ErrorMessage> ErrorState;
 
         private void ParseMessage(ReceivedMessage receivedMessage)
         {
@@ -66,6 +75,16 @@ namespace OBSWebSocketLibrary
             }
         }
 
+        protected virtual void OnErrorState(Exception e, int reconnectDelay)
+        {
+            errorMessage = new ErrorMessage
+            {
+                Error = e,
+                ReconnectDelay = reconnectDelay
+            };
+            ErrorState?.Invoke(this, errorMessage);
+        }
+
         public ObsWsClient(Uri url)
         {
             _Client.Options.SetBuffer(8192, 8192);
@@ -91,8 +110,9 @@ namespace OBSWebSocketLibrary
                     connected = await ConnectAsync();
                     if (!connected)
                     {
+                        OnErrorState(errorMessage.Error, retryMs / 1000);
                         _Client = new ClientWebSocket();
-                        Trace.WriteLine("Attempting another reconnection attempt in " + retryMs + " milliseconds.");
+                        OnStateChange(_Client.State);
                         await Task.Delay(retryMs, connectionCancellation.Token);
                         if (retryMs < TimeSpan.FromMinutes(_MaximumRetryMinutes).TotalMilliseconds)
                         {
@@ -128,7 +148,7 @@ namespace OBSWebSocketLibrary
             }
             catch (WebSocketException e)
             {
-                Trace.WriteLine("Connect error: " + e.GetBaseException() + " - " + e.InnerException.GetBaseException());
+                errorMessage.Error = e;
                 return false;
             }
         }
@@ -210,11 +230,7 @@ namespace OBSWebSocketLibrary
                 }
                 catch (WebSocketException e)
                 {
-                    Trace.WriteLine(e.WebSocketErrorCode);
-                    if (e.WebSocketErrorCode == WebSocketError.ConnectionClosedPrematurely)
-                    {
-                        Trace.WriteLine("WS Error Code: " +e.WebSocketErrorCode);
-                    }
+                    OnErrorState(e, -1);
                 }
             }
         }

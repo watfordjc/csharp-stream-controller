@@ -39,6 +39,7 @@ namespace Stream_Controller
         private System.Timers.Timer heartBeatCheck = new System.Timers.Timer(8000);
         private Guid enableHeartbeatMessageId;
         private bool disposedValue;
+        private int reconnectDelay;
 
         public WebSocketTest()
         {
@@ -87,6 +88,7 @@ namespace Stream_Controller
             webSocket.StateChange += WebSocket_StateChange;
             webSocket.StateChange += WebSocket_EnableHeartBeat;
             webSocket.ReceiveTextMessage += WebSocket_NewTextMessage;
+            webSocket.ErrorState += WebSocket_ErrorMessage;
             heartBeatCheck.Elapsed += HeartBeatTimer_Elapsed;
             if (Preferences.Default.obs_connect_launch)
             {
@@ -104,10 +106,25 @@ namespace Stream_Controller
 
         private void WebSocket_StateChange(object sender, WebSocketState e)
         {
-            txtStatus.Text = e.ToString();
+            txtStatus.Text = $"Connection Status: {e.ToString()}";
             if (e == WebSocketState.Closed)
             {
                 btnTest.IsEnabled = true;
+            } else if (e == WebSocketState.None)
+            {
+                txtStatus.Text = $"Connection Status: {e.ToString()} (Current reconnect delay: {reconnectDelay} seconds)";
+            }
+        }
+
+        private void WebSocket_ErrorMessage(object sender, ObsWsClient.ErrorMessage errorMessage)
+        {
+            if (errorMessage.Error != null)
+            {
+                txtOutput.Text += errorMessage.Error.Message + "\n" + errorMessage.Error.InnerException.Message + "\n\n";
+                if (errorMessage.ReconnectDelay > 0)
+                {
+                    reconnectDelay = errorMessage.ReconnectDelay;
+                }
             }
         }
 
