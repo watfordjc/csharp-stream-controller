@@ -13,7 +13,7 @@ namespace Stream_Controller {
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.6.0.0")]
-    internal sealed partial class Preferences : global::System.Configuration.ApplicationSettingsBase {
+    public sealed partial class Preferences : global::System.Configuration.ApplicationSettingsBase {
         
         private static Preferences defaultInstance = ((Preferences)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Preferences())));
         
@@ -25,19 +25,7 @@ namespace Stream_Controller {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("ws://localhost:4444")]
-        public string obs_uri {
-            get {
-                return ((string)(this["obs_uri"]));
-            }
-            set {
-                this["obs_uri"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool obs_connect_launch {
             get {
                 return ((bool)(this["obs_connect_launch"]));
@@ -176,6 +164,42 @@ namespace Stream_Controller {
             }
             set {
                 this["obs_left"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("localhost")]
+        public string obs_uri_host {
+            get {
+                return ((string)(this["obs_uri_host"]));
+            }
+            set {
+                this["obs_uri_host"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("4444")]
+        public string obs_uri_port {
+            get {
+                return ((string)(this["obs_uri_port"]));
+            }
+            set {
+                this["obs_uri_port"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ws")]
+        public string obs_uri_scheme {
+            get {
+                return ((string)(this["obs_uri_scheme"]));
+            }
+            set {
+                this["obs_uri_scheme"] = value;
             }
         }
     }

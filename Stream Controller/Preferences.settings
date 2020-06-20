@@ -2,11 +2,8 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Stream_Controller" GeneratedClassName="Preferences">
   <Profiles />
   <Settings>
-    <Setting Name="obs_uri" Type="System.String" Scope="User">
-      <Value Profile="(Default)">ws://localhost:4444</Value>
-    </Setting>
     <Setting Name="obs_connect_launch" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="obs_auto_reconnect" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
@@ -40,6 +37,15 @@
     </Setting>
     <Setting Name="obs_left" Type="System.Double" Scope="User">
       <Value Profile="(Default)">200</Value>
+    </Setting>
+    <Setting Name="obs_uri_host" Type="System.String" Scope="User">
+      <Value Profile="(Default)">localhost</Value>
+    </Setting>
+    <Setting Name="obs_uri_port" Type="System.String" Scope="User">
+      <Value Profile="(Default)">4444</Value>
+    </Setting>
+    <Setting Name="obs_uri_scheme" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ws</Value>
     </Setting>
   </Settings>
 </SettingsFile>

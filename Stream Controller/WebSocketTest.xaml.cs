@@ -45,7 +45,12 @@ namespace Stream_Controller
         {
             InitializeComponent();
             InitialiseWindow();
-            webSocket = new ObsWsClient(new Uri(Preferences.Default.obs_uri));
+            Uri obs_uri = new UriBuilder(
+                Preferences.Default.obs_uri_scheme,
+                Preferences.Default.obs_uri_host,
+                int.Parse(Preferences.Default.obs_uri_port)
+                ).Uri;
+            webSocket = new ObsWsClient(obs_uri);
         }
 
         private void InitialiseWindow()
