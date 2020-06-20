@@ -1,0 +1,70 @@
+﻿<Window x:Class="Stream_Controller.PreferencesWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Stream_Controller"
+        mc:Ignorable="d"
+        FontFamily="Open Sans"
+        FontSize="12"
+        Title="Preferences" Height="450" Width="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="16" />
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="16" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="16" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="16" />
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1" >
+        <Button Content="Save" HorizontalAlignment="Left" Margin="8" Padding="8 2" Click="SaveButton_Click" />
+            <TextBlock x:Name="tb_preferences_error" VerticalAlignment="Center" Margin="8" Foreground="DarkRed" FontWeight="SemiBold" />
+        </StackPanel>
+        <GroupBox Header="OBS-websocket" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Padding="8">
+            <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="URI:" Margin="8 8 2 8" VerticalAlignment="Center" />
+                    <ComboBox Margin="8 8 2 8" VerticalContentAlignment="Center" x:Name="cbUriProtocol">
+                        <ComboBoxItem Content="ws" IsSelected="True" />
+                        <ComboBoxItem Content="wss" />
+                    </ComboBox>
+                    <TextBlock Text="://" VerticalAlignment="Center" Margin="2 8 2 8" />
+                    <TextBox Text="localhost" VerticalAlignment="Center" MinWidth="150" Margin="2 8 2 8" x:Name="tbUriHostname" />
+                    <TextBlock Text=":" VerticalAlignment="Center" Margin="2 8 2 8" />
+                    <TextBox Text="4444" VerticalAlignment="Center" MinWidth="50" Margin="2 8" x:Name="tbUriPort" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox Content="Connect on Launch" Margin="8" x:Name="cbConnectLaunch" />
+                    <CheckBox Content="Automatically Reconnect" Margin="8" IsChecked="True" x:Name="cbAutoReconnect" />
+                </StackPanel>
+                <GroupBox Header="Exponential Backoff" Margin="8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Delay between 1st and 2nd connection attempt:" Margin="2 8" VerticalAlignment="Center" />
+                        <TextBox Grid.Row="0" Grid.Column="1" Text="5" Margin="2 8" VerticalAlignment="Center" Width="30" TextAlignment="Right" x:Name="tbBackoffMin" />
+                        <TextBlock Grid.Row="0" Grid.Column="2" Text="seconds" Margin="2 8" VerticalAlignment="Center" />
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Maximum delay between connection attempts:" Margin="2 8" VerticalAlignment="Center" />
+                        <TextBox Grid.Row="1" Grid.Column="1" Text="10" Margin="2 8" VerticalAlignment="Center" Width="30" TextAlignment="Right" x:Name="tbBackoffMax" />
+                        <TextBlock Grid.Row="1" Grid.Column="2" Text="minutes" Margin="2 8" VerticalAlignment="Center" />
+                    </Grid>
+                </GroupBox>
+                <CheckBox Content="Autoscroll" IsChecked="True" VerticalContentAlignment="Center" Margin="8" x:Name="cbAutoscroll" />
+            </StackPanel>
+        </GroupBox>
+    </Grid>
+</Window>

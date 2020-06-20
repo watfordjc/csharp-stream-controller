@@ -5,33 +5,50 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Stream_Controller"
         mc:Ignorable="d"
+        Closing="Window_Closing"
+        Loaded="Window_Loaded"
         Title="WebSocketTest" Height="450" Width="800"
-        FontFamily="Open Sans" FontSize="18">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="16" />
-            <ColumnDefinition Width="auto" />
-            <ColumnDefinition Width="auto" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="16" />
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="16" />
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="16" />
-        </Grid.RowDefinitions>
-        <Button Width="auto" Height="auto" Grid.Column="1" Grid.Row="1" x:Name="btnTest" Margin="8" Padding="3 0" Click="ButtonTest_Click">
-            <TextBlock Text="Test" />
-        </Button>
-        <Button Width="auto" Height="auto" Grid.Column="1" Grid.Row="2" x:Name="btnClose" Margin="8" Padding="3 0" Click="ButtonClose_Click">
-            <TextBlock Text="Close" />
-        </Button>
-        <TextBlock x:Name="txtStatus" Grid.Column="2" Grid.Row="1" Margin="8"  />
-        <CheckBox x:Name="cbAutoScroll" Content="Auto Scroll" Grid.Column="3" Grid.Row="1" Margin="8" VerticalContentAlignment="Center" HorizontalAlignment="Right" Checked="AutoScroll_Checked" Unchecked="AutoScroll_Unchecked" />
-        <ScrollViewer Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="2" Grid.RowSpan="2" Margin="8" x:Name="svScroll" ScrollViewer.ScrollChanged="txtOutput_ScrollChanged" >
-            <TextBlock x:Name="txtOutput" />
-        </ScrollViewer>
-    </Grid>
+        FontFamily="Open Sans" FontSize="14">
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="E_xit" Click="MenuItemExit_Click" />
+            </MenuItem>
+            <MenuItem Header="_Edit">
+                <MenuItem Header="_Preferences" Click="MenuItemPreferences_Click" />
+            </MenuItem>
+            <MenuItem Header="_Window">
+                <MenuItem Header="_Audio Interfaces" Click="MenuItemAudioInterfaces_Click" />
+                <MenuItem Header="_OBS" IsEnabled="False" />
+            </MenuItem>
+        </Menu>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="16" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="16" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="16" />
+            </Grid.RowDefinitions>
+            <Button Width="auto" Height="auto" Grid.Column="1" Grid.Row="1" x:Name="btnTest" Margin="8" Padding="3 0" Click="ButtonTest_Click">
+                <TextBlock Text="Test" />
+            </Button>
+            <Button Width="auto" Height="auto" Grid.Column="1" Grid.Row="2" x:Name="btnClose" Margin="8" Padding="3 0" Click="ButtonClose_Click">
+                <TextBlock Text="Close" />
+            </Button>
+            <TextBlock x:Name="txtStatus" Grid.Column="2" Grid.Row="1" Margin="8"  />
+            <CheckBox x:Name="cbAutoScroll" Content="Auto Scroll" Grid.Column="3" Grid.Row="1" Margin="8" VerticalContentAlignment="Center" HorizontalAlignment="Right" Checked="AutoScroll_Checked" Unchecked="AutoScroll_Unchecked" />
+            <ScrollViewer Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="2" Grid.RowSpan="2" Margin="8" x:Name="svScroll" ScrollViewer.ScrollChanged="txtOutput_ScrollChanged" >
+                <TextBlock x:Name="txtOutput" />
+            </ScrollViewer>
+        </Grid>
+
+    </DockPanel>
 </Window>

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Sockets;
 using System.Net.WebSockets;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -42,11 +43,60 @@ namespace Stream_Controller
         public WebSocketTest()
         {
             InitializeComponent();
-            webSocket = new ObsWsClient(new Uri("ws://localhost:4444"));
+            InitialiseWindow();
+            webSocket = new ObsWsClient(new Uri(Preferences.Default.obs_uri));
+        }
+
+        private void InitialiseWindow()
+        {
+            this.Width = Preferences.Default.obs_width;
+            this.Height = Preferences.Default.obs_height;
+            this.WindowStartupLocation = WindowStartupLocation.Manual;
+            this.Left = Preferences.Default.obs_left;
+            this.Top = Preferences.Default.obs_top;
+            this.cbAutoScroll.IsChecked = Preferences.Default.obs_autoscroll;
+        }
+
+        private void MenuItemPreferences_Click(object sender, RoutedEventArgs e)
+        {
+            Window window = WindowUtilityLibrary.GetWindow(WindowUtilityLibrary.PREFERENCES);
+            window.Show();
+            window.Activate();
+        }
+
+        private void MenuItemExit_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void MenuItemAudioInterfaces_Click(object sender, RoutedEventArgs e)
+        {
+            Window window = WindowUtilityLibrary.GetWindow(WindowUtilityLibrary.MAIN_WINDOW);
+            window.Show();
+            window.Activate();
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            Preferences.Default.obs_width = this.Width;
+            Preferences.Default.obs_height = this.Height;
+            Preferences.Default.obs_left = this.Left;
+            Preferences.Default.obs_top = this.Top;
+        }
+
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+
+            webSocket.SetExponentialBackoff(Preferences.Default.obs_reconnect_min_seconds, Preferences.Default.obs_reconnect_max_minutes);
             webSocket.StateChange += WebSocket_StateChange;
             webSocket.StateChange += WebSocket_EnableHeartBeat;
             webSocket.ReceiveTextMessage += WebSocket_NewTextMessage;
             heartBeatCheck.Elapsed += HeartBeatTimer_Elapsed;
+            if (Preferences.Default.obs_connect_launch)
+            {
+                btnTest.IsEnabled = false;
+                await webSocket.AutoReconnectConnectAsync();
+            }
         }
 
         private async void ButtonTest_Click(object sender, RoutedEventArgs e)
@@ -81,7 +131,9 @@ namespace Stream_Controller
 
         private void WebSocket_NewTextMessage(object sender, string message)
         {
-            txtOutput.Text += message + "\n\n";
+            Application.Current.Dispatcher.Invoke(
+            () => txtOutput.Text += message + "\n\n"
+            );
             if (autoscroll == true)
             {
                 svScroll.ScrollToBottom();
@@ -97,7 +149,8 @@ namespace Stream_Controller
                     {
                         root.TryGetProperty("status", out JsonElement status);
                         Trace.WriteLine("Server response to enabling HeartBeat: " + status.GetString());
-                    } else
+                    }
+                    else
                     {
                         Trace.WriteLine("Unexpected JSON.");
                     }
@@ -120,9 +173,18 @@ namespace Stream_Controller
         private void HeartBeatTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             heartBeatCheck.Stop();
-            Application.Current.Dispatcher.Invoke(
-                async () => await webSocket.ReconnectAsync()
-                );
+            if (Preferences.Default.obs_auto_reconnect)
+            {
+                Application.Current.Dispatcher.Invoke(
+                    async () => await webSocket.ReconnectAsync()
+                    );
+            }
+            else
+            {
+                Application.Current.Dispatcher.Invoke(
+                    async () => await webSocket.DisconnectAsync()
+                    );
+            }
         }
 
         private async void ButtonClose_Click(object sender, RoutedEventArgs e)

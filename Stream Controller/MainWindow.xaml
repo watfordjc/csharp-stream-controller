@@ -7,6 +7,21 @@
         mc:Ignorable="d"
         FontFamily="Open Sans"
         Title="Stream Control" Height="450" Width="800">
+    <StackPanel Orientation="Vertical">
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+                <MenuItem Header="_File">
+                    <MenuItem Header="E_xit" Click="MenuItemExit_Click" />
+                </MenuItem>
+                <MenuItem Header="_Edit">
+                    <MenuItem Header="_Preferences" Click="MenuItemPreferences_Click" />
+                </MenuItem>
+                <MenuItem Header="_Window">
+                    <MenuItem Header="_Audio Interfaces" IsEnabled="False" />
+                    <MenuItem Header="_OBS" Click="MenuItemObs_Click" />
+                </MenuItem>
+        </Menu>
+    </DockPanel>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="20" />
@@ -128,4 +143,5 @@
             </Grid>
         </GroupBox>
     </Grid>
+    </StackPanel>
 </Window>

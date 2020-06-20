@@ -253,5 +253,24 @@ namespace Stream_Controller
                 interface_muted.Visibility = Visibility.Collapsed;
             }
         }
+
+        private void MenuItemPreferences_Click(object sender, RoutedEventArgs e)
+        {
+            Window window = WindowUtilityLibrary.GetWindow(WindowUtilityLibrary.PREFERENCES);
+            window.Show();
+            window.Activate();
+        }
+
+        private void MenuItemExit_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void MenuItemObs_Click(object sender, RoutedEventArgs e)
+        {
+            Window window = WindowUtilityLibrary.GetWindow(WindowUtilityLibrary.WEB_SOCKETS);
+            window.Show();
+            window.Activate();
+        }
     }
 }

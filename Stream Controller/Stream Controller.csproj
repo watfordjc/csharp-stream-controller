@@ -5,6 +5,9 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Stream_Controller</RootNamespace>
     <UseWPF>true</UseWPF>
+    <Version>0.0.3</Version>
+    <NeutralLanguage>en-GB</NeutralLanguage>
+    <StartupObject>Stream_Controller.App</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,5 +16,20 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OBSWebSocketLibrary\OBSWebSocketLibrary.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Preferences.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Preferences.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Preferences.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Preferences.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
 </Project>
