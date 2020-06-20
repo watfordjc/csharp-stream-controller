@@ -36,7 +36,7 @@ namespace Stream_Controller
     {
         private readonly ObsWsClient webSocket;
         private bool autoscroll = false;
-        private System.Timers.Timer heartBeatCheck = new System.Timers.Timer(8000);
+        private readonly System.Timers.Timer heartBeatCheck = new System.Timers.Timer(8000);
         private Guid enableHeartbeatMessageId;
         private bool disposedValue;
         private int reconnectDelay;
@@ -86,7 +86,7 @@ namespace Stream_Controller
 
             webSocket.SetExponentialBackoff(Preferences.Default.obs_reconnect_min_seconds, Preferences.Default.obs_reconnect_max_minutes);
             webSocket.StateChange += WebSocket_StateChange;
-            webSocket.StateChange += WebSocket_EnableHeartBeat;
+            webSocket.StateChange += WebSocket_Connected;
             webSocket.ReceiveTextMessage += WebSocket_NewTextMessage;
             webSocket.ErrorState += WebSocket_ErrorMessage;
             heartBeatCheck.Elapsed += HeartBeatTimer_Elapsed;
@@ -106,80 +106,143 @@ namespace Stream_Controller
 
         private void WebSocket_StateChange(object sender, WebSocketState e)
         {
-            txtStatus.Text = $"Connection Status: {e.ToString()}";
+            txtStatus.Text = $"Connection Status: {e}";
             if (e == WebSocketState.Closed)
             {
                 btnTest.IsEnabled = true;
-            } else if (e == WebSocketState.None)
+            }
+            else if (e == WebSocketState.None)
             {
-                txtStatus.Text = $"Connection Status: {e.ToString()} (Current reconnect delay: {reconnectDelay} seconds)";
+                txtStatus.Text = $"Connection Status: {e} (Current reconnect delay: {reconnectDelay} seconds)";
             }
         }
 
         private void WebSocket_ErrorMessage(object sender, ObsWsClient.ErrorMessage errorMessage)
         {
-            if (errorMessage.Error != null)
+            if (errorMessage.Error == null)
             {
-                txtOutput.Text += errorMessage.Error.Message + "\n" + errorMessage.Error.InnerException.Message + "\n\n";
-                if (errorMessage.ReconnectDelay > 0)
-                {
-                    reconnectDelay = errorMessage.ReconnectDelay;
-                }
+                return;
+            }
+            txtOutput.Text += $"{errorMessage.Error.Message}\n{errorMessage.Error.InnerException.Message}\n\n";
+            if (errorMessage.ReconnectDelay > 0)
+            {
+                reconnectDelay = errorMessage.ReconnectDelay;
             }
         }
 
-        private async void WebSocket_EnableHeartBeat(object sender, WebSocketState e)
+        private async void OBS_EnableHeartBeat()
         {
-            if (e == WebSocketState.Open)
+            enableHeartbeatMessageId = Guid.NewGuid();
+            Dictionary<string, object> jsonDictionary = new Dictionary<string, object>
             {
-                webSocket.StartMessageReceiveLoop();
-                enableHeartbeatMessageId = Guid.NewGuid();
-                Dictionary<string, object> jsonDictionary = new Dictionary<string, object>();
-                jsonDictionary.Add("request-type", "SetHeartbeat");
-                jsonDictionary.Add("message-id", enableHeartbeatMessageId.ToString());
-                jsonDictionary.Add("enable", true);
-                await webSocket.SendMessageAsync(System.Text.Json.JsonSerializer.Serialize(jsonDictionary));
+                { "request-type", "SetHeartbeat" },
+                { "enable", true }
+            };
+            await OBS_Send(enableHeartbeatMessageId, jsonDictionary);
+        }
+
+        private void WebSocket_Connected(object sender, WebSocketState e)
+        {
+            if (e != WebSocketState.Open)
+            {
+                return;
             }
+
+            webSocket.StartMessageReceiveLoop();
+            OBS_EnableHeartBeat();
+            OBS_GetSourcesList();
+
+            /*
+             * TODO: OBS sourceType to sourceSettings.audio_device_id represented as NAudio property
+             * 
+             * browser_source -> N/A
+             * dshow_input -> Device.FriendlyName + ":"
+             * ffmpeg_source -> N/A
+             * game_capture -> N/A
+             * waspi_input_capture -> Device.ID
+             * waspi_output_capture -> Device.ID
+             * 
+            */
+        }
+
+        private async Task<Guid> OBS_Send(Guid guid, Dictionary<string, object> jsonDictionary)
+        {
+            jsonDictionary.Add("message-id", guid.ToString());
+            await webSocket.SendMessageAsync(JsonSerializer.Serialize(jsonDictionary));
+            return guid;
+        }
+
+        private async Task<Guid> OBS_Send(Dictionary<string, object> jsonDictionary)
+        {
+            Guid guid = Guid.NewGuid();
+            jsonDictionary.Add("message-id", guid.ToString());
+            await webSocket.SendMessageAsync(JsonSerializer.Serialize(jsonDictionary));
+            return guid;
+        }
+
+        private Guid OBS_GetSourcesList()
+        {
+            Dictionary<string, object> jsonDictionary = new Dictionary<string, object>
+            {
+                { "request-type", "GetSourcesList" }
+            };
+            return OBS_Send(jsonDictionary).Result;
+        }
+
+        private Guid OBS_GetSourceSettings(string sourceName)
+        {
+            Dictionary<string, object> jsonDictionary = new Dictionary<string, object>
+            {
+                { "request-type", "GetSourceSettings" },
+                { "sourceName", sourceName }
+            };
+            return OBS_Send(jsonDictionary).Result;
         }
 
         private void WebSocket_NewTextMessage(object sender, string message)
         {
             Application.Current.Dispatcher.Invoke(
-            () => txtOutput.Text += message + "\n\n"
-            );
+                () => txtOutput.Text += $"{message}\n\n"
+                );
             if (autoscroll == true)
             {
                 svScroll.ScrollToBottom();
             }
-            using (JsonDocument document = JsonDocument.Parse(message))
-            {
-                JsonElement root = document.RootElement;
-                JsonElement jsonUpdateType, jsonStreamTimecode, jsonRecTimecode;
-                if (!root.TryGetProperty("update-type", out jsonUpdateType))
-                {
-                    root.TryGetProperty("message-id", out JsonElement messageId);
-                    if (messageId.GetString() == enableHeartbeatMessageId.ToString())
-                    {
-                        root.TryGetProperty("status", out JsonElement status);
-                        Trace.WriteLine("Server response to enabling HeartBeat: " + status.GetString());
-                    }
-                    else
-                    {
-                        Trace.WriteLine("Unexpected JSON.");
-                    }
-                    return;
-                }
-                bool isStreaming = root.TryGetProperty("stream-timecode", out jsonStreamTimecode);
-                bool isRecording = root.TryGetProperty("rec-timecode", out jsonRecTimecode);
-                switch (jsonUpdateType.GetString())
-                {
-                    case "Heartbeat":
-                        root.TryGetProperty("pulse", out JsonElement pulse);
-                        heartBeatCheck.Enabled = pulse.GetBoolean();
-                        heartBeatCheck.Enabled = true;
 
-                        break;
+            OBS_ParseJson(message);
+        }
+
+        private void OBS_ParseJson(string message)
+        {
+            // TODO: Move JSON Handling
+
+            using JsonDocument document = JsonDocument.Parse(message);
+            JsonElement root = document.RootElement;
+            if (!root.TryGetProperty("update-type", out JsonElement jsonUpdateType))
+            {
+                root.TryGetProperty("message-id", out JsonElement messageId);
+                if (messageId.GetString() == enableHeartbeatMessageId.ToString())
+                {
+                    root.TryGetProperty("status", out JsonElement status);
+                    Trace.WriteLine($"Server response to enabling HeartBeat: {status.GetString()}");
                 }
+                else
+                {
+                    Trace.WriteLine("Unexpected JSON.");
+                }
+                return;
+            }
+
+            bool isStreaming = root.TryGetProperty("stream-timecode", out JsonElement jsonStreamTimecode);
+            bool isRecording = root.TryGetProperty("rec-timecode", out JsonElement jsonRecTimecode);
+
+            switch (jsonUpdateType.GetString())
+            {
+                case "Heartbeat":
+                    root.TryGetProperty("pulse", out JsonElement pulse);
+                    heartBeatCheck.Enabled = pulse.GetBoolean();
+                    heartBeatCheck.Enabled = true;
+                    break;
             }
         }
 
@@ -217,7 +280,7 @@ namespace Stream_Controller
             autoscroll = false;
         }
 
-        private void txtOutput_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        private void TxtOutput_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
             if (svScroll.VerticalOffset < svScroll.ScrollableHeight)
             {
