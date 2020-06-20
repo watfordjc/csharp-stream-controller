@@ -17,6 +17,8 @@ namespace OBSWebSocketLibrary
         private readonly Uri _ServerUrl = null;
         private WebSocketState _Status;
         private CancellationTokenSource connectionCancellation;
+        private readonly SemaphoreSlim sendAsyncSemaphore = new SemaphoreSlim(1);
+        private readonly SemaphoreSlim receiveAsyncSemaphore = new SemaphoreSlim(1);
         private bool disposedValue;
         private int _RetrySeconds = 5;
         private int _MaximumRetryMinutes = 10;
@@ -180,14 +182,16 @@ namespace OBSWebSocketLibrary
             await AutoReconnectConnectAsync();
         }
 
-        public async Task<bool> SendMessageAsync(String message)
+        public async Task<bool> SendMessageAsync(string message)
         {
             if (_Client.State != WebSocketState.Open)
             {
                 return false;
             }
             ArraySegment<Byte> sendBuffer = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(message));
+            await sendAsyncSemaphore.WaitAsync();
             await _Client.SendAsync(sendBuffer, WebSocketMessageType.Text, true, CancellationToken.None);
+            sendAsyncSemaphore.Release();
             return true;
         }
 
@@ -213,6 +217,7 @@ namespace OBSWebSocketLibrary
 
         public async void StartMessageReceiveLoop()
         {
+            await receiveAsyncSemaphore.WaitAsync();
             while (_Status == WebSocketState.Open || _Status == WebSocketState.CloseReceived)
             {
                 ReceivedMessage receivedMessage;
@@ -233,6 +238,7 @@ namespace OBSWebSocketLibrary
                     OnErrorState(e, -1);
                 }
             }
+            receiveAsyncSemaphore.Release();
         }
 
         #region Dispose
