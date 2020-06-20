@@ -11,14 +11,14 @@ namespace Stream_Controller.ValidationRules
     {
         public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
-            if (((string)value).Length == 0 || !int.TryParse((string)value, out int number))
-            {
-                return new ValidationResult(false, "Please enter a number.");
-            }
-            if (number <= IPEndPoint.MinPort || number > IPEndPoint.MaxPort)
+            if (
+                ((string)value).Length == 0 ||
+                !int.TryParse((string)value, out int number) ||
+                number <= IPEndPoint.MinPort ||
+                number > IPEndPoint.MaxPort
+                )
             {
                 return new ValidationResult(false, "Please enter a valid port number.");
-                
             }
             return ValidationResult.ValidResult;
         }

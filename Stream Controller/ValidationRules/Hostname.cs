@@ -10,14 +10,12 @@ namespace Stream_Controller.ValidationRules
     {
         public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
-            if (((string)value).Length == 0)
-            {
-                return new ValidationResult(false, "Please enter a hostname or IP address.");
-            }
-            if (Uri.CheckHostName((string)value) == UriHostNameType.Unknown)
+            if (
+                ((string)value).Length == 0 ||
+                Uri.CheckHostName((string)value) == UriHostNameType.Unknown
+                )
             {
                 return new ValidationResult(false, "Please enter a valid hostname or IP address.");
-                
             }
             return ValidationResult.ValidResult;
         }

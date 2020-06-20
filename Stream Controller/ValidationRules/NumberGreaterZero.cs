@@ -10,14 +10,14 @@ namespace Stream_Controller.ValidationRules
     {
         public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
-            if (((string)value).Length == 0 || !int.TryParse((string)value, out int number))
-            {
-                return new ValidationResult(false, "Please enter a number.");
-            }
-            if (number <= 0)
+            if (
+                ((string)value).Length == 0 ||
+                !int.TryParse((string)value, out int number) ||
+                number <= 0 ||
+                number > int.MaxValue
+                )
             {
                 return new ValidationResult(false, "Please enter a number greater than zero.");
-                
             }
             return ValidationResult.ValidResult;
         }
