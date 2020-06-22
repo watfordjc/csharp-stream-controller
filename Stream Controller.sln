@@ -5,7 +5,11 @@ VisualStudioVersion = 16.0.29509.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stream Controller", "Stream Controller\Stream Controller.csproj", "{C0C6BAF1-99E3-4B3B-909B-A6797594B7CD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OBSWebSocketLibrary", "OBSWebSocketLibrary\OBSWebSocketLibrary.csproj", "{F80C62D2-091A-4E47-AF3A-482A05273231}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OBSWebSocketLibrary", "OBSWebSocketLibrary\OBSWebSocketLibrary.csproj", "{F80C62D2-091A-4E47-AF3A-482A05273231}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NAudioWrapperLibrary", "NAudioWrapperLibrary\NAudioWrapperLibrary.csproj", "{5C72BE90-2B84-40E2-9A06-41A39ED4B2EE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedModels", "SharedModels\SharedModels.csproj", "{50D16C7A-0314-4D22-B621-90CD60FA3EB5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,14 @@ Global
 		{F80C62D2-091A-4E47-AF3A-482A05273231}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F80C62D2-091A-4E47-AF3A-482A05273231}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F80C62D2-091A-4E47-AF3A-482A05273231}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C72BE90-2B84-40E2-9A06-41A39ED4B2EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C72BE90-2B84-40E2-9A06-41A39ED4B2EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C72BE90-2B84-40E2-9A06-41A39ED4B2EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C72BE90-2B84-40E2-9A06-41A39ED4B2EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{50D16C7A-0314-4D22-B621-90CD60FA3EB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50D16C7A-0314-4D22-B621-90CD60FA3EB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50D16C7A-0314-4D22-B621-90CD60FA3EB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50D16C7A-0314-4D22-B621-90CD60FA3EB5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

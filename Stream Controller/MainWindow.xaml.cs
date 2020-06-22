@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using NAudio.CoreAudioApi;
 using NAudio.CoreAudioApi.Interfaces;
+using NAudioWrapperLibrary;
 
 namespace Stream_Controller
 {
@@ -21,6 +22,7 @@ namespace Stream_Controller
         private MMDevice defaultRenderDevice;
         private MMDevice defaultCaptureDevice;
         private MMDevice currentInterface;
+        private readonly AudioInterfaces audioInterfaces = AudioInterfaces.Instance;
         public MainWindow()
         {
             InitializeComponent();
