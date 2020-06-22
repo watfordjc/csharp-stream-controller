@@ -7,7 +7,6 @@
         mc:Ignorable="d"
         FontFamily="Open Sans"
         Title="Stream Control" Height="450" Width="800">
-    <StackPanel Orientation="Vertical">
     <DockPanel>
         <Menu DockPanel.Dock="Top">
                 <MenuItem Header="_File">
@@ -21,127 +20,128 @@
                     <MenuItem Header="_OBS" Click="MenuItemObs_Click" />
                 </MenuItem>
         </Menu>
-    </DockPanel>
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="20" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="auto" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="auto" />
-            <ColumnDefinition Width="20" />
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="20" />
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="20" />
-        </Grid.RowDefinitions>
-        <GroupBox x:Name="audio_interfaces" Header="Audio Interfaces" Grid.Column="1" Grid.Row="1" Margin="0,0,8,8" Padding="8" Grid.ColumnSpan="2">
-            <StackPanel Orientation="Vertical">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Interface:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                    <ComboBox x:Name="cb_interfaces" IsEditable="False" Height="auto">
-                        <ComboBox.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <VirtualizingStackPanel />
-                            </ItemsPanelTemplate>
-                        </ComboBox.ItemsPanel>
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding}" />
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
-                </StackPanel>
-                <GroupBox x:Name="current_interface" Header="Interface" Margin="8" Padding="8">
+        <StackPanel Orientation="Vertical">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="20" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="20" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="20" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="20" />
+                </Grid.RowDefinitions>
+                <GroupBox x:Name="audio_interfaces" Header="Audio Interfaces" Grid.Column="1" Grid.Row="1" Margin="0,0,8,8" Padding="8" Grid.ColumnSpan="2">
+                    <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Interface:" VerticalAlignment="Center" Margin="0 0 8 0" />
+                            <ComboBox x:Name="cb_interfaces" IsEditable="False" Height="auto">
+                                <ComboBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <VirtualizingStackPanel />
+                                    </ItemsPanelTemplate>
+                                </ComboBox.ItemsPanel>
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding FriendlyName}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+                        <GroupBox x:Name="current_interface" Header="Interface" Margin="8" Padding="8" DataContext="{Binding ElementName=cb_interfaces, Path=SelectedItem}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" VerticalAlignment="Center" Margin="0 0 8 0" />
+                                <TextBlock Grid.Row="0" Grid.Column="1" x:Name="interface_name" Text="{Binding FriendlyName}" />
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Type:" VerticalAlignment="Center" Margin="0 0 8 0" />
+                                <TextBlock Grid.Row="1" Grid.Column="1" x:Name="interface_type" Text="{Binding DataFlow}" />
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="State:" VerticalAlignment="Center" Margin="0 0 8 0" />
+                                <TextBlock Grid.Row="2" Grid.Column="1" x:Name="interface_state" Text="{Binding State}" />
+                                <TextBlock Grid.Row="3" Grid.Column="0" x:Name="interface_volume_label" Text="Volume:" VerticalAlignment="Center" Margin="0 0 8 0" />
+                                <TextBlock Grid.Row="3" Grid.Column="1" x:Name="interface_volume" Text="{Binding Volume}" />
+                                <TextBlock Grid.Row="4" Grid.Column="0" x:Name="interface_muted_label" Text="Muted:" VerticalAlignment="Center" Margin="0 0 8 0" />
+                                <TextBlock Grid.Row="4" Grid.Column="1" x:Name="interface_muted" Text="{Binding Muted}" />
+                            </Grid>
+                        </GroupBox>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                        </Grid>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox x:Name="group_default_render" Header="Default Render Interface" Grid.Column="1" Grid.Row="2" Margin="0,8,8,8" Padding="8" Grid.ColumnSpan="2">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="auto" />
-                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="auto" />
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
                         </Grid.RowDefinitions>
                         <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                        <TextBlock Grid.Row="0" Grid.Column="1" x:Name="interface_name" Text="{Binding}" />
+                        <TextBlock Grid.Row="0" Grid.Column="1" x:Name="render_interface_name" Text="{Binding FriendlyName}" />
                         <TextBlock Grid.Row="1" Grid.Column="0" Text="Type:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                        <TextBlock Grid.Row="1" Grid.Column="1" x:Name="interface_type" Text="{Binding}" />
+                        <TextBlock Grid.Row="1" Grid.Column="1" x:Name="render_interface_type" Text="{Binding DataFlow}" />
                         <TextBlock Grid.Row="2" Grid.Column="0" Text="State:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                        <TextBlock Grid.Row="2" Grid.Column="1" x:Name="interface_state" Text="{Binding}" />
-                        <TextBlock Grid.Row="3" Grid.Column="0" x:Name="interface_volume_label" Text="Volume:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                        <TextBlock Grid.Row="3" Grid.Column="1" x:Name="interface_volume" Text="{Binding}" />
-                        <TextBlock Grid.Row="4" Grid.Column="0" x:Name="interface_muted_label" Text="Muted:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                        <TextBlock Grid.Row="4" Grid.Column="1" x:Name="interface_muted" Text="{Binding}" />
+                        <TextBlock Grid.Row="2" Grid.Column="1" x:Name="render_interface_state" Text="{Binding State}" />
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Volume:" VerticalAlignment="Center" Margin="0 0 8 0" />
+                        <TextBlock Grid.Row="3" Grid.Column="1" x:Name="render_interface_volume" Text="{Binding Volume}" />
+                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Muted:" VerticalAlignment="Center" Margin="0 0 8 0" />
+                        <TextBlock Grid.Row="4" Grid.Column="1" x:Name="render_interface_muted" Text="{Binding Muted}" />
                     </Grid>
                 </GroupBox>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="auto" />
-                        <ColumnDefinition Width="auto" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
-                </Grid>
-            </StackPanel>
-        </GroupBox>
-        <GroupBox x:Name="group_default_render" Header="Default Render Interface" Grid.Column="1" Grid.Row="2" Margin="0,8,8,8" Padding="8" Grid.ColumnSpan="2">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="auto" />
-                    <ColumnDefinition Width="auto" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                <TextBlock Grid.Row="0" Grid.Column="1" x:Name="render_interface_name" Text="{Binding}" />
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="Type:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                <TextBlock Grid.Row="1" Grid.Column="1" x:Name="render_interface_type" Text="{Binding}" />
-                <TextBlock Grid.Row="2" Grid.Column="0" Text="State:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                <TextBlock Grid.Row="2" Grid.Column="1" x:Name="render_interface_state" Text="{Binding}" />
-                <TextBlock Grid.Row="3" Grid.Column="0" Text="Volume:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                <TextBlock Grid.Row="3" Grid.Column="1" x:Name="render_interface_volume" Text="{Binding}" />
-                <TextBlock Grid.Row="4" Grid.Column="0" Text="Muted:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                <TextBlock Grid.Row="4" Grid.Column="1" x:Name="render_interface_muted" Text="{Binding}" />
+                <GroupBox x:Name="group_default_capture" Header="Default Capture Interface" Grid.Column="3" Grid.Row="2" Margin="8" Padding="8" Grid.ColumnSpan="2">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" VerticalAlignment="Center" Margin="0 0 8 0" />
+                        <TextBlock Grid.Row="0" Grid.Column="1" x:Name="capture_interface_name" Text="{Binding FriendlyName}" />
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Type:" VerticalAlignment="Center" Margin="0 0 8 0" />
+                        <TextBlock Grid.Row="1" Grid.Column="1" x:Name="capture_interface_type" Text="{Binding DataFlow}" />
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="State:" VerticalAlignment="Center" Margin="0 0 8 0" />
+                        <TextBlock Grid.Row="2" Grid.Column="1" x:Name="capture_interface_state" Text="{Binding State}" />
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Volume:" VerticalAlignment="Center" Margin="0 0 8 0" />
+                        <TextBlock Grid.Row="3" Grid.Column="1" x:Name="capture_interface_volume" Text="{Binding Volume}" />
+                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Muted:" VerticalAlignment="Center" Margin="0 0 8 0" />
+                        <TextBlock Grid.Row="4" Grid.Column="1" x:Name="capture_interface_muted" Text="{Binding Muted}" />
+                    </Grid>
+                </GroupBox>
             </Grid>
-        </GroupBox>
-        <GroupBox x:Name="group_default_capture" Header="Default Capture Interface" Grid.Column="3" Grid.Row="2" Margin="8" Padding="8" Grid.ColumnSpan="2">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="auto" />
-                    <ColumnDefinition Width="auto" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                <TextBlock Grid.Row="0" Grid.Column="1" x:Name="capture_interface_name" Text="{Binding}" />
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="Type:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                <TextBlock Grid.Row="1" Grid.Column="1" x:Name="capture_interface_type" Text="{Binding}" />
-                <TextBlock Grid.Row="2" Grid.Column="0" Text="State:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                <TextBlock Grid.Row="2" Grid.Column="1" x:Name="capture_interface_state" Text="{Binding}" />
-                <TextBlock Grid.Row="3" Grid.Column="0" Text="Volume:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                <TextBlock Grid.Row="3" Grid.Column="1" x:Name="capture_interface_volume" Text="{Binding}" />
-                <TextBlock Grid.Row="4" Grid.Column="0" Text="Muted:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                <TextBlock Grid.Row="4" Grid.Column="1" x:Name="capture_interface_muted" Text="{Binding}" />
-            </Grid>
-        </GroupBox>
-    </Grid>
-    </StackPanel>
+        </StackPanel>
+    </DockPanel>
 </Window>

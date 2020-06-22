@@ -6,6 +6,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
+using System.Security.Principal;
+using System.Threading;
 using System.Threading.Tasks;
 using NAudio;
 using NAudio.CoreAudioApi;
@@ -14,14 +16,18 @@ using Stream_Controller.SharedModels;
 
 namespace NAudioWrapperLibrary
 {
+
     public sealed class AudioInterfaces : ObservableCollection<MMDevice>, IDisposable
     {
+        private readonly SynchronizationContext _Context;
         private static readonly MMDeviceEnumerator _Enumerator = new MMDeviceEnumerator();
         private static readonly ObservableCollection<AudioInterface> _Devices = new ObservableCollection<AudioInterface>();
-        private static readonly AudioEndpointNotificationCallback _NotificationCallback = new AudioEndpointNotificationCallback();
-        private static readonly IMMNotificationClient _NotificationClient = (IMMNotificationClient)_NotificationCallback;
+        private static AudioEndpointNotificationCallback _NotificationCallback = null;
+        private static IMMNotificationClient _NotificationClient;
+
         public AudioInterface DefaultRender { get; private set; }
         public AudioInterface DefaultCapture { get; private set; }
+        public ObservableCollection<AudioInterface> Devices { get { return _Devices; } }
 
         private static readonly Lazy<AudioInterfaces> lazySingleton =
             new Lazy<AudioInterfaces>(
@@ -31,16 +37,22 @@ namespace NAudioWrapperLibrary
 
         public static AudioInterfaces Instance { get { return lazySingleton.Value; } }
 
+        public void RegisterEndpointNotificationCallback(IMMNotificationClient notificationClient)
+        {
+            _Enumerator.RegisterEndpointNotificationCallback(notificationClient);
+        }
+
         private AudioInterfaces()
         {
+            _Context = SynchronizationContext.Current;
+            _NotificationCallback = new AudioEndpointNotificationCallback(_Context);
+            _NotificationClient = (IMMNotificationClient)_NotificationCallback;
             Initialise();
         }
 
         private async void Initialise()
         {
             await PopulateInterfaces();
-            Trace.WriteLine($"Default render device: {DefaultRender.FriendlyName}");
-            Trace.WriteLine($"Default capture device: {DefaultCapture.FriendlyName}");
         }
 
         private async Task PopulateInterfaces()
@@ -48,41 +60,72 @@ namespace NAudioWrapperLibrary
             MMDeviceCollection collection = null;
             await Task.Run(
                 () => collection = _Enumerator.EnumerateAudioEndPoints(DataFlow.All, DeviceState.All)
-                ).ConfigureAwait(false);
+                ).ContinueWith(
+            result => DevicesEnumerated(collection)
+            );
+        }
+
+        private void DevicesEnumerated(MMDeviceCollection collection)
+        {
             _Enumerator.RegisterEndpointNotificationCallback(_NotificationClient);
             foreach (MMDevice device in collection)
             {
                 AudioInterface audioDevice = new AudioInterface
                 {
-                    Device = device,
-                    FriendlyName = device.State switch
-                    {
-                        DeviceState.NotPresent => null,
-                        _ => device.FriendlyName
-                    }
+                    Device = device
                 };
-                _Devices.Add(audioDevice);
+                _Context.Send(
+                    x => Devices.Add(audioDevice)
+                , null);
             }
             UpdateDefaultDevice(DataFlow.Render, _Enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console).ID);
             UpdateDefaultDevice(DataFlow.Capture, _Enumerator.GetDefaultAudioEndpoint(DataFlow.Capture, Role.Console).ID);
         }
 
+        public delegate DataFlow OnDefaultDeviceChanged();
+
+        public event EventHandler<DataFlow> DefaultDeviceChange;
+
+        void NotifyDefaultDeviceChange(DataFlow flow)
+        {
+            _Context.Send(
+                x => DefaultDeviceChange?.Invoke(this, flow)
+            , null);
+        }
+
         private void UpdateDefaultDevice(DataFlow flow, string defaultDeviceId)
         {
-            if (flow == DataFlow.Render) {
-                Instance.DefaultRender = (from AudioInterface in _Devices
-                                          where AudioInterface.ID == defaultDeviceId
-                                          select AudioInterface).First();
-            } else if (flow == DataFlow.Capture) {
-                Instance.DefaultCapture = (from AudioInterface in _Devices
-                                           where AudioInterface.ID == defaultDeviceId
-                                           select AudioInterface).First();
+            if (flow == DataFlow.Render)
+            {
+                Instance.DefaultRender = GetAudioInterfaceById(defaultDeviceId);
+                NotifyDefaultDeviceChange(flow);
             }
+            else if (flow == DataFlow.Capture)
+            {
+                Instance.DefaultCapture = GetAudioInterfaceById(defaultDeviceId);
+                NotifyDefaultDeviceChange(flow);
+            }
+        }
+
+        public static AudioInterface GetAudioInterfaceById(string deviceId)
+        {
+            return _Devices.Where(device => device.ID == deviceId).FirstOrDefault();
+        }
+        
+        public static AudioInterface GetAudioInterfaceByVolumeNotificationGuid(Guid guid)
+        {
+            return _Devices.Where(device => device.VolumeNotificationGuid == guid).FirstOrDefault();
         }
 
         // TODO: Implement methods to propagate events
         private class AudioEndpointNotificationCallback : IMMNotificationClient
         {
+            private readonly SynchronizationContext mContext;
+
+            public AudioEndpointNotificationCallback(SynchronizationContext context)
+            {
+                mContext = context;
+            }
             void IMMNotificationClient.OnDefaultDeviceChanged(DataFlow flow, Role role, string defaultDeviceId)
             {
                 if (role != Role.Console) { return; }
@@ -91,35 +134,31 @@ namespace NAudioWrapperLibrary
 
             void IMMNotificationClient.OnDeviceAdded(string pwstrDeviceId)
             {
-                MMDevice audioDevice = _Enumerator.GetDevice(pwstrDeviceId);
                 AudioInterface device = new AudioInterface
                 {
-                    Device = audioDevice,
-                    FriendlyName = audioDevice.State switch
-                    {
-                        DeviceState.NotPresent => null,
-                        _ => audioDevice.FriendlyName
-                    }
+                    Device = _Enumerator.GetDevice(pwstrDeviceId)
                 };
-                _Devices.Add(device);
+                mContext.Send(
+                    x => _Devices.Add(device)
+                , null);
+
             }
 
             void IMMNotificationClient.OnDeviceRemoved(string deviceId)
             {
-                AudioInterface audioDevice = (from AudioInterface in _Devices
-                                              where AudioInterface.ID == deviceId
-                                              select AudioInterface).First();
-                _Devices.Remove(audioDevice);
+                mContext.Send(
+                    x => _Devices.Remove(GetAudioInterfaceById(deviceId))
+                , null);
             }
 
             void IMMNotificationClient.OnDeviceStateChanged(string deviceId, DeviceState newState)
             {
-                throw new NotImplementedException();
+                GetAudioInterfaceById(deviceId).SetProperties(newState);
             }
 
             void IMMNotificationClient.OnPropertyValueChanged(string pwstrDeviceId, PropertyKey key)
             {
-                throw new NotImplementedException();
+              //  throw new NotImplementedException();
             }
         }
 
