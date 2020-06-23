@@ -145,15 +145,23 @@ namespace WebSocketLibrary
             bool connected = false;
             connectionCancellation = new CancellationTokenSource();
             int retryMs = (int)TimeSpan.FromSeconds(_RetrySeconds).TotalMilliseconds;
+            OnErrorState(null, _RetrySeconds);
             while (!connected)
             {
+                OnStateChange(WebSocketState.Connecting);
                 try
                 {
-                    OnStateChange(WebSocketState.Connecting);
                     connected = await ConnectAsync();
-                    if (!connected)
+                }
+                catch (WebSocketException e)
+                {
+                    OnErrorState(e, retryMs / 1000);
+                    OnStateChange(_Client.State);
+                }
+                if (!connected)
+                {
+                    try
                     {
-                        OnErrorState(errorMessage.Error, retryMs / 1000);
                         _Client = new ClientWebSocket();
                         OnStateChange(_Client.State);
                         await Task.Delay(retryMs, connectionCancellation.Token);
@@ -162,11 +170,11 @@ namespace WebSocketLibrary
                             retryMs *= 2;
                         }
                     }
-                }
-                catch (TaskCanceledException)
-                {
-                    OnStateChange(WebSocketState.Closed);
-                    return false;
+                    catch (TaskCanceledException)
+                    {
+                        OnStateChange(WebSocketState.Closed);
+                        return false;
+                    }
                 }
             }
             return true;
@@ -175,7 +183,7 @@ namespace WebSocketLibrary
         /// <summary>
         /// Try to connect once (no retries).
         /// </summary>
-        /// <returns>True if connected, false if not.</returns>
+        /// <returns>True if connected.</returns>
         private async Task<bool> ConnectAsync()
         {
             if (_Client == null)
@@ -187,17 +195,9 @@ namespace WebSocketLibrary
             {
                 return true;
             }
-            try
-            {
-                await _Client.ConnectAsync(_ServerUrl, connectionCancellation.Token);
-                OnStateChange(_Client.State);
-                return true;
-            }
-            catch (WebSocketException e)
-            {
-                errorMessage.Error = e;
-                return false;
-            }
+            await _Client.ConnectAsync(_ServerUrl, connectionCancellation.Token);
+            OnStateChange(_Client.State);
+            return true;
         }
 
         /// <summary>
@@ -235,7 +235,7 @@ namespace WebSocketLibrary
             _Client = new ClientWebSocket();
             await AutoReconnectConnectAsync();
         }
-        
+
         /// <summary>
         /// Send a WebSocket message.
         /// </summary>

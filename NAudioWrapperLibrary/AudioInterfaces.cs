@@ -126,6 +126,7 @@ namespace NAudioWrapperLibrary
             {
                 mContext = context;
             }
+
             void IMMNotificationClient.OnDefaultDeviceChanged(DataFlow flow, Role role, string defaultDeviceId)
             {
                 if (role != Role.Console) { return; }
@@ -141,7 +142,6 @@ namespace NAudioWrapperLibrary
                 mContext.Send(
                     x => _Devices.Add(device)
                 , null);
-
             }
 
             void IMMNotificationClient.OnDeviceRemoved(string deviceId)
