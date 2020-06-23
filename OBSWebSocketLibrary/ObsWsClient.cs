@@ -112,7 +112,7 @@ namespace OBSWebSocketLibrary
             OBS_ParseJson(message);
         }
 
-        private void OBS_ParseJson(string message)
+        private async void OBS_ParseJson(string message)
         {
             using JsonDocument document = JsonDocument.Parse(message);
             JsonElement root = document.RootElement;
@@ -127,13 +127,14 @@ namespace OBSWebSocketLibrary
                     Trace.WriteLine($"Received response to message of type {requestType} with GUID {guid}.");
                     sentMessageGuids.Remove(guid);
                 }
-                switch (requestType)
+                Enum.TryParse(requestType, out Data.Requests reqType);
+                switch (reqType)
                 {
-                    case "SetHeartbeat":
+                    case Data.Requests.SetHeartbeat:
                         root.TryGetProperty("status", out JsonElement status);
                         Trace.WriteLine($"Server response to enabling HeartBeat: {status.GetString()}");
                         break;
-                    case "GetSourcesList":
+                    case Data.Requests.GetSourcesList:
                         Models.GetSourcesListReply reply = JsonSerializer.Deserialize<Models.GetSourcesListReply>(message);
                         foreach (Models.Source device in reply.Sources)
                         {
@@ -153,13 +154,22 @@ namespace OBSWebSocketLibrary
             Trace.WriteLine($"Received a message of type {jsonUpdateType}.");
             bool isStreaming = root.TryGetProperty("stream-timecode", out JsonElement jsonStreamTimecode);
             bool isRecording = root.TryGetProperty("rec-timecode", out JsonElement jsonRecTimecode);
+            Enum.TryParse(jsonUpdateType.GetString(), out Data.Events eventType);
 
-            switch (jsonUpdateType.GetString())
+            switch (eventType)
             {
-                case "Heartbeat":
+                case Data.Events.Heartbeat:
                     root.TryGetProperty("pulse", out JsonElement pulse);
                     heartBeatCheck.Enabled = pulse.GetBoolean();
                     heartBeatCheck.Enabled = true;
+                    break;
+                case Data.Events.Exiting:
+                    await DisconnectAsync();
+                    await Task.Delay(10000);
+                    if (AutoReconnect)
+                    {
+                        await AutoReconnectConnectAsync();
+                    }
                     break;
             }
         }
