@@ -82,5 +82,11 @@ namespace Stream_Controller.SharedModels
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
+
+        public void NotifyMMAudioPropertyChanged(SynchronizationContext context, PropertyKey key)
+        {
+            // TODO: Is property name format correct?
+            PropertyChanged?.Invoke(context, new PropertyChangedEventArgs("Device.Properties[" + key + "]"));
+        }
     }
 }

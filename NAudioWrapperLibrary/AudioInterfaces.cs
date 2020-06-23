@@ -158,7 +158,7 @@ namespace NAudioWrapperLibrary
 
             void IMMNotificationClient.OnPropertyValueChanged(string pwstrDeviceId, PropertyKey key)
             {
-              //  throw new NotImplementedException();
+                GetAudioInterfaceById(pwstrDeviceId).NotifyMMAudioPropertyChanged(mContext, key);
             }
         }
 
