@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Net.Sockets;
 using System.Net.WebSockets;
 using System.Runtime.CompilerServices;
+using System.Runtime.Serialization.Json;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -37,9 +38,9 @@ namespace Stream_Controller
         private readonly ObsWsClient webSocket;
         private bool autoscroll = false;
         private readonly System.Timers.Timer heartBeatCheck = new System.Timers.Timer(8000);
-        private Guid enableHeartbeatMessageId;
         private bool disposedValue;
         private int reconnectDelay;
+        private readonly Dictionary<Guid, string> sentMessageGuids = new Dictionary<Guid, string>();
 
         public WebSocketTest()
         {
@@ -137,13 +138,12 @@ namespace Stream_Controller
 
         private async void OBS_EnableHeartBeat()
         {
-            enableHeartbeatMessageId = Guid.NewGuid();
             Dictionary<string, object> jsonDictionary = new Dictionary<string, object>
             {
                 { "request-type", "SetHeartbeat" },
                 { "enable", true }
             };
-            await OBS_Send(enableHeartbeatMessageId, jsonDictionary);
+            await OBS_Send(jsonDictionary);
         }
 
         private void WebSocket_Connected(object sender, WebSocketState e)
@@ -170,16 +170,11 @@ namespace Stream_Controller
             */
         }
 
-        private async Task<Guid> OBS_Send(Guid guid, Dictionary<string, object> jsonDictionary)
-        {
-            jsonDictionary.Add("message-id", guid.ToString());
-            await webSocket.SendMessageAsync(JsonSerializer.Serialize(jsonDictionary));
-            return guid;
-        }
-
         private async Task<Guid> OBS_Send(Dictionary<string, object> jsonDictionary)
         {
             Guid guid = Guid.NewGuid();
+            jsonDictionary.TryGetValue("request-type", out object requestType);
+            sentMessageGuids.Add(guid, requestType.ToString());
             jsonDictionary.Add("message-id", guid.ToString());
             await webSocket.SendMessageAsync(JsonSerializer.Serialize(jsonDictionary));
             return guid;
@@ -223,21 +218,41 @@ namespace Stream_Controller
 
             using JsonDocument document = JsonDocument.Parse(message);
             JsonElement root = document.RootElement;
-            if (!root.TryGetProperty("update-type", out JsonElement jsonUpdateType))
+            bool hasGuid = root.TryGetProperty("message-id", out JsonElement requestTypeJson);
+            bool hasUpdateType = root.TryGetProperty("update-type", out JsonElement jsonUpdateType);
+            // Handle responses to sent messages
+            if (hasGuid)
             {
-                root.TryGetProperty("message-id", out JsonElement messageId);
-                if (messageId.GetString() == enableHeartbeatMessageId.ToString())
+                Guid guid = Guid.Parse(requestTypeJson.GetString());
+                if (sentMessageGuids.TryGetValue(guid, out string requestType))
                 {
-                    root.TryGetProperty("status", out JsonElement status);
-                    Trace.WriteLine($"Server response to enabling HeartBeat: {status.GetString()}");
+                    Trace.WriteLine($"Received response to message of type {requestType} with GUID {guid}.");
+                    sentMessageGuids.Remove(guid);
                 }
-                else
+                switch (requestType)
                 {
-                    Trace.WriteLine("Unexpected JSON.");
+                    case "SetHeartbeat":
+                        root.TryGetProperty("status", out JsonElement status);
+                        Trace.WriteLine($"Server response to enabling HeartBeat: {status.GetString()}");
+                        break;
+                    case "GetSourcesList":
+                        OBSWebSocketLibrary.Models.GetSourcesListReply reply = JsonSerializer.Deserialize<OBSWebSocketLibrary.Models.GetSourcesListReply>(message);
+                        foreach (OBSWebSocketLibrary.Models.Source device in reply.Sources)
+                        {
+                            OBS_GetSourceSettings(device.Name);
+                        }
+                        break;
                 }
                 return;
             }
+            else if (!hasUpdateType)
+            {
+                Trace.WriteLine("Unexpected JSON.");
+                return;
+            }
+            // Handle responses with an update-type
 
+            Trace.WriteLine($"Received a message of type {jsonUpdateType}.");
             bool isStreaming = root.TryGetProperty("stream-timecode", out JsonElement jsonStreamTimecode);
             bool isRecording = root.TryGetProperty("rec-timecode", out JsonElement jsonRecTimecode);
 
