@@ -7,6 +7,9 @@
         mc:Ignorable="d"
         FontFamily="Open Sans"
         Title="Stream Control" Height="450" Width="800">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+    </Window.Resources>
     <DockPanel>
         <Menu DockPanel.Dock="Top">
                 <MenuItem Header="_File">
@@ -72,10 +75,10 @@
                                 <TextBlock Grid.Row="1" Grid.Column="1" x:Name="interface_type" Text="{Binding DataFlow}" />
                                 <TextBlock Grid.Row="2" Grid.Column="0" Text="State:" VerticalAlignment="Center" Margin="0 0 8 0" />
                                 <TextBlock Grid.Row="2" Grid.Column="1" x:Name="interface_state" Text="{Binding State}" />
-                                <TextBlock Grid.Row="3" Grid.Column="0" x:Name="interface_volume_label" Text="Volume:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                                <TextBlock Grid.Row="3" Grid.Column="1" x:Name="interface_volume" Text="{Binding Volume}" />
-                                <TextBlock Grid.Row="4" Grid.Column="0" x:Name="interface_muted_label" Text="Muted:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                                <TextBlock Grid.Row="4" Grid.Column="1" x:Name="interface_muted" Text="{Binding Muted}" />
+                                <TextBlock Grid.Row="3" Grid.Column="0" x:Name="interface_volume_label" Text="Volume:" VerticalAlignment="Center" Margin="0 0 8 0" Visibility="{Binding IsActive, Converter={StaticResource BoolToVisibility}}" />
+                                <TextBlock Grid.Row="3" Grid.Column="1" x:Name="interface_volume" Text="{Binding Volume,StringFormat={}{0}%}" Visibility="{Binding IsActive, Converter={StaticResource BoolToVisibility}}" />
+                                <TextBlock Grid.Row="4" Grid.Column="0" x:Name="interface_muted_label" Text="Muted:" VerticalAlignment="Center" Margin="0 0 8 0" Visibility="{Binding IsActive, Converter={StaticResource BoolToVisibility}}" />
+                                <TextBlock Grid.Row="4" Grid.Column="1" x:Name="interface_muted" Text="{Binding Muted}" Visibility="{Binding IsActive, Converter={StaticResource BoolToVisibility}}" />
                             </Grid>
                         </GroupBox>
                         <Grid>
@@ -111,7 +114,7 @@
                         <TextBlock Grid.Row="2" Grid.Column="0" Text="State:" VerticalAlignment="Center" Margin="0 0 8 0" />
                         <TextBlock Grid.Row="2" Grid.Column="1" x:Name="render_interface_state" Text="{Binding State}" />
                         <TextBlock Grid.Row="3" Grid.Column="0" Text="Volume:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                        <TextBlock Grid.Row="3" Grid.Column="1" x:Name="render_interface_volume" Text="{Binding Volume}" />
+                        <TextBlock Grid.Row="3" Grid.Column="1" x:Name="render_interface_volume" Text="{Binding Volume,StringFormat={}{0}%}" />
                         <TextBlock Grid.Row="4" Grid.Column="0" Text="Muted:" VerticalAlignment="Center" Margin="0 0 8 0" />
                         <TextBlock Grid.Row="4" Grid.Column="1" x:Name="render_interface_muted" Text="{Binding Muted}" />
                     </Grid>
@@ -136,7 +139,7 @@
                         <TextBlock Grid.Row="2" Grid.Column="0" Text="State:" VerticalAlignment="Center" Margin="0 0 8 0" />
                         <TextBlock Grid.Row="2" Grid.Column="1" x:Name="capture_interface_state" Text="{Binding State}" />
                         <TextBlock Grid.Row="3" Grid.Column="0" Text="Volume:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                        <TextBlock Grid.Row="3" Grid.Column="1" x:Name="capture_interface_volume" Text="{Binding Volume}" />
+                        <TextBlock Grid.Row="3" Grid.Column="1" x:Name="capture_interface_volume" Text="{Binding Volume,StringFormat={}{0}%}" />
                         <TextBlock Grid.Row="4" Grid.Column="0" Text="Muted:" VerticalAlignment="Center" Margin="0 0 8 0" />
                         <TextBlock Grid.Row="4" Grid.Column="1" x:Name="capture_interface_muted" Text="{Binding Muted}" />
                     </Grid>

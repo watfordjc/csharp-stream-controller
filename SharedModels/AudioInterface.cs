@@ -24,6 +24,7 @@ namespace Stream_Controller.SharedModels
         public bool Muted { get; set; }
         public Guid VolumeNotificationGuid { get; set; }
         public string Audio_device_name { get; set; }
+        public bool IsActive { get; private set; }
 
         public MMDevice Device
         {
@@ -61,6 +62,10 @@ namespace Stream_Controller.SharedModels
                 Volume = Math.Round(Device.AudioEndpointVolume.MasterVolumeLevelScalar * 100f);
                 Device.AudioEndpointVolume.OnVolumeNotification += VolumeChanged;
                 Muted = Device.AudioEndpointVolume.Mute;
+                IsActive = true;
+            } else
+            {
+                IsActive = false;
             }
             // Notify all properties have changed.
             OnPropertyChanged(null);
