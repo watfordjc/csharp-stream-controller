@@ -117,7 +117,9 @@ namespace Stream_Controller
             }
             else if (e == WebSocketState.None)
             {
-                txtStatus.Text = $"Connection Status: {e} (Current reconnect delay: {reconnectDelay} seconds)";
+                txtStatus.Text = webSocket.AutoReconnect
+                    ? $"Connection Status: {e} (Current reconnect delay: {reconnectDelay} seconds)"
+                    : $"Connection Status: {e}";
             }
         }
 
