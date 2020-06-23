@@ -49,12 +49,12 @@ namespace Stream_Controller
 
         private void MenuItemPreferences_Click(object sender, RoutedEventArgs e)
         {
-            WindowUtilityLibrary.MakeWindowActive(WindowUtilityLibrary.PREFERENCES);
+            WindowUtilityLibrary.MakeWindowActive(WindowUtilityLibrary.WindowType.PreferencesWindow);
         }
 
         private void MenuItemObs_Click(object sender, RoutedEventArgs e)
         {
-            WindowUtilityLibrary.MakeWindowActive(WindowUtilityLibrary.WEB_SOCKETS);
+            WindowUtilityLibrary.MakeWindowActive(WindowUtilityLibrary.WindowType.WebSocketTest);
         }
 
         private void MenuItemExit_Click(object sender, RoutedEventArgs e)

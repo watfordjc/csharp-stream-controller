@@ -17,25 +17,20 @@ namespace Stream_Controller
     static class WindowUtilityLibrary
     {
         /* Constants for Types of windows in the application. */
-        public const int MAIN_WINDOW = 1; // MainWindow.xaml
-        public const int PREFERENCES = 2; // PreferencesWindow.xaml
-        public const int WEB_SOCKETS = 3; // WebSocketTest.xaml
-
-        /* List containing the above constants for assertion sanity checking. */
-        private static readonly List<int> windowTypes = new List<int>
+        public enum WindowType
         {
-            MAIN_WINDOW,
-            PREFERENCES,
-            WEB_SOCKETS
-        };
+            MainWindow = 0,
+            PreferencesWindow = 1,
+            WebSocketTest = 2
+        }
 
         /// <summary>
         /// Show a new or existing Window and makes it active.
         /// </summary>
-        /// <param name="windowType">A constant for the Window Type, defined in WindowUtilityLibrary.</param>
-        public static void MakeWindowActive(int windowType)
+        /// <param name="windowType">A constant for the WindowType, defined in WindowUtilityLibrary.</param>
+        public static void MakeWindowActive(WindowType windowType)
         {
-            Debug.Assert(windowTypes.Contains(windowType), "Unrecognised window type.");
+            Debug.Assert(Enum.IsDefined(typeof(WindowType), windowType), "Unrecognised window type.");
             Window window = GetWindow(windowType);
             if (window == null)
             {
@@ -48,16 +43,16 @@ namespace Stream_Controller
         /// <summary>
         /// Get an existing Window or create a new one.
         /// </summary>
-        /// <param name="windowType">A constant for the Window Type, defined in WindowUtilityLibrary.</param>
+        /// <param name="windowType">A constant for the WindowType, defined in WindowUtilityLibrary.</param>
         /// <returns>A Window of the specified Type.</returns>
-        public static Window GetWindow(int windowType)
+        public static Window GetWindow(WindowType windowType)
         {
-            Debug.Assert(windowTypes.Contains(windowType), "Unrecognised window type.");
+            Debug.Assert(Enum.IsDefined(typeof(WindowType), windowType), "Unrecognised window type.");
             IEnumerable<Window> windows = windowType switch
             {
-                MAIN_WINDOW => Application.Current.Windows.OfType<MainWindow>(),
-                PREFERENCES => Application.Current.Windows.OfType<PreferencesWindow>(),
-                WEB_SOCKETS => Application.Current.Windows.OfType<WebSocketTest>(),
+                WindowType.MainWindow => Application.Current.Windows.OfType<MainWindow>(),
+                WindowType.PreferencesWindow => Application.Current.Windows.OfType<PreferencesWindow>(),
+                WindowType.WebSocketTest => Application.Current.Windows.OfType<WebSocketTest>(),
                 _ => null,
             };
             return (windows != null && windows.Count() > 0) ? windows.First() : GetNewWindow(windowType);
@@ -66,16 +61,16 @@ namespace Stream_Controller
         /// <summary>
         /// Creates a new Window.
         /// </summary>
-        /// <param name="windowType">A constant for the Window Type, defined in WindowUtilityLibrary.</param>
+        /// <param name="windowType">A constant for the WindowType, defined in WindowUtilityLibrary.</param>
         /// <returns>A new Window of the specified Type.</returns>
-        private static Window GetNewWindow(int windowType)
+        private static Window GetNewWindow(WindowType windowType)
         {
-            Debug.Assert(windowTypes.Contains(windowType), "Unrecognised window type.");
+            Debug.Assert(Enum.IsDefined(typeof(WindowType), windowType), "Unrecognised window type.");
             return windowType switch
             {
-                MAIN_WINDOW => new MainWindow(),
-                PREFERENCES => new PreferencesWindow(),
-                WEB_SOCKETS => new WebSocketTest(),
+                WindowType.MainWindow => new MainWindow(),
+                WindowType.PreferencesWindow => new PreferencesWindow(),
+                WindowType.WebSocketTest => new WebSocketTest(),
                 _ => null,
             };
         }
