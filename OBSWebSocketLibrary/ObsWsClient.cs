@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
@@ -112,7 +113,8 @@ namespace OBSWebSocketLibrary
             OBS_ParseJson(message);
         }
 
-        private async void OBS_ParseJson(string message)
+        // TODO: Avoid string assignment? JsonSerializer.DeserializeAsync takes System.IO.Stream
+        private void OBS_ParseJson(string message)
         {
             using JsonDocument document = JsonDocument.Parse(message);
             JsonElement root = document.RootElement;
@@ -135,11 +137,14 @@ namespace OBSWebSocketLibrary
                         Trace.WriteLine($"Server response to enabling HeartBeat: {status.GetString()}");
                         break;
                     case Data.Requests.GetSourcesList:
-                        Models.GetSourcesListReply reply = JsonSerializer.Deserialize<Models.GetSourcesListReply>(message);
-                        foreach (Models.Source device in reply.Sources)
+                        Models.Requests.GetSourcesList replyGetSourcesList = JsonSerializer.Deserialize<Models.Requests.GetSourcesList>(message);
+                        foreach (Models.Requests.GetSourcesList.Source device in replyGetSourcesList.Sources)
                         {
                             OBS_GetSourceSettings(device.Name);
                         }
+                        break;
+                    case Data.Requests.GetSourceSettings:
+                        Models.Requests.GetSourceSettings replyGetSourceSettings = JsonSerializer.Deserialize<Models.Requests.GetSourceSettings>(message);
                         break;
                 }
                 return;
@@ -159,17 +164,18 @@ namespace OBSWebSocketLibrary
             switch (eventType)
             {
                 case Data.Events.Heartbeat:
-                    root.TryGetProperty("pulse", out JsonElement pulse);
-                    heartBeatCheck.Enabled = pulse.GetBoolean();
+                    Models.Events.Heartbeat eventMessage = JsonSerializer.Deserialize<Models.Events.Heartbeat>(message);
+                    heartBeatCheck.Enabled = eventMessage.Pulse;
                     heartBeatCheck.Enabled = true;
                     break;
                 case Data.Events.Exiting:
+                    /*
                     await DisconnectAsync();
-                    await Task.Delay(10000);
                     if (AutoReconnect)
                     {
                         await AutoReconnectConnectAsync();
                     }
+                    */
                     break;
             }
         }
