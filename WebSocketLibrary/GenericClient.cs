@@ -247,7 +247,7 @@ namespace WebSocketLibrary
             {
                 return false;
             }
-            ArraySegment<Byte> sendBuffer = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(message));
+            ArraySegment<byte> sendBuffer = new ArraySegment<byte>(Encoding.UTF8.GetBytes(message));
             await sendAsyncSemaphore.WaitAsync();
             await _Client.SendAsync(sendBuffer, WebSocketMessageType.Text, true, CancellationToken.None);
             sendAsyncSemaphore.Release();
@@ -262,7 +262,7 @@ namespace WebSocketLibrary
         private async Task<ReceivedMessage> ReceiveMessageAsync()
         {
             ReceivedMessage receivedMessage = new ReceivedMessage();
-            ArraySegment<Byte> receiveBuffer = new ArraySegment<Byte>(new Byte[8192]);
+            ArraySegment<byte> receiveBuffer = new ArraySegment<byte>(new Byte[8192]);
 
             using (MemoryStream memoryStream = new MemoryStream())
             {
