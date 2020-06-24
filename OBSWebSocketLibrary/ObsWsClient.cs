@@ -75,7 +75,7 @@ namespace OBSWebSocketLibrary
             jsonDictionary.TryGetValue("request-type", out object requestType);
             sentMessageGuids.Add(guid, requestType.ToString());
             jsonDictionary.Add("message-id", guid.ToString());
-            await SendMessageAsync(JsonSerializer.Serialize(jsonDictionary));
+            await SendMessageAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(jsonDictionary)).AsMemory());
             return guid;
         }
 

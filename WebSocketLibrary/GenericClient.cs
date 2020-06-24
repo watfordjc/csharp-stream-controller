@@ -24,6 +24,8 @@ namespace WebSocketLibrary
         private int _MaximumRetryMinutes = 10;
         private ErrorMessage errorMessage = new ErrorMessage();
         private bool disposedValue;
+        private const int RECV_BUFFER_SIZE = 8192;
+        private const int SEND_BUFFER_SIZE = 8192;
 
         /// <summary>
         /// Object containing a WebSocketReceiveResult and a received byte[].
@@ -121,7 +123,7 @@ namespace WebSocketLibrary
         /// <param name="url">The WebSocket server URI to connect to.</param>
         public GenericClient(Uri url)
         {
-            _Client.Options.SetBuffer(8192, 8192);
+            _Client.Options.SetBuffer(RECV_BUFFER_SIZE, SEND_BUFFER_SIZE);
             _ServerUrl = url;
         }
 
@@ -241,15 +243,14 @@ namespace WebSocketLibrary
         /// </summary>
         /// <param name="message"></param>
         /// <returns>True if message sent.</returns>
-        public async Task<bool> SendMessageAsync(string message)
+        public async Task<bool> SendMessageAsync(ReadOnlyMemory<byte> message)
         {
             if (_Client.State != WebSocketState.Open)
             {
                 return false;
             }
-            ArraySegment<byte> sendBuffer = new ArraySegment<byte>(Encoding.UTF8.GetBytes(message));
             await sendAsyncSemaphore.WaitAsync();
-            await _Client.SendAsync(sendBuffer, WebSocketMessageType.Text, true, CancellationToken.None);
+            await _Client.SendAsync(message, WebSocketMessageType.Text, true, CancellationToken.None);
             sendAsyncSemaphore.Release();
             return true;
         }
@@ -262,7 +263,7 @@ namespace WebSocketLibrary
         private async Task<ReceivedMessage> ReceiveMessageAsync()
         {
             ReceivedMessage receivedMessage = new ReceivedMessage();
-            ArraySegment<byte> receiveBuffer = new ArraySegment<byte>(new Byte[8192]);
+            ArraySegment<byte> receiveBuffer = ArrayPool<byte>.Shared.Rent(RECV_BUFFER_SIZE);
 
             using (MemoryStream memoryStream = new MemoryStream())
             {
@@ -275,6 +276,8 @@ namespace WebSocketLibrary
                 memoryStream.Seek(0, SeekOrigin.Begin);
                 receivedMessage.Message = memoryStream.ToArray();
             }
+
+            ArrayPool<byte>.Shared.Return(receiveBuffer.Array);
             return receivedMessage;
         }
 
