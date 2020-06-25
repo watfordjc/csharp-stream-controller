@@ -30,16 +30,16 @@ namespace WebSocketLibrary
         /// <summary>
         /// Object containing a WebSocketReceiveResult and a received byte[].
         /// </summary>
-        private struct ReceivedMessage
+        private class ReceivedMessage
         {
             public WebSocketReceiveResult Result { get; set; }
-            public byte[] Message { get; set; }
+            public MemoryStream Message { get; set; }
         }
 
         /// <summary>
         /// Object containing an Exception and current reconnect delay.
         /// </summary>
-        public struct ErrorMessage
+        public class ErrorMessage
         {
             public Exception Error { get; set; }
             public int ReconnectDelay { get; set; }
@@ -50,8 +50,8 @@ namespace WebSocketLibrary
         public delegate WebSocketState StateChanged();
         public delegate string Error();
 
-        public event EventHandler<byte[]> ReceiveBinaryMessage;
-        public event EventHandler<string> ReceiveTextMessage;
+        public event EventHandler<MemoryStream> ReceiveBinaryMessage;
+        public event EventHandler<MemoryStream> ReceiveTextMessage;
         public event EventHandler<WebSocketState> StateChange;
         public event EventHandler<ErrorMessage> ErrorState;
 
@@ -61,9 +61,10 @@ namespace WebSocketLibrary
         /// <param name="receivedMessage">A ReceivedMessage instance.</param>
         private void ParseMessage(ReceivedMessage receivedMessage)
         {
+            receivedMessage.Message.Seek(0, SeekOrigin.Begin);
             if (receivedMessage.Result.MessageType == WebSocketMessageType.Text)
             {
-                OnReceiveTextMessage(Encoding.UTF8.GetString(receivedMessage.Message));
+                OnReceiveTextMessage(receivedMessage.Message);
             }
             else if (receivedMessage.Result.MessageType == WebSocketMessageType.Binary)
             {
@@ -75,7 +76,7 @@ namespace WebSocketLibrary
         /// Invoke event for received binary messages.
         /// </summary>
         /// <param name="message">The message as a byte[].</param>
-        protected virtual void OnReceiveBinaryMessage(byte[] message)
+        protected virtual void OnReceiveBinaryMessage(MemoryStream message)
         {
             ReceiveBinaryMessage?.Invoke(this, message);
         }
@@ -84,7 +85,7 @@ namespace WebSocketLibrary
         /// Invoke event for received text messages.
         /// </summary>
         /// <param name="message">The message as a string.</param>
-        protected virtual void OnReceiveTextMessage(string message)
+        protected virtual void OnReceiveTextMessage(MemoryStream message)
         {
             ReceiveTextMessage?.Invoke(this, message);
         }
@@ -255,27 +256,23 @@ namespace WebSocketLibrary
             return true;
         }
 
-        // TODO: Licensing - function derived from https://stackoverflow.com/questions/23773407/a-websockets-receiveasync-method-does-not-await-the-entire-message
         /// <summary>
         /// Receive a WebSocket message.
         /// </summary>
         /// <returns>A ReceivedMessage object containing Result and Message.</returns>
         private async Task<ReceivedMessage> ReceiveMessageAsync()
         {
-            ReceivedMessage receivedMessage = new ReceivedMessage();
+            ReceivedMessage receivedMessage = new ReceivedMessage
+            {
+                Message = new MemoryStream()
+            };
             ArraySegment<byte> receiveBuffer = ArrayPool<byte>.Shared.Rent(RECV_BUFFER_SIZE);
 
-            using (MemoryStream memoryStream = new MemoryStream())
+            do
             {
-                do
-                {
-                    receivedMessage.Result = await _Client.ReceiveAsync(receiveBuffer, CancellationToken.None);
-                    memoryStream.Write(receiveBuffer.Array, receiveBuffer.Offset, receivedMessage.Result.Count);
-                } while (!receivedMessage.Result.EndOfMessage);
-
-                memoryStream.Seek(0, SeekOrigin.Begin);
-                receivedMessage.Message = memoryStream.ToArray();
-            }
+                receivedMessage.Result = await _Client.ReceiveAsync(receiveBuffer, CancellationToken.None);
+                receivedMessage.Message.Write(receiveBuffer.Array, receiveBuffer.Offset, receivedMessage.Result.Count);
+            } while (!receivedMessage.Result.EndOfMessage);
 
             ArrayPool<byte>.Shared.Return(receiveBuffer.Array);
             return receivedMessage;
@@ -289,10 +286,9 @@ namespace WebSocketLibrary
             await receiveAsyncSemaphore.WaitAsync();
             while (_Status == WebSocketState.Open || _Status == WebSocketState.CloseReceived)
             {
-                ReceivedMessage receivedMessage;
                 try
                 {
-                    receivedMessage = await ReceiveMessageAsync();
+                    ReceivedMessage receivedMessage = await ReceiveMessageAsync();
                     if (receivedMessage.Result.MessageType == WebSocketMessageType.Close)
                     {
                         break;

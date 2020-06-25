@@ -24,6 +24,7 @@ namespace OBSWebSocketLibrary
         public bool AutoReconnect { get; set; }
         private readonly System.Timers.Timer heartBeatCheck = new System.Timers.Timer(8000);
         public Dictionary<Guid, string> sentMessageGuids = new Dictionary<Guid, string>();
+        private Models.Events.Heartbeat heartBeatMessage;
 
         public ObsWsClient(Uri url) : base(url)
         {
@@ -108,64 +109,85 @@ namespace OBSWebSocketLibrary
             return OBS_Send(jsonDictionary).Result;
         }
 
-        private void WebSocket_NewTextMessage(object sender, string message)
+        private void WebSocket_NewTextMessage(object sender, MemoryStream message)
         {
             OBS_ParseJson(message);
         }
 
-        // TODO: Avoid string assignment? JsonSerializer.DeserializeAsync takes System.IO.Stream
-        private void OBS_ParseJson(string message)
+        private JsonDocument GetJsonDocumentFromMemoryStream(MemoryStream stream)
         {
-            using JsonDocument document = JsonDocument.Parse(message);
+            stream.Seek(0, SeekOrigin.Begin);
+            Span<byte> messageBytes = ArrayPool<byte>.Shared.Rent((int)stream.Length);
+            stream.Read(messageBytes);
+            JsonDocument document = JsonDocument.Parse(messageBytes.Slice(0, (int)stream.Length).ToArray());
+            ArrayPool<byte>.Shared.Return(messageBytes.ToArray());
+            return document;
+        }
+
+        private void OBS_ParseJson(MemoryStream message)
+        {
+            using JsonDocument document = GetJsonDocumentFromMemoryStream(message);
             JsonElement root = document.RootElement;
-            bool hasGuid = root.TryGetProperty("message-id", out JsonElement requestTypeJson);
-            bool hasUpdateType = root.TryGetProperty("update-type", out JsonElement jsonUpdateType);
-            // TODO: Handle responses to sent messages
-            if (hasGuid)
+
+            if (root.TryGetProperty("message-id", out JsonElement messageIdJson))
             {
-                Guid guid = Guid.Parse(requestTypeJson.GetString());
+                Guid.TryParse(messageIdJson.GetString(), out Guid guid);
+                root.TryGetProperty("status", out JsonElement statusJson);
                 if (sentMessageGuids.TryGetValue(guid, out string requestType))
                 {
-                    Trace.WriteLine($"Received response to message of type {requestType} with GUID {guid}.");
+                    Trace.WriteLine($"Received response to message of type {requestType} with GUID {guid} - {statusJson.GetString()}.");
                     sentMessageGuids.Remove(guid);
                 }
                 Enum.TryParse(requestType, out Data.Requests reqType);
-                switch (reqType)
-                {
-                    case Data.Requests.SetHeartbeat:
-                        root.TryGetProperty("status", out JsonElement status);
-                        Trace.WriteLine($"Server response to enabling HeartBeat: {status.GetString()}");
-                        break;
-                    case Data.Requests.GetSourcesList:
-                        Models.Requests.GetSourcesList replyGetSourcesList = JsonSerializer.Deserialize<Models.Requests.GetSourcesList>(message);
-                        foreach (Models.Requests.GetSourcesList.Source device in replyGetSourcesList.Sources)
-                        {
-                            OBS_GetSourceSettings(device.Name);
-                        }
-                        break;
-                    case Data.Requests.GetSourceSettings:
-                        Models.Requests.GetSourceSettings replyGetSourceSettings = JsonSerializer.Deserialize<Models.Requests.GetSourceSettings>(message);
-                        break;
-                }
-                return;
+                ParseReply(message, reqType, statusJson);
             }
-            else if (!hasUpdateType)
+            else if (root.TryGetProperty("update-type", out JsonElement updateTypeJson))
+            {
+
+                Trace.WriteLine($"Received a message of type {updateTypeJson}.");
+                bool isStreaming = root.TryGetProperty("stream-timecode", out JsonElement jsonStreamTimecode);
+                bool isRecording = root.TryGetProperty("rec-timecode", out JsonElement jsonRecTimecode);
+                Enum.TryParse(updateTypeJson.GetString(), out Data.Events eventType);
+
+                ParseEvent(message, eventType);
+            }
+            else
             {
                 Trace.WriteLine("Unexpected JSON.");
-                return;
             }
+        }
+
+        private async void ParseReply(MemoryStream message, Data.Requests requestType, JsonElement status)
+        {
+            message.Seek(0, SeekOrigin.Begin);
+            // TODO: Handle responses to sent messages
+            switch (requestType)
+            {
+                case Data.Requests.SetHeartbeat:
+                    Trace.WriteLine($"Server response to enabling HeartBeat: {status.GetString()}");
+                    break;
+                case Data.Requests.GetSourcesList:
+                    Models.Requests.GetSourcesList replyGetSourcesList = await JsonSerializer.DeserializeAsync<Models.Requests.GetSourcesList>(message);
+                    foreach (Models.Requests.GetSourcesList.Source device in replyGetSourcesList.Sources)
+                    {
+                        OBS_GetSourceSettings(device.Name);
+                    }
+                    break;
+                case Data.Requests.GetSourceSettings:
+                    Models.Requests.GetSourceSettings replyGetSourceSettings = await JsonSerializer.DeserializeAsync<Models.Requests.GetSourceSettings>(message);
+                    break;
+            }
+        }
+
+        private async void ParseEvent(MemoryStream message, Data.Events eventType)
+        {
+            message.Seek(0, SeekOrigin.Begin);
             // Handle responses with an update-type
-
-            Trace.WriteLine($"Received a message of type {jsonUpdateType}.");
-            bool isStreaming = root.TryGetProperty("stream-timecode", out JsonElement jsonStreamTimecode);
-            bool isRecording = root.TryGetProperty("rec-timecode", out JsonElement jsonRecTimecode);
-            Enum.TryParse(jsonUpdateType.GetString(), out Data.Events eventType);
-
             switch (eventType)
             {
                 case Data.Events.Heartbeat:
-                    Models.Events.Heartbeat eventMessage = JsonSerializer.Deserialize<Models.Events.Heartbeat>(message);
-                    heartBeatCheck.Enabled = eventMessage.Pulse;
+                    heartBeatMessage = await JsonSerializer.DeserializeAsync<Models.Events.Heartbeat>(message);
+                    heartBeatCheck.Enabled = heartBeatMessage.Pulse;
                     heartBeatCheck.Enabled = true;
                     break;
                 case Data.Events.Exiting:

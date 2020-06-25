@@ -38,6 +38,7 @@ namespace Stream_Controller
         private readonly ObsWsClient webSocket;
         private bool autoscroll = false;
         private int reconnectDelay;
+        private int SCROLL_BUFFER_MAX_CHARS = 8000;
 
         public WebSocketTest()
         {
@@ -139,11 +140,14 @@ namespace Stream_Controller
             webSocket.OBS_GetSourcesList();
         }
 
-        private void WebSocket_NewTextMessage(object sender, string message)
+        private void WebSocket_NewTextMessage(object sender, MemoryStream message)
         {
-            Application.Current.Dispatcher.Invoke(
-                () => txtOutput.Text += $"{message}\n\n"
-                );
+            txtOutput.AppendText(Encoding.UTF8.GetString(message.ToArray()));
+            txtOutput.AppendText("\n\n");
+            if (txtOutput.Text.Length > SCROLL_BUFFER_MAX_CHARS)
+            {
+                txtOutput.Text = txtOutput.Text.AsSpan(txtOutput.Text.Length - SCROLL_BUFFER_MAX_CHARS).ToString();
+            }
             if (autoscroll == true)
             {
                 svScroll.ScrollToBottom();
