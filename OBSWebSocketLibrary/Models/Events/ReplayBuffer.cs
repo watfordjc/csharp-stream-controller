@@ -20,6 +20,4 @@ namespace OBSWebSocketLibrary.Models.Events
     public class ReplayStopped : EventBase
     {
     }
-
-
 }
