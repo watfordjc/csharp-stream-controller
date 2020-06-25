@@ -18,14 +18,14 @@ The main purpose of the solution in this repository is to create a connectivity 
 ## Solution Projects
 Project names and purposes are subject to changes, and this README is likely to lag such changes.
 
-### NAudioWrapperLibrary
-The purpose of this library is to interface with the Windows audio devices via the Naudio library.
+### [NAudioWrapperLibrary](NAudioWrapperLibrary)
+The purpose of this library is to interface with the Windows audio devices via the [NAudio library](https://github.com/naudio/NAudio).
 
-### WebSocketLibrary
-The purpose of this library is to provide a generic websocket client (GenericClient) using System.Net.WebSockets.ClientWebSocket.
+### [WebSocketLibrary](WebSocketLibrary)
+The purpose of this library is to provide a generic websocket client ([GenericClient](WebSocketLibrary/GenericClient.cs)) using [System.Net.WebSockets.ClientWebSocket](https://docs.microsoft.com/en-us/dotnet/api/system.net.websockets.clientwebsocket?view=netcore-3.1).
 
-### OBSWebSocketLibrary
-The purpose of this library is to provide an OBS specific implementation of WebSocketLibrary.GenericClient.
+### [OBSWebSocketLibrary](OBSWebSocketLibrary)
+The purpose of this library is to provide an [obs-websocket](https://github.com/Palakis/obs-websocket) specific implementation of [WebSocketLibrary.GenericClient](WebSocketLibrary/GenericClient.cs).
 
-### Stream Controller
+### [Stream Controller](Stream%20Controller)
 This is the user interface stuff, which at the moment is mostly for debugging the libraries.
