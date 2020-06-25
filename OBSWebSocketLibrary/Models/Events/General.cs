@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace OBSWebSocketLibrary.Models.Events
 {
-    public class Heartbeat
+    public class Heartbeat : EventBase
     {
         [JsonPropertyName("pulse")]
         public bool Pulse { get; set; }
@@ -31,5 +31,13 @@ namespace OBSWebSocketLibrary.Models.Events
         public int TotalRecordFrames { get; set; }
         [JsonPropertyName("stats")]
         public TypeDefs.ObsStats Stats { get; set; }
+    }
+
+    public class BroadcastCustomMessage : EventBase
+    {
+        [JsonPropertyName("realm")]
+        public string Realm { get; set; }
+        [JsonPropertyName("data")]
+        public object Data { get; set; }
     }
 }
