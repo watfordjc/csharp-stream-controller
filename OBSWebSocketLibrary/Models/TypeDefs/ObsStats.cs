@@ -8,7 +8,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
     public class ObsStats
     {
         [JsonPropertyName("fps")]
-        public double FPS { get; set; }
+        public double Fps { get; set; }
         [JsonPropertyName("render-total-frames")]
         public int RenderTotalFrames { get; set; }
         [JsonPropertyName("render-missed-frames")]
