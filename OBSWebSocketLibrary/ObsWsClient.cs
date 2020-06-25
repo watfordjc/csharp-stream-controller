@@ -198,6 +198,7 @@ namespace OBSWebSocketLibrary
             }
         }
 
+        #region ParseReply()
         private async void ParseReply(MemoryStream message, ObsReply obsReply)
         {
             message.Seek(0, SeekOrigin.Begin);
@@ -220,31 +221,174 @@ namespace OBSWebSocketLibrary
             }
             NewObsReply(obsReply);
         }
+        #endregion
 
+        #region ParseEvent()
         private async void ParseEvent(MemoryStream message, ObsEvent obsEvent)
         {
             message.Seek(0, SeekOrigin.Begin);
-            // Handle responses with an update-type
             switch (obsEvent.EventType)
             {
+                case Data.Events.SwitchScenes:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.SwitchScenes>(message);
+                    break;
+                case Data.Events.ScenesChanged:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.ScenesChanged>(message);
+                    break;
+                case Data.Events.SceneCollectionChanged:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.SceneCollectionChanged>(message);
+                    break;
+                case Data.Events.SceneCollectionListChanged:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.SceneCollectionListChanged>(message);
+                    break;
+                case Data.Events.SwitchTransition:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.SwitchTransition>(message);
+                    break;
+                case Data.Events.TransitionListChanged:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.TransitionListChanged>(message);
+                    break;
+                case Data.Events.TransitionDurationChanged:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.TransitionDurationChanged>(message);
+                    break;
+                case Data.Events.TransitionBegin:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.TransitionBegin>(message);
+                    break;
+                case Data.Events.TransitionEnd:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.TransitionEnd>(message);
+                    break;
+                case Data.Events.TransitionVideoEnd:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.TransitionVideoEnd>(message);
+                    break;
+                case Data.Events.ProfileChanged:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.ProfileChanged>(message);
+                    break;
+                case Data.Events.ProfileListChanged:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.ProfileListChanged>(message);
+                    break;
+                case Data.Events.StreamStarting:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.StreamStarting>(message);
+                    break;
+                case Data.Events.StreamStarted:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.StreamStarted>(message);
+                    break;
+                case Data.Events.StreamStopping:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.StreamStopping>(message);
+                    break;
+                case Data.Events.StreamStopped:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.StreamStopped>(message);
+                    break;
+                case Data.Events.StreamStatus:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.StreamStatus>(message);
+                    break;
+                case Data.Events.RecordingStarting:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.RecordingStarting>(message);
+                    break;
+                case Data.Events.RecordingStarted:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.RecordingStarted>(message);
+                    break;
+                case Data.Events.RecordingStopping:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.RecordingStopping>(message);
+                    break;
+                case Data.Events.RecordingStopped:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.RecordingStopped>(message);
+                    break;
+                case Data.Events.RecordingPaused:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.RecordingPaused>(message);
+                    break;
+                case Data.Events.RecordingResumed:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.RecordingResumed>(message);
+                    break;
+                case Data.Events.ReplayStarting:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.ReplayStarting>(message);
+                    break;
+                case Data.Events.ReplayStarted:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.ReplayStarted>(message);
+                    break;
+                case Data.Events.ReplayStopping:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.ReplayStopping>(message);
+                    break;
+                case Data.Events.ReplayStopped:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.ReplayStopped>(message);
+                    break;
+                case Data.Events.Exiting:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.Exiting>(message);
+                    break;
                 case Data.Events.Heartbeat:
                     heartBeatMessage = await JsonSerializer.DeserializeAsync<Models.Events.Heartbeat>(message);
                     obsEvent.MessageObject = heartBeatMessage;
                     heartBeatCheck.Enabled = heartBeatMessage.Pulse;
                     heartBeatCheck.Enabled = true;
                     break;
-                case Data.Events.Exiting:
-                    /*
-                    await DisconnectAsync();
-                    if (AutoReconnect)
-                    {
-                        await AutoReconnectConnectAsync();
-                    }
-                    */
+                case Data.Events.BroadcastCustomMessage:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.BroadcastCustomMessage>(message);
+                    break;
+                case Data.Events.SourceCreated:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.SourceCreated>(message);
+                    break;
+                case Data.Events.SourceDestroyed:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.SourceDestroyed>(message);
+                    break;
+                case Data.Events.SourceVolumeChanged:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.SourceVolumeChanged>(message);
+                    break;
+                case Data.Events.SourceMuteStateChanged:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.SourceMuteStateChanged>(message);
+                    break;
+                case Data.Events.SourceAudioSyncOffsetChanged:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.SourceAudioSyncOffsetChanged>(message);
+                    break;
+                case Data.Events.SourceAudioMixersChanged:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.SourceAudioMixersChanged>(message);
+                    break;
+                case Data.Events.SourceRenamed:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.SourceRenamed>(message);
+                    break;
+                case Data.Events.SourceFilterAdded:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.SourceFilterAdded>(message);
+                    break;
+                case Data.Events.SourceFilterRemoved:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.SourceFilterRemoved>(message);
+                    break;
+                case Data.Events.SourceFilterVisibilityChanged:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.SourceFilterVisibilityChanged>(message);
+                    break;
+                case Data.Events.SourceFiltersReordered:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.SourceFiltersReordered>(message);
+                    break;
+                case Data.Events.SourceOrderChanged:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.SourceOrderChanged>(message);
+                    break;
+                case Data.Events.SceneItemAdded:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.SceneItemAdded>(message);
+                    break;
+                case Data.Events.SceneItemRemoved:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.SceneItemRemoved>(message);
+                    break;
+                case Data.Events.SceneItemVisibilityChanged:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.SceneItemVisibilityChanged>(message);
+                    break;
+                case Data.Events.SceneItemLockChanged:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.SceneItemLockChanged>(message);
+                    break;
+                case Data.Events.SceneItemTransformChanged:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.SceneItemTransformChanged>(message);
+                    break;
+                case Data.Events.SceneItemSelected:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.SceneItemSelected>(message);
+                    break;
+                case Data.Events.SceneItemDeselected:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.SceneItemDeselected>(message);
+                    break;
+                case Data.Events.PreviewSceneChanged:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.PreviewSceneChanged>(message);
+                    break;
+                case Data.Events.StudioModeSwitched:
+                    obsEvent.MessageObject = await JsonSerializer.DeserializeAsync<Models.Events.StudioModeSwitched>(message);
                     break;
             }
             NewObsEvent(obsEvent);
         }
+        #endregion
 
         protected new virtual void Dispose(bool disposing)
         {
