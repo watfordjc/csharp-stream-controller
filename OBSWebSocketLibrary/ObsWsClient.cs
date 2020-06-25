@@ -32,6 +32,37 @@ namespace OBSWebSocketLibrary
             StateChange += WebSocket_Connected;
         }
 
+        public class ObsReply
+        {
+            public Guid MessageId { get; set; }
+            public Data.Requests RequestType { get; set; }
+            public object MessageObject { get; set; }
+            public string Status { get; set; }
+        }
+
+        public class ObsEvent
+        {
+            public Data.Events EventType { get; set; }
+            public object MessageObject { get; set; }
+        }
+
+        public delegate ObsReply OnNewObsReply();
+        public delegate ObsEvent OnNewObsEvent();
+
+        public event EventHandler<ObsReply> OnObsReply;
+        public event EventHandler<ObsEvent> OnObsEvent;
+
+        protected virtual void NewObsReply(ObsReply obsReply)
+        {
+            OnObsReply?.Invoke(this, obsReply);
+        }
+
+        protected virtual void NewObsEvent(ObsEvent obsEvent)
+        {
+            OnObsEvent?.Invoke(this, obsEvent);
+        }
+
+
         private void WebSocket_Connected(object sender, WebSocketState state)
         {
             if (state != WebSocketState.Open) { return; }
@@ -139,7 +170,13 @@ namespace OBSWebSocketLibrary
                     sentMessageGuids.Remove(guid);
                 }
                 Enum.TryParse(requestType, out Data.Requests reqType);
-                ParseReply(message, reqType, statusJson);
+                ObsReply obsReply = new ObsReply()
+                {
+                    MessageId = guid,
+                    RequestType = reqType,
+                    Status = statusJson.GetString()
+                };
+                ParseReply(message, obsReply);
             }
             else if (root.TryGetProperty("update-type", out JsonElement updateTypeJson))
             {
@@ -148,8 +185,12 @@ namespace OBSWebSocketLibrary
                 bool isStreaming = root.TryGetProperty("stream-timecode", out JsonElement jsonStreamTimecode);
                 bool isRecording = root.TryGetProperty("rec-timecode", out JsonElement jsonRecTimecode);
                 Enum.TryParse(updateTypeJson.GetString(), out Data.Events eventType);
+                ObsEvent obsEvent = new ObsEvent()
+                {
+                    EventType = eventType
+                };
 
-                ParseEvent(message, eventType);
+                ParseEvent(message, obsEvent);
             }
             else
             {
@@ -157,36 +198,38 @@ namespace OBSWebSocketLibrary
             }
         }
 
-        private async void ParseReply(MemoryStream message, Data.Requests requestType, JsonElement status)
+        private async void ParseReply(MemoryStream message, ObsReply obsReply)
         {
             message.Seek(0, SeekOrigin.Begin);
             // TODO: Handle responses to sent messages
-            switch (requestType)
+            switch (obsReply.RequestType)
             {
                 case Data.Requests.SetHeartbeat:
-                    Trace.WriteLine($"Server response to enabling HeartBeat: {status.GetString()}");
+                    Trace.WriteLine($"Server response to enabling HeartBeat: {obsReply.Status}");
                     break;
                 case Data.Requests.GetSourcesList:
-                    Models.Requests.GetSourcesList replyGetSourcesList = await JsonSerializer.DeserializeAsync<Models.Requests.GetSourcesList>(message);
-                    foreach (Models.Requests.GetSourcesList.Source device in replyGetSourcesList.Sources)
+                    obsReply.MessageObject = await JsonSerializer.DeserializeAsync<Models.Requests.GetSourcesList>(message);
+                    foreach (Models.Requests.GetSourcesList.Source device in (obsReply.MessageObject as Models.Requests.GetSourcesList).Sources)
                     {
                         OBS_GetSourceSettings(device.Name);
                     }
                     break;
                 case Data.Requests.GetSourceSettings:
-                    Models.Requests.GetSourceSettings replyGetSourceSettings = await JsonSerializer.DeserializeAsync<Models.Requests.GetSourceSettings>(message);
+                    obsReply.MessageObject = await JsonSerializer.DeserializeAsync<Models.Requests.GetSourceSettings>(message);
                     break;
             }
+            NewObsReply(obsReply);
         }
 
-        private async void ParseEvent(MemoryStream message, Data.Events eventType)
+        private async void ParseEvent(MemoryStream message, ObsEvent obsEvent)
         {
             message.Seek(0, SeekOrigin.Begin);
             // Handle responses with an update-type
-            switch (eventType)
+            switch (obsEvent.EventType)
             {
                 case Data.Events.Heartbeat:
                     heartBeatMessage = await JsonSerializer.DeserializeAsync<Models.Events.Heartbeat>(message);
+                    obsEvent.MessageObject = heartBeatMessage;
                     heartBeatCheck.Enabled = heartBeatMessage.Pulse;
                     heartBeatCheck.Enabled = true;
                     break;
@@ -200,6 +243,7 @@ namespace OBSWebSocketLibrary
                     */
                     break;
             }
+            NewObsEvent(obsEvent);
         }
 
         protected new virtual void Dispose(bool disposing)
