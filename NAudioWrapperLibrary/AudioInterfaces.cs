@@ -80,11 +80,21 @@ namespace NAudioWrapperLibrary
             }
             UpdateDefaultDevice(DataFlow.Render, _Enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console).ID);
             UpdateDefaultDevice(DataFlow.Capture, _Enumerator.GetDefaultAudioEndpoint(DataFlow.Capture, Role.Console).ID);
+            OnDeviceCollectionEnumerated(true);
+        }
+
+        void OnDeviceCollectionEnumerated(bool e)
+        {
+            _Context.Send(
+                x => DeviceCollectionEnumerated?.Invoke(this, e)
+            , null);
         }
 
         public delegate DataFlow OnDefaultDeviceChanged();
+        public delegate bool OnDevicesEnumerated();
 
         public event EventHandler<DataFlow> DefaultDeviceChange;
+        public event EventHandler<bool> DeviceCollectionEnumerated;
 
         void NotifyDefaultDeviceChange(DataFlow flow)
         {
