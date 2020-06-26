@@ -4,19 +4,19 @@ using System.Text;
 
 namespace OBSWebSocketLibrary.Models.RequestReplies
 {
-    public class StartStopReplayBuffer : RequestBase
+    public class StartStopReplayBuffer : RequestReplyBase
     {
     }
 
-    public class StartReplayBuffer : RequestBase
+    public class StartReplayBuffer : RequestReplyBase
     {
     }
 
-    public class StopReplayBuffer : RequestBase
+    public class StopReplayBuffer : RequestReplyBase
     {
     }
 
-    public class SaveReplayBuffer : RequestBase
+    public class SaveReplayBuffer : RequestReplyBase
     {
     }
 }

@@ -5,31 +5,31 @@ using System.Text.Json.Serialization;
 
 namespace OBSWebSocketLibrary.Models.RequestReplies
 {
-    public class StartStopRecording : RequestBase
+    public class StartStopRecording : RequestReplyBase
     {
     }
 
-    public class StartRecording : RequestBase
+    public class StartRecording : RequestReplyBase
     {
     }
 
-    public class StopRecording : RequestBase
+    public class StopRecording : RequestReplyBase
     {
     }
 
-    public class PauseRecording : RequestBase
+    public class PauseRecording : RequestReplyBase
     {
     }
 
-    public class ResumeRecording : RequestBase
+    public class ResumeRecording : RequestReplyBase
     {
     }
 
-    public class SetRecordingFolder : RequestBase
+    public class SetRecordingFolder : RequestReplyBase
     {
     }
 
-    public class GetRecordingFolder : RequestBase
+    public class GetRecordingFolder : RequestReplyBase
     {
         [JsonPropertyName("rec-folder")]
         public string RecFolder { get; set; }

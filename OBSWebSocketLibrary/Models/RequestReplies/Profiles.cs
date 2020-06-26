@@ -5,17 +5,17 @@ using System.Text.Json.Serialization;
 
 namespace OBSWebSocketLibrary.Models.RequestReplies
 {
-    public class SetCurrentProfile : RequestBase
+    public class SetCurrentProfile : RequestReplyBase
     {
     }
 
-    public class GetCurrentProfile : RequestBase
+    public class GetCurrentProfile : RequestReplyBase
     {
         [JsonPropertyName("profile-name")]
         public string ProfileName { get; set; }
     }
 
-    public class ListProfiles : RequestBase
+    public class ListProfiles : RequestReplyBase
     {
         [JsonPropertyName("profiles")]
         public object[] Profiles { get; set; }

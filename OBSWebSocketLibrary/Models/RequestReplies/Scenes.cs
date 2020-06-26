@@ -5,11 +5,11 @@ using System.Text.Json.Serialization;
 
 namespace OBSWebSocketLibrary.Models.RequestReplies
 {
-    public class SetCurrentScene : RequestBase
+    public class SetCurrentScene : RequestReplyBase
     {
     }
 
-    public class GetCurrentScene : RequestBase
+    public class GetCurrentScene : RequestReplyBase
     {
         [JsonPropertyName("name")]
         public string Name { get; set; }
@@ -17,7 +17,7 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         public TypeDefs.SceneItem[] Sources { get; set; }
     }
 
-    public class GetSceneList : RequestBase
+    public class GetSceneList : RequestReplyBase
     {
         [JsonPropertyName("current-scene")]
         public string CurrentScene { get; set; }
@@ -25,19 +25,19 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         public TypeDefs.Scene[] Scenes { get; set; }
     }
 
-    public class ReorderSceneItems : RequestBase
+    public class ReorderSceneItems : RequestReplyBase
     {
     }
 
-    public class SetSceneTransitionOverride : RequestBase
+    public class SetSceneTransitionOverride : RequestReplyBase
     {
     }
 
-    public class RemoveSceneTransitionOverride : RequestBase
+    public class RemoveSceneTransitionOverride : RequestReplyBase
     {
     }
 
-    public class GetSceneTransitionOverride : RequestBase
+    public class GetSceneTransitionOverride : RequestReplyBase
     {
         [JsonPropertyName("transitionName")]
         public string TransitionName { get; set; }

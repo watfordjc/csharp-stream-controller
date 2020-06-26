@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace OBSWebSocketLibrary.Models.RequestReplies
 {
-    public class GetTransitionList : RequestBase
+    public class GetTransitionList : RequestReplyBase
     {
         [JsonPropertyName("current-transition")]
         public string CurrentTransition { get; set; }
@@ -18,7 +18,7 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         }
     }
 
-    public class GetCurrentTransition : RequestBase
+    public class GetCurrentTransition : RequestReplyBase
     {
         [JsonPropertyName("name")]
         public string Name { get; set; }
@@ -26,21 +26,21 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         public int Duration { get; set; }
     }
 
-    public class SetCurrentTransition : RequestBase
+    public class SetCurrentTransition : RequestReplyBase
     {
     }
 
-    public class SetTransitionDuration : RequestBase
+    public class SetTransitionDuration : RequestReplyBase
     {
     }
 
-    public class GetTransitionDuration : RequestBase
+    public class GetTransitionDuration : RequestReplyBase
     {
         [JsonPropertyName("transition-duration")]
         public int Duration { get; set; }
     }
 
-    public class GetTransitionPosition : RequestBase
+    public class GetTransitionPosition : RequestReplyBase
     {
         [JsonPropertyName("position")]
         public double Position { get; set; }

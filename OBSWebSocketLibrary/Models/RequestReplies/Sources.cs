@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace OBSWebSocketLibrary.Models.RequestReplies
 {
-    public class GetSourcesList : RequestBase
+    public class GetSourcesList : RequestReplyBase
     {
         [JsonPropertyName("sources")]
         public Source[] Sources { get; set; }
@@ -20,7 +20,7 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         }
     }
 
-    public class GetSourceTypesList : RequestBase
+    public class GetSourceTypesList : RequestReplyBase
     {
         [JsonPropertyName("types")]
         public Type[] Types { get; set; }
@@ -59,7 +59,7 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         }
     }
 
-    public class GetVolume : RequestBase
+    public class GetVolume : RequestReplyBase
     {
         [JsonPropertyName("name")]
         public string Name { get; set; }
@@ -69,11 +69,11 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         public bool Muted { get; set; }
     }
 
-    public class SetVolume : RequestBase
+    public class SetVolume : RequestReplyBase
     {
     }
 
-    public class GetMute : RequestBase
+    public class GetMute : RequestReplyBase
     {
         [JsonPropertyName("name")]
         public string Name { get; set; }
@@ -81,23 +81,23 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         public bool Muted { get; set; }
     }
 
-    public class SetMute : RequestBase
+    public class SetMute : RequestReplyBase
     {
     }
 
-    public class ToggleMute : RequestBase
+    public class ToggleMute : RequestReplyBase
     {
     }
 
-    public class SetSourceName : RequestBase
+    public class SetSourceName : RequestReplyBase
     {
     }
 
-    public class SetSyncOffset : RequestBase
+    public class SetSyncOffset : RequestReplyBase
     {
     }
 
-    public class GetSyncOffset : RequestBase
+    public class GetSyncOffset : RequestReplyBase
     {
         [JsonPropertyName("name")]
         public string Name { get; set; }
@@ -105,7 +105,7 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         public int Offset { get; set; }
     }
 
-    public class GetSourceSettings : RequestBase
+    public class GetSourceSettings : RequestReplyBase
     {
         [JsonPropertyName("sourceName")]
         public string SourceName { get; set; }
@@ -241,7 +241,7 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         }
     }
 
-    public class SetSourceSettings : RequestBase
+    public class SetSourceSettings : RequestReplyBase
     {
         [JsonPropertyName("sourceName")]
         public string SourceName { get; set; }
@@ -376,7 +376,7 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
             }
         }
     }
-    public class GetTextGDIPlusProperties : RequestBase
+    public class GetTextGDIPlusProperties : RequestReplyBase
     {
         [JsonPropertyName("source")]
         public string Source { get; set; }
@@ -428,11 +428,11 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         public bool Vertical { get; set; }
     }
 
-    public class SetTextGDIPlusProperties : RequestBase
+    public class SetTextGDIPlusProperties : RequestReplyBase
     {
     }
 
-    public class GetTextFreetype2Properties : RequestBase
+    public class GetTextFreetype2Properties : RequestReplyBase
     {
         [JsonPropertyName("source")]
         public string Source { get; set; }
@@ -460,11 +460,11 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         public bool WordWrap { get; set; }
     }
 
-    public class SetTextFreetype2Properties : RequestBase
+    public class SetTextFreetype2Properties : RequestReplyBase
     {
     }
 
-    public class GetBrowserSourceProperties : RequestBase
+    public class GetBrowserSourceProperties : RequestReplyBase
     {
         [JsonPropertyName("source")]
         public string Source { get; set; }
@@ -486,11 +486,11 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         public bool Shutdown { get; set; }
     }
 
-    public class SetBrowserSourceProperties : RequestBase
+    public class SetBrowserSourceProperties : RequestReplyBase
     {
     }
 
-    public class GetSpecialSources : RequestBase
+    public class GetSpecialSources : RequestReplyBase
     {
         [JsonPropertyName("desktop-1")]
         public string Desktop1 { get; set; }
@@ -504,7 +504,7 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         public string Mic3 { get; set; }
     }
 
-    public class GetSourceFilters : RequestBase
+    public class GetSourceFilters : RequestReplyBase
     {
         [JsonPropertyName("filters")]
         public Filter[] Filters { get; set; }
@@ -524,7 +524,7 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         }
     }
 
-    public class GetSourceFilterInfo : RequestBase
+    public class GetSourceFilterInfo : RequestReplyBase
     {
         [JsonPropertyName("enabled")]
         public bool Enabled { get; set; }
@@ -539,39 +539,39 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         }
     }
 
-    public class AddFilterToSource : RequestBase
+    public class AddFilterToSource : RequestReplyBase
     {
     }
 
-    public class RemoveFilterFromSource : RequestBase
+    public class RemoveFilterFromSource : RequestReplyBase
     {
     }
 
-    public class ReorderSourceFilter : RequestBase
+    public class ReorderSourceFilter : RequestReplyBase
     {
     }
 
-    public class MoveSourceFilter : RequestBase
+    public class MoveSourceFilter : RequestReplyBase
     {
     }
 
-    public class SetSourceFilterSettings : RequestBase
+    public class SetSourceFilterSettings : RequestReplyBase
     {
     }
 
-    public class SetSourceFilterVisibility : RequestBase
+    public class SetSourceFilterVisibility : RequestReplyBase
     {
     }
 
-    public class GetAudioMonitorType : RequestBase
+    public class GetAudioMonitorType : RequestReplyBase
     {
     }
 
-    public class SetAudioMonitorType : RequestBase
+    public class SetAudioMonitorType : RequestReplyBase
     {
     }
 
-    public class TakeSourceScreenshot : RequestBase
+    public class TakeSourceScreenshot : RequestReplyBase
     {
         [JsonPropertyName("sourceName")]
         public string SourceName { get; set; }

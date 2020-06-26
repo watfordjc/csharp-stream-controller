@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace OBSWebSocketLibrary.Models.RequestReplies
 {
-    public abstract class RequestBase
+    public abstract class RequestReplyBase
     {
         [JsonPropertyName("message-id")]
         public string MessageId { get; set; }

@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace OBSWebSocketLibrary.Models.RequestReplies
 {
-    public class GetSceneItemProperties : RequestBase
+    public class GetSceneItemProperties : RequestReplyBase
     {
         [JsonPropertyName("name")]
         public string Name { get; set; }
@@ -61,35 +61,35 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         public TypeDefs.SceneItemTransform[] GroupChildren { get; set; }
     }
 
-    public class SetSceneItemProperties : RequestBase
+    public class SetSceneItemProperties : RequestReplyBase
     {
     }
 
-    public class ResetSceneItem : RequestBase
+    public class ResetSceneItem : RequestReplyBase
     {
     }
 
-    public class SetSceneItemRender : RequestBase
+    public class SetSceneItemRender : RequestReplyBase
     {
     }
 
-    public class SetSceneItemPosition : RequestBase
+    public class SetSceneItemPosition : RequestReplyBase
     {
     }
 
-    public class SetSceneItemTransform : RequestBase
+    public class SetSceneItemTransform : RequestReplyBase
     {
     }
 
-    public class SetSceneItemCrop : RequestBase
+    public class SetSceneItemCrop : RequestReplyBase
     {
     }
 
-    public class DeleteSceneItem : RequestBase
+    public class DeleteSceneItem : RequestReplyBase
     {
     }
 
-    public class DuplicateSceneItem : RequestBase
+    public class DuplicateSceneItem : RequestReplyBase
     {
         [JsonPropertyName("scene")]
         public string Scene { get; set; }

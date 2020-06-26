@@ -5,11 +5,11 @@ using System.Text.Json.Serialization;
 
 namespace OBSWebSocketLibrary.Models.RequestReplies
 {
-    public class GetStudioModeStatus : RequestBase
+    public class GetStudioModeStatus : RequestReplyBase
     {
     }
 
-    public class GetPreviewScene : RequestBase
+    public class GetPreviewScene : RequestReplyBase
     {
         [JsonPropertyName("name")]
         public string Name { get; set; }
@@ -17,23 +17,23 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         public TypeDefs.SceneItem[] Sources { get; set; }
     }
 
-    public class SetPreviewScene : RequestBase
+    public class SetPreviewScene : RequestReplyBase
     {
     }
 
-    public class TransitionToProgram : RequestBase
+    public class TransitionToProgram : RequestReplyBase
     {
     }
 
-    public class EnableStudioMode : RequestBase
+    public class EnableStudioMode : RequestReplyBase
     {
     }
 
-    public class DisableStudioMode : RequestBase
+    public class DisableStudioMode : RequestReplyBase
     {
     }
 
-    public class ToggleStudioMode : RequestBase
+    public class ToggleStudioMode : RequestReplyBase
     {
     }
 }

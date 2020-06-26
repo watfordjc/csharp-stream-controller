@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace OBSWebSocketLibrary.Models.RequestReplies
 {
-    public class GetStreamingStatus : RequestBase
+    public class GetStreamingStatus : RequestReplyBase
     {
         [JsonPropertyName("streaming")]
         public bool Streaming { get; set; }
@@ -19,23 +19,23 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         public bool PreviewOnly { get; set; }
     }
 
-    public class StartStopStreaming : RequestBase
+    public class StartStopStreaming : RequestReplyBase
     {
     }
 
-    public class StartStreaming : RequestBase
+    public class StartStreaming : RequestReplyBase
     {
     }
 
-    public class StopStreaming : RequestBase
+    public class StopStreaming : RequestReplyBase
     {
     }
 
-    public class SetStreamSettings : RequestBase
+    public class SetStreamSettings : RequestReplyBase
     {
     }
 
-    public class GetStreamSettings : RequestBase
+    public class GetStreamSettings : RequestReplyBase
     {
         [JsonPropertyName("type")]
         public string Type { get; set; }
@@ -56,11 +56,11 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         }
     }
 
-    public class SaveStreamSettings : RequestBase
+    public class SaveStreamSettings : RequestReplyBase
     {
     }
 
-    public class SendCaptions : RequestBase
+    public class SendCaptions : RequestReplyBase
     {
     }
 }

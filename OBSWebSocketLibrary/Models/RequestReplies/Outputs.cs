@@ -5,23 +5,23 @@ using System.Text.Json.Serialization;
 
 namespace OBSWebSocketLibrary.Models.RequestReplies
 {
-    public class ListOutputs : RequestBase
+    public class ListOutputs : RequestReplyBase
     {
         [JsonPropertyName("outputs")]
         public TypeDefs.Output[] Outputs { get; set; }
     }
 
-    public class GetOutputInfo : RequestBase
+    public class GetOutputInfo : RequestReplyBase
     {
         [JsonPropertyName("outputInfo")]
         public TypeDefs.Output OutputInfo { get; set; }
     }
 
-    public class StartOutput : RequestBase
+    public class StartOutput : RequestReplyBase
     {
     }
 
-    public class StopOutput : RequestBase
+    public class StopOutput : RequestReplyBase
     {
     }
 }

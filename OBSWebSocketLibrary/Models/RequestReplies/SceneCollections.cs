@@ -5,17 +5,17 @@ using System.Text.Json.Serialization;
 
 namespace OBSWebSocketLibrary.Models.RequestReplies
 {
-    public class SetCurrentSceneCollection : RequestBase
+    public class SetCurrentSceneCollection : RequestReplyBase
     {
     }
 
-    public class GetCurrentSceneCollection : RequestBase
+    public class GetCurrentSceneCollection : RequestReplyBase
     {
         [JsonPropertyName("sc-name")]
         public string ScName { get; set; }
     }
 
-    public class ListSceneCollections : RequestBase
+    public class ListSceneCollections : RequestReplyBase
     {
         [JsonPropertyName("scene-collections")]
         public string[] SceneCollections { get; set; }

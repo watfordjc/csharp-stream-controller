@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace OBSWebSocketLibrary.Models.RequestReplies
 {
-    public class GetVersion : RequestBase
+    public class GetVersion : RequestReplyBase
     {
         [JsonPropertyName("version")]
         public double Version { get; set; }
@@ -19,7 +19,7 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         public string SupportedImageExportFormats { get; set; }
     }
 
-    public class GetAuthRequired : RequestBase
+    public class GetAuthRequired : RequestReplyBase
     {
         [JsonPropertyName("authRequired")]
         public bool AuthRequired { get; set; }
@@ -29,31 +29,31 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         public string Salt { get; set; }
     }
 
-    public class Authenticate : RequestBase
+    public class Authenticate : RequestReplyBase
     {
     }
 
-    public class SetHeartbeat : RequestBase
+    public class SetHeartbeat : RequestReplyBase
     {
     }
 
-    public class SetFilenameFormatting : RequestBase
+    public class SetFilenameFormatting : RequestReplyBase
     {
     }
 
-    public class GetFilenameFormatting : RequestBase
+    public class GetFilenameFormatting : RequestReplyBase
     {
     }
 
-    public class GetStats : RequestBase
+    public class GetStats : RequestReplyBase
     {
     }
 
-    public class BroadcastCustomMessage : RequestBase
+    public class BroadcastCustomMessage : RequestReplyBase
     {
     }
 
-    public class GetVideoInfo : RequestBase
+    public class GetVideoInfo : RequestReplyBase
     {
         [JsonPropertyName("baseWidth")]
         public int BaseWidth { get; set; }
@@ -75,7 +75,7 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         public string ColorRange { get; set; }
     }
 
-    public class OpenProjector : RequestBase
+    public class OpenProjector : RequestReplyBase
     {
     }
 }
