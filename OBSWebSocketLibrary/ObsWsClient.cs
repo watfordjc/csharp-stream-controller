@@ -1,5 +1,4 @@
-﻿using OBSWebSocketLibrary.Data;
-using System;
+﻿using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.Data;
@@ -224,7 +223,7 @@ namespace OBSWebSocketLibrary
         private async void ParseReply(MemoryStream message, ObsReply obsReply)
         {
             message.Seek(0, SeekOrigin.Begin);
-            if (obsReply.Status == "ok")
+            if (obsReply.Status == "ok" && Enum.IsDefined(typeof(Data.Requests), obsReply.RequestType))
             {
                 obsReply.MessageObject = await JsonSerializer.DeserializeAsync(message, Data.RequestReply.GetType(obsReply.RequestType));
                 NewObsReply(obsReply);
