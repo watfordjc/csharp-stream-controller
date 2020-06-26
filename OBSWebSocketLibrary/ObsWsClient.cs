@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OBSWebSocketLibrary.Data;
+using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.Data;
@@ -23,7 +24,7 @@ namespace OBSWebSocketLibrary
         private bool disposedValue;
         public bool AutoReconnect { get; set; }
         private readonly System.Timers.Timer heartBeatCheck = new System.Timers.Timer(8000);
-        public Dictionary<Guid, string> sentMessageGuids = new Dictionary<Guid, string>();
+        public Dictionary<Guid, Data.Requests> sentMessageGuids = new Dictionary<Guid, Data.Requests>();
 
         public ObsWsClient(Uri url) : base(url)
         {
@@ -102,44 +103,36 @@ namespace OBSWebSocketLibrary
             }
         }
 
-        private async Task<Guid> OBS_Send(Dictionary<string, object> jsonDictionary)
+        private async Task<Guid> OBS_Send(object message)
         {
-            // TODO: Switch from Dictionary to object
-            Guid guid = Guid.NewGuid();
-            jsonDictionary.TryGetValue("request-type", out object requestType);
-            sentMessageGuids.Add(guid, requestType.ToString());
-            jsonDictionary.Add("message-id", guid.ToString());
-            await SendMessageAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(jsonDictionary)).AsMemory());
+            Guid guid = (message as Models.Requests.RequestBase).MessageId;
+            Data.Requests messageType = (message as Models.Requests.RequestBase).RequestType;
+            sentMessageGuids.Add(guid, messageType);
+            await SendMessageAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(message)));
             return guid;
         }
 
         private Guid OBS_EnableHeartBeat()
         {
-            Dictionary<string, object> jsonDictionary = new Dictionary<string, object>
+            Models.Requests.SetHeartbeat message = new Models.Requests.SetHeartbeat()
             {
-                { "request-type", "SetHeartbeat" },
-                { "enable", true }
+                Enable = true
             };
-            return OBS_Send(jsonDictionary).Result;
+            return OBS_Send(message).Result;
         }
 
         public Guid OBS_GetSourcesList()
         {
-            Dictionary<string, object> jsonDictionary = new Dictionary<string, object>
-            {
-                { "request-type", "GetSourcesList" }
-            };
-            return OBS_Send(jsonDictionary).Result;
+            return OBS_Send(new Models.Requests.GetSourcesList()).Result;
         }
 
         public Guid OBS_GetSourceSettings(string sourceName)
         {
-            Dictionary<string, object> jsonDictionary = new Dictionary<string, object>
+            Models.Requests.GetSourceSettings message = new Models.Requests.GetSourceSettings()
             {
-                { "request-type", "GetSourceSettings" },
-                { "sourceName", sourceName }
+                SourceName = sourceName
             };
-            return OBS_Send(jsonDictionary).Result;
+            return OBS_Send(message).Result;
         }
 
         private void FurtherProcessObsReply(object sender, ObsReply obsReply)
@@ -195,12 +188,12 @@ namespace OBSWebSocketLibrary
             {
                 Guid.TryParse(messageIdJson.GetString(), out Guid guid);
                 root.TryGetProperty("status", out JsonElement statusJson);
-                if (sentMessageGuids.TryGetValue(guid, out string requestType))
+                if (sentMessageGuids.TryGetValue(guid, out Data.Requests requestType))
                 {
                     Trace.WriteLine($"Received response to message of type {requestType} with GUID {guid} - {statusJson.GetString()}.");
                     sentMessageGuids.Remove(guid);
                 }
-                Enum.TryParse(requestType, out Data.Requests reqType);
+                Enum.TryParse(requestType.ToString(), out Data.Requests reqType);
                 ObsReply obsReply = new ObsReply()
                 {
                     MessageId = guid,
@@ -211,7 +204,6 @@ namespace OBSWebSocketLibrary
             }
             else if (root.TryGetProperty("update-type", out JsonElement updateTypeJson))
             {
-
                 Trace.WriteLine($"Received a message of type {updateTypeJson}.");
                 bool isStreaming = root.TryGetProperty("stream-timecode", out JsonElement jsonStreamTimecode);
                 bool isRecording = root.TryGetProperty("rec-timecode", out JsonElement jsonRecTimecode);
@@ -232,8 +224,24 @@ namespace OBSWebSocketLibrary
         private async void ParseReply(MemoryStream message, ObsReply obsReply)
         {
             message.Seek(0, SeekOrigin.Begin);
-            obsReply.MessageObject = await JsonSerializer.DeserializeAsync(message, Data.RequestReply.GetType(obsReply.RequestType));
-            NewObsReply(obsReply);
+            if (obsReply.Status == "ok")
+            {
+                obsReply.MessageObject = await JsonSerializer.DeserializeAsync(message, Data.RequestReply.GetType(obsReply.RequestType));
+                NewObsReply(obsReply);
+            }
+            else if (obsReply.Status == "error")
+            {
+                Models.RequestReplies.Error replyModel = (Models.RequestReplies.Error)await JsonSerializer.DeserializeAsync(message, typeof(Models.RequestReplies.Error));
+                ErrorMessage errorMessage = new ErrorMessage()
+                {
+                    Error = new Exception(
+                        $"The {sentMessageGuids.GetValueOrDefault(obsReply.MessageId)} request {obsReply.MessageId} was responded to by a status of {obsReply.Status}.",
+                        new Exception(replyModel.Error)
+                        ),
+                    ReconnectDelay = -1
+                };
+                base.OnErrorState(errorMessage.Error, errorMessage.ReconnectDelay);
+            }
         }
 
         private async void ParseEvent(MemoryStream message, ObsEvent obsEvent)

@@ -127,7 +127,7 @@ namespace Stream_Controller
         private void WebSocket_ErrorMessage(object sender, ObsWsClient.ErrorMessage errorMessage)
         {
             if (errorMessage.Error == null) { return; }
-            txtOutput.Text += $"{errorMessage.Error.Message}\n{errorMessage.Error.InnerException.Message}\n\n";
+            txtOutput.Text += $"{errorMessage.Error.Message}\n{errorMessage.Error.InnerException?.Message}\n\n";
             if (errorMessage.ReconnectDelay > 0)
             {
                 reconnectDelay = errorMessage.ReconnectDelay;

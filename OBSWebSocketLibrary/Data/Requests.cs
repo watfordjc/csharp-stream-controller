@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace OBSWebSocketLibrary.Data
@@ -212,6 +213,120 @@ namespace OBSWebSocketLibrary.Data
         public static Type GetType(Requests requestType)
         {
             return requestReplyDictionary.TryGetValue(requestType, out Type value) ? value : null;
+        }
+    }
+
+    public static class Request
+    {
+        private static readonly Dictionary<Requests, Type> requestDictionary = new Dictionary<Requests, Type>() {
+            { Requests.GetVersion, typeof(Models.Requests.GetVersion) },
+            { Requests.GetAuthRequired, typeof(Models.Requests.GetAuthRequired) },
+            { Requests.Authenticate, typeof(Models.Requests.Authenticate) },
+            { Requests.SetHeartbeat, typeof(Models.Requests.SetHeartbeat) },
+            { Requests.SetFilenameFormatting, typeof(Models.Requests.SetFilenameFormatting) },
+            { Requests.GetFilenameFormatting, typeof(Models.Requests.GetFilenameFormatting) },
+            { Requests.GetStats, typeof(Models.Requests.GetStats) },
+            { Requests.BroadcastCustomMessage, typeof(Models.Requests.BroadcastCustomMessage) },
+            { Requests.GetVideoInfo, typeof(Models.Requests.GetVideoInfo) },
+            { Requests.OpenProjector, typeof(Models.Requests.OpenProjector) },
+            { Requests.ListOutputs, typeof(Models.Requests.ListOutputs) },
+            { Requests.GetOutputInfo, typeof(Models.Requests.GetOutputInfo) },
+            { Requests.StartOutput, typeof(Models.Requests.StartOutput) },
+            { Requests.StopOutput, typeof(Models.Requests.StopOutput) },
+            { Requests.SetCurrentProfile, typeof(Models.Requests.SetCurrentProfile) },
+            { Requests.GetCurrentProfile, typeof(Models.Requests.GetCurrentProfile) },
+            { Requests.ListProfiles, typeof(Models.Requests.ListProfiles) },
+            { Requests.StartStopRecording, typeof(Models.Requests.StartStopRecording) },
+            { Requests.StartRecording, typeof(Models.Requests.StartRecording) },
+            { Requests.StopRecording, typeof(Models.Requests.StopRecording) },
+            { Requests.PauseRecording, typeof(Models.Requests.PauseRecording) },
+            { Requests.ResumeRecording, typeof(Models.Requests.ResumeRecording) },
+            { Requests.SetRecordingFolder, typeof(Models.Requests.SetRecordingFolder) },
+            { Requests.GetRecordingFolder, typeof(Models.Requests.GetRecordingFolder) },
+            { Requests.StartStopReplayBuffer, typeof(Models.Requests.StartStopReplayBuffer) },
+            { Requests.StartReplayBuffer, typeof(Models.Requests.StartReplayBuffer) },
+            { Requests.StopReplayBuffer, typeof(Models.Requests.StopReplayBuffer) },
+            { Requests.SaveReplayBuffer, typeof(Models.Requests.SaveReplayBuffer) },
+            { Requests.SetCurrentSceneCollection, typeof(Models.Requests.SetCurrentSceneCollection) },
+            { Requests.GetCurrentSceneCollection, typeof(Models.Requests.GetCurrentSceneCollection) },
+            { Requests.ListSceneCollections, typeof(Models.Requests.ListSceneCollections) },
+            { Requests.GetSceneItemProperties, typeof(Models.Requests.GetSceneItemProperties) },
+            { Requests.SetSceneItemProperties, typeof(Models.Requests.SetSceneItemProperties) },
+            { Requests.ResetSceneItem, typeof(Models.Requests.ResetSceneItem) },
+            { Requests.SetSceneItemRender, typeof(Models.Requests.SetSceneItemRender) },
+            { Requests.SetSceneItemPosition, typeof(Models.Requests.SetSceneItemPosition) },
+            { Requests.SetSceneItemTransform, typeof(Models.Requests.SetSceneItemTransform) },
+            { Requests.SetSceneItemCrop, typeof(Models.Requests.SetSceneItemCrop) },
+            { Requests.DeleteSceneItem, typeof(Models.Requests.DeleteSceneItem) },
+            { Requests.DuplicateSceneItem, typeof(Models.Requests.DuplicateSceneItem) },
+            { Requests.SetCurrentScene, typeof(Models.Requests.SetCurrentScene) },
+            { Requests.GetCurrentScene, typeof(Models.Requests.GetCurrentScene) },
+            { Requests.GetSceneList, typeof(Models.Requests.GetSceneList) },
+            { Requests.ReorderSceneItems, typeof(Models.Requests.ReorderSceneItems) },
+            { Requests.SetSceneTransitionOverride, typeof(Models.Requests.SetSceneTransitionOverride) },
+            { Requests.RemoveSceneTransitionOverride, typeof(Models.Requests.RemoveSceneTransitionOverride) },
+            { Requests.GetSceneTransitionOverride, typeof(Models.Requests.GetSceneTransitionOverride) },
+            { Requests.GetSourcesList, typeof(Models.Requests.GetSourcesList) },
+            { Requests.GetSourceTypesList, typeof(Models.Requests.GetSourceTypesList) },
+            { Requests.GetVolume, typeof(Models.Requests.GetVolume) },
+            { Requests.SetVolume, typeof(Models.Requests.SetVolume) },
+            { Requests.GetMute, typeof(Models.Requests.GetMute) },
+            { Requests.SetMute, typeof(Models.Requests.SetMute) },
+            { Requests.ToggleMute, typeof(Models.Requests.ToggleMute) },
+            { Requests.SetSourceName, typeof(Models.Requests.SetSourceName) },
+            { Requests.SetSyncOffset, typeof(Models.Requests.SetSyncOffset) },
+            { Requests.GetSyncOffset, typeof(Models.Requests.GetSyncOffset) },
+            { Requests.GetSourceSettings, typeof(Models.Requests.GetSourceSettings) },
+            { Requests.SetSourceSettings, typeof(Models.Requests.SetSourceSettings) },
+            { Requests.GetTextGDIPlusProperties, typeof(Models.Requests.GetTextGDIPlusProperties) },
+            { Requests.SetTextGDIPlusProperties, typeof(Models.Requests.SetTextGDIPlusProperties) },
+            { Requests.GetTextFreetype2Properties, typeof(Models.Requests.GetTextFreetype2Properties) },
+            { Requests.SetTextFreetype2Properties, typeof(Models.Requests.SetTextFreetype2Properties) },
+            { Requests.GetBrowserSourceProperties, typeof(Models.Requests.GetBrowserSourceProperties) },
+            { Requests.SetBrowserSourceProperties, typeof(Models.Requests.SetBrowserSourceProperties) },
+            { Requests.GetSpecialSources, typeof(Models.Requests.GetSpecialSources) },
+            { Requests.GetSourceFilters, typeof(Models.Requests.GetSourceFilters) },
+            { Requests.GetSourceFilterInfo, typeof(Models.Requests.GetSourceFilterInfo) },
+            { Requests.AddFilterToSource, typeof(Models.Requests.AddFilterToSource) },
+            { Requests.RemoveFilterFromSource, typeof(Models.Requests.RemoveFilterFromSource) },
+            { Requests.ReorderSourceFilter, typeof(Models.Requests.ReorderSourceFilter) },
+            { Requests.MoveSourceFilter, typeof(Models.Requests.MoveSourceFilter) },
+            { Requests.SetSourceFilterSettings, typeof(Models.Requests.SetSourceFilterSettings) },
+            { Requests.SetSourceFilterVisibility, typeof(Models.Requests.SetSourceFilterVisibility) },
+            { Requests.GetAudioMonitorType, typeof(Models.Requests.GetAudioMonitorType) },
+            { Requests.SetAudioMonitorType, typeof(Models.Requests.SetAudioMonitorType) },
+            { Requests.TakeSourceScreenshot, typeof(Models.Requests.TakeSourceScreenshot) },
+            { Requests.GetStreamingStatus, typeof(Models.Requests.GetStreamingStatus) },
+            { Requests.StartStopStreaming, typeof(Models.Requests.StartStopStreaming) },
+            { Requests.StartStreaming, typeof(Models.Requests.StartStreaming) },
+            { Requests.StopStreaming, typeof(Models.Requests.StopStreaming) },
+            { Requests.SetStreamSettings, typeof(Models.Requests.SetStreamSettings) },
+            { Requests.GetStreamSettings, typeof(Models.Requests.GetStreamSettings) },
+            { Requests.SaveStreamSettings, typeof(Models.Requests.SaveStreamSettings) },
+            { Requests.SendCaptions, typeof(Models.Requests.SendCaptions) },
+            { Requests.GetStudioModeStatus, typeof(Models.Requests.GetStudioModeStatus) },
+            { Requests.GetPreviewScene, typeof(Models.Requests.GetPreviewScene) },
+            { Requests.SetPreviewScene, typeof(Models.Requests.SetPreviewScene) },
+            { Requests.TransitionToProgram, typeof(Models.Requests.TransitionToProgram) },
+            { Requests.EnableStudioMode, typeof(Models.Requests.EnableStudioMode) },
+            { Requests.DisableStudioMode, typeof(Models.Requests.DisableStudioMode) },
+            { Requests.ToggleStudioMode, typeof(Models.Requests.ToggleStudioMode) },
+            { Requests.GetTransitionList, typeof(Models.Requests.GetTransitionList) },
+            { Requests.GetCurrentTransition, typeof(Models.Requests.GetCurrentTransition) },
+            { Requests.SetCurrentTransition, typeof(Models.Requests.SetCurrentTransition) },
+            { Requests.SetTransitionDuration, typeof(Models.Requests.SetTransitionDuration) },
+            { Requests.GetTransitionDuration, typeof(Models.Requests.GetTransitionDuration) },
+            { Requests.GetTransitionPosition, typeof(Models.Requests.GetTransitionPosition) }
+            };
+
+        public static Type GetType(Requests requestType)
+        {
+            return requestDictionary.TryGetValue(requestType, out Type value) ? value : null;
+        }
+
+        public static Data.Requests GetRequestEnum(Type objectType)
+        {
+            return requestDictionary.FirstOrDefault(k => k.Value == objectType).Key;
         }
     }
 }
