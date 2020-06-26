@@ -31,9 +31,10 @@ namespace Stream_Controller
         private static readonly AudioInterfaces audioInterfaces = AudioInterfaces.Instance;
         private readonly ObservableCollection<AudioInterface> devices = audioInterfaces.Devices;
         private readonly ObsWsClient webSocket;
-        private int reconnectDelay;
+        private int reconnectDelay = -1;
         private bool audioDevicesEnumerate = false;
         private bool obsWebsocketConnected = false;
+        private string connectionError = String.Empty;
 
         public AudioCheck()
         {
@@ -51,7 +52,7 @@ namespace Stream_Controller
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            tbNaudioStatus.Text = String.Format("{0} audio devices enumerated\nWebsocket connection {1} established", devices.Count, obsWebsocketConnected ? "is" : "is not");
+            ConnectionCheck();
             devices.CollectionChanged += DeviceCollectionChanged;
             audioInterfaces.DeviceCollectionEnumerated += AudioDevicesEnumerated;
             webSocket.SetExponentialBackoff(Preferences.Default.obs_reconnect_min_seconds, Preferences.Default.obs_reconnect_max_minutes);
@@ -68,13 +69,13 @@ namespace Stream_Controller
             }
             if (e.Error != null)
             {
-                UpdateUIConnectStatus($"{e.Error.Message}\n{e.Error.InnerException?.Message}");
+                connectionError = $"{e.Error.Message}\n{e.Error.InnerException?.Message}";
             }
         }
 
         private void DeviceCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            UpdateUIConnectStatus(String.Empty);
+            ConnectionCheck();
         }
 
         private async void ObsWebsocketConnect()
@@ -86,8 +87,9 @@ namespace Stream_Controller
         {
             if (newState == WebSocketState.Open)
             {
+                connectionError = String.Empty;
                 obsWebsocketConnected = true;
-                reconnectDelay = 0;
+                reconnectDelay = -1;
                 ConnectionCheck();
             }
             else
@@ -109,19 +111,19 @@ namespace Stream_Controller
         private void ConnectionCheck()
         {
             tbNaudioStatus.Dispatcher.Invoke(
-                () => UpdateUIConnectStatus(String.Empty)
+                () => UpdateUIConnectStatus()
             );
         }
 
-        private void UpdateUIConnectStatus(string errorMessage)
+        private void UpdateUIConnectStatus()
         {
             tbNaudioStatus.Text = String.Format(
-                "{0} audio devices enumerated\nWebsocket connection {1} established{2}{3}",
+                "{0} audio devices enumerated\nWebsocket connection {1} established{2}",
                 devices.Count,
                 obsWebsocketConnected ? "is" : "is not",
-                reconnectDelay > 0 ? $"\nCurrent reconnect delay: {reconnectDelay} seconds" : "",
-                errorMessage != String.Empty ? $"\n{errorMessage}" : ""
+                reconnectDelay > 0 ? $"\nCurrent reconnect delay: {reconnectDelay} seconds" : ""
                 );
+            tbWebsocketError.Text = connectionError;
             pbNaudioStatus.IsIndeterminate = !(audioDevicesEnumerate && obsWebsocketConnected);
             if (audioDevicesEnumerate && obsWebsocketConnected)
             {

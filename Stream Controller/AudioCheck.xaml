@@ -27,5 +27,6 @@
         </Grid.RowDefinitions>
         <TextBlock Grid.Row="1" Grid.Column="1" x:Name="tbNaudioStatus" Margin="0 0 0 36" TextAlignment="Center" />
         <ProgressBar Grid.Row="1" Grid.Column="1" x:Name="pbNaudioStatus" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="20" Margin="8" IsIndeterminate="True" Minimum="0" Maximum="100" />
+        <TextBlock Grid.Row="2" Grid.Column="1" x:Name="tbWebsocketError" Margin="8" TextAlignment="Center" TextWrapping="Wrap" />
     </Grid>
 </Window>
