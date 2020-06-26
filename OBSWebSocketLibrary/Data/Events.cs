@@ -58,4 +58,67 @@ namespace OBSWebSocketLibrary.Data
         PreviewSceneChanged = 50,
         StudioModeSwitched = 51
     }
+
+    public static class Event
+    {
+        private static readonly Dictionary<Events, Type> eventDictionary = new Dictionary<Events, Type>()
+        {
+            { Events.SwitchScenes, typeof(Models.Events.SwitchScenes) },
+            { Events.ScenesChanged, typeof(Models.Events.ScenesChanged) },
+            { Events.SceneCollectionChanged, typeof(Models.Events.SceneCollectionChanged) },
+            { Events.SceneCollectionListChanged, typeof(Models.Events.SceneCollectionListChanged) },
+            { Events.SwitchTransition, typeof(Models.Events.SwitchTransition) },
+            { Events.TransitionListChanged, typeof(Models.Events.TransitionListChanged) },
+            { Events.TransitionDurationChanged, typeof(Models.Events.TransitionDurationChanged) },
+            { Events.TransitionBegin, typeof(Models.Events.TransitionBegin) },
+            { Events.TransitionEnd, typeof(Models.Events.TransitionEnd) },
+            { Events.TransitionVideoEnd, typeof(Models.Events.TransitionVideoEnd) },
+            { Events.ProfileChanged, typeof(Models.Events.ProfileChanged) },
+            { Events.ProfileListChanged, typeof(Models.Events.ProfileListChanged) },
+            { Events.StreamStarting, typeof(Models.Events.StreamStarting) },
+            { Events.StreamStarted, typeof(Models.Events.StreamStarted) },
+            { Events.StreamStopping, typeof(Models.Events.StreamStopping) },
+            { Events.StreamStopped, typeof(Models.Events.StreamStopped) },
+            { Events.StreamStatus, typeof(Models.Events.StreamStatus) },
+            { Events.RecordingStarting, typeof(Models.Events.RecordingStarting) },
+            { Events.RecordingStarted, typeof(Models.Events.RecordingStarted) },
+            { Events.RecordingStopping, typeof(Models.Events.RecordingStopping) },
+            { Events.RecordingStopped, typeof(Models.Events.RecordingStopped) },
+            { Events.RecordingPaused, typeof(Models.Events.RecordingPaused) },
+            { Events.RecordingResumed, typeof(Models.Events.RecordingResumed) },
+            { Events.ReplayStarting, typeof(Models.Events.ReplayStarting) },
+            { Events.ReplayStarted, typeof(Models.Events.ReplayStarted) },
+            { Events.ReplayStopping, typeof(Models.Events.ReplayStopping) },
+            { Events.ReplayStopped, typeof(Models.Events.ReplayStopped) },
+            { Events.Exiting, typeof(Models.Events.Exiting) },
+            { Events.Heartbeat, typeof(Models.Events.Heartbeat) },
+            { Events.BroadcastCustomMessage, typeof(Models.Events.BroadcastCustomMessage) },
+            { Events.SourceCreated, typeof(Models.Events.SourceCreated) },
+            { Events.SourceDestroyed, typeof(Models.Events.SourceDestroyed) },
+            { Events.SourceVolumeChanged, typeof(Models.Events.SourceVolumeChanged) },
+            { Events.SourceMuteStateChanged, typeof(Models.Events.SourceMuteStateChanged) },
+            { Events.SourceAudioSyncOffsetChanged, typeof(Models.Events.SourceAudioSyncOffsetChanged) },
+            { Events.SourceAudioMixersChanged, typeof(Models.Events.SourceAudioMixersChanged) },
+            { Events.SourceRenamed, typeof(Models.Events.SourceRenamed) },
+            { Events.SourceFilterAdded, typeof(Models.Events.SourceFilterAdded) },
+            { Events.SourceFilterRemoved, typeof(Models.Events.SourceFilterRemoved) },
+            { Events.SourceFilterVisibilityChanged, typeof(Models.Events.SourceFilterVisibilityChanged) },
+            { Events.SourceFiltersReordered, typeof(Models.Events.SourceFiltersReordered) },
+            { Events.SourceOrderChanged, typeof(Models.Events.SourceOrderChanged) },
+            { Events.SceneItemAdded, typeof(Models.Events.SceneItemAdded) },
+            { Events.SceneItemRemoved, typeof(Models.Events.SceneItemRemoved) },
+            { Events.SceneItemVisibilityChanged, typeof(Models.Events.SceneItemVisibilityChanged) },
+            { Events.SceneItemLockChanged, typeof(Models.Events.SceneItemLockChanged) },
+            { Events.SceneItemTransformChanged, typeof(Models.Events.SceneItemTransformChanged) },
+            { Events.SceneItemSelected, typeof(Models.Events.SceneItemSelected) },
+            { Events.SceneItemDeselected, typeof(Models.Events.SceneItemDeselected) },
+            { Events.PreviewSceneChanged, typeof(Models.Events.PreviewSceneChanged) },
+            { Events.StudioModeSwitched, typeof(Models.Events.StudioModeSwitched) }
+        };
+
+        public static Type GetType(Events eventType)
+        {
+            return eventDictionary.TryGetValue(eventType, out Type value) ? value : null;
+        }
+    }
 }
