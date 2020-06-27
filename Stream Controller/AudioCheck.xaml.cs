@@ -1,4 +1,5 @@
 ﻿using NAudio.CoreAudioApi;
+using NAudio.Wave;
 using NAudioWrapperLibrary;
 using OBSWebSocketLibrary;
 using OBSWebSocketLibrary.Models.RequestReplies;
@@ -7,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
@@ -35,6 +37,7 @@ namespace Stream_Controller
         private bool audioDevicesEnumerate = false;
         private bool obsWebsocketConnected = false;
         private string connectionError = String.Empty;
+        private WaveOutEvent silentAudioEvent = null;
 
         public AudioCheck()
         {
@@ -55,10 +58,19 @@ namespace Stream_Controller
             ConnectionCheck();
             devices.CollectionChanged += DeviceCollectionChanged;
             audioInterfaces.DeviceCollectionEnumerated += AudioDevicesEnumerated;
+            audioInterfaces.DefaultDeviceChange += DefaultAudioDeviceChanged;
             webSocket.SetExponentialBackoff(Preferences.Default.obs_reconnect_min_seconds, Preferences.Default.obs_reconnect_max_minutes);
             webSocket.StateChange += WebSocket_StateChange;
             webSocket.ErrorState += WebSocket_Error;
             ObsWebsocketConnect();
+        }
+
+        private void DefaultAudioDeviceChanged(object sender, DataFlow dataFlow)
+        {
+            if (dataFlow == DataFlow.Render)
+            {
+                DisplayPortAudioWorkaround();
+            }
         }
 
         private void WebSocket_Error(object sender, GenericClient.ErrorMessage e)
@@ -105,6 +117,21 @@ namespace Stream_Controller
             {
                 audioDevicesEnumerate = true;
                 ConnectionCheck();
+                DisplayPortAudioWorkaround();
+            }
+        }
+
+        private void DisplayPortAudioWorkaround()
+        {
+            if (audioDevicesEnumerate && audioInterfaces.DefaultRender.FriendlyName.Contains("NVIDIA") && silentAudioEvent?.PlaybackState != PlaybackState.Playing)
+            {
+                Task.Run(
+                    () => PlaySilence(audioInterfaces.DefaultRender)
+                );
+            }
+            else if (audioDevicesEnumerate)
+            {
+                StopSilence();
             }
         }
 
@@ -131,5 +158,24 @@ namespace Stream_Controller
             }
         }
 
+        private Task PlaySilence(AudioInterface audioInterface)
+        {
+            if (audioInterface.IsActive)
+            {
+                SilenceProvider provider = new SilenceProvider(WaveFormat.CreateIeeeFloatWaveFormat(44100, 2));
+                silentAudioEvent = new WaveOutEvent();
+                silentAudioEvent.Init(provider);
+                silentAudioEvent.Play();
+            }
+            return Task.CompletedTask;
+        }
+
+        private void StopSilence()
+        {
+            if (silentAudioEvent?.PlaybackState == PlaybackState.Playing)
+            {
+                silentAudioEvent.Stop();
+            }
+        }
     }
 }
