@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualBasic;
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -24,6 +25,14 @@ namespace Stream_Controller
             WebSocketTest = 2,
             Audiocheck = 3
         }
+
+        private static readonly Dictionary<Type, WindowType> enumTypeDictionary = new Dictionary<Type, WindowType>()
+        {
+            { typeof(MainWindow), WindowType.MainWindow },
+            { typeof(PreferencesWindow), WindowType.PreferencesWindow },
+            { typeof(WebSocketTest), WindowType.WebSocketTest },
+            { typeof(AudioCheck), WindowType.Audiocheck }
+        };
 
         /// <summary>
         /// Show a new or existing Window and makes it active.
@@ -76,6 +85,12 @@ namespace Stream_Controller
                 WindowType.Audiocheck => new AudioCheck(),
                 _ => null,
             };
+        }
+
+        public static WindowType GetWindowTypeEnum(Type window)
+        {
+            Debug.Assert(enumTypeDictionary.ContainsKey(window), "Unrecognised window Type.");
+            return enumTypeDictionary.GetValueOrDefault(window);
         }
     }
 }

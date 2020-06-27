@@ -1,0 +1,19 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:Stream_Controller"
+                    xmlns:Collections="clr-namespace:System.Collections;assembly=System.Runtime.Extensions"
+                    x:Class="Stream_Controller.MenuItems">
+    <Collections:ArrayList x:Key="MenuItems" x:Shared="false">
+        <MenuItem Header="_File">
+            <MenuItem Header="E_xit" Click="MenuItemExit_Click" />
+        </MenuItem>
+        <MenuItem Header="_Edit">
+            <MenuItem Header="_Preferences" Click="MenuWindowItem_Click" x:Name="PreferencesWindow" Loaded="MenuWindowItem_Loaded" />
+        </MenuItem>
+        <MenuItem Header="_Window">
+            <MenuItem Header="_Audio Interfaces" Click="MenuWindowItem_Click" x:Name="MainWindow" Loaded="MenuWindowItem_Loaded" />
+            <MenuItem Header="Audio _Check" Click="MenuWindowItem_Click" x:Name="Audiocheck" Loaded="MenuWindowItem_Loaded" />
+            <MenuItem Header="_OBS" Click="MenuWindowItem_Click" x:Name="WebSocketTest" Loaded="MenuWindowItem_Loaded" />
+        </MenuItem>
+    </Collections:ArrayList>
+</ResourceDictionary>

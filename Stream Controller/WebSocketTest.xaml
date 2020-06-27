@@ -10,19 +10,7 @@
         Title="WebSocketTest" Height="450" Width="800"
         FontFamily="Open Sans" FontSize="14">
     <DockPanel>
-        <Menu DockPanel.Dock="Top">
-            <MenuItem Header="_File">
-                <MenuItem Header="E_xit" Click="MenuItemExit_Click" />
-            </MenuItem>
-            <MenuItem Header="_Edit">
-                <MenuItem Header="_Preferences" Click="MenuItemPreferences_Click" />
-            </MenuItem>
-            <MenuItem Header="_Window">
-                <MenuItem Header="_Audio Interfaces" Click="MenuItemAudioInterfaces_Click" />
-                <MenuItem Header="Audio _Check" Click="MenuItemAudioCheck_Click" />
-                <MenuItem Header="_OBS" IsEnabled="False" />
-            </MenuItem>
-        </Menu>
+        <Menu DockPanel.Dock="Top" ItemsSource="{StaticResource ResourceKey=MenuItems}" />
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="16" />

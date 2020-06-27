@@ -199,26 +199,5 @@ namespace Stream_Controller
             }
             return -1;
         }
-
-
-        private void MenuItemExit_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
-
-        private void MenuItemPreferences_Click(object sender, RoutedEventArgs e)
-        {
-            WindowUtilityLibrary.MakeWindowActive(WindowUtilityLibrary.WindowType.PreferencesWindow);
-        }
-
-        private void MenuItemAudioInterfaces_Click(object sender, RoutedEventArgs e)
-        {
-            WindowUtilityLibrary.MakeWindowActive(WindowUtilityLibrary.WindowType.MainWindow);
-        }
-
-        private void MenuItemObs_Click(object sender, RoutedEventArgs e)
-        {
-            WindowUtilityLibrary.MakeWindowActive(WindowUtilityLibrary.WindowType.WebSocketTest);
-        }
     }
 }

@@ -11,19 +11,7 @@
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
     </Window.Resources>
     <DockPanel>
-        <Menu DockPanel.Dock="Top">
-            <MenuItem Header="_File">
-                <MenuItem Header="E_xit" Click="MenuItemExit_Click" />
-            </MenuItem>
-            <MenuItem Header="_Edit">
-                <MenuItem Header="_Preferences" Click="MenuItemPreferences_Click" />
-            </MenuItem>
-            <MenuItem Header="_Window">
-                <MenuItem Header="_Audio Interfaces" IsEnabled="False" />
-                <MenuItem Header="Audio _Check" Click="MenuItemAudioCheck_Click" />
-                <MenuItem Header="_OBS" Click="MenuItemObs_Click" />
-            </MenuItem>
-        </Menu>
+        <Menu DockPanel.Dock="Top" ItemsSource="{StaticResource ResourceKey=MenuItems}" />
         <StackPanel Orientation="Vertical">
             <Grid>
                 <Grid.ColumnDefinitions>

@@ -4,6 +4,6 @@
              xmlns:local="clr-namespace:Stream_Controller"
              StartupUri="AudioCheck.xaml">
     <Application.Resources>
-         
+        <ResourceDictionary Source="Properties\Menus.xaml" />
     </Application.Resources>
 </Application>

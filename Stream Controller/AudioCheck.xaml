@@ -10,19 +10,7 @@
         Loaded="Window_Loaded"
         Title="AudioCheck" Height="450" Width="800">
     <DockPanel>
-        <Menu DockPanel.Dock="Top">
-            <MenuItem Header="_File">
-                <MenuItem Header="E_xit" Click="MenuItemExit_Click" />
-            </MenuItem>
-            <MenuItem Header="_Edit">
-                <MenuItem Header="_Preferences" Click="MenuItemPreferences_Click" />
-            </MenuItem>
-            <MenuItem Header="_Window">
-                <MenuItem Header="_Audio Interfaces" Click="MenuItemAudioInterfaces_Click" />
-                <MenuItem Header="Audio _Check" IsEnabled="False" />
-                <MenuItem Header="_OBS" Click="MenuItemObs_Click" />
-            </MenuItem>
-        </Menu>
+        <Menu DockPanel.Dock="Top" ItemsSource="{StaticResource ResourceKey=MenuItems}" />
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="16" />
