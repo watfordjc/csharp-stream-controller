@@ -2,7 +2,6 @@
 using NAudio.Wave;
 using NAudioWrapperLibrary;
 using OBSWebSocketLibrary;
-using OBSWebSocketLibrary.Models.RequestReplies;
 using Stream_Controller.SharedModels;
 using System;
 using System.Collections.Generic;
@@ -44,6 +43,7 @@ namespace Stream_Controller
         private CancellationTokenSource pulseCancellationToken = new CancellationTokenSource();
         private readonly System.Timers.Timer _ReconnectCountdownTimer = new System.Timers.Timer(1000);
         private int _ReconnectTimeRemaining;
+        private OBSWebSocketLibrary.Models.RequestReplies.GetCurrentScene currentScene;
 
         #region Instantiation and initialisation
 
@@ -72,6 +72,7 @@ namespace Stream_Controller
             webSocket.StateChange += WebSocket_StateChange;
             webSocket.ErrorState += WebSocket_Error;
             webSocket.OnObsEvent += WebSocket_Event;
+            webSocket.OnObsReply += Websocket_Reply;
             _ReconnectCountdownTimer.Elapsed += ReconnectCountdownTimer_Elapsed;
             ObsWebsocketConnect();
         }
@@ -183,6 +184,7 @@ namespace Stream_Controller
                 connectionError = String.Empty;
                 _ReconnectCountdownTimer.Stop();
                 UpdateUIConnectStatus(String.Empty, Brushes.DarkGreen, null);
+                Obs_GetCurrentScene();
             }
             else if (newState != WebSocketState.Connecting)
             {
@@ -212,11 +214,40 @@ namespace Stream_Controller
 
         private void WebSocket_Event(object sender, ObsWsClient.ObsEvent eventObject)
         {
-            if (eventObject.EventType == OBSWebSocketLibrary.Data.Events.Heartbeat)
+            switch (eventObject.EventType)
             {
-                Heartbeat_Event((OBSWebSocketLibrary.Models.Events.Heartbeat)eventObject.MessageObject);
+                case OBSWebSocketLibrary.Data.Events.Heartbeat:
+                    Heartbeat_Event((OBSWebSocketLibrary.Models.Events.Heartbeat)eventObject.MessageObject);
+                    break;
+                case OBSWebSocketLibrary.Data.Events.SwitchScenes:
+                    SwitchScenes_Event((OBSWebSocketLibrary.Models.Events.SwitchScenes)eventObject.MessageObject);
+                    break;
+                case OBSWebSocketLibrary.Data.Events.ScenesChanged:
+                    Obs_GetCurrentScene();
+                    break;
+                case OBSWebSocketLibrary.Data.Events.TransitionBegin:
+                    string nextScene = ((OBSWebSocketLibrary.Models.Events.TransitionBegin)eventObject.MessageObject).ToScene;
+                    UpdateTransitionMessage($"\u27a1\ufe0f {nextScene}\u2026");
+                    break;
+                case OBSWebSocketLibrary.Data.Events.TransitionEnd:
+                case OBSWebSocketLibrary.Data.Events.TransitionVideoEnd:
+                    UpdateTransitionMessage(String.Empty);
+                    break;
             }
         }
+
+        private void Websocket_Reply(object sender, ObsWsClient.ObsReply replyObject)
+        {
+            switch (replyObject.RequestType)
+            {
+                case OBSWebSocketLibrary.Data.Requests.GetCurrentScene:
+                    currentScene = (OBSWebSocketLibrary.Models.RequestReplies.GetCurrentScene)replyObject.MessageObject;
+                    UpdateSceneInformation();
+                    break;
+            }
+        }
+
+        #region obs-events
 
         private void Heartbeat_Event(OBSWebSocketLibrary.Models.Events.Heartbeat messageObject)
         {
@@ -237,6 +268,25 @@ namespace Stream_Controller
                 UpdateUIConnectStatus(null, Brushes.Gray, null);
             }
         }
+
+        private void SwitchScenes_Event(OBSWebSocketLibrary.Models.Events.SwitchScenes messageObject)
+        {
+            currentScene.Name = messageObject.SceneName;
+            currentScene.Sources = messageObject.Sources;
+            UpdateSceneInformation();
+        }
+
+        #endregion
+
+        #region obs-requests
+
+        private Guid Obs_GetCurrentScene()
+        {
+            OBSWebSocketLibrary.Models.Requests.GetCurrentScene request = new OBSWebSocketLibrary.Models.Requests.GetCurrentScene();
+            return webSocket.OBS_Send(request).Result;
+        }
+
+        #endregion
 
         #endregion
 
@@ -278,6 +328,43 @@ namespace Stream_Controller
                     _ => sbCircleStatus.Fill = brush2,
                     null);
             }
+        }
+
+        private Task UpdateSceneInformation()
+        {
+            if (Guid.Parse(currentScene?.MessageId) == Guid.Empty)
+            {
+                return Task.CompletedTask;
+            }
+            _Context.Send(
+                x => tbActiveScene.Text = currentScene.Name,
+                null);
+            if (currentScene.Sources != null)
+            {
+                tbSourceList.Text = String.Empty;
+                string[] sourceNames = currentScene.Sources.Select(a => a.Name).ToArray();
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < sourceNames.Length; i++)
+                {
+                    sb.Append($"* {sourceNames[i]}");
+                    if (i != sourceNames.Length - 1)
+                    {
+                        sb.Append("\n");
+                    }
+                }
+                _Context.Send(
+                    x => tbSourceList.Text = sb.ToString(),
+                    null);
+            }
+            return Task.CompletedTask;
+        }
+
+        private Task UpdateTransitionMessage(string transitionMessage)
+        {
+            _Context.Send(
+                x => tbTransitioning.Text = transitionMessage,
+                null);
+            return Task.CompletedTask;
         }
 
         #endregion
