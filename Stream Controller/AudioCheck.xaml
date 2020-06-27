@@ -11,6 +11,26 @@
         Title="AudioCheck" Height="450" Width="800">
     <DockPanel>
         <Menu DockPanel.Dock="Top" ItemsSource="{StaticResource ResourceKey=MenuItems}" />
+        <StatusBar DockPanel.Dock="Bottom" Height="auto" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" Padding="2">
+            <StatusBarItem DockPanel.Dock="Right">
+                <Ellipse HorizontalAlignment="Right" Width="16" Height="16" Fill="Gray" x:Name="sbCircleStatus" />
+            </StatusBarItem>
+            <StatusBarItem DockPanel.Dock="Right">
+                <TextBlock x:Name="tbReconnectCountdown" MinWidth="10" TextAlignment="Right" />
+            </StatusBarItem>
+            <StatusBarItem DockPanel.Dock="Right" VerticalContentAlignment="Stretch">
+                <Rectangle Width="1" Fill="Gray" />
+            </StatusBarItem>
+            <StatusBarItem DockPanel.Dock="Right">
+                <TextBlock x:Name="tbAudioInterfaceStatus" MinWidth="10" TextAlignment="Right" />
+            </StatusBarItem>
+            <StatusBarItem DockPanel.Dock="Right" VerticalContentAlignment="Stretch">
+                <Rectangle Width="1" Fill="Gray" />
+            </StatusBarItem>
+            <StatusBarItem DockPanel.Dock="Right" Margin="4 0">
+                <TextBlock x:Name="tbStatus" HorizontalAlignment="Stretch" />
+            </StatusBarItem>
+        </StatusBar>
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="16" />
@@ -27,9 +47,10 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="16" />
             </Grid.RowDefinitions>
-            <TextBlock Grid.Row="1" Grid.Column="1" x:Name="tbNaudioStatus" Margin="0 0 0 36" TextAlignment="Center" />
-            <ProgressBar Grid.Row="1" Grid.Column="1" x:Name="pbNaudioStatus" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="20" Margin="8" IsIndeterminate="True" Minimum="0" Maximum="100" />
-            <TextBlock Grid.Row="2" Grid.Column="1" x:Name="tbWebsocketError" Margin="8" TextAlignment="Center" TextWrapping="Wrap" />
+            <StackPanel Orientation="Vertical" Grid.Row="1" Grid.Column="1" Margin="8 0" VerticalAlignment="Top">
+                <TextBlock Text="Current Scene" FontWeight="SemiBold" TextAlignment="Left" Margin="0 0 0 8" />
+                <TextBlock Grid.Row="1" Grid.Column="2" x:Name="tbActiveScene" Margin="0 0 0 8" TextWrapping="Wrap" />
+            </StackPanel>
         </Grid>
     </DockPanel>
 </Window>

@@ -48,6 +48,7 @@ namespace Stream_Controller
         {
             Preferences.Default.obs_uri_scheme = cbUriProtocol.Text;
             Preferences.Default.Save();
+            // TODO: Update existing ObsWsClient.AutoReconnect if necessary
             e.Handled = true;
             this.Close();
         }
