@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
@@ -126,12 +127,14 @@ namespace Stream_Controller
             if (audioDevicesEnumerate && audioInterfaces.DefaultRender.FriendlyName.Contains("NVIDIA") && silentAudioEvent?.PlaybackState != PlaybackState.Playing)
             {
                 Task.Run(
-                    () => PlaySilence(audioInterfaces.DefaultRender)
+                    () => StartPlaySilence(audioInterfaces.DefaultRender)
                 );
             }
             else if (audioDevicesEnumerate)
             {
-                StopSilence();
+                Task.Run(
+                    () => StopPlaySilence()
+                    );
             }
         }
 
@@ -158,24 +161,43 @@ namespace Stream_Controller
             }
         }
 
-        private Task PlaySilence(AudioInterface audioInterface)
+        private Task StartPlaySilence(AudioInterface audioInterface)
         {
             if (audioInterface.IsActive)
             {
                 SilenceProvider provider = new SilenceProvider(WaveFormat.CreateIeeeFloatWaveFormat(44100, 2));
-                silentAudioEvent = new WaveOutEvent();
+                silentAudioEvent = new WaveOutEvent()
+                {
+                    DeviceNumber = GetWaveOutDeviceNumber(audioInterface)
+                };
                 silentAudioEvent.Init(provider);
                 silentAudioEvent.Play();
             }
             return Task.CompletedTask;
         }
 
-        private void StopSilence()
+        private Task StopPlaySilence()
         {
             if (silentAudioEvent?.PlaybackState == PlaybackState.Playing)
             {
                 silentAudioEvent.Stop();
+                silentAudioEvent.Dispose();
             }
+            return Task.CompletedTask;
+        }
+
+        private int GetWaveOutDeviceNumber(AudioInterface audioInterface)
+        {
+            int deviceNameMaxLength = Math.Min(audioInterface.FriendlyName.Length, 31);
+            string deviceNameTruncated = audioInterface.FriendlyName.Substring(0, deviceNameMaxLength);
+            for (int i = 0; i < WaveOut.DeviceCount; i++)
+            {
+                if (WaveOut.GetCapabilities(i).ProductName == deviceNameTruncated)
+                {
+                    return i;
+                }
+            }
+            return -1;
         }
     }
 }
