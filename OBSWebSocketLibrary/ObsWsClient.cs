@@ -102,7 +102,7 @@ namespace OBSWebSocketLibrary
             }
         }
 
-        private async Task<Guid> OBS_Send(object message)
+        public async Task<Guid> OBS_Send(object message)
         {
             Guid guid = (message as Models.Requests.RequestBase).MessageId;
             Data.Requests messageType = (message as Models.Requests.RequestBase).RequestType;
@@ -120,32 +120,12 @@ namespace OBSWebSocketLibrary
             return OBS_Send(message).Result;
         }
 
-        public Guid OBS_GetSourcesList()
-        {
-            return OBS_Send(new Models.Requests.GetSourcesList()).Result;
-        }
-
-        public Guid OBS_GetSourceSettings(string sourceName)
-        {
-            Models.Requests.GetSourceSettings message = new Models.Requests.GetSourceSettings()
-            {
-                SourceName = sourceName
-            };
-            return OBS_Send(message).Result;
-        }
-
         private void FurtherProcessObsReply(object sender, ObsReply obsReply)
         {
             switch (obsReply.RequestType)
             {
                 case Data.Requests.SetHeartbeat:
                     Trace.WriteLine($"Server response to enabling HeartBeat: {obsReply.Status}");
-                    break;
-                case Data.Requests.GetSourcesList:
-                    foreach (Models.RequestReplies.GetSourcesList.Source device in (obsReply.MessageObject as Models.RequestReplies.GetSourcesList).Sources)
-                    {
-                        OBS_GetSourceSettings(device.Name);
-                    }
                     break;
                 default: break;
             }

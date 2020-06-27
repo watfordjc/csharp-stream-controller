@@ -38,7 +38,7 @@ namespace Stream_Controller
         private readonly ObsWsClient webSocket;
         private bool autoscroll = false;
         private int reconnectDelay;
-        private int SCROLL_BUFFER_MAX_CHARS = 8000;
+        private readonly int SCROLL_BUFFER_MAX_CHARS = 65000;
 
         public WebSocketTest()
         {
@@ -137,7 +137,6 @@ namespace Stream_Controller
         private void WebSocket_Connected(object sender, WebSocketState e)
         {
             if (e != WebSocketState.Open) { return; }
-            webSocket.OBS_GetSourcesList();
         }
 
         private void WebSocket_NewTextMessage(object sender, MemoryStream message)
