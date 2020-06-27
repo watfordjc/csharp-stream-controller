@@ -168,10 +168,11 @@ namespace WebSocketLibrary
                         _Client = new ClientWebSocket();
                         OnStateChange(_Client.State);
                         await Task.Delay(retryMs, connectionCancellation.Token);
-                        if (retryMs < TimeSpan.FromMinutes(_MaximumRetryMinutes).TotalMilliseconds)
-                        {
-                            retryMs *= 2;
-                        }
+                        retryMs = (int)(
+                            retryMs * 2 < TimeSpan.FromMinutes(_MaximumRetryMinutes).TotalMilliseconds
+                            ? retryMs * 2
+                            : TimeSpan.FromMinutes(_MaximumRetryMinutes).TotalMilliseconds
+                        );
                     }
                     catch (TaskCanceledException)
                     {
