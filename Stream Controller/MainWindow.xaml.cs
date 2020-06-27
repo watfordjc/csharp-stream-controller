@@ -47,19 +47,24 @@ namespace Stream_Controller
             }
         }
 
+        private void MenuItemExit_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
         private void MenuItemPreferences_Click(object sender, RoutedEventArgs e)
         {
             WindowUtilityLibrary.MakeWindowActive(WindowUtilityLibrary.WindowType.PreferencesWindow);
         }
 
+        private void MenuItemAudioCheck_Click(object sender, RoutedEventArgs e)
+        {
+            WindowUtilityLibrary.MakeWindowActive(WindowUtilityLibrary.WindowType.Audiocheck);
+        }
+
         private void MenuItemObs_Click(object sender, RoutedEventArgs e)
         {
             WindowUtilityLibrary.MakeWindowActive(WindowUtilityLibrary.WindowType.WebSocketTest);
-        }
-
-        private void MenuItemExit_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
         }
     }
 }

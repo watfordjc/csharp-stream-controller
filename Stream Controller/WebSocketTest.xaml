@@ -19,6 +19,7 @@
             </MenuItem>
             <MenuItem Header="_Window">
                 <MenuItem Header="_Audio Interfaces" Click="MenuItemAudioInterfaces_Click" />
+                <MenuItem Header="Audio _Check" Click="MenuItemAudioCheck_Click" />
                 <MenuItem Header="_OBS" IsEnabled="False" />
             </MenuItem>
         </Menu>

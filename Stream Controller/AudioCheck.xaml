@@ -9,24 +9,39 @@
         FontSize="12"
         Loaded="Window_Loaded"
         Title="AudioCheck" Height="450" Width="800">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="16" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="16" />
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="16" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="16" />
-        </Grid.RowDefinitions>
-        <TextBlock Grid.Row="1" Grid.Column="1" x:Name="tbNaudioStatus" Margin="0 0 0 36" TextAlignment="Center" />
-        <ProgressBar Grid.Row="1" Grid.Column="1" x:Name="pbNaudioStatus" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="20" Margin="8" IsIndeterminate="True" Minimum="0" Maximum="100" />
-        <TextBlock Grid.Row="2" Grid.Column="1" x:Name="tbWebsocketError" Margin="8" TextAlignment="Center" TextWrapping="Wrap" />
-    </Grid>
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="E_xit" Click="MenuItemExit_Click" />
+            </MenuItem>
+            <MenuItem Header="_Edit">
+                <MenuItem Header="_Preferences" Click="MenuItemPreferences_Click" />
+            </MenuItem>
+            <MenuItem Header="_Window">
+                <MenuItem Header="_Audio Interfaces" Click="MenuItemAudioInterfaces_Click" />
+                <MenuItem Header="Audio _Check" IsEnabled="False" />
+                <MenuItem Header="_OBS" Click="MenuItemObs_Click" />
+            </MenuItem>
+        </Menu>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="16" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="16" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="16" />
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="1" Grid.Column="1" x:Name="tbNaudioStatus" Margin="0 0 0 36" TextAlignment="Center" />
+            <ProgressBar Grid.Row="1" Grid.Column="1" x:Name="pbNaudioStatus" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="20" Margin="8" IsIndeterminate="True" Minimum="0" Maximum="100" />
+            <TextBlock Grid.Row="2" Grid.Column="1" x:Name="tbWebsocketError" Margin="8" TextAlignment="Center" TextWrapping="Wrap" />
+        </Grid>
+    </DockPanel>
 </Window>

@@ -21,7 +21,8 @@ namespace Stream_Controller
         {
             MainWindow = 0,
             PreferencesWindow = 1,
-            WebSocketTest = 2
+            WebSocketTest = 2,
+            Audiocheck = 3
         }
 
         /// <summary>
@@ -53,6 +54,7 @@ namespace Stream_Controller
                 WindowType.MainWindow => Application.Current.Windows.OfType<MainWindow>(),
                 WindowType.PreferencesWindow => Application.Current.Windows.OfType<PreferencesWindow>(),
                 WindowType.WebSocketTest => Application.Current.Windows.OfType<WebSocketTest>(),
+                WindowType.Audiocheck => Application.Current.Windows.OfType<AudioCheck>(),
                 _ => null,
             };
             return (windows != null && windows.Count() > 0) ? windows.First() : GetNewWindow(windowType);
@@ -71,6 +73,7 @@ namespace Stream_Controller
                 WindowType.MainWindow => new MainWindow(),
                 WindowType.PreferencesWindow => new PreferencesWindow(),
                 WindowType.WebSocketTest => new WebSocketTest(),
+                WindowType.Audiocheck => new AudioCheck(),
                 _ => null,
             };
         }

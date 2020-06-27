@@ -65,21 +65,6 @@ namespace Stream_Controller
             this.cbAutoScroll.IsChecked = Preferences.Default.obs_autoscroll;
         }
 
-        private void MenuItemPreferences_Click(object sender, RoutedEventArgs e)
-        {
-            WindowUtilityLibrary.MakeWindowActive(WindowUtilityLibrary.WindowType.PreferencesWindow);
-        }
-
-        private void MenuItemExit_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
-
-        private void MenuItemAudioInterfaces_Click(object sender, RoutedEventArgs e)
-        {
-            WindowUtilityLibrary.MakeWindowActive(WindowUtilityLibrary.WindowType.MainWindow);
-        }
-
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             Preferences.Default.obs_width = this.Width;
@@ -178,6 +163,24 @@ namespace Stream_Controller
             }
         }
 
+        private void MenuItemExit_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
 
+        private void MenuItemPreferences_Click(object sender, RoutedEventArgs e)
+        {
+            WindowUtilityLibrary.MakeWindowActive(WindowUtilityLibrary.WindowType.PreferencesWindow);
+        }
+
+        private void MenuItemAudioCheck_Click(object sender, RoutedEventArgs e)
+        {
+            WindowUtilityLibrary.MakeWindowActive(WindowUtilityLibrary.WindowType.Audiocheck);
+        }
+
+        private void MenuItemAudioInterfaces_Click(object sender, RoutedEventArgs e)
+        {
+            WindowUtilityLibrary.MakeWindowActive(WindowUtilityLibrary.WindowType.MainWindow);
+        }
     }
 }
