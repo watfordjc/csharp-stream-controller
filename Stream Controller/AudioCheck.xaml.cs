@@ -35,7 +35,7 @@ namespace Stream_Controller
         private static readonly AudioInterfaces audioInterfaces = AudioInterfaces.Instance;
         private readonly ObservableCollection<AudioInterface> devices = audioInterfaces.Devices;
         private readonly ObsWsClient webSocket;
-        private bool audioDevicesEnumerate = false;
+        private readonly TaskCompletionSource<bool> audioDevicesEnumerated = new TaskCompletionSource<bool>();
         private string connectionError = String.Empty;
         private WaveOutEvent silentAudioEvent = null;
         private static readonly Brush primaryBrush = new SolidColorBrush(Color.FromArgb(0xFF, 0xE2, 0xC1, 0xEA));
@@ -44,6 +44,8 @@ namespace Stream_Controller
         private readonly System.Timers.Timer _ReconnectCountdownTimer = new System.Timers.Timer(1000);
         private int _ReconnectTimeRemaining;
         private OBSWebSocketLibrary.Models.RequestReplies.GetCurrentScene currentScene;
+        private OBSWebSocketLibrary.Models.RequestReplies.GetSourceTypesList sourceTypes;
+        private Dictionary<string, ObsWsClient.ObsReply> obsSourceDictionary = new Dictionary<string, ObsWsClient.ObsReply>();
 
         #region Instantiation and initialisation
 
@@ -86,33 +88,33 @@ namespace Stream_Controller
             UpdateUIConnectStatus(null, null, null);
         }
 
-        private void AudioDevicesEnumerated(object sender, bool e)
+        private void AudioDevicesEnumerated(object sender, bool deviceEnumerationComplete)
         {
-            if (e)
+            if (deviceEnumerationComplete)
             {
-                audioDevicesEnumerate = true;
+                audioDevicesEnumerated.SetResult(true);
                 UpdateUIConnectStatus(null, null, null);
-                DisplayPortAudioWorkaround();
             }
         }
 
-        private void DefaultAudioDeviceChanged(object sender, DataFlow dataFlow)
+        private async void DefaultAudioDeviceChanged(object sender, DataFlow dataFlow)
         {
             if (dataFlow == DataFlow.Render)
             {
+                await audioDevicesEnumerated.Task;
                 DisplayPortAudioWorkaround();
             }
         }
 
         private void DisplayPortAudioWorkaround()
         {
-            if (audioDevicesEnumerate && audioInterfaces.DefaultRender.FriendlyName.Contains("NVIDIA") && silentAudioEvent?.PlaybackState != PlaybackState.Playing)
+            if (audioInterfaces.DefaultRender.FriendlyName.Contains("NVIDIA") && silentAudioEvent?.PlaybackState != PlaybackState.Playing)
             {
                 _ = Task.Run(
                     () => StartPlaySilence(audioInterfaces.DefaultRender)
                 );
             }
-            else if (audioDevicesEnumerate)
+            else
             {
                 _ = Task.Run(
                     () => StopPlaySilence()
@@ -122,7 +124,7 @@ namespace Stream_Controller
 
         private Task StartPlaySilence(AudioInterface audioInterface)
         {
-            if (audioInterface.IsActive)
+            if (audioInterface.IsActive && silentAudioEvent?.PlaybackState != PlaybackState.Playing)
             {
                 SilenceProvider provider = new SilenceProvider(WaveFormat.CreateIeeeFloatWaveFormat(44100, 2));
                 silentAudioEvent = new WaveOutEvent()
@@ -184,7 +186,10 @@ namespace Stream_Controller
                 connectionError = String.Empty;
                 _ReconnectCountdownTimer.Stop();
                 UpdateUIConnectStatus(String.Empty, Brushes.DarkGreen, null);
+                obsSourceDictionary = new Dictionary<string, ObsWsClient.ObsReply>();
                 Obs_GetCurrentScene();
+                Obs_GetSourceTypesList();
+                Obs_GetSourcesList();
             }
             else if (newState != WebSocketState.Connecting)
             {
@@ -244,6 +249,58 @@ namespace Stream_Controller
                     currentScene = (OBSWebSocketLibrary.Models.RequestReplies.GetCurrentScene)replyObject.MessageObject;
                     UpdateSceneInformation();
                     break;
+                case OBSWebSocketLibrary.Data.Requests.GetSourceTypesList:
+                    sourceTypes = (OBSWebSocketLibrary.Models.RequestReplies.GetSourceTypesList)replyObject.MessageObject;
+                    // TODO: Check if sourceTypes matches enum list.
+                    break;
+                case OBSWebSocketLibrary.Data.Requests.GetSourcesList:
+                    OBSWebSocketLibrary.Models.RequestReplies.GetSourcesList sourcesList = (OBSWebSocketLibrary.Models.RequestReplies.GetSourcesList)replyObject.MessageObject;
+                    Array.ForEach<string>(sourcesList.Sources.Select(a => a.Name).ToArray(),
+                        a => Obs_GetSourceSettings(a)
+                        );
+                    GetDeviceIdsForSources();
+                    break;
+                case OBSWebSocketLibrary.Data.Requests.GetSourceSettings:
+                    OBSWebSocketLibrary.Models.RequestReplies.GetSourceSettings sourceSettings = (OBSWebSocketLibrary.Models.RequestReplies.GetSourceSettings)replyObject.MessageObject;
+                    Trace.WriteLine($"{sourceSettings.SourceName} [{sourceSettings.SourceType}] -> {sourceSettings.SourceSettings}");
+                    obsSourceDictionary.Add(sourceSettings.SourceName, replyObject);
+                    break;
+            }
+        }
+
+        private async void GetDeviceIdsForSources()
+        {
+            await audioDevicesEnumerated.Task;
+            while (webSocket.sentMessageGuids.ContainsValue(OBSWebSocketLibrary.Data.Requests.GetSourceSettings)) {
+                await Task.Delay(250);
+            }
+            ObsWsClient.ObsReply[] sourcePropertyReplies = obsSourceDictionary.Values.Where(
+                x => x.SourceType == OBSWebSocketLibrary.Data.SourceTypes.wasapi_output_capture || x.SourceType == OBSWebSocketLibrary.Data.SourceTypes.wasapi_input_capture
+            ).ToArray();
+            for (int i = 0; i < sourcePropertyReplies.Length; i++)
+            {
+                OBSWebSocketLibrary.Models.RequestReplies.GetSourceSettings sourceReply = (OBSWebSocketLibrary.Models.RequestReplies.GetSourceSettings)sourcePropertyReplies[i].MessageObject;
+                AudioInterface audioInterface = null;
+                switch (Enum.Parse(typeof(OBSWebSocketLibrary.Data.SourceTypes), sourceReply.SourceType))
+                {
+                    case OBSWebSocketLibrary.Data.SourceTypes.wasapi_input_capture:
+                        audioInterface = devices.FirstOrDefault(x => x.ID == ((OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.WasapiInputCapture)sourceReply.SourceSettingsObj).DeviceID);
+                        break;
+                    case OBSWebSocketLibrary.Data.SourceTypes.wasapi_output_capture:
+                        audioInterface = devices.FirstOrDefault(x => x.ID == ((OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.WasapiOutputCapture)sourceReply.SourceSettingsObj).DeviceID);
+                        break;
+                    case OBSWebSocketLibrary.Data.SourceTypes.dshow_input:
+                        string deviceName = ((OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.DShowInput)sourceReply.SourceSettingsObj).AudioDeviceId;
+                        deviceName = deviceName.Substring(deviceName.Length - 1);
+                        audioInterface = devices.FirstOrDefault(x => x.FriendlyName == deviceName);
+                        break;
+                }
+                // TODO: Do something with the results.
+                Trace.WriteLine($"{sourceReply.SourceName} -> {sourceReply.SourceType} -> device_id: {audioInterface?.ID} AKA {audioInterface?.FriendlyName}");
+                if (audioInterface?.ID == audioInterface?.FriendlyName)
+                {
+                    Trace.WriteLine($"Info: The device used for {sourceReply.SourceName} is in a {audioInterface.State} state.");
+                }
             }
         }
 
@@ -286,6 +343,27 @@ namespace Stream_Controller
             return webSocket.OBS_Send(request).Result;
         }
 
+        private Guid Obs_GetSourceTypesList()
+        {
+            OBSWebSocketLibrary.Models.Requests.GetSourceTypesList request = new OBSWebSocketLibrary.Models.Requests.GetSourceTypesList();
+            return webSocket.OBS_Send(request).Result;
+        }
+
+        private Guid Obs_GetSourcesList()
+        {
+            OBSWebSocketLibrary.Models.Requests.GetSourcesList request = new OBSWebSocketLibrary.Models.Requests.GetSourcesList();
+            return webSocket.OBS_Send(request).Result;
+        }
+
+        private Guid Obs_GetSourceSettings(string deviceName)
+        {
+            OBSWebSocketLibrary.Models.Requests.GetSourceSettings request = new OBSWebSocketLibrary.Models.Requests.GetSourceSettings()
+            {
+                SourceName = deviceName
+            };
+            return webSocket.OBS_Send(request).Result;
+        }
+
         #endregion
 
         #endregion
@@ -294,11 +372,9 @@ namespace Stream_Controller
 
         private void UpdateUIConnectStatus(string countdownText, Brush brush1, Brush brush2)
         {
-            Trace.WriteLine($"Start UI thread update: {DateTime.Now.Ticks}");
             _ = Task.Run(
                 () => UpdateConnectStatus(countdownText, brush1, brush2)
                 );
-            Trace.WriteLine($"Finished UI thread update: {DateTime.Now.Ticks}");
         }
 
         private async Task UpdateConnectStatus(string countdownText, Brush brush1, Brush brush2)

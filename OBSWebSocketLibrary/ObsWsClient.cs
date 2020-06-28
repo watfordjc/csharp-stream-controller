@@ -29,7 +29,6 @@ namespace OBSWebSocketLibrary
         {
             context = SynchronizationContext.Current;
             StateChange += WebSocket_Connected;
-            OnObsReply += FurtherProcessObsReply;
             OnObsEvent += FurtherProcessObsEvent;
         }
 
@@ -37,6 +36,7 @@ namespace OBSWebSocketLibrary
         {
             public Guid MessageId { get; set; }
             public Data.Requests RequestType { get; set; }
+            public Data.SourceTypes SourceType { get; set; }
             public object MessageObject { get; set; }
             public string Status { get; set; }
         }
@@ -71,18 +71,6 @@ namespace OBSWebSocketLibrary
             ReceiveTextMessage += WebSocket_NewTextMessage;
             StartMessageReceiveLoop();
             OBS_EnableHeartBeat();
-
-            /*
-             * TODO: OBS sourceType to sourceSettings.audio_device_id represented as NAudio property
-             * 
-             * browser_source -> N/A
-             * dshow_input -> Device.FriendlyName + ":"
-             * ffmpeg_source -> N/A
-             * game_capture -> N/A
-             * waspi_input_capture -> Device.ID
-             * waspi_output_capture -> Device.ID
-             * 
-            */
         }
 
         private void HeartBeatTimer_Elapsed(object sender, ElapsedEventArgs e)
@@ -118,17 +106,6 @@ namespace OBSWebSocketLibrary
                 Enable = true
             };
             return OBS_Send(message).Result;
-        }
-
-        private void FurtherProcessObsReply(object sender, ObsReply obsReply)
-        {
-            switch (obsReply.RequestType)
-            {
-                case Data.Requests.SetHeartbeat:
-                    Trace.WriteLine($"Server response to enabling HeartBeat: {obsReply.Status}");
-                    break;
-                default: break;
-            }
         }
 
         private void FurtherProcessObsEvent(object sender, ObsEvent obsEvent)
@@ -169,7 +146,6 @@ namespace OBSWebSocketLibrary
                 root.TryGetProperty("status", out JsonElement statusJson);
                 if (sentMessageGuids.TryGetValue(guid, out Data.Requests requestType))
                 {
-                    Trace.WriteLine($"Received response to message of type {requestType} with GUID {guid} - {statusJson.GetString()}.");
                     sentMessageGuids.Remove(guid);
                 }
                 Enum.TryParse(requestType.ToString(), out Data.Requests reqType);
@@ -179,6 +155,12 @@ namespace OBSWebSocketLibrary
                     RequestType = reqType,
                     Status = statusJson.GetString()
                 };
+                if (reqType == Data.Requests.GetSourceSettings)
+                {
+                    root.TryGetProperty("sourceType", out JsonElement sourceType);
+                    Enum.TryParse(sourceType.ToString(), out Data.SourceTypes srcType);
+                    obsReply.SourceType = srcType;
+                }
                 ParseReply(message, obsReply);
             }
             else if (root.TryGetProperty("update-type", out JsonElement updateTypeJson))
@@ -206,6 +188,21 @@ namespace OBSWebSocketLibrary
             if (obsReply.Status == "ok" && Enum.IsDefined(typeof(Data.Requests), obsReply.RequestType))
             {
                 obsReply.MessageObject = await JsonSerializer.DeserializeAsync(message, Data.RequestReply.GetType(obsReply.RequestType));
+                if (obsReply.RequestType == Data.Requests.GetSourceSettings)
+                {
+                    if (Data.SourceTypeSettings.GetType(obsReply.SourceType) != null)
+                    {
+                        object sourceTypeSettings = JsonSerializer.Deserialize(
+                            ((Models.RequestReplies.GetSourceSettings)obsReply.MessageObject).SourceSettings.GetRawText(),
+                            Data.SourceTypeSettings.GetType(obsReply.SourceType)
+                            );
+                        ((Models.RequestReplies.GetSourceSettings)obsReply.MessageObject).SourceSettingsObj = sourceTypeSettings;
+                    } else
+                    {
+                        NotImplementedException ex = new NotImplementedException($"Source type {obsReply.SourceType} has not yet been implemented.", new JsonException($"Unable to parse: {((Models.RequestReplies.GetSourceSettings)obsReply.MessageObject).SourceSettings}"));
+                        OnErrorState(ex, -1);
+                    }
+                }
                 NewObsReply(obsReply);
             }
             else if (obsReply.Status == "error")
