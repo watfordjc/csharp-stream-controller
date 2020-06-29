@@ -59,6 +59,7 @@ namespace OBSWebSocketLibrary.Data
     {
         private static readonly Dictionary<SourceTypes, Type> sourceTypeSettingsDictionary = new Dictionary<SourceTypes, Type>()
         {
+            { SourceTypes.scene, typeof(Models.TypeDefs.SourceTypes.Scene) },
             { SourceTypes.image_source, typeof(Models.TypeDefs.SourceTypes.ImageSource) },
             { SourceTypes.color_source_v2, typeof(Models.TypeDefs.SourceTypes.ColorSourceV2) },
             { SourceTypes.slideshow, typeof(Models.TypeDefs.SourceTypes.Slideshow) },
