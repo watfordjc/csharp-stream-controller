@@ -28,6 +28,4 @@ namespace OBSWebSocketLibrary.Models.Events
     public class RecordingResumed : EventBase
     {
     }
-
-
 }

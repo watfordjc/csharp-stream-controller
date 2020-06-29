@@ -15,20 +15,22 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         public int Width { get; set; }
         [JsonPropertyName("height")]
         public int Height { get; set; }
-        public class Flags
+        [JsonPropertyName("flags")]
+        public FlagsProperties Flags { get; set; }
+        public class FlagsProperties
         {
-            [JsonPropertyName("flags.rawValue")]
-            public int FlagsRawValue { get; set; }
-            [JsonPropertyName("flags.audio")]
-            public bool FlagsAudio { get; set; }
-            [JsonPropertyName("flags.video")]
-            public bool FlagsVideo { get; set; }
-            [JsonPropertyName("flags.encoded")]
-            public bool FlagsEncoded { get; set; }
-            [JsonPropertyName("flags.multiTrack")]
-            public bool FlagsMultiTrack { get; set; }
-            [JsonPropertyName("flags.service")]
-            public bool FlagsService { get; set; }
+            [JsonPropertyName("rawValue")]
+            public int RawValue { get; set; }
+            [JsonPropertyName("audio")]
+            public bool Audio { get; set; }
+            [JsonPropertyName("video")]
+            public bool Video { get; set; }
+            [JsonPropertyName("encoded")]
+            public bool Encoded { get; set; }
+            [JsonPropertyName("multiTrack")]
+            public bool MultiTrack { get; set; }
+            [JsonPropertyName("service")]
+            public bool Service { get; set; }
         }
         public class Settings
         {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace OBSWebSocketLibrary.Models.Events
@@ -38,6 +39,7 @@ namespace OBSWebSocketLibrary.Models.Events
         [JsonPropertyName("realm")]
         public string Realm { get; set; }
         [JsonPropertyName("data")]
-        public object Data { get; set; }
+        public JsonElement Data { get; set; }
+        public object DataObj { get; set; }
     }
 }

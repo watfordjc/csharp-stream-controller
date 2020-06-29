@@ -43,7 +43,7 @@ namespace OBSWebSocketLibrary.Models.Requests
         [JsonPropertyName("realm")]
         public string Realm { get; set; }
         [JsonPropertyName("data")]
-        public JsonElement Data { get; set; }
+        public object Data { get; set; }
     }
 
     public class GetVideoInfo : RequestBase

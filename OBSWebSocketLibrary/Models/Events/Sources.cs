@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace OBSWebSocketLibrary.Models.Events
@@ -13,9 +14,9 @@ namespace OBSWebSocketLibrary.Models.Events
         public string SourceType { get; set; }
         [JsonPropertyName("sourceKind")]
         public string SourceKind { get; set; }
-        public class SourceSettings
-        {
-        }
+        [JsonPropertyName("sourceSettings")]
+        public JsonElement SourceSettings { get; set; }
+        public object SourceSettingsObj { get; set; }
     }
 
     public class SourceDestroyed : EventBase
@@ -86,9 +87,9 @@ namespace OBSWebSocketLibrary.Models.Events
         public string FilterName { get; set; }
         [JsonPropertyName("filterType")]
         public string FilterType { get; set; }
-        public class FilterSettings
-        {
-        }
+        [JsonPropertyName("filterSettings")]
+        public JsonElement FilterSettings { get; set; }
+        public object FilterSettingsObj { get; set; }
     }
 
     public class SourceFilterRemoved : EventBase

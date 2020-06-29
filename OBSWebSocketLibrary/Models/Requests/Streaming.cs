@@ -17,13 +17,13 @@ namespace OBSWebSocketLibrary.Models.Requests
     public class StartStreaming : RequestBase
     {
         [JsonPropertyName("stream")]
-        public Stream StreamItem { get; set; }
-        public class Stream
+        public StreamProperties Stream { get; set; }
+        public class StreamProperties
         {
             [JsonPropertyName("type")]
             public string Type { get; set; }
             [JsonPropertyName("metadata")]
-            public JsonElement Metadata { get; set; }
+            public object Metadata { get; set; }
             [JsonPropertyName("settings")]
             public StreamSettings Settings { get; set; }
             public class StreamSettings

@@ -89,7 +89,7 @@ namespace OBSWebSocketLibrary.Models.Requests
         [JsonPropertyName("sourceType")]
         public string SourceType { get; set; }
         [JsonPropertyName("sourceSettings")]
-        public JsonElement SourceSettings { get; set; }
+        public object SourceSettings { get; set; }
     }
 
     public class GetTextGDIPlusProperties : RequestBase
@@ -220,8 +220,8 @@ namespace OBSWebSocketLibrary.Models.Requests
 
     public class GetSourceFilters : RequestBase
     {
-        [JsonPropertyName("source")]
-        public string Source { get; set; }
+        [JsonPropertyName("sourceName")]
+        public string SourceName { get; set; }
     }
 
     public class GetSourceFilterInfo : RequestBase
@@ -240,7 +240,8 @@ namespace OBSWebSocketLibrary.Models.Requests
         public string FilterName { get; set; }
         [JsonPropertyName("filterType")]
         public string FilterType { get; set; }
-        public JsonElement FilterSettings { get; set; }
+        [JsonPropertyName("filterSettings")]
+        public object FilterSettings { get; set; }
     }
 
     public class RemoveFilterFromSource : RequestBase
@@ -277,7 +278,8 @@ namespace OBSWebSocketLibrary.Models.Requests
         public string SourceName { get; set; }
         [JsonPropertyName("filterName")]
         public string FilterName { get; set; }
-        public JsonElement FilterSettings { get; set; }
+        [JsonPropertyName("filterSettings")]
+        public object FilterSettings { get; set; }
     }
 
     public class SetSourceFilterVisibility : RequestBase

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace OBSWebSocketLibrary.Models.RequestReplies
@@ -18,6 +19,6 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
     public class ListProfiles : RequestReplyBase
     {
         [JsonPropertyName("profiles")]
-        public object[] Profiles { get; set; }
+        public OBSWebSocketLibrary.Models.TypeDefs.Profile[] Profiles { get; set; }
     }
 }
