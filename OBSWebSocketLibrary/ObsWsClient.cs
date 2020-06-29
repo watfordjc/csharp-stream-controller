@@ -155,9 +155,15 @@ namespace OBSWebSocketLibrary
                     RequestType = reqType,
                     Status = statusJson.GetString()
                 };
-                if (reqType == Data.Requests.GetSourceSettings)
+                if (reqType == Data.Requests.GetSourceSettings || reqType == Data.Requests.SetSourceSettings)
                 {
                     root.TryGetProperty("sourceType", out JsonElement sourceType);
+                    Enum.TryParse(sourceType.ToString(), out Data.SourceTypes srcType);
+                    obsReply.SourceType = srcType;
+                }
+                else if (reqType == Data.Requests.GetSourceFilterInfo)
+                {
+                    root.TryGetProperty("type", out JsonElement sourceType);
                     Enum.TryParse(sourceType.ToString(), out Data.SourceTypes srcType);
                     obsReply.SourceType = srcType;
                 }
@@ -182,28 +188,88 @@ namespace OBSWebSocketLibrary
             }
         }
 
+        private static void GetJsonElementFromObjectProperty(object messageObject, string propertyName, out ReadOnlyMemory<char> json)
+        {
+            json = ((JsonElement)messageObject.GetType().GetProperty(propertyName).GetValue(messageObject, null)).GetRawText().AsMemory();
+        }
+
+        private bool CanDeserializeSourceType(Data.SourceTypes sourceType, ReadOnlyMemory<char> settingsJson, out object deserialisedObject)
+        {
+            Type modelType = Data.SourceTypeSettings.GetType(sourceType);
+            if (modelType == null)
+            {
+                NotImplementedException ex = new NotImplementedException($"Source type {sourceType} has not yet been implemented.", new JsonException($"Unable to parse: {settingsJson}"));
+                OnErrorState(ex, -1);
+                deserialisedObject = null;
+                return false;
+            }
+            else
+            {
+                Span<byte> span = ArrayPool<byte>.Shared.Rent(Encoding.UTF8.GetByteCount(settingsJson.Span));
+                int length = Encoding.UTF8.GetBytes(settingsJson.Span, span);
+                deserialisedObject = JsonSerializer.Deserialize(span.Slice(0, length), modelType);
+                ArrayPool<byte>.Shared.Return(span.ToArray());
+                return true;
+            }
+        }
+
         private async void ParseReply(MemoryStream message, ObsReply obsReply)
         {
             message.Seek(0, SeekOrigin.Begin);
             if (obsReply.Status == "ok" && Enum.IsDefined(typeof(Data.Requests), obsReply.RequestType))
             {
                 obsReply.MessageObject = await JsonSerializer.DeserializeAsync(message, Data.RequestReply.GetType(obsReply.RequestType));
-                if (obsReply.RequestType == Data.Requests.GetSourceSettings)
+
+                dynamic settingsObject;
+                ReadOnlyMemory<char> settingsJson;
+                Data.SourceTypes sourceType;
+
+                switch (obsReply.RequestType)
                 {
-                    if (Data.SourceTypeSettings.GetType(obsReply.SourceType) != null)
-                    {
-                        object sourceTypeSettings = JsonSerializer.Deserialize(
-                            ((Models.RequestReplies.GetSourceSettings)obsReply.MessageObject).SourceSettings.GetRawText(),
-                            Data.SourceTypeSettings.GetType(obsReply.SourceType)
-                            );
-                        ((Models.RequestReplies.GetSourceSettings)obsReply.MessageObject).SourceSettingsObj = sourceTypeSettings;
-                    } else
-                    {
-                        NotImplementedException ex = new NotImplementedException($"Source type {obsReply.SourceType} has not yet been implemented.", new JsonException($"Unable to parse: {((Models.RequestReplies.GetSourceSettings)obsReply.MessageObject).SourceSettings}"));
-                        OnErrorState(ex, -1);
-                    }
+                    case Data.Requests.GetSourceSettings:
+                        GetJsonElementFromObjectProperty(obsReply.MessageObject, "SourceSettings", out settingsJson);
+                        if (!CanDeserializeSourceType(obsReply.SourceType, settingsJson, out settingsObject)) { break; }
+                        (obsReply.MessageObject as Models.RequestReplies.GetSourceSettings).SourceSettingsObj = settingsObject;
+                        break;
+                    case Data.Requests.SetSourceSettings:
+                        GetJsonElementFromObjectProperty(obsReply.MessageObject, "SourceSettings", out settingsJson);
+                        if (!CanDeserializeSourceType(obsReply.SourceType, settingsJson, out settingsObject)) { break; }
+                        (obsReply.MessageObject as Models.RequestReplies.SetSourceSettings).SourceSettingsObj = settingsObject;
+                        break;
+                    case Data.Requests.GetSourceFilters:
+                        foreach (Models.RequestReplies.GetSourceFilters.Filter filter in (obsReply.MessageObject as Models.RequestReplies.GetSourceFilters).Filters)
+                        {
+                            settingsJson = filter.Settings.GetRawText().AsMemory();
+                            sourceType = (Data.SourceTypes)Enum.Parse(typeof(Data.SourceTypes), filter.Type);
+                            if (!CanDeserializeSourceType(sourceType, settingsJson, out settingsObject)) { continue; }
+                            filter.SettingsObj = settingsObject;
+                        }
+                        break;
+                    case Data.Requests.GetSourceFilterInfo:
+                        GetJsonElementFromObjectProperty(obsReply.MessageObject, "Settings", out settingsJson);
+                        if (!CanDeserializeSourceType(obsReply.SourceType, settingsJson, out settingsObject)) { break; }
+                        (obsReply.MessageObject as Models.RequestReplies.GetSourceFilterInfo).SettingsObj = settingsObject;
+                        break;
                 }
+
                 NewObsReply(obsReply);
+
+                /*
+                
+                Types that contain unspecified source types:
+
+                obsReply.RequestType ==
+                    Data.Requests.GetSourceSettings ||
+                    Data.Requests.SetSourceSettings ||
+                    Data.Requests.GetSourceFilters ||
+                    Data.Requests.GetSourceFilterInfo ||
+                    Data.Requests.ListProfiles ||
+                    
+                obsEvent.EventType ==
+                    Data.Events.SourceCreated ||
+                    Data.Events.SourceFilterAdded ||
+                */
+
             }
             else if (obsReply.Status == "error")
             {

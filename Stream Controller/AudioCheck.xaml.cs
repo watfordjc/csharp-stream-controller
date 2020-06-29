@@ -255,15 +255,33 @@ namespace Stream_Controller
                     break;
                 case OBSWebSocketLibrary.Data.Requests.GetSourcesList:
                     OBSWebSocketLibrary.Models.RequestReplies.GetSourcesList sourcesList = (OBSWebSocketLibrary.Models.RequestReplies.GetSourcesList)replyObject.MessageObject;
-                    Array.ForEach<string>(sourcesList.Sources.Select(a => a.Name).ToArray(),
-                        a => Obs_GetSourceSettings(a)
-                        );
+                    foreach (string sourceName in sourcesList.Sources.Select(a => a.Name))
+                    {
+                        Obs_GetSourceSettings(sourceName);
+                        Obs_GetSourceFilters(sourceName);
+                    }
                     GetDeviceIdsForSources();
+                    Obs_GetTransitionList();
                     break;
                 case OBSWebSocketLibrary.Data.Requests.GetSourceSettings:
                     OBSWebSocketLibrary.Models.RequestReplies.GetSourceSettings sourceSettings = (OBSWebSocketLibrary.Models.RequestReplies.GetSourceSettings)replyObject.MessageObject;
                     Trace.WriteLine($"{sourceSettings.SourceName} [{sourceSettings.SourceType}] -> {sourceSettings.SourceSettings}");
                     obsSourceDictionary.Add(sourceSettings.SourceName, replyObject);
+                    break;
+                case OBSWebSocketLibrary.Data.Requests.GetSourceFilters:
+                    OBSWebSocketLibrary.Models.RequestReplies.GetSourceFilters sourceFilters = (OBSWebSocketLibrary.Models.RequestReplies.GetSourceFilters)replyObject.MessageObject;
+                    OBSWebSocketLibrary.Models.RequestReplies.GetSourceFilters.Filter[] filters = sourceFilters.Filters.ToArray();
+                    foreach (OBSWebSocketLibrary.Models.RequestReplies.GetSourceFilters.Filter filter in filters)
+                    {
+                        Trace.WriteLine($"{filter.Name} ({filter.Type}) => {filter.Settings}");
+                    }
+                    break;
+                case OBSWebSocketLibrary.Data.Requests.GetTransitionList:
+                    OBSWebSocketLibrary.Models.RequestReplies.GetTransitionList transitionList = (OBSWebSocketLibrary.Models.RequestReplies.GetTransitionList)replyObject.MessageObject;
+                    foreach (OBSWebSocketLibrary.Models.RequestReplies.GetTransitionList.Transition transition in transitionList.Transitions)
+                    {
+                        Trace.WriteLine($"{transition.Name}");
+                    }
                     break;
             }
         }
@@ -355,12 +373,27 @@ namespace Stream_Controller
             return webSocket.OBS_Send(request).Result;
         }
 
-        private Guid Obs_GetSourceSettings(string deviceName)
+        private Guid Obs_GetSourceSettings(string sourceName)
         {
             OBSWebSocketLibrary.Models.Requests.GetSourceSettings request = new OBSWebSocketLibrary.Models.Requests.GetSourceSettings()
             {
-                SourceName = deviceName
+                SourceName = sourceName
             };
+            return webSocket.OBS_Send(request).Result;
+        }
+
+        private Guid Obs_GetSourceFilters(string sourceName)
+        {
+            OBSWebSocketLibrary.Models.Requests.GetSourceFilters request = new OBSWebSocketLibrary.Models.Requests.GetSourceFilters()
+            {
+                SourceName = sourceName
+            };
+            return webSocket.OBS_Send(request).Result;
+        }
+        
+        private Guid Obs_GetTransitionList()
+        {
+            OBSWebSocketLibrary.Models.Requests.GetTransitionList request = new OBSWebSocketLibrary.Models.Requests.GetTransitionList();
             return webSocket.OBS_Send(request).Result;
         }
 

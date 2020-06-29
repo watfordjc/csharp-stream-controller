@@ -76,6 +76,18 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         public string LocalFile { get; set; }
     }
 
+    public class MaskFilter
+    {
+        [JsonPropertyName("opacity")]
+        public int Opacity { get; set; }
+    }
+
+    public class ColorFilter
+    {
+        [JsonPropertyName("opacity")]
+        public int Opacity { get; set; }
+    }
+
     public class TextGdiPlusV2
     {
         [JsonPropertyName("align")]
