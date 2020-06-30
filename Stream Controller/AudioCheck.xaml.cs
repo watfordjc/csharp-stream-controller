@@ -283,6 +283,10 @@ namespace Stream_Controller
                         Trace.WriteLine($"{transition.Name}");
                     }
                     break;
+                case OBSWebSocketLibrary.Data.Requests.GetSceneItemProperties:
+                    OBSWebSocketLibrary.Models.RequestReplies.GetSceneItemProperties itemProps = (OBSWebSocketLibrary.Models.RequestReplies.GetSceneItemProperties)replyObject.MessageObject;
+                    Trace.WriteLine($"{itemProps.Name} -> {itemProps}");
+                    break;
             }
         }
 
@@ -358,6 +362,15 @@ namespace Stream_Controller
         private Guid Obs_GetCurrentScene()
         {
             OBSWebSocketLibrary.Models.Requests.GetCurrentScene request = new OBSWebSocketLibrary.Models.Requests.GetCurrentScene();
+            return webSocket.OBS_Send(request).Result;
+        }
+
+        private Guid Obs_GetSceneItemProperties(string sceneName)
+        {
+            OBSWebSocketLibrary.Models.Requests.GetSceneItemProperties request = new OBSWebSocketLibrary.Models.Requests.GetSceneItemProperties()
+            {
+                Item = sceneName
+            };
             return webSocket.OBS_Send(request).Result;
         }
 
@@ -460,6 +473,7 @@ namespace Stream_Controller
                     {
                         sb.Append("\n");
                     }
+                    Obs_GetSceneItemProperties(sourceNames[i]);
                 }
                 _Context.Send(
                     x => tbSourceList.Text = sb.ToString(),
