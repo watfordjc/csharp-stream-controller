@@ -91,7 +91,7 @@ namespace OBSWebSocketLibrary
             }
         }
 
-        public async Task<Guid> OBS_Send(object message)
+        public async ValueTask<Guid> OBS_Send(object message)
         {
             Guid guid = (message as Models.Requests.RequestBase).MessageId;
             Data.Requests messageType = (message as Models.Requests.RequestBase).RequestType;
@@ -242,7 +242,7 @@ namespace OBSWebSocketLibrary
             {
                 obsReply.MessageObject = await JsonSerializer.DeserializeAsync(message, Data.RequestReply.GetType(obsReply.RequestType));
 
-                dynamic settingsObject;
+                object settingsObject;
                 ReadOnlyMemory<char> settingsJson;
                 Data.SourceTypes sourceType;
 
@@ -272,26 +272,11 @@ namespace OBSWebSocketLibrary
                         if (!CanDeserializeSourceType(obsReply.SourceType, settingsJson, out settingsObject)) { break; }
                         (obsReply.MessageObject as Models.RequestReplies.GetSourceFilterInfo).SettingsObj = settingsObject;
                         break;
+                    default:
+                        break;
                 }
 
                 NewObsReply(obsReply);
-
-                /*
-                
-                Types that contain unspecified source types:
-
-                obsReply.RequestType ==
-                    Data.Requests.GetSourceSettings ||
-                    Data.Requests.SetSourceSettings ||
-                    Data.Requests.GetSourceFilters ||
-                    Data.Requests.GetSourceFilterInfo ||
-                    Data.Requests.ListProfiles ||
-                    
-                obsEvent.EventType ==
-                    Data.Events.SourceCreated ||
-                    Data.Events.SourceFilterAdded ||
-                */
-
             }
             else if (obsReply.Status == "error")
             {
@@ -313,9 +298,8 @@ namespace OBSWebSocketLibrary
             message.Seek(0, SeekOrigin.Begin);
             obsEvent.MessageObject = await JsonSerializer.DeserializeAsync(message, Data.Event.GetType(obsEvent.EventType));
 
-            dynamic settingsObject;
+            object settingsObject;
             ReadOnlyMemory<char> settingsJson;
-            Data.SourceTypes sourceType;
 
             switch (obsEvent.EventType)
             {

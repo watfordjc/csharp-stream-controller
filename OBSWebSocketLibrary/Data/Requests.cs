@@ -324,6 +324,11 @@ namespace OBSWebSocketLibrary.Data
             return requestDictionary.TryGetValue(requestType, out Type value) ? value : null;
         }
 
+        public static object GetInstanceOfType(Requests requestType)
+        {
+            return requestDictionary.TryGetValue(requestType, out Type value) ? Activator.CreateInstance(value) : null;
+        }
+
         public static Data.Requests GetRequestEnum(Type objectType)
         {
             return requestDictionary.FirstOrDefault(k => k.Value == objectType).Key;
