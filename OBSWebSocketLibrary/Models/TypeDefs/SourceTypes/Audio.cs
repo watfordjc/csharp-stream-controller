@@ -17,6 +17,10 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         public int SuppressLevel { get; set; }
     }
 
+    public class InvertPolarityFilter
+    {
+    }
+
     public class NoiseGateFilter
     {
         [JsonPropertyName("close_threshold")]
@@ -45,6 +49,24 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
 
     public class LimiterFilter
     {
+        [JsonPropertyName("release_time")]
+        public int ReleaseTime { get; set; }
+        [JsonPropertyName("threshold")]
+        public Decimal Threshold { get; set; }
+    }
+
+    public class ExpanderFilter
+    {
+        [JsonPropertyName("attack_time")]
+        public int AttackTime { get; set; }
+        [JsonPropertyName("detector")]
+        public string Detector { get; set; }
+        [JsonPropertyName("output_gain")]
+        public Decimal OutputGain { get; set; }
+        [JsonPropertyName("presets")]
+        public string Presets { get; set; }
+        [JsonPropertyName("ratio")]
+        public Decimal Ratio { get; set; }
         [JsonPropertyName("release_time")]
         public int ReleaseTime { get; set; }
         [JsonPropertyName("threshold")]

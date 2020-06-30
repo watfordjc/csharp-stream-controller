@@ -138,12 +138,56 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         public int DelayMs { get; set; }
     }
 
+    public class ColorKeyFilter
+    {
+        [JsonPropertyName("brightness")]
+        public Decimal Brightness { get; set; }
+        [JsonPropertyName("contrast")]
+        public Decimal Contrast { get; set; }
+        [JsonPropertyName("gamma")]
+        public Decimal Gamma { get; set; }
+        [JsonPropertyName("key_color_type")]
+        public string KeyColorType { get; set; }
+        [JsonPropertyName("opacity")]
+        public int Opacity { get; set; }
+        [JsonPropertyName("similarity")]
+        public int Similarity { get; set; }
+        [JsonPropertyName("smoothness")]
+        public int Smoothness { get; set; }
+    }
+
     public class ClutFilter
     {
         [JsonPropertyName("clut_amount")]
         public Decimal ClutAmount { get; set; }
         [JsonPropertyName("image_path")]
         public string ImagePath { get; set; }
+    }
+
+    public class SharpnessFilter
+    {
+        [JsonPropertyName("sharpness_filter")]
+        public Decimal Sharpness { get; set; }
+    }
+
+    public class ChromaKeyFilter
+    {
+        [JsonPropertyName("brightness")]
+        public Decimal Brightness { get; set; }
+        [JsonPropertyName("contrast")]
+        public Decimal Contrast { get; set; }
+        [JsonPropertyName("gamma")]
+        public Decimal Gamma { get; set; }
+        [JsonPropertyName("key_color_type")]
+        public string KeyColorType { get; set; }
+        [JsonPropertyName("opacity")]
+        public int Opacity { get; set; }
+        [JsonPropertyName("similarity")]
+        public int Similarity { get; set; }
+        [JsonPropertyName("smoothness")]
+        public int Smoothness { get; set; }
+        [JsonPropertyName("spill")]
+        public int Spill { get; set; }
     }
 
     public class AsyncDelayFilter
@@ -196,10 +240,36 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         public bool Vertical { get; set; }
     }
 
+    public class TextFt2SouceV2
+    {
+        [JsonPropertyName("color1")]
+        public long Color1 { get; set; }
+        [JsonPropertyName("color2")]
+        public long Color2 { get; set; }
+        [JsonPropertyName("custom_width")]
+        public int CustomWidth { get; set; }
+        [JsonPropertyName("drop_shadow")]
+        public bool DropShadow { get; set; }
+        [JsonPropertyName("from_file")]
+        public bool FromFile { get; set; }
+        [JsonPropertyName("log_mode")]
+        public bool LogMode { get; set; }
+        [JsonPropertyName("outline")]
+        public bool Outline { get; set; }
+        [JsonPropertyName("text")]
+        public string Text { get; set; }
+        [JsonPropertyName("text_file")]
+        public string TextFile { get; set; }
+        [JsonPropertyName("word_wrap")]
+        public bool WordWrap { get; set; }
+    }
+
     public class WindowCapture
     {
         [JsonPropertyName("cursor")]
         public bool Cursor { get; set; }
+        [JsonPropertyName("client_area")]
+        public bool ClientArea { get; set; }
         [JsonPropertyName("method")]
         public int Method { get; set; }
         [JsonPropertyName("priority")]
