@@ -321,7 +321,7 @@ namespace Stream_Controller
                 }
                 // TODO: Do something with the results.
                 Trace.WriteLine($"{sourceReply.SourceName} -> {sourceReply.SourceType} -> device_id: {audioInterface?.ID} AKA {audioInterface?.FriendlyName}");
-                if (audioInterface?.ID == audioInterface?.FriendlyName)
+                if (audioInterface != null && audioInterface.ID == audioInterface.FriendlyName)
                 {
                     Trace.WriteLine($"Info: The device used for {sourceReply.SourceName} is in a {audioInterface.State} state.");
                 }

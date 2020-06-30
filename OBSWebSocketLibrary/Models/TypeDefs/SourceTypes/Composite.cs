@@ -54,4 +54,18 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
             public bool Visible { get; set; }
         }
     }
+
+    public class Group
+    {
+        [JsonPropertyName("custom_size")]
+        public bool CustomSize { get; set; }
+        [JsonPropertyName("cx")]
+        public int Cx { get; set; }
+        [JsonPropertyName("cy")]
+        public int Cy { get; set; }
+        [JsonPropertyName("id_counter")]
+        public int IdCounter { get; set; }
+        [JsonPropertyName("items")]
+        public Scene.Item[] Items { get; set; }
+    }
 }

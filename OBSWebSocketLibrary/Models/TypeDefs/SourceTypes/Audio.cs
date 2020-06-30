@@ -5,6 +5,12 @@ using System.Text.Json.Serialization;
 
 namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
 {
+    public class GainFilter
+    {
+        [JsonPropertyName("db")]
+        public Decimal Db { get; set; }
+    }
+
     public class NoiseSupressFilter
     {
         [JsonPropertyName("suppress_level")]
@@ -33,6 +39,14 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         public int ReleaseTime { get; set; }
         [JsonPropertyName("sidechain_source")]
         public string SidechainSource { get; set; }
+        [JsonPropertyName("threshold")]
+        public Decimal Threshold { get; set; }
+    }
+
+    public class LimiterFilter
+    {
+        [JsonPropertyName("release_time")]
+        public int ReleaseTime { get; set; }
         [JsonPropertyName("threshold")]
         public Decimal Threshold { get; set; }
     }

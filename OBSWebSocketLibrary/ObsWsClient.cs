@@ -305,12 +305,12 @@ namespace OBSWebSocketLibrary
             {
                 case Data.Events.SourceCreated:
                     GetJsonElementFromObjectProperty(obsEvent.MessageObject, "SourceSettings", out settingsJson);
-                    if (!CanDeserializeSourceType(obsEvent.SourceType, settingsJson, out settingsObject)) { Trace.WriteLine($"{obsEvent.EventType} -> {settingsJson}"); break; }
+                    if (!CanDeserializeSourceType(obsEvent.SourceType, settingsJson, out settingsObject)) { Trace.WriteLine($"{obsEvent.EventType} ({obsEvent.SourceType}) -> {settingsJson}"); break; }
                     (obsEvent.MessageObject as Models.Events.SourceCreated).SourceSettingsObj = settingsObject;
                     break;
                 case Data.Events.SourceFilterAdded:
                     GetJsonElementFromObjectProperty(obsEvent.MessageObject, "FilterSettings", out settingsJson);
-                    if (!CanDeserializeSourceType(obsEvent.SourceType, settingsJson, out settingsObject)) { Trace.WriteLine($"{obsEvent.EventType} -> {settingsJson}"); break; }
+                    if (!CanDeserializeSourceType(obsEvent.SourceType, settingsJson, out settingsObject)) { Trace.WriteLine($"{obsEvent.EventType} ({obsEvent.SourceType}) -> {settingsJson}"); break; }
                     (obsEvent.MessageObject as Models.Events.SourceFilterAdded).FilterSettingsObj = settingsObject;
                     break;
             }
