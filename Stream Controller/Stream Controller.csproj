@@ -8,6 +8,9 @@
     <Version>0.0.3</Version>
     <NeutralLanguage>en-GB</NeutralLanguage>
     <StartupObject>Stream_Controller.App</StartupObject>
+    <Authors>John Cook</Authors>
+    <Copyright>Copyright © John Cook 2020</Copyright>
+    <Platforms>AnyCPU;x64;x86</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
