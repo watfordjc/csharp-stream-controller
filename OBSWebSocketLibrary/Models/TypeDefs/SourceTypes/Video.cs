@@ -13,6 +13,10 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         public bool Unload { get; set; }
     }
 
+    public class ColorSource : ColorSourceV2
+    {
+    }
+
     public class ColorSourceV2
     {
         [JsonPropertyName("color")]
@@ -208,6 +212,10 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         public Decimal LumaMinSmooth { get; set; }
     }
 
+    public class TextGdiPlus : TextGdiPlusV2
+    {
+    }
+
     public class TextGdiPlusV2
     {
         [JsonPropertyName("align")]
@@ -240,6 +248,38 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         public bool Vertical { get; set; }
     }
 
+    public class CutTransition
+    {
+    }
+
+    public class FadeTransition
+    {
+    }
+
+    public class SwipeTransition
+    {
+    }
+
+    public class SlideTransition
+    {
+    }
+
+    public class ObsStingerTransition
+    {
+    }
+
+    public class FadeToColorTransition
+    {
+    }
+
+    public class WipeTransition
+    {
+    }
+
+    public class TextFt2Source : TextFt2SouceV2
+    {
+    }
+
     public class TextFt2SouceV2
     {
         [JsonPropertyName("color1")]
@@ -262,6 +302,14 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         public string TextFile { get; set; }
         [JsonPropertyName("word_wrap")]
         public bool WordWrap { get; set; }
+    }
+
+    public class VlcSource
+    {
+    }
+
+    public class MonitorCapture
+    {
     }
 
     public class WindowCapture
