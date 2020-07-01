@@ -61,6 +61,7 @@ namespace OBSWebSocketLibrary.Data
         {
             { SourceTypes.scene, typeof(Models.TypeDefs.SourceTypes.Scene) },
             { SourceTypes.group, typeof(Models.TypeDefs.SourceTypes.Group) },
+            { SourceTypes.audio_line, typeof(Models.TypeDefs.SourceTypes.AudioLine) },
             { SourceTypes.image_source, typeof(Models.TypeDefs.SourceTypes.ImageSource) },
             { SourceTypes.color_source, typeof(Models.TypeDefs.SourceTypes.ColorSource) },
             { SourceTypes.color_source_v2, typeof(Models.TypeDefs.SourceTypes.ColorSourceV2) },
@@ -95,6 +96,7 @@ namespace OBSWebSocketLibrary.Data
             { SourceTypes.obs_stinger_transition, typeof(Models.TypeDefs.SourceTypes.ObsStingerTransition) },
             { SourceTypes.fade_to_color_transition, typeof(Models.TypeDefs.SourceTypes.FadeToColorTransition) },
             { SourceTypes.wipe_transition, typeof(Models.TypeDefs.SourceTypes.WipeTransition) },
+            { SourceTypes.vst_filter, typeof(Models.TypeDefs.SourceTypes.VstFilter) },
             { SourceTypes.text_ft2_source, typeof(Models.TypeDefs.SourceTypes.TextFt2Source) },
             { SourceTypes.text_ft2_source_v2, typeof(Models.TypeDefs.SourceTypes.TextFt2SouceV2) },
             { SourceTypes.vlc_source, typeof(Models.TypeDefs.SourceTypes.VlcSource) },

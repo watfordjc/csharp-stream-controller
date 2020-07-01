@@ -306,10 +306,37 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
 
     public class VlcSource
     {
+        [JsonPropertyName("loop")]
+        public bool Loop { get; set; }
+        [JsonPropertyName("network_caching")]
+        public int NetworkCaching { get; set; }
+        [JsonPropertyName("playback_behavior")]
+        public string PlaybackBehavior { get; set; }
+        [JsonPropertyName("playlist")]
+        public PlaylistItem[] Playlist { get; set; }
+        public class PlaylistItem
+        {
+        [JsonPropertyName("hidden")]
+            public bool Hidden { get; set; }
+        [JsonPropertyName("selected")]
+            public bool Selected { get; set; }
+        [JsonPropertyName("value")]
+            public string Value { get; set; }
+        }
+        [JsonPropertyName("shuffle")]
+        public bool Shuffle { get; set; }
+        [JsonPropertyName("subtitle")]
+        public int Subtitle { get; set; }
+        [JsonPropertyName("subtitle_enable")]
+        public bool SubtitleEnable { get; set; }
     }
 
     public class MonitorCapture
     {
+        [JsonPropertyName("capture_cursor")]
+        public bool CaptureCursor { get; set; }
+        [JsonPropertyName("monitor")]
+        public int Monitor { get; set; }
     }
 
     public class WindowCapture

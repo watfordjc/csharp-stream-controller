@@ -5,6 +5,10 @@ using System.Text.Json.Serialization;
 
 namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
 {
+    public class AudioLine
+    {
+    }
+
     public class GainFilter
     {
         [JsonPropertyName("db")]
@@ -71,6 +75,14 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         public int ReleaseTime { get; set; }
         [JsonPropertyName("threshold")]
         public Decimal Threshold { get; set; }
+    }
+
+    public class VstFilter
+    {
+        [JsonPropertyName("chunk_data")]
+        public string ChunkDataBase64 { get; set; }
+        [JsonPropertyName("plugin_path")]
+        public string PluginPath { get; set; }
     }
 
     public class WasapiOutputCapture
