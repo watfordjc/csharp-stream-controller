@@ -311,14 +311,14 @@ namespace Stream_Controller
                 switch (Enum.Parse(typeof(OBSWebSocketLibrary.Data.SourceTypes), sourceReply.SourceType))
                 {
                     case OBSWebSocketLibrary.Data.SourceTypes.wasapi_input_capture:
-                        audioInterface = devices.FirstOrDefault(x => x.ID == ((OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.WasapiInputCapture)sourceReply.SourceSettingsObj).DeviceID);
+                        audioInterface = AudioInterfaces.GetAudioInterfaceById(((OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.WasapiInputCapture)sourceReply.SourceSettingsObj).DeviceID);
                         break;
                     case OBSWebSocketLibrary.Data.SourceTypes.wasapi_output_capture:
-                        audioInterface = devices.FirstOrDefault(x => x.ID == ((OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.WasapiOutputCapture)sourceReply.SourceSettingsObj).DeviceID);
+                        audioInterface = AudioInterfaces.GetAudioInterfaceById(((OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.WasapiOutputCapture)sourceReply.SourceSettingsObj).DeviceID);
                         break;
                     case OBSWebSocketLibrary.Data.SourceTypes.dshow_input:
                         ReadOnlyMemory<char> deviceName = ((OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.DShowInput)sourceReply.SourceSettingsObj).AudioDeviceId.AsMemory();
-                        audioInterface = devices.FirstOrDefault(x => x.FriendlyName == deviceName[0..^1].ToString());
+                        audioInterface = AudioInterfaces.GetAudioInterfaceByName(deviceName[0..^1].ToString());
                         break;
                 }
                 // TODO: Do something with the results.

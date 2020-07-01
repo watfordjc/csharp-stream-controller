@@ -121,6 +121,11 @@ namespace NAudioWrapperLibrary
         {
             return _Devices.Where(device => device.ID == deviceId).FirstOrDefault();
         }
+
+        public static AudioInterface GetAudioInterfaceByName(string deviceName)
+        {
+            return _Devices.Where(device => device.FriendlyName == deviceName).FirstOrDefault();
+        }
         
         public static AudioInterface GetAudioInterfaceByVolumeNotificationGuid(Guid guid)
         {
