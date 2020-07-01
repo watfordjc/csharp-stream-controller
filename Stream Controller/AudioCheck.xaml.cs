@@ -255,10 +255,10 @@ namespace Stream_Controller
                     break;
                 case OBSWebSocketLibrary.Data.Requests.GetSourcesList:
                     OBSWebSocketLibrary.Models.RequestReplies.GetSourcesList sourcesList = (OBSWebSocketLibrary.Models.RequestReplies.GetSourcesList)replyObject.MessageObject;
-                    foreach (string sourceName in sourcesList.Sources.Select(a => a.Name))
+                    foreach (OBSWebSocketLibrary.Models.RequestReplies.GetSourcesList.Source source in sourcesList.Sources)
                     {
-                        Obs_Get(OBSWebSocketLibrary.Data.Requests.GetSourceSettings, sourceName);
-                        Obs_Get(OBSWebSocketLibrary.Data.Requests.GetSourceFilters, sourceName);
+                        Obs_Get(OBSWebSocketLibrary.Data.Requests.GetSourceSettings, source.Name);
+                        Obs_Get(OBSWebSocketLibrary.Data.Requests.GetSourceFilters, source.Name);
                     }
                     GetDeviceIdsForSources();
                     Obs_Get(OBSWebSocketLibrary.Data.Requests.GetTransitionList);
@@ -295,11 +295,14 @@ namespace Stream_Controller
         private async void GetDeviceIdsForSources()
         {
             await audioDevicesEnumerated.Task;
-            while (webSocket.sentMessageGuids.ContainsValue(OBSWebSocketLibrary.Data.Requests.GetSourceSettings)) {
+            while (webSocket.sentMessageGuids.ContainsValue(OBSWebSocketLibrary.Data.Requests.GetSourceSettings))
+            {
                 await Task.Delay(250);
             }
             ObsWsClient.ObsReply[] sourcePropertyReplies = obsSourceDictionary.Values.Where(
-                x => x.SourceType == OBSWebSocketLibrary.Data.SourceTypes.wasapi_output_capture || x.SourceType == OBSWebSocketLibrary.Data.SourceTypes.wasapi_input_capture
+                x => x.SourceType == OBSWebSocketLibrary.Data.SourceTypes.wasapi_output_capture ||
+                x.SourceType == OBSWebSocketLibrary.Data.SourceTypes.wasapi_input_capture ||
+                x.SourceType == OBSWebSocketLibrary.Data.SourceTypes.dshow_input
             ).ToArray();
             for (int i = 0; i < sourcePropertyReplies.Length; i++)
             {
@@ -314,16 +317,19 @@ namespace Stream_Controller
                         audioInterface = devices.FirstOrDefault(x => x.ID == ((OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.WasapiOutputCapture)sourceReply.SourceSettingsObj).DeviceID);
                         break;
                     case OBSWebSocketLibrary.Data.SourceTypes.dshow_input:
-                        string deviceName = ((OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.DShowInput)sourceReply.SourceSettingsObj).AudioDeviceId;
-                        deviceName = deviceName.Substring(deviceName.Length - 1);
-                        audioInterface = devices.FirstOrDefault(x => x.FriendlyName == deviceName);
+                        ReadOnlyMemory<char> deviceName = ((OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.DShowInput)sourceReply.SourceSettingsObj).AudioDeviceId.AsMemory();
+                        audioInterface = devices.FirstOrDefault(x => x.FriendlyName == deviceName[0..^1].ToString());
                         break;
                 }
                 // TODO: Do something with the results.
                 Trace.WriteLine($"{sourceReply.SourceName} -> {sourceReply.SourceType} -> device_id: {audioInterface?.ID} AKA {audioInterface?.FriendlyName}");
-                if (audioInterface != null && audioInterface.ID == audioInterface.FriendlyName)
+                if (audioInterface == null)
                 {
-                    Trace.WriteLine($"Info: The device used for {sourceReply.SourceName} is in a {audioInterface.State} state.");
+                    Trace.WriteLine($"Info: The audio device used for {sourceReply.SourceName} does not exist.");
+                }
+                else if (audioInterface.ID == audioInterface.FriendlyName)
+                {
+                    Trace.WriteLine($"Info: The audio device used for {sourceReply.SourceName} is in a {audioInterface.State} state.");
                 }
             }
         }
