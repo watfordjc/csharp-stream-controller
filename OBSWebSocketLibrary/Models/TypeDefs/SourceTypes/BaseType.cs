@@ -38,18 +38,49 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
     */
 
 
-public class BaseType : OBSWebSocketLibrary.Models.RequestReplies.GetSourceTypesList.Type
+    public class BaseType : OBSWebSocketLibrary.Models.RequestReplies.GetSourceTypesList.Type
     {
-        public class Dependencies
+        public BaseType()
         {
-            public bool HasAudioInterface { get; set; }
+            Dependencies = new DependencyProperties();
+        }
+
+        public DependencyProperties Dependencies { get; set; }
+        public class DependencyProperties
+        {
+            public bool DependencyProblem { get; set; }
             public string AudioDeviceId { get; set; }
-            public bool HasVideoInterface { get; set; }
+            public bool HasAudioInterface
+            {
+                get
+                {
+                    return AudioDeviceId != null && AudioDeviceId != String.Empty;
+                }
+            }
             public string VideoDeviceId { get; set; }
-            public bool HasFiles { get; set; }
+            public bool HasVideoInterface
+            {
+                get
+                {
+                    return VideoDeviceId != null && VideoDeviceId != String.Empty;
+                }
+            }
             public string[] FilePaths { get; set; }
-            public bool HasURIs { get; set; }
+            public bool HasFiles
+            {
+                get
+                {
+                    return FilePaths != null && FilePaths.Length != 0;
+                }
+            }
             public string[] Uris { get; set; }
+            public bool HasURIs
+            {
+                get
+                {
+                    return Uris != null && Uris.Length != 0;
+                }
+            }
         }
     }
 }

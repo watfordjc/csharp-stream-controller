@@ -89,10 +89,6 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
 
     public class WasapiOutputCapture : BaseType
     {
-        public new BaseType.Dependencies Dependencies = new BaseType.Dependencies()
-        {
-            HasAudioInterface = true
-        };
         [JsonPropertyName("device_id")]
         public string DeviceID
         {
@@ -109,10 +105,6 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
 
     public class WasapiInputCapture : BaseType
     {
-        public new BaseType.Dependencies Dependencies = new BaseType.Dependencies()
-        {
-            HasAudioInterface = true
-        };
         [JsonPropertyName("device_id")]
         public string DeviceID {
             get

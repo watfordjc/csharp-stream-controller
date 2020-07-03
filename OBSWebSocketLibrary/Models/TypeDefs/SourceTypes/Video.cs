@@ -316,11 +316,11 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         public PlaylistItem[] Playlist { get; set; }
         public class PlaylistItem
         {
-        [JsonPropertyName("hidden")]
+            [JsonPropertyName("hidden")]
             public bool Hidden { get; set; }
-        [JsonPropertyName("selected")]
+            [JsonPropertyName("selected")]
             public bool Selected { get; set; }
-        [JsonPropertyName("value")]
+            [JsonPropertyName("value")]
             public string Value { get; set; }
         }
         [JsonPropertyName("shuffle")]
@@ -380,6 +380,16 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         [JsonPropertyName("use_custom_audio_device")]
         public bool UseCustomAudioDevice { get; set; }
         [JsonPropertyName("video_device_id")]
-        public string VideoDeviceId { get; set; }
+        public string VideoDeviceId
+        {
+            get
+            {
+                return Dependencies.VideoDeviceId;
+            }
+            set
+            {
+                Dependencies.VideoDeviceId = value;
+            }
+        }
     }
 }
