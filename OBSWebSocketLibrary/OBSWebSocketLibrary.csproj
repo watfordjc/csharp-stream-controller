@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SharedModels\SharedModels.csproj" />
     <ProjectReference Include="..\WebSocketLibrary\WebSocketLibrary.csproj" />
   </ItemGroup>
 

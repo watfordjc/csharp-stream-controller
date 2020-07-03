@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
 {
-    public class ImageSource
+    public class ImageSource : BaseType
     {
         [JsonPropertyName("file")]
         public string File { get; set; }
@@ -17,7 +17,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
     {
     }
 
-    public class ColorSourceV2
+    public class ColorSourceV2 : BaseType
     {
         [JsonPropertyName("color")]
         public long Color { get; set; }
@@ -27,7 +27,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         public int Width { get; set; }
     }
 
-    public class Slideshow
+    public class Slideshow : BaseType
     {
         [JsonPropertyName("files")]
         public File[] Files { get; set; }
@@ -50,7 +50,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         public string UseCustomSize { get; set; }
     }
 
-    public class BrowserSource
+    public class BrowserSource : BaseType
     {
         [JsonPropertyName("css")]
         public string CSS { get; set; }
@@ -68,7 +68,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         public int Width { get; set; }
     }
 
-    public class FFmpegSource
+    public class FFmpegSource : BaseType
     {
         [JsonPropertyName("clear_on_media_end")]
         public bool ClearOnMediaEnd { get; set; }
@@ -80,13 +80,13 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         public string LocalFile { get; set; }
     }
 
-    public class MaskFilter
+    public class MaskFilter : BaseType
     {
         [JsonPropertyName("opacity")]
         public int Opacity { get; set; }
     }
 
-    public class CropFilter
+    public class CropFilter : BaseType
     {
         [JsonPropertyName("cx")]
         public int Cx { get; set; }
@@ -104,13 +104,13 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         public int Top { get; set; }
     }
 
-    public class ColorFilter
+    public class ColorFilter : BaseType
     {
         [JsonPropertyName("opacity")]
         public int Opacity { get; set; }
     }
 
-    public class ScaleFilter
+    public class ScaleFilter : BaseType
     {
         [JsonPropertyName("resolution")]
         public string Resolution { get; set; }
@@ -118,7 +118,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         public string Sampling { get; set; }
     }
 
-    public class ScrollFilter
+    public class ScrollFilter : BaseType
     {
         [JsonPropertyName("cx")]
         public int Cx { get; set; }
@@ -136,13 +136,13 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         public Decimal SpeedY { get; set; }
     }
 
-    public class GpuDelay
+    public class GpuDelay : BaseType
     {
         [JsonPropertyName("gpu_delay")]
         public int DelayMs { get; set; }
     }
 
-    public class ColorKeyFilter
+    public class ColorKeyFilter : BaseType
     {
         [JsonPropertyName("brightness")]
         public Decimal Brightness { get; set; }
@@ -160,7 +160,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         public int Smoothness { get; set; }
     }
 
-    public class ClutFilter
+    public class ClutFilter : BaseType
     {
         [JsonPropertyName("clut_amount")]
         public Decimal ClutAmount { get; set; }
@@ -168,13 +168,13 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         public string ImagePath { get; set; }
     }
 
-    public class SharpnessFilter
+    public class SharpnessFilter : BaseType
     {
         [JsonPropertyName("sharpness_filter")]
         public Decimal Sharpness { get; set; }
     }
 
-    public class ChromaKeyFilter
+    public class ChromaKeyFilter : BaseType
     {
         [JsonPropertyName("brightness")]
         public Decimal Brightness { get; set; }
@@ -194,13 +194,13 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         public int Spill { get; set; }
     }
 
-    public class AsyncDelayFilter
+    public class AsyncDelayFilter : BaseType
     {
         [JsonPropertyName("delay_ms")]
         public int DelayMx { get; set; }
     }
 
-    public class LumaKeyFilter
+    public class LumaKeyFilter : BaseType
     {
         [JsonPropertyName("luma_max")]
         public Decimal LumaMax { get; set; }
@@ -216,7 +216,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
     {
     }
 
-    public class TextGdiPlusV2
+    public class TextGdiPlusV2 : BaseType
     {
         [JsonPropertyName("align")]
         public string Align { get; set; }
@@ -248,31 +248,31 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         public bool Vertical { get; set; }
     }
 
-    public class CutTransition
+    public class CutTransition : BaseType
     {
     }
 
-    public class FadeTransition
+    public class FadeTransition : BaseType
     {
     }
 
-    public class SwipeTransition
+    public class SwipeTransition : BaseType
     {
     }
 
-    public class SlideTransition
+    public class SlideTransition : BaseType
     {
     }
 
-    public class ObsStingerTransition
+    public class ObsStingerTransition : BaseType
     {
     }
 
-    public class FadeToColorTransition
+    public class FadeToColorTransition : BaseType
     {
     }
 
-    public class WipeTransition
+    public class WipeTransition : BaseType
     {
     }
 
@@ -280,7 +280,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
     {
     }
 
-    public class TextFt2SouceV2
+    public class TextFt2SouceV2 : BaseType
     {
         [JsonPropertyName("color1")]
         public long Color1 { get; set; }
@@ -304,7 +304,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         public bool WordWrap { get; set; }
     }
 
-    public class VlcSource
+    public class VlcSource : BaseType
     {
         [JsonPropertyName("loop")]
         public bool Loop { get; set; }
@@ -331,7 +331,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         public bool SubtitleEnable { get; set; }
     }
 
-    public class MonitorCapture
+    public class MonitorCapture : BaseType
     {
         [JsonPropertyName("capture_cursor")]
         public bool CaptureCursor { get; set; }
@@ -339,7 +339,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         public int Monitor { get; set; }
     }
 
-    public class WindowCapture
+    public class WindowCapture : BaseType
     {
         [JsonPropertyName("cursor")]
         public bool Cursor { get; set; }
@@ -353,7 +353,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         public string Window { get; set; }
     }
 
-    public class GameCapture
+    public class GameCapture : BaseType
     {
         [JsonPropertyName("force_scaling")]
         public bool ForceScaling { get; set; }
@@ -363,7 +363,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         public string ScaleRes { get; set; }
     }
 
-    public class DShowInput
+    public class DShowInput : BaseType
     {
         [JsonPropertyName("active")]
         public bool Active { get; set; }

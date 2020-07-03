@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 
 namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
 {
-    public class Scene
+    public class Scene : BaseType
     {
         [JsonPropertyName("custom_size")]
         public bool CustomSize { get; set; }
@@ -55,7 +55,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         }
     }
 
-    public class Group
+    public class Group : BaseType
     {
         [JsonPropertyName("custom_size")]
         public bool CustomSize { get; set; }
