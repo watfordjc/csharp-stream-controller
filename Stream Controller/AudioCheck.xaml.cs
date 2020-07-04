@@ -239,6 +239,9 @@ namespace Stream_Controller
                 case OBSWebSocketLibrary.Data.Events.SourceOrderChanged:
                     SourceOrderChanged_Event((OBSWebSocketLibrary.Models.Events.SourceOrderChanged)eventObject.MessageObject);
                     break;
+                case OBSWebSocketLibrary.Data.Events.SourceCreated:
+                    SourceCreated_Event((OBSWebSocketLibrary.Models.Events.SourceCreated)eventObject.MessageObject);
+                    break;
             }
         }
 
@@ -300,7 +303,7 @@ namespace Stream_Controller
                     OBSWebSocketLibrary.Models.RequestReplies.GetSourceSettings sourceSettings = (OBSWebSocketLibrary.Models.RequestReplies.GetSourceSettings)replyObject.MessageObject;
                     OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType newSource = (OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType)sourceSettings.SourceSettingsObj;
                     newSource.Type = sourceTypes.Types.First(x => x.TypeId == sourceSettings.SourceType);
-                    obsSourceDictionary.Add(sourceSettings.SourceName, newSource);
+                    obsSourceDictionary[sourceSettings.SourceName] = newSource;
                     break;
                 case OBSWebSocketLibrary.Data.Requests.GetSourceFilters:
                     OBSWebSocketLibrary.Models.RequestReplies.GetSourceFilters sourceFilters = (OBSWebSocketLibrary.Models.RequestReplies.GetSourceFilters)replyObject.MessageObject;
@@ -399,6 +402,14 @@ namespace Stream_Controller
             List<int> collectionOrderList = messageObject.SceneItems.Select(x => x.ItemId).ToList();
             ListCollectionView listCollection = (ListCollectionView)CollectionViewSource.GetDefaultView(lbSourceList.ItemsSource);
             listCollection.CustomSort = new SceneItemSort(collectionOrderList);
+        }
+
+        private void SourceCreated_Event(OBSWebSocketLibrary.Models.Events.SourceCreated messageObject)
+        {
+            OBSWebSocketLibrary.Data.SourceTypes sourceType = (OBSWebSocketLibrary.Data.SourceTypes)Enum.Parse(typeof(OBSWebSocketLibrary.Data.SourceTypes), messageObject.SourceKind);
+            object createdSource = OBSWebSocketLibrary.Data.SourceTypeSettings.GetInstanceOfType(sourceType);
+            (createdSource as OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType).Type = sourceTypes.Types.First(x => x.TypeId == messageObject.SourceKind);
+            obsSourceDictionary[messageObject.SourceName] = createdSource;
         }
 
         #endregion

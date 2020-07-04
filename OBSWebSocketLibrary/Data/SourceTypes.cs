@@ -112,5 +112,10 @@ namespace OBSWebSocketLibrary.Data
         {
             return sourceTypeSettingsDictionary.TryGetValue(sourceType, out Type value) ? value : null;
         }
+
+        public static object GetInstanceOfType(SourceTypes sourceType)
+        {
+            return sourceTypeSettingsDictionary.TryGetValue(sourceType, out Type value) ? Activator.CreateInstance(value) : null;
+        }
     }
 }
