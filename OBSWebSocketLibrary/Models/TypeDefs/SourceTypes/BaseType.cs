@@ -7,12 +7,13 @@ using Stream_Controller.SharedModels;
 
 namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
 {
-    public class BaseType : OBSWebSocketLibrary.Models.RequestReplies.GetSourceTypesList.Type
+    public class BaseType
     {
         public BaseType()
         {
             Dependencies = new DependencyProperties();
         }
+        public OBSWebSocketLibrary.Models.RequestReplies.GetSourceTypesList.Type Type { get; set; }
 
         public DependencyProperties Dependencies { get; set; }
         public class DependencyProperties : INotifyPropertyChanged

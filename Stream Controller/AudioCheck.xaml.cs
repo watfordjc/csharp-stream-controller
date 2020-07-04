@@ -45,7 +45,7 @@ namespace Stream_Controller
         private int _ReconnectTimeRemaining;
         private OBSWebSocketLibrary.Models.RequestReplies.GetCurrentScene currentScene;
         private OBSWebSocketLibrary.Models.RequestReplies.GetSourceTypesList sourceTypes;
-        private Dictionary<string, ObsWsClient.ObsReply> obsSourceDictionary = new Dictionary<string, ObsWsClient.ObsReply>();
+        private Dictionary<string, object> obsSourceDictionary = new Dictionary<string, object>();
 
         #region Instantiation and initialisation
 
@@ -186,10 +186,8 @@ namespace Stream_Controller
                 connectionError = String.Empty;
                 _ReconnectCountdownTimer.Stop();
                 UpdateUIConnectStatus(String.Empty, Brushes.DarkGreen, null);
-                obsSourceDictionary = new Dictionary<string, ObsWsClient.ObsReply>();
-                Obs_Get(OBSWebSocketLibrary.Data.Requests.GetCurrentScene);
+                obsSourceDictionary = new Dictionary<string, object>();
                 Obs_Get(OBSWebSocketLibrary.Data.Requests.GetSourceTypesList);
-                Obs_Get(OBSWebSocketLibrary.Data.Requests.GetSourcesList);
             }
             else if (newState != WebSocketState.Connecting)
             {
@@ -247,6 +245,10 @@ namespace Stream_Controller
             {
                 case OBSWebSocketLibrary.Data.Requests.GetCurrentScene:
                     currentScene = (OBSWebSocketLibrary.Models.RequestReplies.GetCurrentScene)replyObject.MessageObject;
+                    foreach (OBSWebSocketLibrary.Models.TypeDefs.SceneItem sceneItem in currentScene.Sources)
+                    {
+                        sceneItem.Source = (OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType)obsSourceDictionary.GetValueOrDefault(sceneItem.Name);
+                    }
                     UpdateSceneInformation();
                     break;
                 case OBSWebSocketLibrary.Data.Requests.GetSourceTypesList:
@@ -258,6 +260,7 @@ namespace Stream_Controller
                             Trace.WriteLine($"Unknown source type: {type.DisplayName} ({type.TypeId}) is not defined but the server supports it.");
                         }
                     }
+                    Obs_Get(OBSWebSocketLibrary.Data.Requests.GetSourcesList);
                     break;
                 case OBSWebSocketLibrary.Data.Requests.GetSourcesList:
                     OBSWebSocketLibrary.Models.RequestReplies.GetSourcesList sourcesList = (OBSWebSocketLibrary.Models.RequestReplies.GetSourcesList)replyObject.MessageObject;
@@ -267,16 +270,14 @@ namespace Stream_Controller
                         Obs_Get(OBSWebSocketLibrary.Data.Requests.GetSourceFilters, source.Name);
                     }
                     GetDeviceIdsForSources();
+                    Obs_Get(OBSWebSocketLibrary.Data.Requests.GetCurrentScene);
                     Obs_Get(OBSWebSocketLibrary.Data.Requests.GetTransitionList);
                     break;
                 case OBSWebSocketLibrary.Data.Requests.GetSourceSettings:
                     OBSWebSocketLibrary.Models.RequestReplies.GetSourceSettings sourceSettings = (OBSWebSocketLibrary.Models.RequestReplies.GetSourceSettings)replyObject.MessageObject;
-                    //  Trace.WriteLine($"{sourceSettings.SourceName} [{sourceSettings.SourceType}] -> {sourceSettings.SourceSettings}");
-                    obsSourceDictionary.Add(sourceSettings.SourceName, replyObject);
-                    foreach (OBSWebSocketLibrary.Models.TypeDefs.SceneItem item in currentScene.Sources.Where(x => x.Name == sourceSettings.SourceName))
-                    {
-                        item.Source = (OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType)sourceSettings.SourceSettingsObj;
-                    }
+                    OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType newSource = (OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType)sourceSettings.SourceSettingsObj;
+                    newSource.Type = sourceTypes.Types.First(x => x.TypeId == sourceSettings.SourceType);
+                    obsSourceDictionary.Add(sourceSettings.SourceName, newSource);
                     break;
                 case OBSWebSocketLibrary.Data.Requests.GetSourceFilters:
                     OBSWebSocketLibrary.Models.RequestReplies.GetSourceFilters sourceFilters = (OBSWebSocketLibrary.Models.RequestReplies.GetSourceFilters)replyObject.MessageObject;
@@ -309,18 +310,22 @@ namespace Stream_Controller
             {
                 await Task.Delay(250);
             }
-            ObsWsClient.ObsReply[] sourcePropertyReplies = obsSourceDictionary.Values.Where(
-                x => x.SourceType == OBSWebSocketLibrary.Data.SourceTypes.wasapi_output_capture ||
-                x.SourceType == OBSWebSocketLibrary.Data.SourceTypes.wasapi_input_capture ||
-                x.SourceType == OBSWebSocketLibrary.Data.SourceTypes.dshow_input
-            ).ToArray();
-            for (int i = 0; i < sourcePropertyReplies.Length; i++)
+
+            foreach (OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType source in obsSourceDictionary.Values)
             {
-                OBSWebSocketLibrary.Models.RequestReplies.GetSourceSettings sourceReply = (OBSWebSocketLibrary.Models.RequestReplies.GetSourceSettings)sourcePropertyReplies[i].MessageObject;
-                OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType.DependencyProperties dependencies = (sourceReply.SourceSettingsObj as OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType).Dependencies;
-                if (sourceReply.SourceType == OBSWebSocketLibrary.Data.SourceTypes.dshow_input.ToString())
+                switch (Enum.Parse(typeof(OBSWebSocketLibrary.Data.SourceTypes), source.Type.TypeId))
                 {
-                    ReadOnlyMemory<char> deviceName = ((OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.DShowInput)sourceReply.SourceSettingsObj).AudioDeviceId.AsMemory();
+                    case OBSWebSocketLibrary.Data.SourceTypes.wasapi_output_capture:
+                    case OBSWebSocketLibrary.Data.SourceTypes.wasapi_input_capture:
+                    case OBSWebSocketLibrary.Data.SourceTypes.dshow_input:
+                        break;
+                    default:
+                        continue;
+                }
+                OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType.DependencyProperties dependencies = source.Dependencies;
+                if (source.Type.TypeId == OBSWebSocketLibrary.Data.SourceTypes.dshow_input.ToString())
+                {
+                    ReadOnlyMemory<char> deviceName = ((OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.DShowInput)source).AudioDeviceId.AsMemory();
                     dependencies.AudioDeviceId = AudioInterfaces.GetAudioInterfaceByName(deviceName[0..^1].ToString()).ID;
                 }
                 dependencies.AudioInterface = AudioInterfaces.GetAudioInterfaceById(dependencies.AudioDeviceId);
@@ -454,11 +459,7 @@ namespace Stream_Controller
             _Context.Send(
                 x => tbActiveScene.Text = currentScene.Name,
                 null);
-            lbSourceList.Items.Clear();
-            foreach (OBSWebSocketLibrary.Models.TypeDefs.SceneItem sceneItem in currentScene.Sources)
-            {
-                lbSourceList.Items.Add(sceneItem);
-            }
+            lbSourceList.ItemsSource = currentScene.Sources;
             return Task.CompletedTask;
         }
 
@@ -471,10 +472,5 @@ namespace Stream_Controller
         }
 
         #endregion
-
-        public OBSWebSocketLibrary.Models.RequestReplies.GetSourceSettings GetObsReplyFromSourceName(string sourceName)
-        {
-            return obsSourceDictionary.GetValueOrDefault(sourceName).MessageObject as OBSWebSocketLibrary.Models.RequestReplies.GetSourceSettings;
-        }
     }
 }
