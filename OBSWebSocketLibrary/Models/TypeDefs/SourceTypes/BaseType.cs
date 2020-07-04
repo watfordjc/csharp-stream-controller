@@ -14,6 +14,12 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         {
             Dependencies = new DependencyProperties();
         }
+
+        [JsonIgnore]
+        public bool Muted { get; set; }
+        [JsonIgnore]
+        public double Volume { get; set; }
+
         [JsonIgnore]
         public OBSWebSocketLibrary.Models.RequestReplies.GetSourceTypesList.Type Type { get; set; }
 

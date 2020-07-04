@@ -255,6 +255,12 @@ namespace Stream_Controller
                 case OBSWebSocketLibrary.Data.Events.SceneItemTransformChanged:
                     SceneItemTransformChanged_Event((OBSWebSocketLibrary.Models.Events.SceneItemTransformChanged)eventObject.MessageObject);
                     break;
+                case OBSWebSocketLibrary.Data.Events.SourceVolumeChanged:
+                    SourceVolumeChanged_Event((OBSWebSocketLibrary.Models.Events.SourceVolumeChanged)eventObject.MessageObject);
+                    break;
+                case OBSWebSocketLibrary.Data.Events.SourceMuteStateChanged:
+                    SourceMuteStateChanged_Event((OBSWebSocketLibrary.Models.Events.SourceMuteStateChanged)eventObject.MessageObject);
+                    break;
             }
         }
 
@@ -490,6 +496,16 @@ namespace Stream_Controller
         {
             OBSWebSocketLibrary.Models.TypeDefs.SceneItem existingScene = sceneList.First(x => x.Name == messageObject.SceneName).Sources.First(x => x.Name == messageObject.ItemName);
             existingScene.Transform = messageObject.Transform;
+        }
+
+        private void SourceVolumeChanged_Event(OBSWebSocketLibrary.Models.Events.SourceVolumeChanged messageObject)
+        {
+            (obsSourceDictionary[messageObject.SourceName] as OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType).Volume = messageObject.Volume;
+        }
+
+        private void SourceMuteStateChanged_Event(OBSWebSocketLibrary.Models.Events.SourceMuteStateChanged messageObject)
+        {
+            (obsSourceDictionary[messageObject.SourceName] as OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType).Muted = messageObject.Muted;
         }
 
         #endregion

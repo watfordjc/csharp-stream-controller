@@ -8,6 +8,9 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
 {
     public class SceneItem
     {
+        private bool mutedTmp = false;
+        private double volumeTmp = 0;
+        private SourceTypes.BaseType source;
         [JsonPropertyName("cy")]
         public double Cy { get; set; }
         [JsonPropertyName("cx")]
@@ -21,7 +24,21 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         [JsonPropertyName("render")]
         public bool Render { get; set; }
         [JsonPropertyName("muted")]
-        public bool Muted { get; set; }
+        public bool Muted
+        {
+            get
+            {
+                return Source != null ? Source.Muted : mutedTmp;
+            }
+            set
+            {
+                mutedTmp = value;
+                if (Source != null)
+                {
+                    Source.Muted = value;
+                }
+            }
+        }
         [JsonPropertyName("locked")]
         public bool Locked { get; set; }
         [JsonPropertyName("source_cx")]
@@ -31,7 +48,21 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         [JsonPropertyName("type")]
         public string Type { get; set; }
         [JsonPropertyName("volume")]
-        public double Volume { get; set; }
+        public double Volume
+        {
+            get
+            {
+                return Source != null ? Source.Volume : volumeTmp;
+            }
+            set
+            {
+                volumeTmp = value;
+                if (Source != null)
+                {
+                    Source.Volume = value;
+                }
+            }
+        }
         [JsonPropertyName("x")]
         public double X { get; set; }
         [JsonPropertyName("y")]
@@ -41,7 +72,19 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         [JsonPropertyName("groupChildren")]
         public ObservableCollection<SceneItem> GroupChildren { get; set; }
         [JsonIgnore]
-        public SourceTypes.BaseType Source { get; set; }
+        public SourceTypes.BaseType Source
+        {
+            get { return source; }
+            set
+            {
+                source = value;
+                if (source != null)
+                {
+                    source.Muted = mutedTmp;
+                    source.Volume = volumeTmp;
+                }
+            }
+        }
         [JsonIgnore]
         public SceneItemTransform Transform { get; set; }
     }
