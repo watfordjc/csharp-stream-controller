@@ -11,6 +11,8 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         private bool mutedTmp = false;
         private double volumeTmp = 0;
         private SourceTypes.BaseType source;
+        private int syncOffsetTmp = 0;
+
         [JsonPropertyName("cy")]
         public double Cy { get; set; }
         [JsonPropertyName("cx")]
@@ -82,10 +84,27 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
                 {
                     source.Muted = mutedTmp;
                     source.Volume = volumeTmp;
+                    source.SyncOffset = syncOffsetTmp;
                 }
             }
         }
         [JsonIgnore]
         public SceneItemTransform Transform { get; set; }
+        [JsonIgnore]
+        public int SyncOffset
+        {
+            get
+            {
+                return Source != null ? Source.SyncOffset : syncOffsetTmp;
+            }
+            set
+            {
+                syncOffsetTmp = value;
+                if (Source != null)
+                {
+                    Source.SyncOffset = value;
+                }
+            }
+        }
     }
 }

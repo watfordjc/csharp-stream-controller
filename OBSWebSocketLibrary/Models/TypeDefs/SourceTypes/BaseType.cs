@@ -19,6 +19,8 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         public bool Muted { get; set; }
         [JsonIgnore]
         public double Volume { get; set; }
+        [JsonIgnore]
+        public int SyncOffset { get; set; }
 
         [JsonIgnore]
         public OBSWebSocketLibrary.Models.RequestReplies.GetSourceTypesList.Type Type { get; set; }

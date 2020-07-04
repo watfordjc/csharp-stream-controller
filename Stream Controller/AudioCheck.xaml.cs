@@ -261,8 +261,13 @@ namespace Stream_Controller
                 case OBSWebSocketLibrary.Data.Events.SourceMuteStateChanged:
                     SourceMuteStateChanged_Event((OBSWebSocketLibrary.Models.Events.SourceMuteStateChanged)eventObject.MessageObject);
                     break;
+                case OBSWebSocketLibrary.Data.Events.SourceAudioSyncOffsetChanged:
+                    SourceAudioSyncOffsetChanged_Event((OBSWebSocketLibrary.Models.Events.SourceAudioSyncOffsetChanged)eventObject.MessageObject);
+                    break;
             }
         }
+
+
 
         private void PopulateSceneItemSources(IList<OBSWebSocketLibrary.Models.TypeDefs.SceneItem> sceneItems, OBSWebSocketLibrary.Models.TypeDefs.Scene scene)
         {
@@ -506,6 +511,11 @@ namespace Stream_Controller
         private void SourceMuteStateChanged_Event(OBSWebSocketLibrary.Models.Events.SourceMuteStateChanged messageObject)
         {
             (obsSourceDictionary[messageObject.SourceName] as OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType).Muted = messageObject.Muted;
+        }
+
+        private void SourceAudioSyncOffsetChanged_Event(OBSWebSocketLibrary.Models.Events.SourceAudioSyncOffsetChanged messageObject)
+        {
+            (obsSourceDictionary[messageObject.SourceName] as OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType).SyncOffset = messageObject.SyncOffset;
         }
 
         #endregion
