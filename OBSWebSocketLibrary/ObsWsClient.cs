@@ -39,6 +39,7 @@ namespace OBSWebSocketLibrary
             public Data.SourceTypes SourceType { get; set; }
             public object MessageObject { get; set; }
             public string Status { get; set; }
+            public object OriginalRequest { get; set; }
         }
 
         public class ObsEvent
@@ -148,10 +149,7 @@ namespace OBSWebSocketLibrary
             {
                 Guid.TryParse(messageIdJson.GetString(), out Guid guid);
                 root.TryGetProperty("status", out JsonElement statusJson);
-                if (sentMessageGuids.TryGetValue(guid, out Data.Requests requestType))
-                {
-                    sentMessageGuids.Remove(guid);
-                }
+                bool sentMessageGuidExists = sentMessageGuids.TryGetValue(guid, out Data.Requests requestType);
                 Enum.TryParse(requestType.ToString(), out Data.Requests reqType);
                 ObsReply obsReply = new ObsReply()
                 {
@@ -159,6 +157,11 @@ namespace OBSWebSocketLibrary
                     RequestType = reqType,
                     Status = statusJson.GetString()
                 };
+                if (sentMessageGuidExists)
+                {
+                    obsReply.OriginalRequest = requestType;
+                    sentMessageGuids.Remove(guid);
+                }
                 switch (reqType)
                 {
                     case Data.Requests.GetSourceSettings:
@@ -284,7 +287,7 @@ namespace OBSWebSocketLibrary
                 ErrorMessage errorMessage = new ErrorMessage()
                 {
                     Error = new Exception(
-                        $"The {sentMessageGuids.GetValueOrDefault(obsReply.MessageId)} request {obsReply.MessageId} was responded to by a status of {obsReply.Status}.",
+                        $"The {obsReply.OriginalRequest} request {obsReply.MessageId} was responded to by a status of {obsReply.Status}.",
                         new Exception(replyModel.Error)
                         ),
                     ReconnectDelay = -1

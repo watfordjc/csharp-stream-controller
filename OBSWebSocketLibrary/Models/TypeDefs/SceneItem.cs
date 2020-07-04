@@ -40,6 +40,9 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         public string ParentGroupName { get; set; }
         [JsonPropertyName("groupChildren")]
         public ObservableCollection<SceneItem> GroupChildren { get; set; }
+        [JsonIgnore]
         public SourceTypes.BaseType Source { get; set; }
+        [JsonIgnore]
+        public SceneItemTransform Transform { get; set; }
     }
 }

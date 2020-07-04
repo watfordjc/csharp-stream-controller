@@ -47,6 +47,7 @@ namespace Stream_Controller
         private OBSWebSocketLibrary.Models.TypeDefs.Scene currentScene;
         private OBSWebSocketLibrary.Models.RequestReplies.GetSourceTypesList sourceTypes;
         private Dictionary<string, object> obsSourceDictionary = new Dictionary<string, object>();
+        private Dictionary<int, OBSWebSocketLibrary.Models.TypeDefs.Scene> obsSceneItemSceneDictionary = new Dictionary<int, OBSWebSocketLibrary.Models.TypeDefs.Scene>();
 
         #region Instantiation and initialisation
 
@@ -248,20 +249,27 @@ namespace Stream_Controller
                 case OBSWebSocketLibrary.Data.Events.SceneItemRemoved:
                     SceneItemRemoved_Event((OBSWebSocketLibrary.Models.Events.SceneItemRemoved)eventObject.MessageObject);
                     break;
+                case OBSWebSocketLibrary.Data.Events.SourceDestroyed:
+                    SourceDestroyed_Event((OBSWebSocketLibrary.Models.Events.SourceDestroyed)eventObject.MessageObject);
+                    break;
+                case OBSWebSocketLibrary.Data.Events.SceneItemTransformChanged:
+                    SceneItemTransformChanged_Event((OBSWebSocketLibrary.Models.Events.SceneItemTransformChanged)eventObject.MessageObject);
+                    break;
             }
         }
 
-        private void PopulateSceneItemSources(IList<OBSWebSocketLibrary.Models.TypeDefs.SceneItem> sceneItems)
+        private void PopulateSceneItemSources(IList<OBSWebSocketLibrary.Models.TypeDefs.SceneItem> sceneItems, OBSWebSocketLibrary.Models.TypeDefs.Scene scene)
         {
             foreach (OBSWebSocketLibrary.Models.TypeDefs.SceneItem sceneItem in sceneItems)
             {
                 sceneItem.Source = (OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType)obsSourceDictionary.GetValueOrDefault(sceneItem.Name);
                 if (sceneItem.GroupChildren != null)
                 {
-                    PopulateSceneItemSources(sceneItem.GroupChildren);
+                    PopulateSceneItemSources(sceneItem.GroupChildren, scene);
                 }
+                obsSceneItemSceneDictionary[sceneItem.Id] = scene;
+                Obs_Get(OBSWebSocketLibrary.Data.Requests.GetSceneItemProperties, sceneItem.Name, scene.Name);
             }
-
         }
 
         private void Websocket_Reply(object sender, ObsWsClient.ObsReply replyObject)
@@ -270,7 +278,7 @@ namespace Stream_Controller
             {
                 case OBSWebSocketLibrary.Data.Requests.GetCurrentScene:
                     currentScene = replyObject.MessageObject as OBSWebSocketLibrary.Models.TypeDefs.Scene;
-                    PopulateSceneItemSources(currentScene.Sources);
+                    PopulateSceneItemSources(currentScene.Sources, currentScene);
                     UpdateSceneInformation();
                     break;
                 case OBSWebSocketLibrary.Data.Requests.GetSceneList:
@@ -278,7 +286,7 @@ namespace Stream_Controller
                     sceneList = new ObservableCollection<OBSWebSocketLibrary.Models.TypeDefs.Scene>((replyObject.MessageObject as OBSWebSocketLibrary.Models.RequestReplies.GetSceneList).Scenes);
                     foreach (OBSWebSocketLibrary.Models.TypeDefs.Scene scene in sceneList)
                     {
-                        PopulateSceneItemSources(scene.Sources);
+                        PopulateSceneItemSources(scene.Sources, scene);
                     }
                     currentScene = sceneList.First(x => x.Name == currentSceneName.ToString());
                     UpdateSceneInformation();
@@ -328,11 +336,44 @@ namespace Stream_Controller
                     break;
                 case OBSWebSocketLibrary.Data.Requests.GetSceneItemProperties:
                     OBSWebSocketLibrary.Models.RequestReplies.GetSceneItemProperties itemProps = (OBSWebSocketLibrary.Models.RequestReplies.GetSceneItemProperties)replyObject.MessageObject;
-                    //  Trace.WriteLine($"{itemProps.Name} -> {itemProps}");
+                    OBSWebSocketLibrary.Models.TypeDefs.SceneItem existingSceneItem = GetSceneItemFromSceneItemId(itemProps.ItemId, null);
+                    existingSceneItem.Transform = itemProps;
                     break;
                 default:
                     break;
             }
+        }
+
+        private OBSWebSocketLibrary.Models.TypeDefs.SceneItem GetSceneItemFromSceneItemId(int sceneItemId, ObservableCollection<OBSWebSocketLibrary.Models.TypeDefs.SceneItem> sceneItems)
+        {
+            /*
+             * 
+             * DANGER: Untested Recursion
+             * 
+             */
+            OBSWebSocketLibrary.Models.TypeDefs.SceneItem returnValue = null;
+            if (sceneItems == null)
+            {
+                OBSWebSocketLibrary.Models.TypeDefs.Scene firstScene = obsSceneItemSceneDictionary[sceneItemId];
+                returnValue = GetSceneItemFromSceneItemId(sceneItemId, firstScene.Sources);
+            }
+            if (returnValue == null && sceneItems != null)
+            {
+                returnValue = sceneItems.Where(x => x.Id == sceneItemId).First();
+            }
+
+            if (returnValue == null)
+            {
+                foreach (OBSWebSocketLibrary.Models.TypeDefs.SceneItem nextSceneItem in sceneItems.Where(x => x.GroupChildren.Count > 0).ToArray())
+                {
+                    returnValue = GetSceneItemFromSceneItemId(sceneItemId, nextSceneItem.GroupChildren);
+                    if (returnValue != null)
+                    {
+                        break;
+                    }
+                }
+            }
+            return returnValue;
         }
 
         private async void GetDeviceIdsForSources()
@@ -424,6 +465,11 @@ namespace Stream_Controller
             obsSourceDictionary[messageObject.SourceName] = createdSource;
         }
 
+        private void SourceDestroyed_Event(OBSWebSocketLibrary.Models.Events.SourceDestroyed messageObject)
+        {
+            obsSourceDictionary.Remove(messageObject.SourceName);
+        }
+
         private void SceneItemAdded_Event(OBSWebSocketLibrary.Models.Events.SceneItemAdded messageObject)
         {
             if (!obsSourceDictionary.TryGetValue(messageObject.ItemName, out object source))
@@ -438,6 +484,12 @@ namespace Stream_Controller
             };
             newSceneItem.Type = newSceneItem.Source.Type.TypeId;
             sceneList.First(x => x.Name == messageObject.SceneName).Sources.Insert(0, newSceneItem);
+        }
+
+        private void SceneItemTransformChanged_Event(OBSWebSocketLibrary.Models.Events.SceneItemTransformChanged messageObject)
+        {
+            OBSWebSocketLibrary.Models.TypeDefs.SceneItem existingScene = sceneList.First(x => x.Name == messageObject.SceneName).Sources.First(x => x.Name == messageObject.ItemName);
+            existingScene.Transform = messageObject.Transform;
         }
 
         #endregion
@@ -475,7 +527,29 @@ namespace Stream_Controller
                     (request as OBSWebSocketLibrary.Models.Requests.GetSourceFilters).SourceName = name;
                     break;
                 default:
+                    return Guid.Empty;
+            }
+            return webSocket.OBS_Send(request).Result;
+        }
+
+        /// <summary>
+        /// Sends an OBS Request with two request parameters.
+        /// </summary>
+        /// <param name="requestType">The request type constant.</param>
+        /// <param name="name">The primary request parameter - see method for request type assumptions.</param>
+        /// <param name="name2">The secondary request parameter - see method for request type assumptions.</param>
+        /// <returns>The Guid for the request.</returns>
+        private Guid Obs_Get(OBSWebSocketLibrary.Data.Requests requestType, string name, string name2)
+        {
+            object request = OBSWebSocketLibrary.Data.Request.GetInstanceOfType(requestType);
+            switch (requestType)
+            {
+                case OBSWebSocketLibrary.Data.Requests.GetSceneItemProperties:
+                    (request as OBSWebSocketLibrary.Models.Requests.GetSceneItemProperties).Item = name;
+                    (request as OBSWebSocketLibrary.Models.Requests.GetSceneItemProperties).SceneName = name2;
                     break;
+                default:
+                    return Guid.Empty;
             }
             return webSocket.OBS_Send(request).Result;
         }

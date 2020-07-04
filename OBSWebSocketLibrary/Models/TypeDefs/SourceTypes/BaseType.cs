@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json.Serialization;
 using Stream_Controller.SharedModels;
 
 namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
@@ -13,8 +14,10 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         {
             Dependencies = new DependencyProperties();
         }
+        [JsonIgnore]
         public OBSWebSocketLibrary.Models.RequestReplies.GetSourceTypesList.Type Type { get; set; }
 
+        [JsonIgnore]
         public DependencyProperties Dependencies { get; set; }
         public class DependencyProperties : INotifyPropertyChanged
         {
