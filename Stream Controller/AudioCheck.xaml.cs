@@ -271,7 +271,7 @@ namespace Stream_Controller
                     break;
                 case OBSWebSocketLibrary.Data.Requests.GetSourceSettings:
                     OBSWebSocketLibrary.Models.RequestReplies.GetSourceSettings sourceSettings = (OBSWebSocketLibrary.Models.RequestReplies.GetSourceSettings)replyObject.MessageObject;
-                  //  Trace.WriteLine($"{sourceSettings.SourceName} [{sourceSettings.SourceType}] -> {sourceSettings.SourceSettings}");
+                    //  Trace.WriteLine($"{sourceSettings.SourceName} [{sourceSettings.SourceType}] -> {sourceSettings.SourceSettings}");
                     obsSourceDictionary.Add(sourceSettings.SourceName, replyObject);
                     foreach (OBSWebSocketLibrary.Models.TypeDefs.SceneItem item in currentScene.Sources.Where(x => x.Name == sourceSettings.SourceName))
                     {
@@ -283,19 +283,19 @@ namespace Stream_Controller
                     OBSWebSocketLibrary.Models.RequestReplies.GetSourceFilters.Filter[] filters = sourceFilters.Filters.ToArray();
                     foreach (OBSWebSocketLibrary.Models.RequestReplies.GetSourceFilters.Filter filter in filters)
                     {
-                    //    Trace.WriteLine($"{filter.Name} ({filter.Type}) => {filter.Settings}");
+                        //    Trace.WriteLine($"{filter.Name} ({filter.Type}) => {filter.Settings}");
                     }
                     break;
                 case OBSWebSocketLibrary.Data.Requests.GetTransitionList:
                     OBSWebSocketLibrary.Models.RequestReplies.GetTransitionList transitionList = (OBSWebSocketLibrary.Models.RequestReplies.GetTransitionList)replyObject.MessageObject;
                     foreach (OBSWebSocketLibrary.Models.RequestReplies.GetTransitionList.Transition transition in transitionList.Transitions)
                     {
-                      //  Trace.WriteLine($"{transition.Name}");
+                        //  Trace.WriteLine($"{transition.Name}");
                     }
                     break;
                 case OBSWebSocketLibrary.Data.Requests.GetSceneItemProperties:
                     OBSWebSocketLibrary.Models.RequestReplies.GetSceneItemProperties itemProps = (OBSWebSocketLibrary.Models.RequestReplies.GetSceneItemProperties)replyObject.MessageObject;
-                  //  Trace.WriteLine($"{itemProps.Name} -> {itemProps}");
+                    //  Trace.WriteLine($"{itemProps.Name} -> {itemProps}");
                     break;
                 default:
                     break;
@@ -320,20 +320,16 @@ namespace Stream_Controller
                 OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType.DependencyProperties dependencies = (sourceReply.SourceSettingsObj as OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType).Dependencies;
                 if (sourceReply.SourceType == OBSWebSocketLibrary.Data.SourceTypes.dshow_input.ToString())
                 {
-                        ReadOnlyMemory<char> deviceName = ((OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.DShowInput)sourceReply.SourceSettingsObj).AudioDeviceId.AsMemory();
+                    ReadOnlyMemory<char> deviceName = ((OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.DShowInput)sourceReply.SourceSettingsObj).AudioDeviceId.AsMemory();
                     dependencies.AudioDeviceId = AudioInterfaces.GetAudioInterfaceByName(deviceName[0..^1].ToString()).ID;
                 }
+                dependencies.AudioInterface = AudioInterfaces.GetAudioInterfaceById(dependencies.AudioDeviceId);
                 //Trace.WriteLine($"{sourceReply.SourceName} -> {sourceReply.SourceType} -> device_id: {audioInterface?.ID} AKA {audioInterface?.FriendlyName}");
                 // WASAPI and DirectShow source types should reference an audio device
                 if (!dependencies.HasAudioInterface)
                 {
                     dependencies.DependencyProblem = true;
                     continue;
-                }
-                AudioInterface audioInterface = AudioInterfaces.GetAudioInterfaceById(dependencies.AudioDeviceId);
-                if (audioInterface.ID == audioInterface.FriendlyName)
-                {
-                    dependencies.DependencyProblem = true;
                 }
             }
         }

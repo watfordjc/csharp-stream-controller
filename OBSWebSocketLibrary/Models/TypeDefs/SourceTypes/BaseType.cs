@@ -25,6 +25,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
 
             private bool dependencyProblem;
             private string audioDeviceId;
+            private AudioInterface audioInterface;
             private string videoDeviceId;
             private string[] filePaths;
             private string[] uris;
@@ -48,6 +49,35 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
                     NotifyPropertyChanged();
                 }
             }
+
+            public AudioInterface AudioInterface
+            {
+                get { return audioInterface; }
+                set
+                {
+                    audioInterface = value;
+                    // FriendlyName is equal to ID if FriendlyName isn't available due to interface state (e.g. NotPresent)
+                    DependencyProblem = audioInterface.ID == audioInterface.FriendlyName;
+                    NotifyPropertyChanged();
+                    audioInterface.PropertyChanged += AudioInterface_PropertyChanged;
+                }
+            }
+
+            private void AudioInterface_PropertyChanged(object sender, PropertyChangedEventArgs e)
+            {
+                if (e.PropertyName == null)
+                {
+                    if (audioInterface.State != NAudio.CoreAudioApi.DeviceState.Active)
+                    {
+                        DependencyProblem = true;
+                    }
+                    else
+                    {
+                        DependencyProblem = false;
+                    }
+                }
+            }
+
             public bool HasAudioInterface
             {
                 get { return AudioDeviceId != null && AudioDeviceId != String.Empty; }
