@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -38,7 +39,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         [JsonPropertyName("parentGroupName")]
         public string ParentGroupName { get; set; }
         [JsonPropertyName("groupChildren")]
-        public IList<SceneItem> GroupChildren { get; set; }
+        public ObservableCollection<SceneItem> GroupChildren { get; set; }
         public SourceTypes.BaseType Source { get; set; }
     }
 }

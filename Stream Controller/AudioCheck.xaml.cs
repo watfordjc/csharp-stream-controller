@@ -43,7 +43,7 @@ namespace Stream_Controller
         private CancellationTokenSource pulseCancellationToken = new CancellationTokenSource();
         private readonly System.Timers.Timer _ReconnectCountdownTimer = new System.Timers.Timer(1000);
         private int _ReconnectTimeRemaining;
-        private OBSWebSocketLibrary.Models.TypeDefs.Scene[] sceneList;
+        private ObservableCollection<OBSWebSocketLibrary.Models.TypeDefs.Scene> sceneList;
         private OBSWebSocketLibrary.Models.TypeDefs.Scene currentScene;
         private OBSWebSocketLibrary.Models.RequestReplies.GetSourceTypesList sourceTypes;
         private Dictionary<string, object> obsSourceDictionary = new Dictionary<string, object>();
@@ -242,6 +242,9 @@ namespace Stream_Controller
                 case OBSWebSocketLibrary.Data.Events.SourceCreated:
                     SourceCreated_Event((OBSWebSocketLibrary.Models.Events.SourceCreated)eventObject.MessageObject);
                     break;
+                case OBSWebSocketLibrary.Data.Events.SceneItemAdded:
+                    SceneItemAdded_Event((OBSWebSocketLibrary.Models.Events.SceneItemAdded)eventObject.MessageObject);
+                    break;
             }
         }
 
@@ -269,7 +272,7 @@ namespace Stream_Controller
                     break;
                 case OBSWebSocketLibrary.Data.Requests.GetSceneList:
                     ReadOnlyMemory<char> currentSceneName = (replyObject.MessageObject as OBSWebSocketLibrary.Models.RequestReplies.GetSceneList).CurrentScene.AsMemory();
-                    sceneList = (replyObject.MessageObject as OBSWebSocketLibrary.Models.RequestReplies.GetSceneList).Scenes;
+                    sceneList = new ObservableCollection<OBSWebSocketLibrary.Models.TypeDefs.Scene>((replyObject.MessageObject as OBSWebSocketLibrary.Models.RequestReplies.GetSceneList).Scenes);
                     foreach (OBSWebSocketLibrary.Models.TypeDefs.Scene scene in sceneList)
                     {
                         PopulateSceneItemSources(scene.Sources);
@@ -412,6 +415,22 @@ namespace Stream_Controller
             obsSourceDictionary[messageObject.SourceName] = createdSource;
         }
 
+        private void SceneItemAdded_Event(OBSWebSocketLibrary.Models.Events.SceneItemAdded messageObject)
+        {
+            if (!obsSourceDictionary.TryGetValue(messageObject.ItemName, out object source))
+            {
+                return;
+            }
+            OBSWebSocketLibrary.Models.TypeDefs.SceneItem newSceneItem = new OBSWebSocketLibrary.Models.TypeDefs.SceneItem()
+            {
+                Name = messageObject.ItemName,
+                Id = messageObject.ItemId,
+                Source = (OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType)source
+            };
+            newSceneItem.Type = newSceneItem.Source.Type.TypeId;
+            sceneList.First(x => x.Name == messageObject.SceneName).Sources.Insert(0, newSceneItem);
+            }
+
         #endregion
 
         #region obs-requests
@@ -496,10 +515,7 @@ namespace Stream_Controller
 
         private Task UpdateSceneInformation()
         {
-            _Context.Send(
-                x => tbActiveScene.Text = currentScene.Name,
-                null);
-            lbSourceList.ItemsSource = currentScene.Sources;
+            DataContext = currentScene;
             return Task.CompletedTask;
         }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -10,6 +11,6 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         [JsonPropertyName("name")]
         public string Name { get; set; }
         [JsonPropertyName("sources")]
-        public IList<SceneItem> Sources { get; set; }
+        public ObservableCollection<SceneItem> Sources { get; set; }
     }
 }

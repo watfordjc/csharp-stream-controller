@@ -50,18 +50,18 @@
             <StackPanel Orientation="Vertical" Grid.Row="1" Grid.Column="1" Margin="8 0" VerticalAlignment="Top" Grid.ColumnSpan="2">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Current Scene:" FontWeight="SemiBold" TextAlignment="Left" Margin="0 0 2 8" />
-                    <TextBlock x:Name="tbActiveScene" Margin="2 0 0 8" TextWrapping="Wrap" />
+                    <TextBlock Text="{Binding Name}" Margin="2 0 0 8" TextWrapping="Wrap" />
                 </StackPanel>
                 <TextBlock x:Name="tbTransitioning" Margin="0 0 0 8" TextWrapping="Wrap" />
             </StackPanel>
-            <Grid  Grid.Row="1" Grid.Column="3" Grid.RowSpan="4">
+            <Grid Grid.Row="1" Grid.Column="3" Grid.RowSpan="4">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <TextBlock Grid.Row="0" Text="Scene Sources:" FontWeight="SemiBold" TextAlignment="Left" Margin="0 0 2 8" />
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                    <ListBox x:Name="lbSourceList" Margin="0 0 0 8" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ListBox ItemsSource="{Binding Sources}" x:Name="lbSourceList" Margin="0 0 0 8" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Width="auto" TextWrapping="Wrap" Text="{Binding Name, StringFormat={} * {0}}">
