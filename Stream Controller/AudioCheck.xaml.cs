@@ -239,16 +239,26 @@ namespace Stream_Controller
             }
         }
 
+        private void PopulateSceneItemSources(OBSWebSocketLibrary.Models.TypeDefs.SceneItem[] sceneItems)
+        {
+            foreach (OBSWebSocketLibrary.Models.TypeDefs.SceneItem sceneItem in sceneItems)
+            {
+                sceneItem.Source = (OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType)obsSourceDictionary.GetValueOrDefault(sceneItem.Name);
+                if (sceneItem.GroupChildren != null)
+                {
+                    PopulateSceneItemSources(sceneItem.GroupChildren);
+                }
+            }
+
+        }
+
         private void Websocket_Reply(object sender, ObsWsClient.ObsReply replyObject)
         {
             switch (replyObject.RequestType)
             {
                 case OBSWebSocketLibrary.Data.Requests.GetCurrentScene:
                     currentScene = (OBSWebSocketLibrary.Models.RequestReplies.GetCurrentScene)replyObject.MessageObject;
-                    foreach (OBSWebSocketLibrary.Models.TypeDefs.SceneItem sceneItem in currentScene.Sources)
-                    {
-                        sceneItem.Source = (OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType)obsSourceDictionary.GetValueOrDefault(sceneItem.Name);
-                    }
+                    PopulateSceneItemSources(currentScene.Sources);
                     UpdateSceneInformation();
                     break;
                 case OBSWebSocketLibrary.Data.Requests.GetSourceTypesList:
@@ -365,6 +375,7 @@ namespace Stream_Controller
         {
             currentScene.Name = messageObject.SceneName;
             currentScene.Sources = messageObject.Sources;
+            PopulateSceneItemSources(currentScene.Sources);
             UpdateSceneInformation();
         }
 
