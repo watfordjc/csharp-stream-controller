@@ -61,7 +61,23 @@
                 </Grid.RowDefinitions>
                 <TextBlock Grid.Row="0" Text="Scene Sources:" FontWeight="SemiBold" TextAlignment="Left" Margin="0 0 2 8" />
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                    <TextBlock x:Name="tbSourceList" Margin="0 0 0 8" TextWrapping="Wrap" />
+                    <ListBox x:Name="lbSourceList" Margin="0 0 0 8" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Width="auto" TextWrapping="Wrap" Text="{Binding Name, StringFormat={} * {0}}">
+                                </TextBlock>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Source.Dependencies.DependencyProblem}" Value="True">
+                                        <Setter Property="Foreground" Value="Red" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                    </ListBox>
                 </ScrollViewer>
             </Grid>
         </Grid>

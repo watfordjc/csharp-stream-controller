@@ -6,12 +6,15 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stream Controller", "Stream Controller\Stream Controller.csproj", "{C0C6BAF1-99E3-4B3B-909B-A6797594B7CD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OBSWebSocketLibrary", "OBSWebSocketLibrary\OBSWebSocketLibrary.csproj", "{F80C62D2-091A-4E47-AF3A-482A05273231}"
+	ProjectSection(ProjectDependencies) = postProject
+		{50D16C7A-0314-4D22-B621-90CD60FA3EB5} = {50D16C7A-0314-4D22-B621-90CD60FA3EB5}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NAudioWrapperLibrary", "NAudioWrapperLibrary\NAudioWrapperLibrary.csproj", "{5C72BE90-2B84-40E2-9A06-41A39ED4B2EE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharedModels", "SharedModels\SharedModels.csproj", "{50D16C7A-0314-4D22-B621-90CD60FA3EB5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebSocketLibrary", "WebSocketLibrary\WebSocketLibrary.csproj", "{1E989DD4-F972-4C97-90F0-5096F578EBC0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebSocketLibrary", "WebSocketLibrary\WebSocketLibrary.csproj", "{1E989DD4-F972-4C97-90F0-5096F578EBC0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

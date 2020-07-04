@@ -258,7 +258,6 @@ namespace Stream_Controller
                             Trace.WriteLine($"Unknown source type: {type.DisplayName} ({type.TypeId}) is not defined but the server supports it.");
                         }
                     }
-                    // TODO: Check if sourceTypes matches enum list.
                     break;
                 case OBSWebSocketLibrary.Data.Requests.GetSourcesList:
                     OBSWebSocketLibrary.Models.RequestReplies.GetSourcesList sourcesList = (OBSWebSocketLibrary.Models.RequestReplies.GetSourcesList)replyObject.MessageObject;
@@ -274,6 +273,10 @@ namespace Stream_Controller
                     OBSWebSocketLibrary.Models.RequestReplies.GetSourceSettings sourceSettings = (OBSWebSocketLibrary.Models.RequestReplies.GetSourceSettings)replyObject.MessageObject;
                   //  Trace.WriteLine($"{sourceSettings.SourceName} [{sourceSettings.SourceType}] -> {sourceSettings.SourceSettings}");
                     obsSourceDictionary.Add(sourceSettings.SourceName, replyObject);
+                    foreach (OBSWebSocketLibrary.Models.TypeDefs.SceneItem item in currentScene.Sources.Where(x => x.Name == sourceSettings.SourceName))
+                    {
+                        item.Source = (OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType)sourceSettings.SourceSettingsObj;
+                    }
                     break;
                 case OBSWebSocketLibrary.Data.Requests.GetSourceFilters:
                     OBSWebSocketLibrary.Models.RequestReplies.GetSourceFilters sourceFilters = (OBSWebSocketLibrary.Models.RequestReplies.GetSourceFilters)replyObject.MessageObject;
@@ -320,6 +323,8 @@ namespace Stream_Controller
                         ReadOnlyMemory<char> deviceName = ((OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.DShowInput)sourceReply.SourceSettingsObj).AudioDeviceId.AsMemory();
                     dependencies.AudioDeviceId = AudioInterfaces.GetAudioInterfaceByName(deviceName[0..^1].ToString()).ID;
                 }
+                //Trace.WriteLine($"{sourceReply.SourceName} -> {sourceReply.SourceType} -> device_id: {audioInterface?.ID} AKA {audioInterface?.FriendlyName}");
+                // WASAPI and DirectShow source types should reference an audio device
                 if (!dependencies.HasAudioInterface)
                 {
                     dependencies.DependencyProblem = true;
@@ -453,23 +458,10 @@ namespace Stream_Controller
             _Context.Send(
                 x => tbActiveScene.Text = currentScene.Name,
                 null);
-            if (currentScene.Sources != null)
+            lbSourceList.Items.Clear();
+            foreach (OBSWebSocketLibrary.Models.TypeDefs.SceneItem sceneItem in currentScene.Sources)
             {
-                tbSourceList.Text = String.Empty;
-                string[] sourceNames = currentScene.Sources.Select(a => a.Name).ToArray();
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < sourceNames.Length; i++)
-                {
-                    sb.Append($"* {sourceNames[i]}");
-                    if (i != sourceNames.Length - 1)
-                    {
-                        sb.Append("\n");
-                    }
-                    Obs_Get(OBSWebSocketLibrary.Data.Requests.GetSceneItemProperties, sourceNames[i]);
-                }
-                _Context.Send(
-                    x => tbSourceList.Text = sb.ToString(),
-                    null);
+                lbSourceList.Items.Add(sceneItem);
             }
             return Task.CompletedTask;
         }
@@ -483,5 +475,10 @@ namespace Stream_Controller
         }
 
         #endregion
+
+        public OBSWebSocketLibrary.Models.RequestReplies.GetSourceSettings GetObsReplyFromSourceName(string sourceName)
+        {
+            return obsSourceDictionary.GetValueOrDefault(sourceName).MessageObject as OBSWebSocketLibrary.Models.RequestReplies.GetSourceSettings;
+        }
     }
 }

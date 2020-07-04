@@ -1,43 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Stream_Controller.SharedModels;
 
 namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
 {
-    /*
-     * OBSWebSocketLibrary.Models.RequestReplies.GetSourceTypesList.Type
-    [JsonPropertyName("typeId")]
-    public string TypeId { get; set; }
-    [JsonPropertyName("displayName")]
-    public string DisplayName { get; set; }
-    [JsonPropertyName("type")]
-    public string TypeType { get; set; }
-    [JsonPropertyName("defaultSettings")]
-    public JsonElement DefaultSettings { get; set; }
-    public object DefaultSettingsObj;
-    [JsonPropertyName("caps")]
-    public CapsProperties Caps { get; set; }
-    public class CapsProperties
-    {
-        [JsonPropertyName("isAsync")]
-        public bool IsAsync { get; set; }
-        [JsonPropertyName("hasVideo")]
-        public bool HasVideo { get; set; }
-        [JsonPropertyName("hasAudio")]
-        public bool HasAudio { get; set; }
-        [JsonPropertyName("canInteract")]
-        public bool CanInteract { get; set; }
-        [JsonPropertyName("isComposite")]
-        public bool IsComposite { get; set; }
-        [JsonPropertyName("doNotDuplicate")]
-        public bool DoNotDuplicate { get; set; }
-        [JsonPropertyName("doNotSelfMonitor")]
-        public bool DoNotSelfMonitor { get; set; }
-    }
-    */
-
-
     public class BaseType : OBSWebSocketLibrary.Models.RequestReplies.GetSourceTypesList.Type
     {
         public BaseType()
@@ -46,40 +15,84 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         }
 
         public DependencyProperties Dependencies { get; set; }
-        public class DependencyProperties
+        public class DependencyProperties : INotifyPropertyChanged
         {
-            public bool DependencyProblem { get; set; }
-            public string AudioDeviceId { get; set; }
+            public event PropertyChangedEventHandler PropertyChanged;
+            public void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            }
+
+            private bool dependencyProblem;
+            private string audioDeviceId;
+            private string videoDeviceId;
+            private string[] filePaths;
+            private string[] uris;
+
+            public bool DependencyProblem
+            {
+                get { return dependencyProblem; }
+                set
+                {
+                    dependencyProblem = value;
+                    NotifyPropertyChanged();
+                }
+            }
+
+            public string AudioDeviceId
+            {
+                get { return audioDeviceId; }
+                set
+                {
+                    audioDeviceId = value;
+                    NotifyPropertyChanged();
+                }
+            }
             public bool HasAudioInterface
             {
-                get
+                get { return AudioDeviceId != null && AudioDeviceId != String.Empty; }
+            }
+
+            public string VideoDeviceId
+            {
+                get { return videoDeviceId; }
+                set
                 {
-                    return AudioDeviceId != null && AudioDeviceId != String.Empty;
+                    videoDeviceId = value;
+                    NotifyPropertyChanged();
                 }
             }
-            public string VideoDeviceId { get; set; }
             public bool HasVideoInterface
             {
-                get
+                get { return VideoDeviceId != null && VideoDeviceId != String.Empty; }
+            }
+
+            public string[] FilePaths
+            {
+                get { return filePaths; }
+                set
                 {
-                    return VideoDeviceId != null && VideoDeviceId != String.Empty;
+                    filePaths = value;
+                    NotifyPropertyChanged();
                 }
             }
-            public string[] FilePaths { get; set; }
             public bool HasFiles
             {
-                get
+                get { return FilePaths != null && FilePaths.Length != 0; }
+            }
+
+            public string[] Uris
+            {
+                get { return uris; }
+                set
                 {
-                    return FilePaths != null && FilePaths.Length != 0;
+                    uris = value;
+                    NotifyPropertyChanged();
                 }
             }
-            public string[] Uris { get; set; }
             public bool HasURIs
             {
-                get
-                {
-                    return Uris != null && Uris.Length != 0;
-                }
+                get { return Uris != null && Uris.Length != 0; }
             }
         }
     }

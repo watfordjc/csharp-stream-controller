@@ -39,5 +39,6 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         public string ParentGroupName { get; set; }
         [JsonPropertyName("groupChildren")]
         public SceneItem[] GroupChildren { get; set; }
+        public SourceTypes.BaseType Source { get; set; }
     }
 }
