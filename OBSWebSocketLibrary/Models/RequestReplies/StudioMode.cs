@@ -14,7 +14,7 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         [JsonPropertyName("name")]
         public string Name { get; set; }
         [JsonPropertyName("sources")]
-        public TypeDefs.SceneItem[] Sources { get; set; }
+        public IList<TypeDefs.SceneItem> Sources { get; set; }
     }
 
     public class SetPreviewScene : RequestReplyBase

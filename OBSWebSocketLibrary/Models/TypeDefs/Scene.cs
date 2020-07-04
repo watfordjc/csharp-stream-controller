@@ -10,6 +10,6 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         [JsonPropertyName("name")]
         public string Name { get; set; }
         [JsonPropertyName("sources")]
-        public SceneItem[] Sources { get; set; }
+        public IList<SceneItem> Sources { get; set; }
     }
 }

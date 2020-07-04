@@ -236,10 +236,13 @@ namespace Stream_Controller
                 case OBSWebSocketLibrary.Data.Events.TransitionVideoEnd:
                     UpdateTransitionMessage(String.Empty);
                     break;
+                case OBSWebSocketLibrary.Data.Events.SourceOrderChanged:
+                    SourceOrderChanged_Event((OBSWebSocketLibrary.Models.Events.SourceOrderChanged)eventObject.MessageObject);
+                    break;
             }
         }
 
-        private void PopulateSceneItemSources(OBSWebSocketLibrary.Models.TypeDefs.SceneItem[] sceneItems)
+        private void PopulateSceneItemSources(IList<OBSWebSocketLibrary.Models.TypeDefs.SceneItem> sceneItems)
         {
             foreach (OBSWebSocketLibrary.Models.TypeDefs.SceneItem sceneItem in sceneItems)
             {
@@ -379,6 +382,17 @@ namespace Stream_Controller
             UpdateSceneInformation();
         }
 
+        private void SourceOrderChanged_Event(OBSWebSocketLibrary.Models.Events.SourceOrderChanged messageObject)
+        {
+            if (messageObject.SceneName != currentScene.Name)
+            {
+                return;
+            }
+            List<int> collectionOrderList = messageObject.SceneItems.Select(x => x.ItemId).ToList();
+            ListCollectionView listCollection = (ListCollectionView)CollectionViewSource.GetDefaultView(lbSourceList.ItemsSource);
+            listCollection.CustomSort = new SceneItemSort(collectionOrderList);
+        }
+
         #endregion
 
         #region obs-requests
@@ -472,6 +486,21 @@ namespace Stream_Controller
                 null);
             lbSourceList.ItemsSource = currentScene.Sources;
             return Task.CompletedTask;
+        }
+
+        public class SceneItemSort : System.Collections.IComparer
+        {
+            private readonly List<int> collectionOrderList;
+
+            public SceneItemSort(List<int> collectionOrderList)
+            {
+                this.collectionOrderList = collectionOrderList;
+            }
+
+            public int Compare(object x, object y)
+            {
+                return collectionOrderList.IndexOf((y as OBSWebSocketLibrary.Models.TypeDefs.SceneItem).Id) - collectionOrderList.IndexOf((x as OBSWebSocketLibrary.Models.TypeDefs.SceneItem).Id);
+            }
         }
 
         private Task UpdateTransitionMessage(string transitionMessage)

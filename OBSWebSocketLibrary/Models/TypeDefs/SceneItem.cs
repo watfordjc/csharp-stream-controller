@@ -16,7 +16,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         [JsonPropertyName("name")]
         public string Name { get; set; }
         [JsonPropertyName("id")]
-        public double Id { get; set; }
+        public int Id { get; set; }
         [JsonPropertyName("render")]
         public bool Render { get; set; }
         [JsonPropertyName("muted")]
@@ -38,7 +38,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         [JsonPropertyName("parentGroupName")]
         public string ParentGroupName { get; set; }
         [JsonPropertyName("groupChildren")]
-        public SceneItem[] GroupChildren { get; set; }
+        public IList<SceneItem> GroupChildren { get; set; }
         public SourceTypes.BaseType Source { get; set; }
     }
 }
