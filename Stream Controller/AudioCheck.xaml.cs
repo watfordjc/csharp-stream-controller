@@ -43,7 +43,8 @@ namespace Stream_Controller
         private CancellationTokenSource pulseCancellationToken = new CancellationTokenSource();
         private readonly System.Timers.Timer _ReconnectCountdownTimer = new System.Timers.Timer(1000);
         private int _ReconnectTimeRemaining;
-        private OBSWebSocketLibrary.Models.RequestReplies.GetCurrentScene currentScene;
+        private OBSWebSocketLibrary.Models.TypeDefs.Scene[] sceneList;
+        private OBSWebSocketLibrary.Models.TypeDefs.Scene currentScene;
         private OBSWebSocketLibrary.Models.RequestReplies.GetSourceTypesList sourceTypes;
         private Dictionary<string, object> obsSourceDictionary = new Dictionary<string, object>();
 
@@ -226,7 +227,6 @@ namespace Stream_Controller
                     SwitchScenes_Event((OBSWebSocketLibrary.Models.Events.SwitchScenes)eventObject.MessageObject);
                     break;
                 case OBSWebSocketLibrary.Data.Events.ScenesChanged:
-                    Obs_Get(OBSWebSocketLibrary.Data.Requests.GetCurrentScene);
                     break;
                 case OBSWebSocketLibrary.Data.Events.TransitionBegin:
                     string nextScene = ((OBSWebSocketLibrary.Models.Events.TransitionBegin)eventObject.MessageObject).ToScene;
@@ -260,8 +260,18 @@ namespace Stream_Controller
             switch (replyObject.RequestType)
             {
                 case OBSWebSocketLibrary.Data.Requests.GetCurrentScene:
-                    currentScene = (OBSWebSocketLibrary.Models.RequestReplies.GetCurrentScene)replyObject.MessageObject;
+                    currentScene = replyObject.MessageObject as OBSWebSocketLibrary.Models.TypeDefs.Scene;
                     PopulateSceneItemSources(currentScene.Sources);
+                    UpdateSceneInformation();
+                    break;
+                case OBSWebSocketLibrary.Data.Requests.GetSceneList:
+                    ReadOnlyMemory<char> currentSceneName = (replyObject.MessageObject as OBSWebSocketLibrary.Models.RequestReplies.GetSceneList).CurrentScene.AsMemory();
+                    sceneList = (replyObject.MessageObject as OBSWebSocketLibrary.Models.RequestReplies.GetSceneList).Scenes;
+                    foreach (OBSWebSocketLibrary.Models.TypeDefs.Scene scene in sceneList)
+                    {
+                        PopulateSceneItemSources(scene.Sources);
+                    }
+                    currentScene = sceneList.First(x => x.Name == currentSceneName.ToString());
                     UpdateSceneInformation();
                     break;
                 case OBSWebSocketLibrary.Data.Requests.GetSourceTypesList:
@@ -283,7 +293,7 @@ namespace Stream_Controller
                         Obs_Get(OBSWebSocketLibrary.Data.Requests.GetSourceFilters, source.Name);
                     }
                     GetDeviceIdsForSources();
-                    Obs_Get(OBSWebSocketLibrary.Data.Requests.GetCurrentScene);
+                    Obs_Get(OBSWebSocketLibrary.Data.Requests.GetSceneList);
                     Obs_Get(OBSWebSocketLibrary.Data.Requests.GetTransitionList);
                     break;
                 case OBSWebSocketLibrary.Data.Requests.GetSourceSettings:
@@ -376,9 +386,7 @@ namespace Stream_Controller
 
         private void SwitchScenes_Event(OBSWebSocketLibrary.Models.Events.SwitchScenes messageObject)
         {
-            currentScene.Name = messageObject.SceneName;
-            currentScene.Sources = messageObject.Sources;
-            PopulateSceneItemSources(currentScene.Sources);
+            currentScene = sceneList.First(x => x.Name == messageObject.SceneName);
             UpdateSceneInformation();
         }
 
@@ -477,10 +485,6 @@ namespace Stream_Controller
 
         private Task UpdateSceneInformation()
         {
-            if (Guid.Parse(currentScene?.MessageId) == Guid.Empty)
-            {
-                return Task.CompletedTask;
-            }
             _Context.Send(
                 x => tbActiveScene.Text = currentScene.Name,
                 null);
