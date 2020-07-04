@@ -245,6 +245,9 @@ namespace Stream_Controller
                 case OBSWebSocketLibrary.Data.Events.SceneItemAdded:
                     SceneItemAdded_Event((OBSWebSocketLibrary.Models.Events.SceneItemAdded)eventObject.MessageObject);
                     break;
+                case OBSWebSocketLibrary.Data.Events.SceneItemRemoved:
+                    SceneItemRemoved_Event((OBSWebSocketLibrary.Models.Events.SceneItemRemoved)eventObject.MessageObject);
+                    break;
             }
         }
 
@@ -407,6 +410,12 @@ namespace Stream_Controller
             listCollection.CustomSort = new SceneItemSort(collectionOrderList);
         }
 
+        private void SceneItemRemoved_Event(OBSWebSocketLibrary.Models.Events.SceneItemRemoved messageObject)
+        {
+            OBSWebSocketLibrary.Models.TypeDefs.SceneItem sceneItemToRemove = sceneList.First(x => x.Name == messageObject.SceneName).Sources.First(x => x.Name == messageObject.ItemName);
+            sceneList.First(x => x.Name == messageObject.SceneName).Sources.Remove(sceneItemToRemove);
+        }
+
         private void SourceCreated_Event(OBSWebSocketLibrary.Models.Events.SourceCreated messageObject)
         {
             OBSWebSocketLibrary.Data.SourceTypes sourceType = (OBSWebSocketLibrary.Data.SourceTypes)Enum.Parse(typeof(OBSWebSocketLibrary.Data.SourceTypes), messageObject.SourceKind);
@@ -429,7 +438,7 @@ namespace Stream_Controller
             };
             newSceneItem.Type = newSceneItem.Source.Type.TypeId;
             sceneList.First(x => x.Name == messageObject.SceneName).Sources.Insert(0, newSceneItem);
-            }
+        }
 
         #endregion
 
