@@ -264,10 +264,11 @@ namespace Stream_Controller
                 case OBSWebSocketLibrary.Data.Events.SourceAudioSyncOffsetChanged:
                     SourceAudioSyncOffsetChanged_Event((OBSWebSocketLibrary.Models.Events.SourceAudioSyncOffsetChanged)eventObject.MessageObject);
                     break;
+                case OBSWebSocketLibrary.Data.Events.SourceRenamed:
+                    SourceRenamed_Event((OBSWebSocketLibrary.Models.Events.SourceRenamed)eventObject.MessageObject);
+                    break;
             }
         }
-
-
 
         private void PopulateSceneItemSources(IList<OBSWebSocketLibrary.Models.TypeDefs.SceneItem> sceneItems, OBSWebSocketLibrary.Models.TypeDefs.Scene scene)
         {
@@ -516,6 +517,17 @@ namespace Stream_Controller
         private void SourceAudioSyncOffsetChanged_Event(OBSWebSocketLibrary.Models.Events.SourceAudioSyncOffsetChanged messageObject)
         {
             (obsSourceDictionary[messageObject.SourceName] as OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType).SyncOffset = messageObject.SyncOffset;
+        }
+
+        private void SourceRenamed_Event(OBSWebSocketLibrary.Models.Events.SourceRenamed messageObject)
+        {
+            if (!obsSourceDictionary.ContainsKey(messageObject.PreviousName))
+            {
+                return;
+            }
+            obsSourceDictionary[messageObject.NewName] = obsSourceDictionary[messageObject.PreviousName];
+            (obsSourceDictionary[messageObject.NewName] as OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType).Name = messageObject.NewName;
+            obsSourceDictionary.Remove(messageObject.PreviousName);
         }
 
         #endregion

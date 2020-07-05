@@ -8,6 +8,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
 {
     public class SceneItem
     {
+        private string nameTmp = String.Empty;
         private bool mutedTmp = false;
         private double volumeTmp = 0;
         private SourceTypes.BaseType source;
@@ -20,7 +21,21 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         [JsonPropertyName("alignment")]
         public double Alignment { get; set; }
         [JsonPropertyName("name")]
-        public string Name { get; set; }
+        public string Name
+        {
+            get
+            {
+                return Source != null ? Source.Name : nameTmp;
+            }
+            set
+            {
+                nameTmp = value;
+                if (Source != null)
+                {
+                    Source.Name = value;
+                }
+            }
+        }
         [JsonPropertyName("id")]
         public int Id { get; set; }
         [JsonPropertyName("render")]
@@ -85,6 +100,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
                     source.Muted = mutedTmp;
                     source.Volume = volumeTmp;
                     source.SyncOffset = syncOffsetTmp;
+                    source.Name = nameTmp;
                 }
             }
         }

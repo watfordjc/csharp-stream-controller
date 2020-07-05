@@ -8,25 +8,68 @@ using Stream_Controller.SharedModels;
 
 namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
 {
-    public class BaseType
+    public class BaseType : INotifyPropertyChanged
     {
+        private bool muted;
+        private double volume;
+        private int syncOffset;
+        private string name;
+
         public BaseType()
         {
             Dependencies = new DependencyProperties();
         }
 
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
         [JsonIgnore]
-        public bool Muted { get; set; }
+        public bool Muted {
+            get { return muted; }
+            set
+            {
+                muted = value;
+                NotifyPropertyChanged();
+            }
+        }
         [JsonIgnore]
-        public double Volume { get; set; }
+        public double Volume {
+            get { return volume; }
+            set
+            {
+                volume = value;
+                NotifyPropertyChanged();
+            }
+        }
         [JsonIgnore]
-        public int SyncOffset { get; set; }
+        public int SyncOffset {
+            get { return syncOffset; }
+            set
+            {
+                syncOffset = value;
+                NotifyPropertyChanged();
+            }
+        }
+        [JsonIgnore]
+        public string Name {
+            get { return name; }
+            set
+            {
+                name = value;
+                NotifyPropertyChanged();
+            }
+        }
 
         [JsonIgnore]
         public OBSWebSocketLibrary.Models.RequestReplies.GetSourceTypesList.Type Type { get; set; }
 
         [JsonIgnore]
         public DependencyProperties Dependencies { get; set; }
+
         public class DependencyProperties : INotifyPropertyChanged
         {
             public event PropertyChangedEventHandler PropertyChanged;

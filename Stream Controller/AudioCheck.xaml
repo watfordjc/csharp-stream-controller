@@ -64,7 +64,7 @@
                     <ListBox ItemsSource="{Binding Sources}" x:Name="lbSourceList" Margin="0 0 0 8" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Width="auto" TextWrapping="Wrap" Text="{Binding Name, StringFormat={} * {0}}">
+                                <TextBlock Width="auto" TextWrapping="Wrap" Text="{Binding Source.Name, StringFormat={} * {0}}">
                                 </TextBlock>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
