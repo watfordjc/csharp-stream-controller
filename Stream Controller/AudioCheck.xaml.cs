@@ -267,6 +267,12 @@ namespace Stream_Controller
                 case OBSWebSocketLibrary.Data.Events.SourceRenamed:
                     SourceRenamed_Event((OBSWebSocketLibrary.Models.Events.SourceRenamed)eventObject.MessageObject);
                     break;
+                case OBSWebSocketLibrary.Data.Events.SceneItemVisibilityChanged:
+                    SceneItemVisibilityChanged_Event((OBSWebSocketLibrary.Models.Events.SceneItemVisibilityChanged)eventObject.MessageObject);
+                    break;
+                case OBSWebSocketLibrary.Data.Events.SceneItemLockChanged:
+                    SceneItemLockChanged_Event((OBSWebSocketLibrary.Models.Events.SceneItemLockChanged)eventObject.MessageObject);
+                    break;
             }
         }
 
@@ -528,6 +534,18 @@ namespace Stream_Controller
             obsSourceDictionary[messageObject.NewName] = obsSourceDictionary[messageObject.PreviousName];
             (obsSourceDictionary[messageObject.NewName] as OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType).Name = messageObject.NewName;
             obsSourceDictionary.Remove(messageObject.PreviousName);
+        }
+
+        private void SceneItemVisibilityChanged_Event(OBSWebSocketLibrary.Models.Events.SceneItemVisibilityChanged messageObject)
+        {
+            OBSWebSocketLibrary.Models.TypeDefs.SceneItem existingScene = sceneList.First(x => x.Name == messageObject.SceneName).Sources.First(x => x.Name == messageObject.ItemName);
+            existingScene.Render = messageObject.ItemVisible;
+        }
+
+        private void SceneItemLockChanged_Event(OBSWebSocketLibrary.Models.Events.SceneItemLockChanged messageObject)
+        {
+            OBSWebSocketLibrary.Models.TypeDefs.SceneItem existingScene = sceneList.First(x => x.Name == messageObject.SceneName).Sources.First(x => x.Name == messageObject.ItemName);
+            existingScene.Locked = messageObject.ItemLocked;
         }
 
         #endregion
