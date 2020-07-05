@@ -293,7 +293,7 @@ namespace Stream_Controller
                 }
                 obsSceneItemSceneDictionary[sceneItem.Id] = scene;
                 Obs_Get(OBSWebSocketLibrary.Data.Requests.GetSceneItemProperties, sceneItem.Name, scene.Name);
-                Obs_Get(OBSWebSocketLibrary.Data.Requests.GetAudioMonitorType, sceneItem.Source.Name);
+                Obs_Get(OBSWebSocketLibrary.Data.Requests.GetAudioMonitorType, sceneItem.Name);
             }
         }
 
@@ -332,7 +332,6 @@ namespace Stream_Controller
                     foreach (OBSWebSocketLibrary.Models.RequestReplies.GetSourcesList.Source source in sourcesList.Sources)
                     {
                         Obs_Get(OBSWebSocketLibrary.Data.Requests.GetSourceSettings, source.Name);
-                        Obs_Get(OBSWebSocketLibrary.Data.Requests.GetSourceFilters, source.Name);
                     }
                     GetDeviceIdsForSources();
                     Obs_Get(OBSWebSocketLibrary.Data.Requests.GetSceneList);
@@ -343,13 +342,13 @@ namespace Stream_Controller
                     OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType newSource = (OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType)sourceSettings.SourceSettingsObj;
                     newSource.Type = sourceTypes.Types.First(x => x.TypeId == sourceSettings.SourceType);
                     obsSourceDictionary[sourceSettings.SourceName] = newSource;
+                    Obs_Get(OBSWebSocketLibrary.Data.Requests.GetSourceFilters, sourceSettings.SourceName);
                     break;
                 case OBSWebSocketLibrary.Data.Requests.GetSourceFilters:
-                    OBSWebSocketLibrary.Models.RequestReplies.GetSourceFilters sourceFilters = (OBSWebSocketLibrary.Models.RequestReplies.GetSourceFilters)replyObject.MessageObject;
-                    OBSWebSocketLibrary.Models.RequestReplies.GetSourceFilters.Filter[] filters = sourceFilters.Filters.ToArray();
-                    foreach (OBSWebSocketLibrary.Models.RequestReplies.GetSourceFilters.Filter filter in filters)
+                    OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType sourceToModify = obsSourceDictionary[(replyObject.RequestMetadata.OriginalRequestData as OBSWebSocketLibrary.Models.Requests.GetSourceFilters).SourceName] as OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType;
+                    foreach (OBSWebSocketLibrary.Models.RequestReplies.GetSourceFilters.Filter filter in (replyObject.MessageObject as OBSWebSocketLibrary.Models.RequestReplies.GetSourceFilters).Filters)
                     {
-                        //    Trace.WriteLine($"{filter.Name} ({filter.Type}) => {filter.Settings}");
+                        sourceToModify.Filters.Add(filter);
                     }
                     break;
                 case OBSWebSocketLibrary.Data.Requests.GetTransitionList:

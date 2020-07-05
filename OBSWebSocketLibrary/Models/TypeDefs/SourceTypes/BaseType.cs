@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -21,6 +22,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         public BaseType()
         {
             Dependencies = new DependencyProperties();
+            Filters = new ObservableCollection<FilterTypes.BaseFilter>();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -95,6 +97,8 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
                 NotifyPropertyChanged();
             }
         }
+        [JsonIgnore]
+        public ObservableCollection<FilterTypes.BaseFilter> Filters { get; set; }
 
         [JsonIgnore]
         public OBSWebSocketLibrary.Models.RequestReplies.GetSourceTypesList.Type Type { get; set; }
