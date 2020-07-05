@@ -273,6 +273,9 @@ namespace Stream_Controller
                 case OBSWebSocketLibrary.Data.Events.SceneItemLockChanged:
                     SceneItemLockChanged_Event((OBSWebSocketLibrary.Models.Events.SceneItemLockChanged)eventObject.MessageObject);
                     break;
+                case OBSWebSocketLibrary.Data.Events.SceneCollectionChanged:
+                    Obs_Get(OBSWebSocketLibrary.Data.Requests.GetSourcesList);
+                    break;
             }
         }
 
@@ -454,8 +457,11 @@ namespace Stream_Controller
 
         private void SwitchScenes_Event(OBSWebSocketLibrary.Models.Events.SwitchScenes messageObject)
         {
-            currentScene = sceneList.First(x => x.Name == messageObject.SceneName);
-            UpdateSceneInformation();
+            if (sceneList.Count(x => x.Name == messageObject.SceneName) > 0)
+            {
+                currentScene = sceneList.First(x => x.Name == messageObject.SceneName);
+                UpdateSceneInformation();
+            }
         }
 
         private void SourceOrderChanged_Event(OBSWebSocketLibrary.Models.Events.SourceOrderChanged messageObject)
@@ -501,13 +507,19 @@ namespace Stream_Controller
                 Source = (OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType)source
             };
             newSceneItem.Type = newSceneItem.Source.Type.TypeId;
-            sceneList.First(x => x.Name == messageObject.SceneName).Sources.Insert(0, newSceneItem);
+            if (sceneList.Count(x => x.Name == messageObject.SceneName) > 0)
+            {
+                sceneList.First(x => x.Name == messageObject.SceneName).Sources.Insert(0, newSceneItem);
+            }
         }
 
         private void SceneItemTransformChanged_Event(OBSWebSocketLibrary.Models.Events.SceneItemTransformChanged messageObject)
         {
-            OBSWebSocketLibrary.Models.TypeDefs.SceneItem existingScene = sceneList.First(x => x.Name == messageObject.SceneName).Sources.First(x => x.Name == messageObject.ItemName);
-            existingScene.Transform = messageObject.Transform;
+            if (sceneList.Count(x => x.Name == messageObject.SceneName) > 0)
+            {
+                OBSWebSocketLibrary.Models.TypeDefs.SceneItem existingScene = sceneList.First(x => x.Name == messageObject.SceneName).Sources.First(x => x.Name == messageObject.ItemName);
+                existingScene.Transform = messageObject.Transform;
+            }
         }
 
         private void SourceVolumeChanged_Event(OBSWebSocketLibrary.Models.Events.SourceVolumeChanged messageObject)
