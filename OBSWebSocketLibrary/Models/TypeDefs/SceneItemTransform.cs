@@ -48,32 +48,33 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
 
         public static implicit operator SceneItemTransform(RequestReplies.GetSceneItemProperties v)
         {
-            SceneItemTransform transform = new SceneItemTransform();
-            transform.Position = new PositionProperties()
+            return new SceneItemTransform
             {
-                Alignment = v.Position.Alignment,
-                X = v.Position.X,
-                Y = v.Position.Y
+                Position = new PositionProperties()
+                {
+                    Alignment = v.Position.Alignment,
+                    X = v.Position.X,
+                    Y = v.Position.Y
+                },
+                Rotation = v.Rotation,
+                Scale = v.Scale,
+                Crop = v.Crop,
+                Visible = v.Visible,
+                Locked = v.Locked,
+                Bounds = new BoundsProperties()
+                {
+                    Alignment = v.Bounds.Alignment,
+                    Type = v.Bounds.Type,
+                    X = v.Bounds.X,
+                    Y = v.Bounds.Y
+                },
+                SourceWidth = v.SourceWidth,
+                SourceHeight = v.SourceHeight,
+                Width = v.Width,
+                Height = v.Height,
+                ParentGroupName = v.ParentGroupName,
+                GroupChildren = v.GroupChildren
             };
-            transform.Rotation = v.Rotation;
-            transform.Scale = v.Scale;
-            transform.Crop = v.Crop;
-            transform.Visible = v.Visible;
-            transform.Locked = v.Locked;
-            transform.Bounds = new BoundsProperties()
-            {
-                Alignment = v.Bounds.Alignment,
-                Type = v.Bounds.Type,
-                X = v.Bounds.X,
-                Y = v.Bounds.Y
-            };
-            transform.SourceWidth = v.SourceWidth;
-            transform.SourceHeight = v.SourceHeight;
-            transform.Width = v.Width;
-            transform.Height = v.Height;
-            transform.ParentGroupName = v.ParentGroupName;
-            transform.GroupChildren = v.GroupChildren;
-            return transform;
         }
     }
 }

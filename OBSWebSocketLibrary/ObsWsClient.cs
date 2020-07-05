@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OBSWebSocketLibrary.Data;
+using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.Data;
@@ -23,13 +24,20 @@ namespace OBSWebSocketLibrary
         private bool disposedValue;
         public bool AutoReconnect { get; set; }
         private readonly System.Timers.Timer heartBeatCheck = new System.Timers.Timer(8000);
-        public Dictionary<Guid, Data.Requests> sentMessageGuids = new Dictionary<Guid, Data.Requests>();
+        public Dictionary<Guid, ObsRequestMetadata> sentMessageGuids = new Dictionary<Guid, ObsRequestMetadata>();
 
         public ObsWsClient(Uri url) : base(url)
         {
             context = SynchronizationContext.Current;
             StateChange += WebSocket_Connected;
             OnObsEvent += FurtherProcessObsEvent;
+        }
+
+        public class ObsRequestMetadata
+        {
+            public Guid RequestGuid { get; set; }
+            public Data.Requests OriginalRequestType { get; set; }
+            public object OriginalRequestData { get; set; }
         }
 
         public class ObsReply
@@ -39,7 +47,7 @@ namespace OBSWebSocketLibrary
             public Data.SourceTypes SourceType { get; set; }
             public object MessageObject { get; set; }
             public string Status { get; set; }
-            public object OriginalRequest { get; set; }
+            public ObsRequestMetadata RequestMetadata { get; set; }
         }
 
         public class ObsEvent
@@ -94,11 +102,15 @@ namespace OBSWebSocketLibrary
 
         public async ValueTask<Guid> OBS_Send(object message)
         {
-            Guid guid = (message as Models.Requests.RequestBase).MessageId;
-            Data.Requests messageType = (message as Models.Requests.RequestBase).RequestType;
-            sentMessageGuids.Add(guid, messageType);
+            ObsRequestMetadata metadata = new ObsRequestMetadata()
+            {
+                RequestGuid = (message as Models.Requests.RequestBase).MessageId,
+                OriginalRequestType = (message as Models.Requests.RequestBase).RequestType,
+                OriginalRequestData = message
+            };
+            sentMessageGuids.Add(metadata.RequestGuid, metadata);
             await SendMessageAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(message)));
-            return guid;
+            return metadata.RequestGuid;
         }
 
         private Guid OBS_EnableHeartBeat()
@@ -149,8 +161,8 @@ namespace OBSWebSocketLibrary
             {
                 Guid.TryParse(messageIdJson.GetString(), out Guid guid);
                 root.TryGetProperty("status", out JsonElement statusJson);
-                bool sentMessageGuidExists = sentMessageGuids.TryGetValue(guid, out Data.Requests requestType);
-                Enum.TryParse(requestType.ToString(), out Data.Requests reqType);
+                bool sentMessageGuidExists = sentMessageGuids.TryGetValue(guid, out ObsRequestMetadata requestMetadata);
+                Enum.TryParse(requestMetadata.OriginalRequestType.ToString(), out Data.Requests reqType);
                 ObsReply obsReply = new ObsReply()
                 {
                     MessageId = guid,
@@ -159,7 +171,7 @@ namespace OBSWebSocketLibrary
                 };
                 if (sentMessageGuidExists)
                 {
-                    obsReply.OriginalRequest = requestType;
+                    obsReply.RequestMetadata = requestMetadata;
                     sentMessageGuids.Remove(guid);
                 }
                 switch (reqType)
@@ -287,7 +299,7 @@ namespace OBSWebSocketLibrary
                 ErrorMessage errorMessage = new ErrorMessage()
                 {
                     Error = new Exception(
-                        $"The {obsReply.OriginalRequest} request {obsReply.MessageId} was responded to by a status of {obsReply.Status}.",
+                        $"The {obsReply.RequestMetadata.OriginalRequestType} request {obsReply.MessageId} was responded to by a status of {obsReply.Status}.",
                         new Exception(replyModel.Error)
                         ),
                     ReconnectDelay = -1

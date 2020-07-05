@@ -14,12 +14,12 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         private double volume;
         private int syncOffset;
         private string name;
+        private string monitorType;
 
         public BaseType()
         {
             Dependencies = new DependencyProperties();
         }
-
 
         public event PropertyChangedEventHandler PropertyChanged;
         public void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
@@ -60,6 +60,17 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
             set
             {
                 name = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        [JsonIgnore]
+        public string MonitorType
+        {
+            get { return monitorType; }
+            set
+            {
+                monitorType = value;
                 NotifyPropertyChanged();
             }
         }

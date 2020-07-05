@@ -311,6 +311,8 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
 
     public class GetAudioMonitorType : RequestReplyBase
     {
+        [JsonPropertyName("monitorType")]
+        public string MonitorType { get; set; }
     }
 
     public class SetAudioMonitorType : RequestReplyBase

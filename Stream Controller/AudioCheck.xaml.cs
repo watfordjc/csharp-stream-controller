@@ -290,6 +290,7 @@ namespace Stream_Controller
                 }
                 obsSceneItemSceneDictionary[sceneItem.Id] = scene;
                 Obs_Get(OBSWebSocketLibrary.Data.Requests.GetSceneItemProperties, sceneItem.Name, scene.Name);
+                Obs_Get(OBSWebSocketLibrary.Data.Requests.GetAudioMonitorType, sceneItem.Source.Name);
             }
         }
 
@@ -360,6 +361,10 @@ namespace Stream_Controller
                     OBSWebSocketLibrary.Models.TypeDefs.SceneItem existingSceneItem = GetSceneItemFromSceneItemId(itemProps.ItemId, null);
                     existingSceneItem.Transform = itemProps;
                     break;
+                case OBSWebSocketLibrary.Data.Requests.GetAudioMonitorType:
+                    OBSWebSocketLibrary.Models.Requests.GetAudioMonitorType requestSent = replyObject.RequestMetadata.OriginalRequestData as OBSWebSocketLibrary.Models.Requests.GetAudioMonitorType;
+                    (obsSourceDictionary[requestSent.SourceName] as OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType).MonitorType = (replyObject.MessageObject as OBSWebSocketLibrary.Models.RequestReplies.GetAudioMonitorType).MonitorType;
+                    break;
                 default:
                     break;
             }
@@ -400,7 +405,7 @@ namespace Stream_Controller
         private async void GetDeviceIdsForSources()
         {
             await audioDevicesEnumerated.Task;
-            while (webSocket.sentMessageGuids.ContainsValue(OBSWebSocketLibrary.Data.Requests.GetSourceSettings))
+            while (webSocket.sentMessageGuids.Values.Count(x => x.OriginalRequestType == OBSWebSocketLibrary.Data.Requests.GetSourceSettings) > 0)
             {
                 await Task.Delay(250);
             }
@@ -593,6 +598,9 @@ namespace Stream_Controller
                     break;
                 case OBSWebSocketLibrary.Data.Requests.GetSourceFilters:
                     (request as OBSWebSocketLibrary.Models.Requests.GetSourceFilters).SourceName = name;
+                    break;
+                case OBSWebSocketLibrary.Data.Requests.GetAudioMonitorType:
+                    (request as OBSWebSocketLibrary.Models.Requests.GetAudioMonitorType).SourceName = name;
                     break;
                 default:
                     return Guid.Empty;

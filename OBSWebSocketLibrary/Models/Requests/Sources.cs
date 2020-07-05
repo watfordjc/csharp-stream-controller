@@ -294,16 +294,16 @@ namespace OBSWebSocketLibrary.Models.Requests
 
     public class GetAudioMonitorType : RequestBase
     {
-        [JsonPropertyName("source")]
-        public string Source { get; set; }
+        [JsonPropertyName("sourceName")]
+        public string SourceName { get; set; }
     }
 
     public class SetAudioMonitorType : RequestBase
     {
         [JsonPropertyName("sourceName")]
         public string SourceName { get; set; }
-        [JsonPropertyName("monitorAndOutput")]
-        public string MonitorAndOutput { get; set; }
+        [JsonPropertyName("monitorType")]
+        public string MonitorType { get; set; }
     }
 
     public class TakeSourceScreenshot : RequestBase
