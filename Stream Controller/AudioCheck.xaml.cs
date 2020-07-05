@@ -279,6 +279,12 @@ namespace Stream_Controller
                 case OBSWebSocketLibrary.Data.Events.SourceAudioMixersChanged:
                     SourceAudioMixersChanged_Event((OBSWebSocketLibrary.Models.Events.SourceAudioMixersChanged)eventObject.MessageObject);
                     break;
+                case OBSWebSocketLibrary.Data.Events.SourceFilterAdded:
+                    SourceFilterAdded_Event((OBSWebSocketLibrary.Models.Events.SourceFilterAdded)eventObject.MessageObject);
+                    break;
+                case OBSWebSocketLibrary.Data.Events.SourceFilterRemoved:
+                    SourceFilterRemoved_Event((OBSWebSocketLibrary.Models.Events.SourceFilterRemoved)eventObject.MessageObject);
+                    break;
             }
         }
 
@@ -571,6 +577,20 @@ namespace Stream_Controller
         {
             (obsSourceDictionary[messageObject.SourceName] as OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType).Mixers = messageObject.Mixers;
             (obsSourceDictionary[messageObject.SourceName] as OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType).HexMixersValue = messageObject.HexMixersValue;
+        }
+
+        private void SourceFilterAdded_Event(OBSWebSocketLibrary.Models.Events.SourceFilterAdded messageObject)
+        {
+            OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType source = (OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType)obsSourceDictionary[messageObject.SourceName];
+            OBSWebSocketLibrary.Models.TypeDefs.FilterTypes.BaseFilter filter = (OBSWebSocketLibrary.Models.TypeDefs.FilterTypes.BaseFilter)messageObject.FilterSettingsObj;
+            source.Filters.Add(filter);
+        }
+
+        private void SourceFilterRemoved_Event(OBSWebSocketLibrary.Models.Events.SourceFilterRemoved messageObject)
+        {
+            OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType source = (OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType)obsSourceDictionary[messageObject.SourceName];
+            OBSWebSocketLibrary.Models.TypeDefs.FilterTypes.BaseFilter filter = source.Filters.First(x => x.Name == messageObject.FilterName);
+            source.Filters.Remove(filter);
         }
 
         #endregion
