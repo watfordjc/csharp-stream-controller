@@ -276,6 +276,9 @@ namespace Stream_Controller
                 case OBSWebSocketLibrary.Data.Events.SceneCollectionChanged:
                     Obs_Get(OBSWebSocketLibrary.Data.Requests.GetSourcesList);
                     break;
+                case OBSWebSocketLibrary.Data.Events.SourceAudioMixersChanged:
+                    SourceAudioMixersChanged_Event((OBSWebSocketLibrary.Models.Events.SourceAudioMixersChanged)eventObject.MessageObject);
+                    break;
             }
         }
 
@@ -563,6 +566,12 @@ namespace Stream_Controller
         {
             OBSWebSocketLibrary.Models.TypeDefs.SceneItem existingScene = sceneList.First(x => x.Name == messageObject.SceneName).Sources.First(x => x.Name == messageObject.ItemName);
             existingScene.Locked = messageObject.ItemLocked;
+        }
+
+        private void SourceAudioMixersChanged_Event(OBSWebSocketLibrary.Models.Events.SourceAudioMixersChanged messageObject)
+        {
+            (obsSourceDictionary[messageObject.SourceName] as OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType).Mixers = messageObject.Mixers;
+            (obsSourceDictionary[messageObject.SourceName] as OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType).HexMixersValue = messageObject.HexMixersValue;
         }
 
         #endregion

@@ -162,35 +162,42 @@ namespace OBSWebSocketLibrary
                 Guid.TryParse(messageIdJson.GetString(), out Guid guid);
                 root.TryGetProperty("status", out JsonElement statusJson);
                 bool sentMessageGuidExists = sentMessageGuids.TryGetValue(guid, out ObsRequestMetadata requestMetadata);
-                Enum.TryParse(requestMetadata.OriginalRequestType.ToString(), out Data.Requests reqType);
-                ObsReply obsReply = new ObsReply()
-                {
-                    MessageId = guid,
-                    RequestType = reqType,
-                    Status = statusJson.GetString()
-                };
                 if (sentMessageGuidExists)
                 {
-                    obsReply.RequestMetadata = requestMetadata;
-                    sentMessageGuids.Remove(guid);
+                    Enum.TryParse(requestMetadata.OriginalRequestType.ToString(), out Data.Requests reqType);
+                    ObsReply obsReply = new ObsReply()
+                    {
+                        MessageId = guid,
+                        RequestType = reqType,
+                        Status = statusJson.GetString()
+                    };
+                    if (sentMessageGuidExists)
+                    {
+                        obsReply.RequestMetadata = requestMetadata;
+                        sentMessageGuids.Remove(guid);
+                    }
+                    switch (reqType)
+                    {
+                        case Data.Requests.GetSourceSettings:
+                        case Data.Requests.SetSourceSettings:
+                            root.TryGetProperty("sourceType", out sourceType);
+                            Enum.TryParse(sourceType.ToString(), out srcType);
+                            obsReply.SourceType = srcType;
+                            break;
+                        case Data.Requests.GetSourceFilterInfo:
+                            root.TryGetProperty("type", out sourceType);
+                            Enum.TryParse(sourceType.ToString(), out srcType);
+                            obsReply.SourceType = srcType;
+                            break;
+                        default:
+                            break;
+                    }
+                    ParseReply(message, obsReply);
                 }
-                switch (reqType)
+                else
                 {
-                    case Data.Requests.GetSourceSettings:
-                    case Data.Requests.SetSourceSettings:
-                        root.TryGetProperty("sourceType", out sourceType);
-                        Enum.TryParse(sourceType.ToString(), out srcType);
-                        obsReply.SourceType = srcType;
-                        break;
-                    case Data.Requests.GetSourceFilterInfo:
-                        root.TryGetProperty("type", out sourceType);
-                        Enum.TryParse(sourceType.ToString(), out srcType);
-                        obsReply.SourceType = srcType;
-                        break;
-                    default:
-                        break;
+                    Trace.WriteLine($"message-id {messageIdJson} received, but no matching request found.");
                 }
-                ParseReply(message, obsReply);
             }
             else if (root.TryGetProperty("update-type", out JsonElement updateTypeJson))
             {

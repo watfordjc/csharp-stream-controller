@@ -50,4 +50,12 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         [JsonPropertyName("profile-name")]
         public string Name { get; set; }
     }
+
+    public class Mixer
+    {
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
+        [JsonPropertyName("enabled")]
+        public bool Enabled { get; set; }
+    }
 }

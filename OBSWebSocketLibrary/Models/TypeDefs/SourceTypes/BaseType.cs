@@ -15,6 +15,8 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         private int syncOffset;
         private string name;
         private string monitorType;
+        private Mixer[] mixers;
+        private string hexMixersValue;
 
         public BaseType()
         {
@@ -63,7 +65,6 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
                 NotifyPropertyChanged();
             }
         }
-
         [JsonIgnore]
         public string MonitorType
         {
@@ -71,6 +72,26 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
             set
             {
                 monitorType = value;
+                NotifyPropertyChanged();
+            }
+        }
+        [JsonIgnore]
+        public Mixer[] Mixers
+        {
+            get { return mixers; }
+            set
+            {
+                mixers = value;
+                NotifyPropertyChanged();
+            }
+        }
+        [JsonIgnore]
+        public string HexMixersValue
+        {
+            get { return hexMixersValue; }
+            set
+            {
+                hexMixersValue = value;
                 NotifyPropertyChanged();
             }
         }

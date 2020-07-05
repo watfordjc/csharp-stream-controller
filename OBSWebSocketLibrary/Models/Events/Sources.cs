@@ -58,14 +58,7 @@ namespace OBSWebSocketLibrary.Models.Events
         [JsonPropertyName("sourceName")]
         public string SourceName { get; set; }
         [JsonPropertyName("mixers")]
-        public Mixer[] Mixers { get; set; }
-        public class Mixer
-        {
-            [JsonPropertyName("id")]
-            public int Id { get; set; }
-            [JsonPropertyName("enabled")]
-            public bool Enabled { get; set; }
-        }
+        public TypeDefs.Mixer[] Mixers { get; set; }
         [JsonPropertyName("hexMixersValue")]
         public string HexMixersValue { get; set; }
     }
