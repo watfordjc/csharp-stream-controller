@@ -10,6 +10,8 @@ namespace StreamController.ValidationRules
     {
         public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
+            if (value == null) { throw new ArgumentNullException(nameof(value)); }
+
             if (
                 ((string)value).Length == 0 ||
                 Uri.CheckHostName((string)value) == UriHostNameType.Unknown

@@ -32,7 +32,7 @@ namespace StreamController.SharedModels
             // When Device is set, populate the additional properties
             set
             {
-                _Device = value;
+                _Device = value ?? throw new ArgumentNullException(nameof(value));
                 ID = value.ID;
                 DataFlow = value.DataFlow;
                 SetProperties(value.State);
@@ -75,6 +75,8 @@ namespace StreamController.SharedModels
 
         public void VolumeChanged(AudioVolumeNotificationData data)
         {
+            if (data == null) { throw new ArgumentNullException(nameof(data)); }
+
             // Update the Volume and notify the change.
             Volume = Math.Round(data.MasterVolume * 100f);
             OnPropertyChanged("Volume");

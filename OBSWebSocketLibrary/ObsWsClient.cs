@@ -112,6 +112,8 @@ namespace OBSWebSocketLibrary
 
         public async ValueTask<Guid> ObsSend(object message)
         {
+            if (message == null) { throw new ArgumentNullException(nameof(message)); }
+
             ObsRequestMetadata metadata = new ObsRequestMetadata()
             {
                 RequestGuid = (message as Models.Requests.RequestBase).MessageId,

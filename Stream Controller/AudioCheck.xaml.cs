@@ -750,6 +750,9 @@ namespace StreamController
 
             public int Compare(object x, object y)
             {
+                if (x == null) { throw new ArgumentNullException(nameof(x)); }
+                if (y == null) { throw new ArgumentNullException(nameof(y)); }
+
                 return collectionOrderList.IndexOf((y as OBSWebSocketLibrary.Models.TypeDefs.SceneItem).Id) - collectionOrderList.IndexOf((x as OBSWebSocketLibrary.Models.TypeDefs.SceneItem).Id);
             }
         }

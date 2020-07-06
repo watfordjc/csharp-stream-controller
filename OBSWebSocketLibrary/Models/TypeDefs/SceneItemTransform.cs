@@ -48,6 +48,8 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
 
         public static implicit operator SceneItemTransform(RequestReplies.GetSceneItemProperties v)
         {
+            if (v == null) { return null; }
+
             return new SceneItemTransform
             {
                 Position = new PositionProperties()

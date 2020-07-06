@@ -23,6 +23,8 @@ namespace StreamController
 
         public void MenuWindowItemLoaded(object sender, RoutedEventArgs e)
         {
+            if (sender == null) { throw new ArgumentNullException(nameof(sender)); }
+
             WindowUtilityLibrary.WindowType clickedWindowType = (WindowUtilityLibrary.WindowType)Enum.Parse(typeof(WindowUtilityLibrary.WindowType), ((MenuItem)sender).Name);
             Window parent = Window.GetWindow((MenuItem)sender);
             WindowUtilityLibrary.WindowType windowType = WindowUtilityLibrary.GetWindowTypeEnum(parent.GetType());

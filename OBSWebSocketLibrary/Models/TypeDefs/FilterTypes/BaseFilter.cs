@@ -51,6 +51,8 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.FilterTypes
 
         public static implicit operator BaseFilter(RequestReplies.GetSourceFilters.Filter v)
         {
+            if (v == null) { return null; }
+
             BaseFilter converted = v.SettingsObj as BaseFilter;
             converted.Name = v.Name;
             converted.Type = ObsTypes.ObsTypeNameDictionary[v.Type];

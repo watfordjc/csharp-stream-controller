@@ -146,7 +146,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
                 get { return audioInterface; }
                 set
                 {
-                    audioInterface = value;
+                    audioInterface = value ?? throw new ArgumentNullException(nameof(value));
                     // FriendlyName is equal to ID if FriendlyName isn't available due to interface state (e.g. NotPresent)
                     DependencyProblem = audioInterface.ID == audioInterface.FriendlyName;
                     NotifyPropertyChanged();
