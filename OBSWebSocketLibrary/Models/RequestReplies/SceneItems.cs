@@ -12,12 +12,7 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         [JsonPropertyName("itemId")]
         public int ItemId { get; set; }
         [JsonPropertyName("position")]
-        public PositionProperties Position { get; set; }
-        public class PositionProperties : TypeDefs.Coordinates
-        {
-            [JsonPropertyName("alignment")]
-            public int Alignment { get; set; }
-        }
+        public TypeDefs.PositionProperties Position { get; set; }
         [JsonPropertyName("rotation")]
         public double Rotation { get; set; }
         [JsonPropertyName("scale")]
@@ -31,14 +26,7 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         [JsonPropertyName("locked")]
         public bool Locked { get; set; }
         [JsonPropertyName("bounds")]
-        public BoundsProperties Bounds { get; set; }
-        public class BoundsProperties : TypeDefs.Coordinates
-        {
-            [JsonPropertyName("type")]
-            public string Type { get; set; }
-            [JsonPropertyName("alignment")]
-            public int Alignment { get; set; }
-        }
+        public TypeDefs.BoundsProperties Bounds { get; set; }
         [JsonPropertyName("sourceWidth")]
         public int SourceWidth { get; set; }
         [JsonPropertyName("sourceHeight")]
@@ -88,13 +76,6 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         [JsonPropertyName("scene")]
         public string Scene { get; set; }
         [JsonPropertyName("item")]
-        public SceneItem Item { get; set; }
-        public class SceneItem
-        {
-            [JsonPropertyName("id")]
-            public int Id { get; set; }
-            [JsonPropertyName("name")]
-            public string Name { get; set; }
-        }
+        public TypeDefs.ItemObject Item { get; set; }
     }
 }

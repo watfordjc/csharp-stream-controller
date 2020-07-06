@@ -16,31 +16,9 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         [JsonPropertyName("height")]
         public int Height { get; set; }
         [JsonPropertyName("flags")]
-        public FlagsProperties Flags { get; set; }
-        public class FlagsProperties
-        {
-            [JsonPropertyName("rawValue")]
-            public int RawValue { get; set; }
-            [JsonPropertyName("audio")]
-            public bool Audio { get; set; }
-            [JsonPropertyName("video")]
-            public bool Video { get; set; }
-            [JsonPropertyName("encoded")]
-            public bool Encoded { get; set; }
-            [JsonPropertyName("multiTrack")]
-            public bool MultiTrack { get; set; }
-            [JsonPropertyName("service")]
-            public bool Service { get; set; }
-        }
-        public class Settings
-        {
-            [JsonPropertyName("active")]
-            public bool Active { get; set; }
-            [JsonPropertyName("reconnecting")]
-            public bool Reconnecting { get; set; }
-            [JsonPropertyName("congestion")]
-            public double Congestion { get; set; }
-        }
+        public TypeDefs.ObsOutputFlags Flags { get; set; }
+        [JsonPropertyName("settings")]
+        public TypeDefs.ObsOutputSettings Settings { get; set; }
         [JsonPropertyName("totalFrames")]
         public int TotalFrames { get; set; }
         [JsonPropertyName("droppedFrames")]

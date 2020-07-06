@@ -10,14 +10,7 @@ namespace OBSWebSocketLibrary.Models.Events
         [JsonPropertyName("scene-name")]
         public string SceneName { get; set; }
         [JsonPropertyName("scene-items")]
-        public IList<SceneItem> SceneItems { get; set; }
-        public class SceneItem
-        {
-            [JsonPropertyName("source-name")]
-            public string SourceName { get; set; }
-            [JsonPropertyName("item-id")]
-            public int ItemId { get; set; }
-        }
+        public IList<TypeDefs.ObsEventSceneItem> SceneItems { get; set; }
     }
 
     public class SceneItemAdded : EventBase

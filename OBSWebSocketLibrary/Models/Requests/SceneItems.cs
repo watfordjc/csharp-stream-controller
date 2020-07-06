@@ -23,12 +23,7 @@ namespace OBSWebSocketLibrary.Models.Requests
         [JsonPropertyName("item")]
         public TypeDefs.ItemObject ItemObj { get; set; }
         [JsonPropertyName("position")]
-        public PositionProperties Position { get; set; }
-        public class PositionProperties : TypeDefs.Coordinates
-        {
-            [JsonPropertyName("alignment")]
-            public int Alignment { get; set; }
-        }
+        public TypeDefs.PositionProperties Position { get; set; }
         [JsonPropertyName("rotation")]
         public double Rotation { get; set; }
         [JsonPropertyName("scale")]
@@ -40,14 +35,7 @@ namespace OBSWebSocketLibrary.Models.Requests
         [JsonPropertyName("locked")]
         public bool Locked { get; set; }
         [JsonPropertyName("bounds")]
-        public BoundsProperties Bounds { get; set; }
-        public class BoundsProperties : TypeDefs.Coordinates
-        {
-            [JsonPropertyName("type")]
-            public string Type { get; set; }
-            [JsonPropertyName("alignment")]
-            public int Alignment { get; set; }
-        }
+        public TypeDefs.BoundsProperties Bounds { get; set; }
     }
 
     public class ResetSceneItem : RequestBase

@@ -49,7 +49,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.FilterTypes
             }
         }
 
-        public static implicit operator BaseFilter(RequestReplies.GetSourceFilters.Filter v)
+        public static implicit operator BaseFilter(TypeDefs.ObsReplyFilter v)
         {
             if (v == null) { return null; }
 
@@ -60,7 +60,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.FilterTypes
             return converted;
         }
 
-        public static BaseFilter FromFilter(RequestReplies.GetSourceFilters.Filter v)
+        public static BaseFilter FromObsReplyFilter(TypeDefs.ObsReplyFilter v)
         {
             return v;
         }

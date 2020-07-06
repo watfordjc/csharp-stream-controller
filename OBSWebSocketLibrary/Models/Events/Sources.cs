@@ -110,13 +110,6 @@ namespace OBSWebSocketLibrary.Models.Events
         [JsonPropertyName("sourceName")]
         public string SourceName { get; set; }
         [JsonPropertyName("filters")]
-        public IList<Filter> Filters { get; set; }
-        public class Filter
-        {
-            [JsonPropertyName("name")]
-            public string Name { get; set; }
-            [JsonPropertyName("type")]
-            public string Type { get; set; }
-        }
+        public IList<TypeDefs.ObsFilter> Filters { get; set; }
     }
 }

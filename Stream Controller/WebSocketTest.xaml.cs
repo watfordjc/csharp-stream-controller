@@ -111,7 +111,7 @@ namespace StreamController
             }
         }
 
-        private void WebSocket_ErrorMessage(object sender, ObsWsClient.ErrorMessage errorMessage)
+        private void WebSocket_ErrorMessage(object sender, WebSocketLibrary.Models.ErrorMessage errorMessage)
         {
             if (errorMessage.Error == null) { return; }
             txtOutput.Text += $"{errorMessage.Error.Message}\n{errorMessage.Error.InnerException?.Message}\n\n";

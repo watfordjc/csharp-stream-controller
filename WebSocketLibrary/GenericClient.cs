@@ -22,28 +22,10 @@ namespace WebSocketLibrary
         private readonly SemaphoreSlim receiveAsyncSemaphore = new SemaphoreSlim(1);
         private int _RetrySeconds = 5;
         private int _MaximumRetryMinutes = 10;
-        private ErrorMessage errorMessage = new ErrorMessage();
+        private Models.ErrorMessage errorMessage = new Models.ErrorMessage();
         private bool disposedValue;
         private const int RECV_BUFFER_SIZE = 8192;
         private const int SEND_BUFFER_SIZE = 8192;
-
-        /// <summary>
-        /// Object containing a WebSocketReceiveResult and a received byte[].
-        /// </summary>
-        private class ReceivedMessage
-        {
-            public WebSocketReceiveResult Result { get; set; }
-            public MemoryStream Message { get; set; }
-        }
-
-        /// <summary>
-        /// Object containing an Exception and current reconnect delay.
-        /// </summary>
-        public class ErrorMessage
-        {
-            public Exception Error { get; set; }
-            public int ReconnectDelay { get; set; }
-        }
 
         public delegate byte[] ReceivedBinaryMessage();
         public delegate string ReceivedTextMessage();
@@ -53,13 +35,13 @@ namespace WebSocketLibrary
         public event EventHandler<MemoryStream> ReceiveBinaryMessage;
         public event EventHandler<MemoryStream> ReceiveTextMessage;
         public event EventHandler<WebSocketState> StateChange;
-        public event EventHandler<ErrorMessage> ErrorState;
+        public event EventHandler<Models.ErrorMessage> ErrorState;
 
         /// <summary>
         /// Calls correct event invocation method depending on MessageType.
         /// </summary>
         /// <param name="receivedMessage">A ReceivedMessage instance.</param>
-        private void ParseMessage(ReceivedMessage receivedMessage)
+        private void ParseMessage(Models.ReceivedMessage receivedMessage)
         {
             receivedMessage.Message.Seek(0, SeekOrigin.Begin);
             if (receivedMessage.Result.MessageType == WebSocketMessageType.Text)
@@ -110,7 +92,7 @@ namespace WebSocketLibrary
         /// <param name="reconnectDelay">The current reconnection attempt delay.</param>
         protected virtual void OnErrorState(Exception e, int reconnectDelay)
         {
-            errorMessage = new ErrorMessage
+            errorMessage = new Models.ErrorMessage
             {
                 Error = e,
                 ReconnectDelay = reconnectDelay
@@ -261,9 +243,9 @@ namespace WebSocketLibrary
         /// Receive a WebSocket message.
         /// </summary>
         /// <returns>A ReceivedMessage object containing Result and Message.</returns>
-        private async Task<ReceivedMessage> ReceiveMessageAsync()
+        private async Task<Models.ReceivedMessage> ReceiveMessageAsync()
         {
-            ReceivedMessage receivedMessage = new ReceivedMessage
+            Models.ReceivedMessage receivedMessage = new Models.ReceivedMessage
             {
                 Message = new MemoryStream()
             };
@@ -289,7 +271,7 @@ namespace WebSocketLibrary
             {
                 try
                 {
-                    ReceivedMessage receivedMessage = await ReceiveMessageAsync();
+                    Models.ReceivedMessage receivedMessage = await ReceiveMessageAsync();
                     if (receivedMessage.Result.MessageType == WebSocketMessageType.Close)
                     {
                         break;

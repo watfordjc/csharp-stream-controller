@@ -40,20 +40,7 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         [JsonPropertyName("type")]
         public string Type { get; set; }
         [JsonPropertyName("settings")]
-        public StreamSettings Settings { get; set; }
-        public class StreamSettings
-        {
-            [JsonPropertyName("server")]
-            public string SettingsServer { get; set; }
-            [JsonPropertyName("key")]
-            public string SettingsKey { get; set; }
-            [JsonPropertyName("use_auth")]
-            public bool SettingsUseAuth { get; set; }
-            [JsonPropertyName("username")]
-            public string Username { get; set; }
-            [JsonPropertyName("password")]
-            public string Password { get; set; }
-        }
+        public TypeDefs.ObsStreamSettings Settings { get; set; }
     }
 
     public class SaveStreamSettings : RequestReplyBase

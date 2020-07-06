@@ -207,7 +207,7 @@ namespace StreamController
             }
         }
 
-        private void WebSocket_Error(object sender, GenericClient.ErrorMessage e)
+        private void WebSocket_Error(object sender, WebSocketLibrary.Models.ErrorMessage e)
         {
             if (e.ReconnectDelay > 0)
             {
@@ -220,7 +220,7 @@ namespace StreamController
             }
         }
 
-        private void WebSocket_Event(object sender, ObsWsClient.ObsEvent eventObject)
+        private void WebSocket_Event(object sender, OBSWebSocketLibrary.Models.TypeDefs.ObsEvent eventObject)
         {
             switch (eventObject.EventType)
             {
@@ -320,7 +320,7 @@ namespace StreamController
             }
         }
 
-        private void Websocket_Reply(object sender, ObsWsClient.ObsReply replyObject)
+        private void Websocket_Reply(object sender, OBSWebSocketLibrary.Models.TypeDefs.ObsReply replyObject)
         {
             switch (replyObject.RequestType)
             {
@@ -341,7 +341,7 @@ namespace StreamController
                     break;
                 case OBSWebSocketLibrary.Data.RequestType.GetSourceTypesList:
                     sourceTypes = (OBSWebSocketLibrary.Models.RequestReplies.GetSourceTypesList)replyObject.MessageObject;
-                    foreach (OBSWebSocketLibrary.Models.RequestReplies.GetSourceTypesList.Type type in sourceTypes.Types)
+                    foreach (OBSWebSocketLibrary.Models.TypeDefs.ObsReplyType type in sourceTypes.Types)
                     {
                         if (!OBSWebSocketLibrary.Data.ObsTypes.ObsTypeNameDictionary.ContainsKey(type.TypeId))
                         {
@@ -352,7 +352,7 @@ namespace StreamController
                     break;
                 case OBSWebSocketLibrary.Data.RequestType.GetSourcesList:
                     OBSWebSocketLibrary.Models.RequestReplies.GetSourcesList sourcesList = (OBSWebSocketLibrary.Models.RequestReplies.GetSourcesList)replyObject.MessageObject;
-                    foreach (OBSWebSocketLibrary.Models.RequestReplies.GetSourcesList.Source source in sourcesList.Sources)
+                    foreach (OBSWebSocketLibrary.Models.TypeDefs.ObsReplySource source in sourcesList.Sources)
                     {
                         Obs_Get(OBSWebSocketLibrary.Data.RequestType.GetSourceSettings, source.Name);
                     }
@@ -369,14 +369,14 @@ namespace StreamController
                     break;
                 case OBSWebSocketLibrary.Data.RequestType.GetSourceFilters:
                     OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType sourceToModify = obsSourceDictionary[(replyObject.RequestMetadata.OriginalRequestData as OBSWebSocketLibrary.Models.Requests.GetSourceFilters).SourceName] as OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType;
-                    foreach (OBSWebSocketLibrary.Models.RequestReplies.GetSourceFilters.Filter filter in (replyObject.MessageObject as OBSWebSocketLibrary.Models.RequestReplies.GetSourceFilters).Filters)
+                    foreach (OBSWebSocketLibrary.Models.TypeDefs.ObsReplyFilter filter in (replyObject.MessageObject as OBSWebSocketLibrary.Models.RequestReplies.GetSourceFilters).Filters)
                     {
                         sourceToModify.Filters.Add(filter);
                     }
                     break;
                 case OBSWebSocketLibrary.Data.RequestType.GetTransitionList:
                     OBSWebSocketLibrary.Models.RequestReplies.GetTransitionList transitionList = (OBSWebSocketLibrary.Models.RequestReplies.GetTransitionList)replyObject.MessageObject;
-                    foreach (OBSWebSocketLibrary.Models.RequestReplies.GetTransitionList.Transition transition in transitionList.Transitions)
+                    foreach (OBSWebSocketLibrary.Models.TypeDefs.ObsTransitionName transition in transitionList.Transitions)
                     {
                         //  Trace.WriteLine($"{transition.Name}");
                     }
@@ -446,7 +446,7 @@ namespace StreamController
                     default:
                         continue;
                 }
-                OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType.DependencyProperties dependencies = source.Dependencies;
+                OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.DependencyProperties dependencies = source.Dependencies;
                 if (source.Type.TypeId == OBSWebSocketLibrary.Data.ObsTypes.ObsTypeNameDictionary.First(x => x.Value == OBSWebSocketLibrary.Data.SourceType.DShowInput).Key)
                 {
                     ReadOnlyMemory<char> deviceName = ((OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.DShowInput)source).AudioDeviceId.AsMemory();
@@ -502,7 +502,7 @@ namespace StreamController
             }
             List<int> collectionOrderList = messageObject.SceneItems.Select(x => x.ItemId).ToList();
             ListCollectionView listCollection = (ListCollectionView)CollectionViewSource.GetDefaultView(lbSourceList.ItemsSource);
-            listCollection.CustomSort = new SceneItemSort(collectionOrderList);
+            listCollection.CustomSort = new Utils.OrderSceneItemsByListOfIds(collectionOrderList);
         }
 
         private void SceneItemRemoved_Event(OBSWebSocketLibrary.Models.Events.SceneItemRemoved messageObject)
@@ -623,7 +623,7 @@ namespace StreamController
             List<string> collectionOrderList = messageObject.Filters.Select(x => x.Name).ToList();
             for (int i = 0; i < collectionOrderList.Count; i++)
             {
-                OBSWebSocketLibrary.Models.TypeDefs.FilterTypes.BaseFilter filter = (OBSWebSocketLibrary.Models.TypeDefs.FilterTypes.BaseFilter)source.Filters.First(x => x.Name == collectionOrderList[i]);
+                OBSWebSocketLibrary.Models.TypeDefs.FilterTypes.BaseFilter filter = source.Filters.First(x => x.Name == collectionOrderList[i]);
                 source.Filters.Move(source.Filters.IndexOf(filter), i);
             }
         }
@@ -739,39 +739,6 @@ namespace StreamController
         {
             DataContext = currentScene;
             return Task.CompletedTask;
-        }
-
-        public class SceneItemSort : System.Collections.IComparer
-        {
-            private readonly List<int> collectionOrderList;
-
-            public SceneItemSort(List<int> collectionOrderList)
-            {
-                this.collectionOrderList = collectionOrderList;
-            }
-
-            public int Compare(object x, object y)
-            {
-                if (x == null) { throw new ArgumentNullException(nameof(x)); }
-                if (y == null) { throw new ArgumentNullException(nameof(y)); }
-
-                return collectionOrderList.IndexOf((y as OBSWebSocketLibrary.Models.TypeDefs.SceneItem).Id) - collectionOrderList.IndexOf((x as OBSWebSocketLibrary.Models.TypeDefs.SceneItem).Id);
-            }
-        }
-
-        public class FilterSort : IComparer<string>
-        {
-            private readonly List<string> collectionOrderList;
-
-            public FilterSort(List<string> collectionOrderList)
-            {
-                this.collectionOrderList = collectionOrderList;
-            }
-
-            public int Compare([AllowNull] string x, [AllowNull] string y)
-            {
-                return collectionOrderList.IndexOf(y) - collectionOrderList.IndexOf(x);
-            }
         }
 
         private Task UpdateTransitionMessage(string transitionMessage)

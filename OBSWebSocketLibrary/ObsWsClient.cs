@@ -24,7 +24,7 @@ namespace OBSWebSocketLibrary
         private readonly SynchronizationContext context;
         public bool AutoReconnect { get; set; }
         private readonly System.Timers.Timer heartBeatCheck = new System.Timers.Timer(8000);
-        private readonly Dictionary<Guid, ObsRequestMetadata> sentMessageGuids = new Dictionary<Guid, ObsRequestMetadata>();
+        private readonly Dictionary<Guid, Models.TypeDefs.ObsRequestMetadata> sentMessageGuids = new Dictionary<Guid, Models.TypeDefs.ObsRequestMetadata>();
 
         public ObsWsClient(Uri url) : base(url)
         {
@@ -33,42 +33,18 @@ namespace OBSWebSocketLibrary
             OnObsEvent += FurtherProcessObsEvent;
         }
 
-        public class ObsRequestMetadata
-        {
-            public Guid RequestGuid { get; set; }
-            public Data.RequestType OriginalRequestType { get; set; }
-            public object OriginalRequestData { get; set; }
-        }
+        public delegate Models.TypeDefs.ObsReply OnNewObsReply();
+        public delegate Models.TypeDefs.ObsEvent OnNewObsEvent();
 
-        public class ObsReply
-        {
-            public Guid MessageId { get; set; }
-            public Data.RequestType RequestType { get; set; }
-            public Data.SourceType SourceType { get; set; }
-            public object MessageObject { get; set; }
-            public string Status { get; set; }
-            public ObsRequestMetadata RequestMetadata { get; set; }
-        }
+        public event EventHandler<Models.TypeDefs.ObsReply> OnObsReply;
+        public event EventHandler<Models.TypeDefs.ObsEvent> OnObsEvent;
 
-        public class ObsEvent
-        {
-            public Data.EventType EventType { get; set; }
-            public Data.SourceType SourceType { get; set; }
-            public object MessageObject { get; set; }
-        }
-
-        public delegate ObsReply OnNewObsReply();
-        public delegate ObsEvent OnNewObsEvent();
-
-        public event EventHandler<ObsReply> OnObsReply;
-        public event EventHandler<ObsEvent> OnObsEvent;
-
-        protected virtual void NewObsReply(ObsReply obsReply)
+        protected virtual void NewObsReply(Models.TypeDefs.ObsReply obsReply)
         {
             OnObsReply?.Invoke(this, obsReply);
         }
 
-        protected virtual void NewObsEvent(ObsEvent obsEvent)
+        protected virtual void NewObsEvent(Models.TypeDefs.ObsEvent obsEvent)
         {
             OnObsEvent?.Invoke(this, obsEvent);
         }
@@ -113,7 +89,7 @@ namespace OBSWebSocketLibrary
         {
             if (message == null) { throw new ArgumentNullException(nameof(message)); }
 
-            ObsRequestMetadata metadata = new ObsRequestMetadata()
+            Models.TypeDefs.ObsRequestMetadata metadata = new Models.TypeDefs.ObsRequestMetadata()
             {
                 RequestGuid = (message as Models.Requests.RequestBase).MessageId,
                 OriginalRequestType = (message as Models.Requests.RequestBase).RequestType,
@@ -133,7 +109,7 @@ namespace OBSWebSocketLibrary
             return ObsSend(message).Result;
         }
 
-        private void FurtherProcessObsEvent(object sender, ObsEvent obsEvent)
+        private void FurtherProcessObsEvent(object sender, Models.TypeDefs.ObsEvent obsEvent)
         {
             switch (obsEvent.EventType)
             {
@@ -171,11 +147,11 @@ namespace OBSWebSocketLibrary
             {
                 Guid.TryParse(messageIdJson.GetString(), out Guid guid);
                 root.TryGetProperty("status", out JsonElement statusJson);
-                bool sentMessageGuidExists = sentMessageGuids.TryGetValue(guid, out ObsRequestMetadata requestMetadata);
+                bool sentMessageGuidExists = sentMessageGuids.TryGetValue(guid, out Models.TypeDefs.ObsRequestMetadata requestMetadata);
                 if (sentMessageGuidExists)
                 {
                     Enum.TryParse(requestMetadata.OriginalRequestType.ToString(), out Data.RequestType reqType);
-                    ObsReply obsReply = new ObsReply()
+                    Models.TypeDefs.ObsReply obsReply = new Models.TypeDefs.ObsReply()
                     {
                         MessageId = guid,
                         RequestType = reqType,
@@ -213,7 +189,7 @@ namespace OBSWebSocketLibrary
                 bool isStreaming = root.TryGetProperty("stream-timecode", out JsonElement jsonStreamTimecode);
                 bool isRecording = root.TryGetProperty("rec-timecode", out JsonElement jsonRecTimecode);
                 Enum.TryParse(updateTypeJson.GetString(), out Data.EventType eventType);
-                ObsEvent obsEvent = new ObsEvent()
+                Models.TypeDefs.ObsEvent obsEvent = new Models.TypeDefs.ObsEvent()
                 {
                     EventType = eventType
                 };
@@ -263,7 +239,7 @@ namespace OBSWebSocketLibrary
             }
         }
 
-        private async void ParseReply(MemoryStream message, ObsReply obsReply)
+        private async void ParseReply(MemoryStream message, Models.TypeDefs.ObsReply obsReply)
         {
             message.Seek(0, SeekOrigin.Begin);
             if (obsReply.Status == "ok" && Enum.IsDefined(typeof(Data.RequestType), obsReply.RequestType))
@@ -287,7 +263,7 @@ namespace OBSWebSocketLibrary
                         (obsReply.MessageObject as Models.RequestReplies.SetSourceSettings).SourceSettingsObj = settingsObject;
                         break;
                     case Data.RequestType.GetSourceFilters:
-                        foreach (Models.RequestReplies.GetSourceFilters.Filter filter in (obsReply.MessageObject as Models.RequestReplies.GetSourceFilters).Filters)
+                        foreach (Models.TypeDefs.ObsReplyFilter filter in (obsReply.MessageObject as Models.RequestReplies.GetSourceFilters).Filters)
                         {
                             settingsJson = filter.Settings.GetRawText().AsMemory();
                             sourceType = ObsTypes.ObsTypeNameDictionary[filter.Type];
@@ -309,7 +285,7 @@ namespace OBSWebSocketLibrary
             else if (obsReply.Status == "error")
             {
                 Models.RequestReplies.ObsError replyModel = (Models.RequestReplies.ObsError)await JsonSerializer.DeserializeAsync(message, typeof(Models.RequestReplies.ObsError));
-                ErrorMessage errorMessage = new ErrorMessage()
+                WebSocketLibrary.Models.ErrorMessage errorMessage = new WebSocketLibrary.Models.ErrorMessage()
                 {
                     Error = new Exception(
                         $"The {obsReply.RequestMetadata.OriginalRequestType} request {obsReply.MessageId} was responded to by a status of {obsReply.Status}.",
@@ -321,7 +297,7 @@ namespace OBSWebSocketLibrary
             }
         }
 
-        private async void ParseEvent(MemoryStream message, ObsEvent obsEvent)
+        private async void ParseEvent(MemoryStream message, Models.TypeDefs.ObsEvent obsEvent)
         {
             message.Seek(0, SeekOrigin.Begin);
             obsEvent.MessageObject = await JsonSerializer.DeserializeAsync(message, Data.ObsEvent.GetType(obsEvent.EventType));

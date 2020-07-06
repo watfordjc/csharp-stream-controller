@@ -22,14 +22,7 @@ namespace OBSWebSocketLibrary.Models.Requests
     public class TransitionToProgram : RequestBase
     {
         [JsonPropertyName("with-transition")]
-        public Transition WithTransition { get; set; }
-        public class Transition
-        {
-            [JsonPropertyName("name")]
-            public string Name { get; set; }
-            [JsonPropertyName("duration")]
-            public int Duration { get; set; }
-        }
+        public TypeDefs.ObsRequestTransition WithTransition { get; set; }
     }
 
     public class EnableStudioMode : RequestBase

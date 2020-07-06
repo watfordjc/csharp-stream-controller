@@ -17,29 +17,7 @@ namespace OBSWebSocketLibrary.Models.Requests
     public class StartStreaming : RequestBase
     {
         [JsonPropertyName("stream")]
-        public StreamProperties Stream { get; set; }
-        public class StreamProperties
-        {
-            [JsonPropertyName("type")]
-            public string Type { get; set; }
-            [JsonPropertyName("metadata")]
-            public object Metadata { get; set; }
-            [JsonPropertyName("settings")]
-            public StreamSettings Settings { get; set; }
-            public class StreamSettings
-            {
-                [JsonPropertyName("server")]
-                public string Server { get; set; }
-                [JsonPropertyName("key")]
-                public string Key { get; set; }
-                [JsonPropertyName("use_auth")]
-                public bool UseAuth { get; set; }
-                [JsonPropertyName("username")]
-                public string Username { get; set; }
-                [JsonPropertyName("password")]
-                public string Password { get; set; }
-            }
-        }
+        public TypeDefs.ObsStream Stream { get; set; }
     }
 
     public class StopStreaming : RequestBase
@@ -51,20 +29,7 @@ namespace OBSWebSocketLibrary.Models.Requests
         [JsonPropertyName("type")]
         public string Type { get; set; }
         [JsonPropertyName("settings")]
-        public StreamSettings Settings { get; set; }
-        public class StreamSettings
-        {
-            [JsonPropertyName("server")]
-            public string Server { get; set; }
-            [JsonPropertyName("key")]
-            public string Key { get; set; }
-            [JsonPropertyName("use_auth")]
-            public bool UseAuth { get; set; }
-            [JsonPropertyName("username")]
-            public string Username { get; set; }
-            [JsonPropertyName("password")]
-            public string Password { get; set; }
-        }
+        public TypeDefs.ObsStreamSettings Settings { get; set; }
         [JsonPropertyName("save")]
         public bool Save { get; set; }
     }

@@ -9,53 +9,13 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
     public class GetSourcesList : RequestReplyBase
     {
         [JsonPropertyName("sources")]
-        public IList<Source> Sources { get; set; }
-        public class Source
-        {
-            [JsonPropertyName("name")]
-            public string Name { get; set; }
-            [JsonPropertyName("typeId")]
-            public string TypeId { get; set; }
-            [JsonPropertyName("type")]
-            public string Type { get; set; }
-        }
+        public IList<TypeDefs.ObsReplySource> Sources { get; set; }
     }
 
     public class GetSourceTypesList : RequestReplyBase
     {
         [JsonPropertyName("types")]
-        public IList<Type> Types { get; set; }
-        public class Type
-        {
-            [JsonPropertyName("typeId")]
-            public string TypeId { get; set; }
-            [JsonPropertyName("displayName")]
-            public string DisplayName { get; set; }
-            [JsonPropertyName("type")]
-            public string TypeType { get; set; }
-            [JsonPropertyName("defaultSettings")]
-            public JsonElement DefaultSettings { get; set; }
-            private object DefaultSettingsObj;
-            [JsonPropertyName("caps")]
-            public CapsProperties Caps { get; set; }
-            public class CapsProperties
-            {
-                [JsonPropertyName("isAsync")]
-                public bool IsAsync { get; set; }
-                [JsonPropertyName("hasVideo")]
-                public bool HasVideo { get; set; }
-                [JsonPropertyName("hasAudio")]
-                public bool HasAudio { get; set; }
-                [JsonPropertyName("canInteract")]
-                public bool CanInteract { get; set; }
-                [JsonPropertyName("isComposite")]
-                public bool IsComposite { get; set; }
-                [JsonPropertyName("doNotDuplicate")]
-                public bool DoNotDuplicate { get; set; }
-                [JsonPropertyName("doNotSelfMonitor")]
-                public bool DoNotSelfMonitor { get; set; }
-            }
-        }
+        public IList<TypeDefs.ObsReplyType> Types { get; set; }
     }
 
     public class GetVolume : RequestReplyBase
@@ -257,19 +217,7 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
     public class GetSourceFilters : RequestReplyBase
     {
         [JsonPropertyName("filters")]
-        public IList<Filter> Filters { get; set; }
-        public class Filter
-        {
-            [JsonPropertyName("enabled")]
-            public bool Enabled { get; set; }
-            [JsonPropertyName("type")]
-            public string Type { get; set; }
-            [JsonPropertyName("name")]
-            public string Name { get; set; }
-            [JsonPropertyName("settings")]
-            public JsonElement Settings { get; set; }
-            public object SettingsObj { get; set; }
-        }
+        public IList<TypeDefs.ObsReplyFilter> Filters { get; set; }
     }
 
     public class GetSourceFilterInfo : RequestReplyBase

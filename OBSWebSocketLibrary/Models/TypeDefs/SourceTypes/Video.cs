@@ -30,16 +30,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
     public class Slideshow : BaseType
     {
         [JsonPropertyName("files")]
-        public IList<File> Files { get; set; }
-        public class File
-        {
-            [JsonPropertyName("hidden")]
-            public bool Hidden { get; set; }
-            [JsonPropertyName("selected")]
-            public bool Selected { get; set; }
-            [JsonPropertyName("value")]
-            public string Value { get; set; }
-        }
+        public IList<ObsFile> Files { get; set; }
         [JsonPropertyName("playback_behavior")]
         public string PlaybackBehavior { get; set; }
         [JsonPropertyName("slide_time")]
@@ -181,16 +172,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         [JsonPropertyName("playback_behavior")]
         public string PlaybackBehavior { get; set; }
         [JsonPropertyName("playlist")]
-        public IList<PlaylistItem> Playlist { get; set; }
-        public class PlaylistItem
-        {
-            [JsonPropertyName("hidden")]
-            public bool Hidden { get; set; }
-            [JsonPropertyName("selected")]
-            public bool Selected { get; set; }
-            [JsonPropertyName("value")]
-            public string Value { get; set; }
-        }
+        public IList<VlcPlaylistItem> Playlist { get; set; }
         [JsonPropertyName("shuffle")]
         public bool Shuffle { get; set; }
         [JsonPropertyName("subtitle")]
