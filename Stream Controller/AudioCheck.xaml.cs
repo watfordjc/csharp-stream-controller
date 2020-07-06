@@ -9,6 +9,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
@@ -59,7 +60,7 @@ namespace StreamController
             Uri obs_uri = new UriBuilder(
                 Preferences.Default.obs_uri_scheme,
                 Preferences.Default.obs_uri_host,
-                int.Parse(Preferences.Default.obs_uri_port)
+                int.Parse(Preferences.Default.obs_uri_port, CultureInfo.InvariantCulture)
                 ).Uri;
             webSocket = new ObsWsClient(obs_uri)
             {
@@ -178,7 +179,7 @@ namespace StreamController
             _ReconnectTimeRemaining--;
             if (_ReconnectTimeRemaining > 0)
             {
-                UpdateUIConnectStatus(_ReconnectTimeRemaining.ToString(), null, null);
+                UpdateUIConnectStatus(TimeSpan.FromSeconds(_ReconnectTimeRemaining).ToString("c", CultureInfo.CurrentCulture), null, null);
             }
         }
 
@@ -209,7 +210,7 @@ namespace StreamController
         {
             if (e.ReconnectDelay > 0)
             {
-                UpdateUIConnectStatus(e.ReconnectDelay.ToString(), null, null);
+                UpdateUIConnectStatus(TimeSpan.FromSeconds(e.ReconnectDelay).ToString("c", CultureInfo.CurrentCulture), null, null);
                 _ReconnectTimeRemaining = e.ReconnectDelay;
             }
             if (e.Error != null)

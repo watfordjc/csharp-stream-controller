@@ -2,6 +2,7 @@
 using System.Buffers.Text;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -47,7 +48,7 @@ namespace StreamController
             Uri obs_uri = new UriBuilder(
                 Preferences.Default.obs_uri_scheme,
                 Preferences.Default.obs_uri_host,
-                int.Parse(Preferences.Default.obs_uri_port)
+                int.Parse(Preferences.Default.obs_uri_port, CultureInfo.InvariantCulture)
                 ).Uri;
             webSocket = new ObsWsClient(obs_uri)
             {
