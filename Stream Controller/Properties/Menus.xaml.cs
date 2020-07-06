@@ -7,7 +7,7 @@ using System.Windows.Controls;
 
 namespace StreamController
 {
-    partial class MenuItems : ResourceDictionary
+    partial class MenuItemDictionary : ResourceDictionary
     {
         private void MenuItemExit_Click(object sender, RoutedEventArgs e)
         {

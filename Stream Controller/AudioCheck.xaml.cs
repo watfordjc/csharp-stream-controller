@@ -33,8 +33,8 @@ namespace StreamController
     public partial class AudioCheck : Window
     {
         private readonly SynchronizationContext _Context;
-        private static readonly AudioInterfaces audioInterfaces = AudioInterfaces.Instance;
-        private readonly ObservableCollection<AudioInterface> devices = AudioInterfaces.Devices;
+        private static readonly AudioInterfaceCollection audioInterfaces = AudioInterfaceCollection.Instance;
+        private readonly ObservableCollection<AudioInterface> devices = AudioInterfaceCollection.Devices;
         private readonly ObsWsClient webSocket;
         private readonly TaskCompletionSource<bool> audioDevicesEnumerated = new TaskCompletionSource<bool>();
         private string connectionError = String.Empty;
@@ -448,9 +448,9 @@ namespace StreamController
                 if (source.Type.TypeId == OBSWebSocketLibrary.Data.ObsTypes.ObsTypeNameDictionary.First(x => x.Value == OBSWebSocketLibrary.Data.SourceTypes2.DShowInput).Key)
                 {
                     ReadOnlyMemory<char> deviceName = ((OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.DShowInput)source).AudioDeviceId.AsMemory();
-                    dependencies.AudioDeviceId = AudioInterfaces.GetAudioInterfaceByName(deviceName[0..^1].ToString()).ID;
+                    dependencies.AudioDeviceId = AudioInterfaceCollection.GetAudioInterfaceByName(deviceName[0..^1].ToString()).ID;
                 }
-                dependencies.AudioInterface = AudioInterfaces.GetAudioInterfaceById(dependencies.AudioDeviceId);
+                dependencies.AudioInterface = AudioInterfaceCollection.GetAudioInterfaceById(dependencies.AudioDeviceId);
                 //Trace.WriteLine($"{sourceReply.SourceName} -> {sourceReply.SourceType} -> device_id: {audioInterface?.ID} AKA {audioInterface?.FriendlyName}");
                 // WASAPI and DirectShow source types should reference an audio device
                 if (!dependencies.HasAudioInterface)

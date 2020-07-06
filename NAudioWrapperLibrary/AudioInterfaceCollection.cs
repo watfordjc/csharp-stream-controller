@@ -17,7 +17,7 @@ using StreamController.SharedModels;
 namespace NAudioWrapperLibrary
 {
 
-    public sealed class AudioInterfaces : ObservableCollection<MMDevice>, IDisposable
+    public sealed class AudioInterfaceCollection : ObservableCollection<MMDevice>, IDisposable
     {
         private readonly SynchronizationContext _Context;
         private static readonly MMDeviceEnumerator _Enumerator = new MMDeviceEnumerator();
@@ -29,20 +29,20 @@ namespace NAudioWrapperLibrary
         public AudioInterface DefaultCapture { get; private set; }
         public static ObservableCollection<AudioInterface> Devices { get { return _Devices; } }
 
-        private static readonly Lazy<AudioInterfaces> lazySingleton =
-            new Lazy<AudioInterfaces>(
-                () => new AudioInterfaces()
+        private static readonly Lazy<AudioInterfaceCollection> lazySingleton =
+            new Lazy<AudioInterfaceCollection>(
+                () => new AudioInterfaceCollection()
             );
         private bool disposedValue;
 
-        public static AudioInterfaces Instance { get { return lazySingleton.Value; } }
+        public static AudioInterfaceCollection Instance { get { return lazySingleton.Value; } }
 
         public static void RegisterEndpointNotificationCallback(IMMNotificationClient notificationClient)
         {
             _Enumerator.RegisterEndpointNotificationCallback(notificationClient);
         }
 
-        private AudioInterfaces()
+        private AudioInterfaceCollection()
         {
             _Context = SynchronizationContext.Current;
             _NotificationCallback = new AudioEndpointNotificationCallback(_Context);
