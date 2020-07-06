@@ -63,7 +63,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         [JsonPropertyName("shutdown")]
         public bool Shutdown { get; set; }
         [JsonPropertyName("url")]
-        public string URL { get; set; }
+        public Uri URL { get; set; }
         [JsonPropertyName("width")]
         public int Width { get; set; }
     }

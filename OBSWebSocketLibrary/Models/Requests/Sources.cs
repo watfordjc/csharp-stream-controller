@@ -199,7 +199,7 @@ namespace OBSWebSocketLibrary.Models.Requests
         [JsonPropertyName("local_file")]
         public string LocalFile { get; set; }
         [JsonPropertyName("url")]
-        public string Url { get; set; }
+        public Uri Url { get; set; }
         [JsonPropertyName("css")]
         public string Css { get; set; }
         [JsonPropertyName("width")]
