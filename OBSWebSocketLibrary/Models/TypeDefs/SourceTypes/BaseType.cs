@@ -171,7 +171,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
 
             public bool HasAudioInterface
             {
-                get { return AudioDeviceId != null && AudioDeviceId != String.Empty; }
+                get { return !String.IsNullOrEmpty(AudioDeviceId); }
             }
 
             public string VideoDeviceId
@@ -185,7 +185,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
             }
             public bool HasVideoInterface
             {
-                get { return VideoDeviceId != null && VideoDeviceId != String.Empty; }
+                get { return !String.IsNullOrEmpty(VideoDeviceId); }
             }
 
             public string[] FilePaths
