@@ -35,7 +35,7 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
             public string TypeType { get; set; }
             [JsonPropertyName("defaultSettings")]
             public JsonElement DefaultSettings { get; set; }
-            public object DefaultSettingsObj;
+            private object DefaultSettingsObj;
             [JsonPropertyName("caps")]
             public CapsProperties Caps { get; set; }
             public class CapsProperties

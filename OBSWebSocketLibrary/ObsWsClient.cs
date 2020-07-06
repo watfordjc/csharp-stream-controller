@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net.WebSockets;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -24,7 +25,7 @@ namespace OBSWebSocketLibrary
         private bool disposedValue;
         public bool AutoReconnect { get; set; }
         private readonly System.Timers.Timer heartBeatCheck = new System.Timers.Timer(8000);
-        public Dictionary<Guid, ObsRequestMetadata> sentMessageGuids = new Dictionary<Guid, ObsRequestMetadata>();
+        private readonly Dictionary<Guid, ObsRequestMetadata> sentMessageGuids = new Dictionary<Guid, ObsRequestMetadata>();
 
         public ObsWsClient(Uri url) : base(url)
         {
@@ -73,6 +74,15 @@ namespace OBSWebSocketLibrary
             OnObsEvent?.Invoke(this, obsEvent);
         }
 
+        public bool WaitingForReplyForType(OBSWebSocketLibrary.Data.Requests requestType)
+        {
+            return sentMessageGuids.Values.Any(x => x.OriginalRequestType == requestType);
+        }
+
+        public bool WaitingForReply(Guid messageId)
+        {
+            return sentMessageGuids.ContainsKey(messageId);
+        }
 
         private void WebSocket_Connected(object sender, WebSocketState state)
         {

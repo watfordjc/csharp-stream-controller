@@ -428,7 +428,7 @@ namespace StreamController
         private async void GetDeviceIdsForSources()
         {
             await audioDevicesEnumerated.Task;
-            while (webSocket.sentMessageGuids.Values.Any(x => x.OriginalRequestType == OBSWebSocketLibrary.Data.Requests.GetSourceSettings))
+            while (webSocket.WaitingForReplyForType(OBSWebSocketLibrary.Data.Requests.GetSourceSettings))
             {
                 await Task.Delay(250);
             }
