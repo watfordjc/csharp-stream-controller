@@ -18,6 +18,6 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
     public class ListSceneCollections : RequestReplyBase
     {
         [JsonPropertyName("scene-collections")]
-        public string[] SceneCollections { get; set; }
+        public IList<string> SceneCollections { get; set; }
     }
 }

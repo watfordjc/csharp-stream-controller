@@ -10,7 +10,7 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         [JsonPropertyName("current-transition")]
         public string CurrentTransition { get; set; }
         [JsonPropertyName("transitions")]
-        public Transition[] Transitions { get; set; }
+        public IList<Transition> Transitions { get; set; }
         public class Transition
         {
             [JsonPropertyName("name")]

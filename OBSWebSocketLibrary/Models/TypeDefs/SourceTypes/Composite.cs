@@ -13,7 +13,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         [JsonPropertyName("id_counter")]
         public int IdCounter { get; set; }
         [JsonPropertyName("items")]
-        public Item[] Items { get; set; }
+        public IList<Item> Items { get; set; }
         public class Item
         {
             [JsonPropertyName("align")]
@@ -66,6 +66,6 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         [JsonPropertyName("id_counter")]
         public int IdCounter { get; set; }
         [JsonPropertyName("items")]
-        public Scene.Item[] Items { get; set; }
+        public IList<Scene.Item> Items { get; set; }
     }
 }

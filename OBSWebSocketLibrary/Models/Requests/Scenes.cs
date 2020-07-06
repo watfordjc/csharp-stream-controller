@@ -25,7 +25,7 @@ namespace OBSWebSocketLibrary.Models.Requests
         [JsonPropertyName("scene")]
         public string Scene { get; set; }
         [JsonPropertyName("items")]
-        public SceneItem[] Items { get; set; }
+        public IList<SceneItem> Items { get; set; }
         public class SceneItem
         {
             [JsonPropertyName("id")]

@@ -52,7 +52,7 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         [JsonPropertyName("parentGroupName")]
         public string ParentGroupName { get; set; }
         [JsonPropertyName("groupChildren")]
-        public TypeDefs.SceneItemTransform[] GroupChildren { get; set; }
+        public IList<TypeDefs.SceneItemTransform> GroupChildren { get; set; }
     }
 
     public class SetSceneItemProperties : RequestReplyBase

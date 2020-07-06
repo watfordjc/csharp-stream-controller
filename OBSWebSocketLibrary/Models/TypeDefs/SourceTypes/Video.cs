@@ -30,7 +30,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
     public class Slideshow : BaseType
     {
         [JsonPropertyName("files")]
-        public File[] Files { get; set; }
+        public IList<File> Files { get; set; }
         public class File
         {
             [JsonPropertyName("hidden")]
@@ -181,7 +181,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         [JsonPropertyName("playback_behavior")]
         public string PlaybackBehavior { get; set; }
         [JsonPropertyName("playlist")]
-        public PlaylistItem[] Playlist { get; set; }
+        public IList<PlaylistItem> Playlist { get; set; }
         public class PlaylistItem
         {
             [JsonPropertyName("hidden")]

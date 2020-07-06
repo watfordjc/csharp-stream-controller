@@ -16,7 +16,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         private int syncOffset;
         private string name;
         private string monitorType;
-        private ObsMixer[] mixers;
+        private IList<ObsMixer> mixers;
         private string hexMixersValue;
 
         public BaseType()
@@ -78,7 +78,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
             }
         }
         [JsonIgnore]
-        public ObsMixer[] Mixers
+        public IList<ObsMixer> Mixers
         {
             get { return mixers; }
             set
@@ -118,8 +118,8 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
             private string audioDeviceId;
             private AudioInterface audioInterface;
             private string videoDeviceId;
-            private string[] filePaths;
-            private string[] uris;
+            private IList<string> filePaths;
+            private IList<string> uris;
 
             public bool DependencyProblem
             {
@@ -188,7 +188,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
                 get { return !String.IsNullOrEmpty(VideoDeviceId); }
             }
 
-            public string[] FilePaths
+            public IList<string> FilePaths
             {
                 get { return filePaths; }
                 set
@@ -199,10 +199,10 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
             }
             public bool HasFiles
             {
-                get { return FilePaths != null && FilePaths.Length != 0; }
+                get { return FilePaths != null && FilePaths.Count != 0; }
             }
 
-            public string[] Uris
+            public IList<string> Uris
             {
                 get { return uris; }
                 set
@@ -213,7 +213,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
             }
             public bool HasURIs
             {
-                get { return Uris != null && Uris.Length != 0; }
+                get { return Uris != null && Uris.Count != 0; }
             }
         }
     }

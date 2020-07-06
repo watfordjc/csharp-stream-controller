@@ -8,7 +8,7 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
     public class ListOutputs : RequestReplyBase
     {
         [JsonPropertyName("outputs")]
-        public TypeDefs.Output[] Outputs { get; set; }
+        public IList<TypeDefs.Output> Outputs { get; set; }
     }
 
     public class GetOutputInfo : RequestReplyBase

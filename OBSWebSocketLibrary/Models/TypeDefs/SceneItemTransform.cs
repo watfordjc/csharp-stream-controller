@@ -44,7 +44,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         [JsonPropertyName("parentGroupName")]
         public string ParentGroupName { get; set; }
         [JsonPropertyName("groupChildren")]
-        public SceneItemTransform[] GroupChildren { get; set; }
+        public IList<SceneItemTransform> GroupChildren { get; set; }
 
         public static implicit operator SceneItemTransform(RequestReplies.GetSceneItemProperties v)
         {

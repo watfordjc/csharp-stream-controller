@@ -10,7 +10,7 @@ namespace OBSWebSocketLibrary.Models.Events
         [JsonPropertyName("scene-name")]
         public string SceneName { get; set; }
         [JsonPropertyName("scene-items")]
-        public SceneItem[] SceneItems { get; set; }
+        public IList<SceneItem> SceneItems { get; set; }
         public class SceneItem
         {
             [JsonPropertyName("source-name")]

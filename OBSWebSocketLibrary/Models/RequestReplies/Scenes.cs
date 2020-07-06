@@ -22,7 +22,7 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         [JsonPropertyName("current-scene")]
         public string CurrentScene { get; set; }
         [JsonPropertyName("scenes")]
-        public TypeDefs.Scene[] Scenes { get; set; }
+        public IList<TypeDefs.Scene> Scenes { get; set; }
     }
 
     public class ReorderSceneItems : RequestReplyBase

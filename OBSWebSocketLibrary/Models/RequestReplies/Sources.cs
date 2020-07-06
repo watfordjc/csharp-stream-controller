@@ -9,7 +9,7 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
     public class GetSourcesList : RequestReplyBase
     {
         [JsonPropertyName("sources")]
-        public Source[] Sources { get; set; }
+        public IList<Source> Sources { get; set; }
         public class Source
         {
             [JsonPropertyName("name")]
@@ -24,7 +24,7 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
     public class GetSourceTypesList : RequestReplyBase
     {
         [JsonPropertyName("types")]
-        public Type[] Types { get; set; }
+        public IList<Type> Types { get; set; }
         public class Type
         {
             [JsonPropertyName("typeId")]
@@ -257,7 +257,7 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
     public class GetSourceFilters : RequestReplyBase
     {
         [JsonPropertyName("filters")]
-        public Filter[] Filters { get; set; }
+        public IList<Filter> Filters { get; set; }
         public class Filter
         {
             [JsonPropertyName("enabled")]
