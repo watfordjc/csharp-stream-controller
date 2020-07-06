@@ -127,9 +127,9 @@ namespace NAudioWrapperLibrary
             return _Devices.Where(device => device.FriendlyName == deviceName).FirstOrDefault();
         }
         
-        public static AudioInterface GetAudioInterfaceByVolumeNotificationGuid(Guid guid)
+        public static AudioInterface GetAudioInterfaceByVolumeNotificationGuid(Guid notificationId)
         {
-            return _Devices.Where(device => device.VolumeNotificationGuid == guid).FirstOrDefault();
+            return _Devices.Where(device => device.VolumeNotificationGuid == notificationId).FirstOrDefault();
         }
 
         // TODO: Implement methods to propagate events
