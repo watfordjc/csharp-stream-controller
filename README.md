@@ -38,8 +38,3 @@ This branch is, for the time being, the only one suitable for forking from.
 This feature branch is a fork of [master](../../tree/master). It is where I am working on some UI and audio stuff.
 
 Until I get my branching and committing sorted out this branch is subject to rebasing and forced pushes.
-
-### [scene-source-settings](../../tree/scene-source-settings)
-This feature branch is a fork of [audio-interface-db](../../tree/audio-interface-db). It is where I am working on [Issue #3](../../issues/3).
-
-Until I get my branching and committing sorted out this branch is subject to rebasing and forced pushes.
