@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OBSWebSocketLibrary.Data;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -9,7 +10,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.FilterTypes
     public class BaseFilter : INotifyPropertyChanged
     {
         private string name;
-        private OBSWebSocketLibrary.Data.SourceTypes type;
+        private OBSWebSocketLibrary.Data.SourceTypes2 type;
         private bool enabled;
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -28,7 +29,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.FilterTypes
             }
         }
 
-        public OBSWebSocketLibrary.Data.SourceTypes Type
+        public OBSWebSocketLibrary.Data.SourceTypes2 Type
         {
             get { return type; }
             set
@@ -52,7 +53,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.FilterTypes
         {
             BaseFilter converted = v.SettingsObj as BaseFilter;
             converted.Name = v.Name;
-            converted.Type = (Data.SourceTypes)Enum.Parse(typeof(Data.SourceTypes), v.Type);
+            converted.Type = ObsTypes.ObsTypeNameDictionary[v.Type];
             converted.Enabled = v.Enabled;
             return converted;
         }

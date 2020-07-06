@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using NAudio;
 using NAudio.CoreAudioApi;
 using NAudio.CoreAudioApi.Interfaces;
-using Stream_Controller.SharedModels;
+using StreamController.SharedModels;
 
 namespace NAudioWrapperLibrary
 {

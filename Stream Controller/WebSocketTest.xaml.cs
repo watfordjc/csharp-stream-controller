@@ -28,7 +28,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using OBSWebSocketLibrary;
 
-namespace Stream_Controller
+namespace StreamController
 {
     /// <summary>
     /// Interaction logic for WebSocketTest.xaml

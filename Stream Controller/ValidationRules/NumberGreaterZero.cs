@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Text;
 using System.Windows.Controls;
 
-namespace Stream_Controller.ValidationRules
+namespace StreamController.ValidationRules
 {
     public class NumberGreaterZero : ValidationRule
     {

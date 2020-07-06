@@ -5,7 +5,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json.Serialization;
-using Stream_Controller.SharedModels;
+using StreamController.SharedModels;
 
 namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
 {

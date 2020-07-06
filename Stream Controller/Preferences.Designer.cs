@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Stream_Controller {
+namespace StreamController {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

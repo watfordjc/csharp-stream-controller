@@ -44,7 +44,7 @@ namespace OBSWebSocketLibrary
         {
             public Guid MessageId { get; set; }
             public Data.Requests RequestType { get; set; }
-            public Data.SourceTypes SourceType { get; set; }
+            public Data.SourceTypes2 SourceType { get; set; }
             public object MessageObject { get; set; }
             public string Status { get; set; }
             public ObsRequestMetadata RequestMetadata { get; set; }
@@ -53,7 +53,7 @@ namespace OBSWebSocketLibrary
         public class ObsEvent
         {
             public Data.Events EventType { get; set; }
-            public Data.SourceTypes SourceType { get; set; }
+            public Data.SourceTypes2 SourceType { get; set; }
             public object MessageObject { get; set; }
         }
 
@@ -100,7 +100,7 @@ namespace OBSWebSocketLibrary
             }
         }
 
-        public async ValueTask<Guid> OBS_Send(object message)
+        public async ValueTask<Guid> ObsSend(object message)
         {
             ObsRequestMetadata metadata = new ObsRequestMetadata()
             {
@@ -119,7 +119,7 @@ namespace OBSWebSocketLibrary
             {
                 Enable = true
             };
-            return OBS_Send(message).Result;
+            return ObsSend(message).Result;
         }
 
         private void FurtherProcessObsEvent(object sender, ObsEvent obsEvent)
@@ -155,7 +155,6 @@ namespace OBSWebSocketLibrary
             JsonElement root = document.RootElement;
 
             JsonElement sourceType;
-            Data.SourceTypes srcType;
 
             if (root.TryGetProperty("message-id", out JsonElement messageIdJson))
             {
@@ -181,13 +180,11 @@ namespace OBSWebSocketLibrary
                         case Data.Requests.GetSourceSettings:
                         case Data.Requests.SetSourceSettings:
                             root.TryGetProperty("sourceType", out sourceType);
-                            Enum.TryParse(sourceType.ToString(), out srcType);
-                            obsReply.SourceType = srcType;
+                            obsReply.SourceType = ObsTypes.ObsTypeNameDictionary[sourceType.ToString()];
                             break;
                         case Data.Requests.GetSourceFilterInfo:
                             root.TryGetProperty("type", out sourceType);
-                            Enum.TryParse(sourceType.ToString(), out srcType);
-                            obsReply.SourceType = srcType;
+                            obsReply.SourceType = ObsTypes.ObsTypeNameDictionary[sourceType.ToString()];
                             break;
                         default:
                             break;
@@ -213,13 +210,11 @@ namespace OBSWebSocketLibrary
                 {
                     case Data.Events.SourceCreated:
                         root.TryGetProperty("sourceKind", out sourceType);
-                        Enum.TryParse(sourceType.ToString(), out srcType);
-                        obsEvent.SourceType = srcType;
+                        obsEvent.SourceType = ObsTypes.ObsTypeNameDictionary[sourceType.ToString()];
                         break;
                     case Data.Events.SourceFilterAdded:
                         root.TryGetProperty("filterType", out sourceType);
-                        Enum.TryParse(sourceType.ToString(), out srcType);
-                        obsEvent.SourceType = srcType;
+                        obsEvent.SourceType = ObsTypes.ObsTypeNameDictionary[sourceType.ToString()];
                         break;
                     default:
                         break;
@@ -237,7 +232,7 @@ namespace OBSWebSocketLibrary
             json = ((JsonElement)messageObject.GetType().GetProperty(propertyName).GetValue(messageObject, null)).GetRawText().AsMemory();
         }
 
-        private bool CanDeserializeSourceType(Data.SourceTypes sourceType, ReadOnlyMemory<char> settingsJson, out object deserialisedObject)
+        private bool CanDeserializeSourceType(Data.SourceTypes2 sourceType, ReadOnlyMemory<char> settingsJson, out object deserialisedObject)
         {
             Type modelType = Data.SourceTypeSettings.GetType(sourceType);
             if (modelType == null)
@@ -266,7 +261,7 @@ namespace OBSWebSocketLibrary
 
                 object settingsObject;
                 ReadOnlyMemory<char> settingsJson;
-                Data.SourceTypes sourceType;
+                Data.SourceTypes2 sourceType;
 
                 switch (obsReply.RequestType)
                 {
@@ -284,7 +279,7 @@ namespace OBSWebSocketLibrary
                         foreach (Models.RequestReplies.GetSourceFilters.Filter filter in (obsReply.MessageObject as Models.RequestReplies.GetSourceFilters).Filters)
                         {
                             settingsJson = filter.Settings.GetRawText().AsMemory();
-                            sourceType = (Data.SourceTypes)Enum.Parse(typeof(Data.SourceTypes), filter.Type);
+                            sourceType = ObsTypes.ObsTypeNameDictionary[filter.Type];
                             if (!CanDeserializeSourceType(sourceType, settingsJson, out settingsObject)) { continue; }
                             filter.SettingsObj = settingsObject;
                         }

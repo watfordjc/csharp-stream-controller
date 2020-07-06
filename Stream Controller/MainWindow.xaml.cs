@@ -8,9 +8,9 @@ using System.Windows;
 using System.Windows.Controls;
 using NAudio.CoreAudioApi;
 using NAudioWrapperLibrary;
-using Stream_Controller.SharedModels;
+using StreamController.SharedModels;
 
-namespace Stream_Controller
+namespace StreamController
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

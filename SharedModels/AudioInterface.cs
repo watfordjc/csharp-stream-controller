@@ -9,7 +9,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace Stream_Controller.SharedModels
+namespace StreamController.SharedModels
 {
     public class AudioInterface : INotifyPropertyChanged
     {
@@ -23,7 +23,7 @@ namespace Stream_Controller.SharedModels
         public double Volume { get; set; }
         public bool Muted { get; set; }
         public Guid VolumeNotificationGuid { get; set; }
-        public string Audio_device_name { get; set; }
+        public string AudioDeviceName { get; set; }
         public bool IsActive { get; private set; }
 
         public MMDevice Device

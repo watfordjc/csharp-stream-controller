@@ -5,7 +5,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Stream_Controller
+namespace StreamController
 {
     partial class MenuItems : ResourceDictionary
     {
@@ -21,7 +21,7 @@ namespace Stream_Controller
             WindowUtilityLibrary.MakeWindowActive(clickedWindowType);
         }
 
-        public void MenuWindowItem_Loaded(object sender, RoutedEventArgs e)
+        public void MenuWindowItemLoaded(object sender, RoutedEventArgs e)
         {
             WindowUtilityLibrary.WindowType clickedWindowType = (WindowUtilityLibrary.WindowType)Enum.Parse(typeof(WindowUtilityLibrary.WindowType), ((MenuItem)sender).Name);
             Window parent = Window.GetWindow((MenuItem)sender);

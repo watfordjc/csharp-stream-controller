@@ -5,7 +5,7 @@ using System.Net;
 using System.Text;
 using System.Windows.Controls;
 
-namespace Stream_Controller.ValidationRules
+namespace StreamController.ValidationRules
 {
     public class PortNumber : ValidationRule
     {

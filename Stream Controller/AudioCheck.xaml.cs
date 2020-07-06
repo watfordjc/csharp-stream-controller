@@ -2,7 +2,7 @@
 using NAudio.Wave;
 using NAudioWrapperLibrary;
 using OBSWebSocketLibrary;
-using Stream_Controller.SharedModels;
+using StreamController.SharedModels;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -25,7 +25,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using WebSocketLibrary;
 
-namespace Stream_Controller
+namespace StreamController
 {
     /// <summary>
     /// Interaction logic for AudioCheck.xaml
@@ -341,7 +341,7 @@ namespace Stream_Controller
                     sourceTypes = (OBSWebSocketLibrary.Models.RequestReplies.GetSourceTypesList)replyObject.MessageObject;
                     foreach (OBSWebSocketLibrary.Models.RequestReplies.GetSourceTypesList.Type type in sourceTypes.Types)
                     {
-                        if (!Enum.IsDefined(typeof(OBSWebSocketLibrary.Data.SourceTypes), type.TypeId))
+                        if (!OBSWebSocketLibrary.Data.ObsTypes.ObsTypeNameDictionary.ContainsKey(type.TypeId))
                         {
                             Trace.WriteLine($"Unknown source type: {type.DisplayName} ({type.TypeId}) is not defined but the server supports it.");
                         }
@@ -435,17 +435,17 @@ namespace Stream_Controller
 
             foreach (OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType source in obsSourceDictionary.Values)
             {
-                switch (Enum.Parse(typeof(OBSWebSocketLibrary.Data.SourceTypes), source.Type.TypeId))
+                switch (OBSWebSocketLibrary.Data.ObsTypes.ObsTypeNameDictionary[source.Type.TypeId])
                 {
-                    case OBSWebSocketLibrary.Data.SourceTypes.wasapi_output_capture:
-                    case OBSWebSocketLibrary.Data.SourceTypes.wasapi_input_capture:
-                    case OBSWebSocketLibrary.Data.SourceTypes.dshow_input:
+                    case OBSWebSocketLibrary.Data.SourceTypes2.WasapiOutputCapture:
+                    case OBSWebSocketLibrary.Data.SourceTypes2.WasapiInputCapture:
+                    case OBSWebSocketLibrary.Data.SourceTypes2.DShowInput:
                         break;
                     default:
                         continue;
                 }
                 OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType.DependencyProperties dependencies = source.Dependencies;
-                if (source.Type.TypeId == OBSWebSocketLibrary.Data.SourceTypes.dshow_input.ToString())
+                if (source.Type.TypeId == OBSWebSocketLibrary.Data.ObsTypes.ObsTypeNameDictionary.First(x => x.Value == OBSWebSocketLibrary.Data.SourceTypes2.DShowInput).Key)
                 {
                     ReadOnlyMemory<char> deviceName = ((OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.DShowInput)source).AudioDeviceId.AsMemory();
                     dependencies.AudioDeviceId = AudioInterfaces.GetAudioInterfaceByName(deviceName[0..^1].ToString()).ID;
@@ -511,7 +511,7 @@ namespace Stream_Controller
 
         private void SourceCreated_Event(OBSWebSocketLibrary.Models.Events.SourceCreated messageObject)
         {
-            OBSWebSocketLibrary.Data.SourceTypes sourceType = (OBSWebSocketLibrary.Data.SourceTypes)Enum.Parse(typeof(OBSWebSocketLibrary.Data.SourceTypes), messageObject.SourceKind);
+            OBSWebSocketLibrary.Data.SourceTypes2 sourceType = OBSWebSocketLibrary.Data.ObsTypes.ObsTypeNameDictionary[messageObject.SourceKind];
             object createdSource = OBSWebSocketLibrary.Data.SourceTypeSettings.GetInstanceOfType(sourceType);
             (createdSource as OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType).Type = sourceTypes.Types.First(x => x.TypeId == messageObject.SourceKind);
             obsSourceDictionary[messageObject.SourceName] = createdSource;
@@ -637,7 +637,7 @@ namespace Stream_Controller
         /// <returns>The Guid for the request.</returns>
         private Guid Obs_Get(OBSWebSocketLibrary.Data.Requests requestType)
         {
-            return webSocket.OBS_Send(OBSWebSocketLibrary.Data.Request.GetInstanceOfType(requestType)).Result;
+            return webSocket.ObsSend(OBSWebSocketLibrary.Data.Request.GetInstanceOfType(requestType)).Result;
         }
 
         /// <summary>
@@ -666,7 +666,7 @@ namespace Stream_Controller
                 default:
                     return Guid.Empty;
             }
-            return webSocket.OBS_Send(request).Result;
+            return webSocket.ObsSend(request).Result;
         }
 
         /// <summary>
@@ -688,7 +688,7 @@ namespace Stream_Controller
                 default:
                     return Guid.Empty;
             }
-            return webSocket.OBS_Send(request).Result;
+            return webSocket.ObsSend(request).Result;
         }
 
         #endregion
