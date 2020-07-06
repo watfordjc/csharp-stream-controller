@@ -66,7 +66,7 @@ namespace Stream_Controller
                 WindowType.Audiocheck => Application.Current.Windows.OfType<AudioCheck>(),
                 _ => null,
             };
-            return (windows != null && windows.Count() > 0) ? windows.First() : GetNewWindow(windowType);
+            return (windows != null && windows.Any()) ? windows.First() : GetNewWindow(windowType);
         }
 
         /// <summary>

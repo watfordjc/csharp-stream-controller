@@ -428,7 +428,7 @@ namespace Stream_Controller
         private async void GetDeviceIdsForSources()
         {
             await audioDevicesEnumerated.Task;
-            while (webSocket.sentMessageGuids.Values.Count(x => x.OriginalRequestType == OBSWebSocketLibrary.Data.Requests.GetSourceSettings) > 0)
+            while (webSocket.sentMessageGuids.Values.Any(x => x.OriginalRequestType == OBSWebSocketLibrary.Data.Requests.GetSourceSettings))
             {
                 await Task.Delay(250);
             }
@@ -485,7 +485,7 @@ namespace Stream_Controller
 
         private void SwitchScenes_Event(OBSWebSocketLibrary.Models.Events.SwitchScenes messageObject)
         {
-            if (sceneList.Count(x => x.Name == messageObject.SceneName) > 0)
+            if (sceneList.Any(x => x.Name == messageObject.SceneName))
             {
                 currentScene = sceneList.First(x => x.Name == messageObject.SceneName);
                 UpdateSceneInformation();
@@ -535,7 +535,7 @@ namespace Stream_Controller
                 Source = (OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType)source
             };
             newSceneItem.Type = newSceneItem.Source.Type.TypeId;
-            if (sceneList.Count(x => x.Name == messageObject.SceneName) > 0)
+            if (sceneList.Any(x => x.Name == messageObject.SceneName))
             {
                 sceneList.First(x => x.Name == messageObject.SceneName).Sources.Insert(0, newSceneItem);
             }
@@ -543,7 +543,7 @@ namespace Stream_Controller
 
         private void SceneItemTransformChanged_Event(OBSWebSocketLibrary.Models.Events.SceneItemTransformChanged messageObject)
         {
-            if (sceneList.Count(x => x.Name == messageObject.SceneName) > 0)
+            if (sceneList.Any(x => x.Name == messageObject.SceneName))
             {
                 OBSWebSocketLibrary.Models.TypeDefs.SceneItem existingScene = sceneList.First(x => x.Name == messageObject.SceneName).Sources.First(x => x.Name == messageObject.ItemName);
                 existingScene.Transform = messageObject.Transform;
