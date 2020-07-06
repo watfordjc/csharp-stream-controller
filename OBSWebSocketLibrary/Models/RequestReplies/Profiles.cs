@@ -19,6 +19,6 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
     public class ListProfiles : RequestReplyBase
     {
         [JsonPropertyName("profiles")]
-        public OBSWebSocketLibrary.Models.TypeDefs.Profile[] Profiles { get; set; }
+        public OBSWebSocketLibrary.Models.TypeDefs.ObsProfile[] Profiles { get; set; }
     }
 }

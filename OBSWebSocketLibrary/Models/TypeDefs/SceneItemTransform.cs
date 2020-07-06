@@ -78,5 +78,10 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
                 GroupChildren = v.GroupChildren
             };
         }
+
+        public static SceneItemTransform FromGetSceneItemProperties(RequestReplies.GetSceneItemProperties v)
+        {
+            return v;
+        }
     }
 }

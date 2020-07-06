@@ -16,7 +16,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         private int syncOffset;
         private string name;
         private string monitorType;
-        private Mixer[] mixers;
+        private ObsMixer[] mixers;
         private string hexMixersValue;
 
         public BaseType()
@@ -78,7 +78,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
             }
         }
         [JsonIgnore]
-        public Mixer[] Mixers
+        public ObsMixer[] Mixers
         {
             get { return mixers; }
             set

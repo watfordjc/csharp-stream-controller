@@ -59,5 +59,10 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.FilterTypes
             converted.Enabled = v.Enabled;
             return converted;
         }
+
+        public static BaseFilter FromFilter(RequestReplies.GetSourceFilters.Filter v)
+        {
+            return v;
+        }
     }
 }

@@ -46,13 +46,13 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         public int Id { get; set; }
     }
 
-    public class Profile
+    public class ObsProfile
     {
         [JsonPropertyName("profile-name")]
         public string Name { get; set; }
     }
 
-    public class Mixer
+    public class ObsMixer
     {
         [JsonPropertyName("id")]
         public int Id { get; set; }
