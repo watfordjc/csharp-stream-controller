@@ -145,16 +145,18 @@ namespace OBSWebSocketLibrary
 
             if (root.TryGetProperty("message-id", out JsonElement messageIdJson))
             {
-                Guid.TryParse(messageIdJson.GetString(), out Guid guid);
+                bool sentMessageGuidExists = false;
+                Models.TypeDefs.ObsRequestMetadata requestMetadata = null;
+                if (Guid.TryParse(messageIdJson.GetString(), out Guid guid))
+                {
+                    sentMessageGuidExists = sentMessageGuids.TryGetValue(guid, out requestMetadata);
+                }
                 root.TryGetProperty("status", out JsonElement statusJson);
-                bool sentMessageGuidExists = sentMessageGuids.TryGetValue(guid, out Models.TypeDefs.ObsRequestMetadata requestMetadata);
                 if (sentMessageGuidExists)
                 {
-                    Enum.TryParse(requestMetadata.OriginalRequestType.ToString(), out Data.RequestType reqType);
                     Models.TypeDefs.ObsReply obsReply = new Models.TypeDefs.ObsReply()
                     {
                         MessageId = guid,
-                        RequestType = reqType,
                         Status = statusJson.GetString()
                     };
                     if (sentMessageGuidExists)
@@ -162,7 +164,12 @@ namespace OBSWebSocketLibrary
                         obsReply.RequestMetadata = requestMetadata;
                         sentMessageGuids.Remove(guid);
                     }
-                    switch (reqType)
+                    if (Enum.TryParse(requestMetadata.OriginalRequestType.ToString(), out Data.RequestType reqType))
+                    {
+                        obsReply.RequestType = reqType;
+                    }
+
+                    switch (obsReply.RequestType)
                     {
                         case Data.RequestType.GetSourceSettings:
                         case Data.RequestType.SetSourceSettings:
@@ -188,12 +195,11 @@ namespace OBSWebSocketLibrary
                 Trace.WriteLine($"Received a message of type {updateTypeJson}.");
                 bool isStreaming = root.TryGetProperty("stream-timecode", out JsonElement jsonStreamTimecode);
                 bool isRecording = root.TryGetProperty("rec-timecode", out JsonElement jsonRecTimecode);
-                Enum.TryParse(updateTypeJson.GetString(), out Data.EventType eventType);
-                Models.TypeDefs.ObsEvent obsEvent = new Models.TypeDefs.ObsEvent()
-                {
-                    EventType = eventType
-                };
-                switch (eventType)
+                Models.TypeDefs.ObsEvent obsEvent = new Models.TypeDefs.ObsEvent();
+                if (Enum.TryParse(updateTypeJson.GetString(), out Data.EventType eventType)) {
+                    obsEvent.EventType = eventType;
+                }
+                switch (obsEvent.EventType)
                 {
                     case Data.EventType.SourceCreated:
                         root.TryGetProperty("sourceKind", out sourceType);
