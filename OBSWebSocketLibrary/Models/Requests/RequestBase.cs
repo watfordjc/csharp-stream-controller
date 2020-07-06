@@ -16,6 +16,6 @@ namespace OBSWebSocketLibrary.Models.Requests
         [JsonPropertyName("request-type")]
         public string RequestTypeName { get { return GetType().Name; } }
         [JsonIgnoreAttribute]
-        public Data.Requests RequestType { get { return Data.Request.GetRequestEnum(GetType()); } }
+        public Data.RequestType RequestType { get { return Data.Request.GetRequestEnum(GetType()); } }
     }
 }

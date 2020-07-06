@@ -10,7 +10,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.FilterTypes
     public class BaseFilter : INotifyPropertyChanged
     {
         private string name;
-        private OBSWebSocketLibrary.Data.SourceTypes2 type;
+        private OBSWebSocketLibrary.Data.SourceType type;
         private bool enabled;
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -29,7 +29,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.FilterTypes
             }
         }
 
-        public OBSWebSocketLibrary.Data.SourceTypes2 Type
+        public OBSWebSocketLibrary.Data.SourceType Type
         {
             get { return type; }
             set
