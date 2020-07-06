@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
@@ -284,6 +285,12 @@ namespace Stream_Controller
                     break;
                 case OBSWebSocketLibrary.Data.Events.SourceFilterRemoved:
                     SourceFilterRemoved_Event((OBSWebSocketLibrary.Models.Events.SourceFilterRemoved)eventObject.MessageObject);
+                    break;
+                case OBSWebSocketLibrary.Data.Events.SourceFilterVisibilityChanged:
+                    SourceFilterVisibilityChanged_Event((OBSWebSocketLibrary.Models.Events.SourceFilterVisibilityChanged)eventObject.MessageObject);
+                    break;
+                case OBSWebSocketLibrary.Data.Events.SourceFiltersReordered:
+                    SourceFiltersReordered_Event((OBSWebSocketLibrary.Models.Events.SourceFiltersReordered)eventObject.MessageObject);
                     break;
             }
         }
@@ -593,6 +600,24 @@ namespace Stream_Controller
             source.Filters.Remove(filter);
         }
 
+        private void SourceFilterVisibilityChanged_Event(OBSWebSocketLibrary.Models.Events.SourceFilterVisibilityChanged messageObject)
+        {
+            OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType source = (OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType)obsSourceDictionary[messageObject.SourceName];
+            OBSWebSocketLibrary.Models.TypeDefs.FilterTypes.BaseFilter filter = source.Filters.First(x => x.Name == messageObject.FilterName);
+            filter.Enabled = messageObject.FilterEnabled;
+        }
+
+        private void SourceFiltersReordered_Event(OBSWebSocketLibrary.Models.Events.SourceFiltersReordered messageObject)
+        {
+            OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType source = (OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType)obsSourceDictionary[messageObject.SourceName];
+            List<string> collectionOrderList = messageObject.Filters.Select(x => x.Name).ToList();
+            for (int i = 0; i < collectionOrderList.Count; i++)
+            {
+                OBSWebSocketLibrary.Models.TypeDefs.FilterTypes.BaseFilter filter = (OBSWebSocketLibrary.Models.TypeDefs.FilterTypes.BaseFilter)source.Filters.First(x => x.Name == collectionOrderList[i]);
+                source.Filters.Move(source.Filters.IndexOf(filter), i);
+            }
+        }
+
         #endregion
 
         #region obs-requests
@@ -718,6 +743,21 @@ namespace Stream_Controller
             public int Compare(object x, object y)
             {
                 return collectionOrderList.IndexOf((y as OBSWebSocketLibrary.Models.TypeDefs.SceneItem).Id) - collectionOrderList.IndexOf((x as OBSWebSocketLibrary.Models.TypeDefs.SceneItem).Id);
+            }
+        }
+
+        public class FilterSort : IComparer<string>
+        {
+            private readonly List<string> collectionOrderList;
+
+            public FilterSort(List<string> collectionOrderList)
+            {
+                this.collectionOrderList = collectionOrderList;
+            }
+
+            public int Compare([AllowNull] string x, [AllowNull] string y)
+            {
+                return collectionOrderList.IndexOf(y) - collectionOrderList.IndexOf(x);
             }
         }
 
