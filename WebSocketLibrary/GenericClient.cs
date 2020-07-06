@@ -315,7 +315,9 @@ namespace WebSocketLibrary
             {
                 if (disposing)
                 {
-                    // TODO: dispose managed state (managed objects)
+                    connectionCancellation.Dispose();
+                    sendAsyncSemaphore.Dispose();
+                    receiveAsyncSemaphore.Dispose();
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override finalizer
