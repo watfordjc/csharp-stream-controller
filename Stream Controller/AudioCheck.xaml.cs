@@ -31,7 +31,7 @@ namespace StreamController
     /// <summary>
     /// Interaction logic for AudioCheck.xaml
     /// </summary>
-    public partial class AudioCheck : Window
+    public partial class AudioCheck : Window, IDisposable
     {
         private readonly SynchronizationContext _Context;
         private static readonly AudioInterfaceCollection audioInterfaces = AudioInterfaceCollection.Instance;
@@ -50,6 +50,7 @@ namespace StreamController
         private OBSWebSocketLibrary.Models.RequestReplies.GetSourceTypesList sourceTypes;
         private Dictionary<string, object> obsSourceDictionary = new Dictionary<string, object>();
         private Dictionary<int, OBSWebSocketLibrary.Models.TypeDefs.Scene> obsSceneItemSceneDictionary = new Dictionary<int, OBSWebSocketLibrary.Models.TypeDefs.Scene>();
+        private bool disposedValue;
 
         #region Instantiation and initialisation
 
@@ -779,6 +780,39 @@ namespace StreamController
                 x => tbTransitioning.Text = transitionMessage,
                 null);
             return Task.CompletedTask;
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    _ReconnectCountdownTimer.Dispose();
+                    pulseCancellationToken.Dispose();
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                // TODO: set large fields to null
+                silentAudioEvent.Stop();
+                silentAudioEvent.Dispose();
+                webSocket.Dispose();
+                disposedValue = true;
+            }
+        }
+
+        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+        ~AudioCheck()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: false);
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
 
         #endregion
