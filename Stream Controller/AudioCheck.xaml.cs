@@ -112,7 +112,7 @@ namespace StreamController
 
         private void DisplayPortAudioWorkaround()
         {
-            if (audioInterfaces.DefaultRender.FriendlyName.Contains("NVIDIA") && silentAudioEvent?.PlaybackState != PlaybackState.Playing)
+            if (audioInterfaces.DefaultRender.FriendlyName.Contains("NVIDIA", StringComparison.Ordinal) && silentAudioEvent?.PlaybackState != PlaybackState.Playing)
             {
                 _ = Task.Run(
                     () => StartPlaySilence(audioInterfaces.DefaultRender)
