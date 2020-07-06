@@ -292,6 +292,14 @@ namespace Stream_Controller
                 case OBSWebSocketLibrary.Data.Events.SourceFiltersReordered:
                     SourceFiltersReordered_Event((OBSWebSocketLibrary.Models.Events.SourceFiltersReordered)eventObject.MessageObject);
                     break;
+                case OBSWebSocketLibrary.Data.Events.SceneItemSelected:
+                    OBSWebSocketLibrary.Models.Events.SceneItemSelected itemSelectedEvent = eventObject.MessageObject as OBSWebSocketLibrary.Models.Events.SceneItemSelected;
+                    Trace.WriteLine($"Item {itemSelectedEvent.ItemName} has been selected in scene {itemSelectedEvent.SceneName}");
+                        break;
+                case OBSWebSocketLibrary.Data.Events.SceneItemDeselected:
+                    OBSWebSocketLibrary.Models.Events.SceneItemDeselected itemDeselectedEvent = eventObject.MessageObject as OBSWebSocketLibrary.Models.Events.SceneItemDeselected;
+                    Trace.WriteLine($"Item {itemDeselectedEvent.ItemName} has been deselected in scene {itemDeselectedEvent.SceneName}");
+                    break;
             }
         }
 
