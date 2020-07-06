@@ -27,7 +27,7 @@ namespace NAudioWrapperLibrary
 
         public AudioInterface DefaultRender { get; private set; }
         public AudioInterface DefaultCapture { get; private set; }
-        public ObservableCollection<AudioInterface> Devices { get { return _Devices; } }
+        public static ObservableCollection<AudioInterface> Devices { get { return _Devices; } }
 
         private static readonly Lazy<AudioInterfaces> lazySingleton =
             new Lazy<AudioInterfaces>(
@@ -37,7 +37,7 @@ namespace NAudioWrapperLibrary
 
         public static AudioInterfaces Instance { get { return lazySingleton.Value; } }
 
-        public void RegisterEndpointNotificationCallback(IMMNotificationClient notificationClient)
+        public static void RegisterEndpointNotificationCallback(IMMNotificationClient notificationClient)
         {
             _Enumerator.RegisterEndpointNotificationCallback(notificationClient);
         }

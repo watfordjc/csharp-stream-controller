@@ -34,7 +34,7 @@ namespace StreamController
     {
         private readonly SynchronizationContext _Context;
         private static readonly AudioInterfaces audioInterfaces = AudioInterfaces.Instance;
-        private readonly ObservableCollection<AudioInterface> devices = audioInterfaces.Devices;
+        private readonly ObservableCollection<AudioInterface> devices = AudioInterfaces.Devices;
         private readonly ObsWsClient webSocket;
         private readonly TaskCompletionSource<bool> audioDevicesEnumerated = new TaskCompletionSource<bool>();
         private string connectionError = String.Empty;
@@ -150,7 +150,7 @@ namespace StreamController
             return Task.CompletedTask;
         }
 
-        private int GetWaveOutDeviceNumber(AudioInterface audioInterface)
+        private static int GetWaveOutDeviceNumber(AudioInterface audioInterface)
         {
             int deviceNameMaxLength = Math.Min(audioInterface.FriendlyName.Length, 31);
             string deviceNameTruncated = audioInterface.FriendlyName.Substring(0, deviceNameMaxLength);

@@ -18,7 +18,7 @@ namespace StreamController
     public partial class MainWindow : Window
     {
         private static readonly AudioInterfaces audioInterfaces = AudioInterfaces.Instance;
-        private readonly ObservableCollection<AudioInterface> devices = audioInterfaces.Devices;
+        private readonly ObservableCollection<AudioInterface> devices = AudioInterfaces.Devices;
 
         public MainWindow()
         {

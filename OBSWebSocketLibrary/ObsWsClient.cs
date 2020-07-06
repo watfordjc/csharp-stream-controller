@@ -139,7 +139,7 @@ namespace OBSWebSocketLibrary
             OBS_ParseJson(message);
         }
 
-        private JsonDocument GetJsonDocumentFromMemoryStream(MemoryStream stream)
+        private static JsonDocument GetJsonDocumentFromMemoryStream(MemoryStream stream)
         {
             stream.Seek(0, SeekOrigin.Begin);
             Span<byte> messageBytes = ArrayPool<byte>.Shared.Rent((int)stream.Length);
