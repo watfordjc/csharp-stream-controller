@@ -48,7 +48,7 @@ namespace WebSocketLibrary
         public delegate byte[] ReceivedBinaryMessage();
         public delegate string ReceivedTextMessage();
         public delegate WebSocketState StateChanged();
-        public delegate string Error();
+        public delegate string GenericWebsocketClientError();
 
         public event EventHandler<MemoryStream> ReceiveBinaryMessage;
         public event EventHandler<MemoryStream> ReceiveTextMessage;

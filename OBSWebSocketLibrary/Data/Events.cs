@@ -59,7 +59,7 @@ namespace OBSWebSocketLibrary.Data
         StudioModeSwitched = 51
     }
 
-    public static class Event
+    public static class ObsEvent
     {
         private static readonly Dictionary<Events, Type> eventDictionary = new Dictionary<Events, Type>()
         {

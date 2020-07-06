@@ -4,7 +4,7 @@ using System.Text;
 
 namespace OBSWebSocketLibrary.Models.RequestReplies
 {
-    public class Error : RequestReplyBase
+    public class ObsError : RequestReplyBase
     {
     }
 }

@@ -309,7 +309,7 @@ namespace OBSWebSocketLibrary
             }
             else if (obsReply.Status == "error")
             {
-                Models.RequestReplies.Error replyModel = (Models.RequestReplies.Error)await JsonSerializer.DeserializeAsync(message, typeof(Models.RequestReplies.Error));
+                Models.RequestReplies.ObsError replyModel = (Models.RequestReplies.ObsError)await JsonSerializer.DeserializeAsync(message, typeof(Models.RequestReplies.ObsError));
                 ErrorMessage errorMessage = new ErrorMessage()
                 {
                     Error = new Exception(
@@ -325,7 +325,7 @@ namespace OBSWebSocketLibrary
         private async void ParseEvent(MemoryStream message, ObsEvent obsEvent)
         {
             message.Seek(0, SeekOrigin.Begin);
-            obsEvent.MessageObject = await JsonSerializer.DeserializeAsync(message, Data.Event.GetType(obsEvent.EventType));
+            obsEvent.MessageObject = await JsonSerializer.DeserializeAsync(message, Data.ObsEvent.GetType(obsEvent.EventType));
 
             object settingsObject;
             ReadOnlyMemory<char> settingsJson;
