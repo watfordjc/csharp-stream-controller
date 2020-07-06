@@ -19,10 +19,9 @@ namespace OBSWebSocketLibrary
     /// <summary>
     /// A WebsocketClient that handles OBS connections.
     /// </summary>
-    public class ObsWsClient : WebSocketLibrary.GenericClient, IDisposable
+    public class ObsWsClient : WebSocketLibrary.GenericClient
     {
         private readonly SynchronizationContext context;
-        private bool disposedValue;
         public bool AutoReconnect { get; set; }
         private readonly System.Timers.Timer heartBeatCheck = new System.Timers.Timer(8000);
         private readonly Dictionary<Guid, ObsRequestMetadata> sentMessageGuids = new Dictionary<Guid, ObsRequestMetadata>();
@@ -346,34 +345,6 @@ namespace OBSWebSocketLibrary
             NewObsEvent(obsEvent);
         }
 
-        protected new virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    // TODO: dispose managed state (managed objects)
-                    heartBeatCheck.Dispose();
-                }
 
-                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
-                // TODO: set large fields to null
-                disposedValue = true;
-            }
-        }
-
-        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
-        // ~WebSocketTest()
-        // {
-        //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        //     Dispose(disposing: false);
-        // }
-
-        public new void Dispose()
-        {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-        }
     }
 }
