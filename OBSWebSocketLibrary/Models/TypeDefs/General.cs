@@ -153,7 +153,8 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         public string TypeType { get; set; }
         [JsonPropertyName("defaultSettings")]
         public JsonElement DefaultSettings { get; set; }
-        private object DefaultSettingsObj;
+        [JsonIgnore]
+        public object DefaultSettingsObj { get; set; }
         [JsonPropertyName("caps")]
         public ObsTypeCapabilities Caps { get; set; }
     }

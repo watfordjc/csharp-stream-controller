@@ -369,13 +369,6 @@ namespace StreamController
                     break;
                 case OBSWebSocketLibrary.Data.RequestType.GetSourceTypesList:
                     sourceTypes = (OBSWebSocketLibrary.Models.RequestReplies.GetSourceTypesList)replyObject.MessageObject;
-                    foreach (OBSWebSocketLibrary.Models.TypeDefs.ObsReplyType type in sourceTypes.Types)
-                    {
-                        if (!OBSWebSocketLibrary.Data.ObsTypes.ObsTypeNameDictionary.ContainsKey(type.TypeId))
-                        {
-                            Trace.WriteLine($"Unknown source type: {type.DisplayName} ({type.TypeId}) is not defined but the server supports it.");
-                        }
-                    }
                     Obs_Get(OBSWebSocketLibrary.Data.RequestType.GetSourcesList);
                     break;
                 case OBSWebSocketLibrary.Data.RequestType.GetSourcesList:

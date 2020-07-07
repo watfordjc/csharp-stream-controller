@@ -266,6 +266,16 @@ namespace OBSWebSocketLibrary
 
                 switch (obsReply.RequestType)
                 {
+                    case Data.RequestType.GetSourceTypesList:
+                        foreach (OBSWebSocketLibrary.Models.TypeDefs.ObsReplyType type in (obsReply.MessageObject as Models.RequestReplies.GetSourceTypesList).Types)
+                        {
+                            if (!CanDeserializeSourceType(ObsTypes.ObsTypeNameDictionary[type.TypeId], type.DefaultSettings.GetRawText().AsMemory(), out settingsObject)) {
+                                Trace.WriteLine($"Unknown source type: {type.DisplayName} ({type.TypeId}) is not defined but the server supports it.");
+                                continue;
+                            }
+                            type.DefaultSettingsObj = settingsObject;
+                        }
+                        break;
                     case Data.RequestType.GetSourceSettings:
                         GetJsonElementFromObjectProperty(obsReply.MessageObject, "SourceSettings", out settingsJson);
                         if (!CanDeserializeSourceType(obsReply.SourceType, settingsJson, out settingsObject)) { break; }
