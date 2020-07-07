@@ -82,13 +82,13 @@ namespace OBSWebSocketLibrary
             if (AutoReconnect)
             {
                 context.Send(
-                    async (x) => await ReconnectAsync()
+                    async (x) => await ReconnectAsync().ConfigureAwait(false)
                     , null);
             }
             else
             {
                 context.Send(
-                    async (x) => await DisconnectAsync()
+                    async (x) => await DisconnectAsync().ConfigureAwait(false)
                 , null);
             }
         }
@@ -104,7 +104,7 @@ namespace OBSWebSocketLibrary
                 OriginalRequestData = message
             };
             sentMessageGuids.Add(metadata.RequestGuid, metadata);
-            await SendMessageAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(message)));
+            await SendMessageAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(message))).ConfigureAwait(false);
             return metadata.RequestGuid;
         }
 
@@ -258,7 +258,7 @@ namespace OBSWebSocketLibrary
             message.Seek(0, SeekOrigin.Begin);
             if (obsReply.Status == "ok" && Enum.IsDefined(typeof(Data.RequestType), obsReply.RequestType))
             {
-                obsReply.MessageObject = await JsonSerializer.DeserializeAsync(message, Data.RequestReply.GetType(obsReply.RequestType));
+                obsReply.MessageObject = await JsonSerializer.DeserializeAsync(message, Data.RequestReply.GetType(obsReply.RequestType)).ConfigureAwait(false);
 
                 object settingsObject;
                 ReadOnlyMemory<char> settingsJson;
@@ -308,7 +308,7 @@ namespace OBSWebSocketLibrary
             }
             else if (obsReply.Status == "error")
             {
-                Models.RequestReplies.ObsError replyModel = (Models.RequestReplies.ObsError)await JsonSerializer.DeserializeAsync(message, typeof(Models.RequestReplies.ObsError));
+                Models.RequestReplies.ObsError replyModel = (Models.RequestReplies.ObsError)await JsonSerializer.DeserializeAsync(message, typeof(Models.RequestReplies.ObsError)).ConfigureAwait(false);
                 WebSocketLibrary.Models.ErrorMessage errorMessage = new WebSocketLibrary.Models.ErrorMessage()
                 {
                     Error = new Exception(
@@ -324,7 +324,7 @@ namespace OBSWebSocketLibrary
         private async void ParseEvent(MemoryStream message, Models.TypeDefs.ObsEvent obsEvent)
         {
             message.Seek(0, SeekOrigin.Begin);
-            obsEvent.MessageObject = await JsonSerializer.DeserializeAsync(message, Data.ObsEvent.GetType(obsEvent.EventType));
+            obsEvent.MessageObject = await JsonSerializer.DeserializeAsync(message, Data.ObsEvent.GetType(obsEvent.EventType)).ConfigureAwait(false);
 
             object settingsObject;
             ReadOnlyMemory<char> settingsJson;

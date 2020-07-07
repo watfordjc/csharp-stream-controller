@@ -106,7 +106,7 @@ namespace StreamController
         {
             if (dataFlow == DataFlow.Render)
             {
-                await audioDevicesEnumerated.Task;
+                await audioDevicesEnumerated.Task.ConfigureAwait(false);
                 DisplayPortAudioWorkaround();
             }
         }
@@ -172,7 +172,7 @@ namespace StreamController
 
         private async void ObsWebsocketConnect()
         {
-            await webSocket.AutoReconnectConnectAsync();
+            await webSocket.AutoReconnectConnectAsync().ConfigureAwait(false);
         }
 
         private void ReconnectCountdownTimer_Elapsed(object sender, ElapsedEventArgs e)
@@ -218,7 +218,7 @@ namespace StreamController
         {
             _Context.Send(
                 x => WebSocket_Error(e),
-                null);            
+                null);
         }
 
         private void WebSocket_Error(WebSocketLibrary.Models.ErrorMessage e)
@@ -318,7 +318,7 @@ namespace StreamController
                 case OBSWebSocketLibrary.Data.EventType.SceneItemSelected:
                     OBSWebSocketLibrary.Models.Events.SceneItemSelected itemSelectedEvent = eventObject.MessageObject as OBSWebSocketLibrary.Models.Events.SceneItemSelected;
                     Trace.WriteLine($"Item {itemSelectedEvent.ItemName} has been selected in scene {itemSelectedEvent.SceneName}");
-                        break;
+                    break;
                 case OBSWebSocketLibrary.Data.EventType.SceneItemDeselected:
                     OBSWebSocketLibrary.Models.Events.SceneItemDeselected itemDeselectedEvent = eventObject.MessageObject as OBSWebSocketLibrary.Models.Events.SceneItemDeselected;
                     Trace.WriteLine($"Item {itemDeselectedEvent.ItemName} has been deselected in scene {itemDeselectedEvent.SceneName}");
@@ -450,10 +450,10 @@ namespace StreamController
 
         private async void GetDeviceIdsForSources()
         {
-            await audioDevicesEnumerated.Task;
+            await audioDevicesEnumerated.Task.ConfigureAwait(false);
             while (webSocket.WaitingForReplyForType(OBSWebSocketLibrary.Data.RequestType.GetSourceSettings))
             {
-                await Task.Delay(250);
+                await Task.Delay(250).ConfigureAwait(false);
             }
 
             foreach (OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType source in obsSourceDictionary.Values)
@@ -752,7 +752,7 @@ namespace StreamController
             }
             if (brush2 != null)
             {
-                await Task.Delay(250, pulseCancellationToken.Token);
+                await Task.Delay(250, pulseCancellationToken.Token).ConfigureAwait(false);
                 _Context.Send(
                     _ => sbCircleStatus.Fill = brush2,
                     null);

@@ -85,14 +85,14 @@ namespace StreamController
             if (Preferences.Default.obs_connect_launch)
             {
                 btnTest.IsEnabled = false;
-                await webSocket.AutoReconnectConnectAsync();
+                await webSocket.AutoReconnectConnectAsync().ConfigureAwait(true);
             }
         }
 
         private async void ButtonTest_Click(object sender, RoutedEventArgs e)
         {
             btnTest.IsEnabled = false;
-            await webSocket.AutoReconnectConnectAsync();
+            await webSocket.AutoReconnectConnectAsync().ConfigureAwait(true);
             e.Handled = true;
         }
 
@@ -142,7 +142,7 @@ namespace StreamController
 
         private async void ButtonClose_Click(object sender, RoutedEventArgs e)
         {
-            await webSocket.DisconnectAsync();
+            await webSocket.DisconnectAsync().ConfigureAwait(true);
             e.Handled = true;
         }
 

@@ -52,7 +52,7 @@ namespace NAudioWrapperLibrary
 
         private async void Initialise()
         {
-            await PopulateInterfaces();
+            await PopulateInterfaces().ConfigureAwait(false);
         }
 
         private async Task PopulateInterfaces()
@@ -61,8 +61,8 @@ namespace NAudioWrapperLibrary
             await Task.Run(
                 () => collection = _Enumerator.EnumerateAudioEndPoints(DataFlow.All, DeviceState.All)
                 ).ContinueWith(
-            result => DevicesEnumerated(collection)
-            );
+            result => DevicesEnumerated(collection), TaskScheduler.Default
+            ).ConfigureAwait(false);
         }
 
         private void DevicesEnumerated(MMDeviceCollection collection)

@@ -139,7 +139,7 @@ namespace WebSocketLibrary
                 OnStateChange(WebSocketState.Connecting);
                 try
                 {
-                    connected = await ConnectAsync();
+                    connected = await ConnectAsync().ConfigureAwait(false);
                 }
                 catch (WebSocketException e)
                 {
@@ -149,9 +149,9 @@ namespace WebSocketLibrary
                 {
                     try
                     {
-                        await DisconnectAsync(false);
+                        await DisconnectAsync(false).ConfigureAwait(false);
                         OnStateChange(WebSocketState.None);
-                        await Task.Delay(retryMs, connectionCancellation.Token);
+                        await Task.Delay(retryMs, connectionCancellation.Token).ConfigureAwait(false);
                         retryMs = (int)(
                             retryMs * 2 < TimeSpan.FromMinutes(_MaximumRetryMinutes).TotalMilliseconds
                             ? retryMs * 2
@@ -187,7 +187,7 @@ namespace WebSocketLibrary
             }
             try
             {
-                await _Client.ConnectAsync(_ServerUrl, connectionCancellation.Token);
+                await _Client.ConnectAsync(_ServerUrl, connectionCancellation.Token).ConfigureAwait(false);
             }
             catch (TaskCanceledException e)
             {
@@ -221,7 +221,7 @@ namespace WebSocketLibrary
             {
                 try
                 {
-                    await _Client.CloseAsync(WebSocketCloseStatus.Empty, null, CancellationToken.None);
+                    await _Client.CloseAsync(WebSocketCloseStatus.Empty, null, CancellationToken.None).ConfigureAwait(false);
                 }
                 catch (WebSocketException e)
                 {
@@ -231,8 +231,8 @@ namespace WebSocketLibrary
             if (_Client != null)
             {
                 OnStateChange(_Client.State);
-                _Client.Abort();
-                _Client.Dispose();
+                _Client?.Abort();
+                _Client?.Dispose();
                 _Client = null;
             }
             else
@@ -248,18 +248,22 @@ namespace WebSocketLibrary
         /// <returns>True if connected, false if cancelled.</returns>
         public async Task ReconnectAsync()
         {
-            await DisconnectAsync(false);
+            await DisconnectAsync(false).ConfigureAwait(false);
             _Client = new ClientWebSocket();
             try
             {
-                await AutoReconnectConnectAsync();
+                await AutoReconnectConnectAsync().ConfigureAwait(false);
             }
             catch (WebSocketException e)
             {
                 Debugger.Break();
                 OnErrorState(e, -1);
             }
-
+            catch (OperationCanceledException e)
+            {
+                Debugger.Break();
+                OnErrorState(e, -1);
+            }
         }
 
         /// <summary>
@@ -273,8 +277,19 @@ namespace WebSocketLibrary
             {
                 return false;
             }
-            await sendAsyncSemaphore.WaitAsync();
-            await _Client.SendAsync(message, WebSocketMessageType.Text, true, CancellationToken.None);
+            // Only one message can be sent at a time. Wait until a message can be sent.
+            await sendAsyncSemaphore.WaitAsync().ConfigureAwait(false);
+            // We can now send a message. Our thread has entered sendAsyncSemaphore, so we should be the one to release it.
+            try
+            {
+                await _Client.SendAsync(message, WebSocketMessageType.Text, true, connectionCancellation.Token).ConfigureAwait(true);
+            }
+            catch (TaskCanceledException)
+            {
+                sendAsyncSemaphore.Release();
+                return false;
+            }
+            // Our thread can now release the sendAsyncSemaphore so another message can be sent.
             sendAsyncSemaphore.Release();
             return true;
         }
@@ -294,7 +309,7 @@ namespace WebSocketLibrary
             {
                 try
                 {
-                    receivedMessage.Result = await _Client.ReceiveAsync(receiveBuffer, CancellationToken.None);
+                    receivedMessage.Result = await _Client.ReceiveAsync(receiveBuffer, CancellationToken.None).ConfigureAwait(false);
                 }
                 catch (WebSocketException e)
                 {
@@ -315,19 +330,43 @@ namespace WebSocketLibrary
         /// </summary>
         public async Task StartMessageReceiveLoop()
         {
-            await receiveAsyncSemaphore.WaitAsync();
+            // Only one message can be received at a time. Wait until we can control the receive queue.
+            await receiveAsyncSemaphore.WaitAsync().ConfigureAwait(false);
+            // Store the context of our thread so we can release receiveAsyncSemaphore later.
+            SynchronizationContext receiveLoopContext = SynchronizationContext.Current ?? new SynchronizationContext();
+            // The long-lived while loop should run synchronously.
             while (_Status == WebSocketState.Open || _Status == WebSocketState.CloseReceived)
             {
                 try
                 {
-                    Models.ReceivedMessage receivedMessage = await ReceiveMessageAsync();
+                    // There can be a long time between messages received... does it matter which thread picks up the next one?
+                    Models.ReceivedMessage receivedMessage = await ReceiveMessageAsync().ConfigureAwait(false);
+                    // There should currently only be three MessageType: Close, Text, and Binary.
+                    Debug.Assert(Enum.GetNames(typeof(WebSocketMessageType)).Length == 3);
+                    // Result is null if a connection issue occurred. MessageType==Close if server is closing connection.
                     if (receivedMessage.Result == null || receivedMessage.Result.MessageType == WebSocketMessageType.Close)
                     {
                         break;
                     }
+                    // The two other MessageType are Text and Binary.
                     else if (receivedMessage.Result.MessageType == WebSocketMessageType.Text || receivedMessage.Result.MessageType == WebSocketMessageType.Binary)
                     {
                         ParseMessage(receivedMessage);
+                    }
+                    else
+                    {
+                        /* Impossible condition unless:
+                         * (a) RFC 6455 is updated,
+                         * (b) ClientWebSocket includes a new websocket protocol OpCode,
+                         * (c) This library hasn't been debugged since (b) made it into a new .NET Core version.
+                         * In such a case, the above if/elseif needs updating as GenericClient is potentially no longer fit for purpose.
+                         */
+                        WebSocketException e = new WebSocketException(
+                            WebSocketError.InvalidMessageType,
+                            $"This version of {typeof(GenericClient).Name} does not support the following ClientWebSocket MessageType: {receivedMessage.Result.MessageType}."
+                           );
+                        OnErrorState(e, -1);
+                        throw e;
                     }
                 }
                 catch (WebSocketException e)
@@ -337,7 +376,10 @@ namespace WebSocketLibrary
                     OnErrorState(e, -1);
                 }
             }
-            receiveAsyncSemaphore.Release();
+            // No more messages can be received on this connection. Get the receiveLoopContext thread to release the receiveAsyncSemaphore.
+            receiveLoopContext.Send(
+                x => receiveAsyncSemaphore.Release(),
+                null);
         }
 
         #region Dispose
