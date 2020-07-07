@@ -76,10 +76,10 @@ namespace StreamController
             audioInterfaces.DeviceCollectionEnumerated += AudioDevicesEnumerated;
             audioInterfaces.DefaultDeviceChange += DefaultAudioDeviceChanged;
             webSocket.SetExponentialBackoff(Preferences.Default.obs_reconnect_min_seconds, Preferences.Default.obs_reconnect_max_minutes);
-            webSocket.StateChange += WebSocket_StateChange;
-            webSocket.ErrorState += WebSocket_Error;
-            webSocket.OnObsEvent += WebSocket_Event;
-            webSocket.OnObsReply += Websocket_Reply;
+            webSocket.StateChange += WebSocket_StateChange_ContextSwitch;
+            webSocket.ErrorState += WebSocket_Error_ContextSwitch;
+            webSocket.OnObsEvent += WebSocket_Event_ContextSwitch;
+            webSocket.OnObsReply += Websocket_Reply_ContextSwitch;
             _ReconnectCountdownTimer.Elapsed += ReconnectCountdownTimer_Elapsed;
             ObsWebsocketConnect();
         }
@@ -184,7 +184,14 @@ namespace StreamController
             }
         }
 
-        private void WebSocket_StateChange(object sender, WebSocketState newState)
+        private void WebSocket_StateChange_ContextSwitch(object sender, WebSocketState newState)
+        {
+            _Context.Send(
+                x => WebSocket_StateChange(newState),
+                null);
+        }
+
+        private void WebSocket_StateChange(WebSocketState newState)
         {
             if (newState == WebSocketState.Open)
             {
@@ -207,7 +214,14 @@ namespace StreamController
             }
         }
 
-        private void WebSocket_Error(object sender, WebSocketLibrary.Models.ErrorMessage e)
+        private void WebSocket_Error_ContextSwitch(object sender, WebSocketLibrary.Models.ErrorMessage e)
+        {
+            _Context.Send(
+                x => WebSocket_Error(e),
+                null);            
+        }
+
+        private void WebSocket_Error(WebSocketLibrary.Models.ErrorMessage e)
         {
             if (e.ReconnectDelay > 0)
             {
@@ -220,7 +234,14 @@ namespace StreamController
             }
         }
 
-        private void WebSocket_Event(object sender, OBSWebSocketLibrary.Models.TypeDefs.ObsEvent eventObject)
+        private void WebSocket_Event_ContextSwitch(object sender, OBSWebSocketLibrary.Models.TypeDefs.ObsEvent eventObject)
+        {
+            _Context.Send(
+                x => WebSocket_Event(eventObject),
+                null);
+        }
+
+        private void WebSocket_Event(OBSWebSocketLibrary.Models.TypeDefs.ObsEvent eventObject)
         {
             switch (eventObject.EventType)
             {
@@ -320,7 +341,14 @@ namespace StreamController
             }
         }
 
-        private void Websocket_Reply(object sender, OBSWebSocketLibrary.Models.TypeDefs.ObsReply replyObject)
+        private void Websocket_Reply_ContextSwitch(object sender, OBSWebSocketLibrary.Models.TypeDefs.ObsReply replyObject)
+        {
+            _Context.Send(
+                x => Websocket_Reply(replyObject),
+                null);
+        }
+
+        private void Websocket_Reply(OBSWebSocketLibrary.Models.TypeDefs.ObsReply replyObject)
         {
             switch (replyObject.RequestType)
             {
@@ -606,8 +634,11 @@ namespace StreamController
         private void SourceFilterRemoved_Event(OBSWebSocketLibrary.Models.Events.SourceFilterRemoved messageObject)
         {
             OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType source = (OBSWebSocketLibrary.Models.TypeDefs.SourceTypes.BaseType)obsSourceDictionary[messageObject.SourceName];
-            OBSWebSocketLibrary.Models.TypeDefs.FilterTypes.BaseFilter filter = source.Filters.First(x => x.Name == messageObject.FilterName);
-            source.Filters.Remove(filter);
+            OBSWebSocketLibrary.Models.TypeDefs.FilterTypes.BaseFilter filter = source.Filters.FirstOrDefault(x => x.Name == messageObject.FilterName);
+            if (filter != default)
+            {
+                source.Filters.Remove(filter);
+            }
         }
 
         private void SourceFilterVisibilityChanged_Event(OBSWebSocketLibrary.Models.Events.SourceFilterVisibilityChanged messageObject)
@@ -737,7 +768,9 @@ namespace StreamController
 
         private Task UpdateSceneInformation()
         {
-            DataContext = currentScene;
+            _Context.Send(
+                x => DataContext = currentScene,
+                null);
             return Task.CompletedTask;
         }
 

@@ -64,7 +64,15 @@ namespace OBSWebSocketLibrary
             if (state != WebSocketState.Open) { return; }
             heartBeatCheck.Elapsed += HeartBeatTimer_Elapsed;
             ReceiveTextMessage += WebSocket_NewTextMessage;
-            StartMessageReceiveLoop();
+            try
+            {
+                _ = StartMessageReceiveLoop();
+            } catch (Exception)
+            {
+                Debugger.Break();
+                throw;
+            }
+            
             OBS_EnableHeartBeat();
         }
 

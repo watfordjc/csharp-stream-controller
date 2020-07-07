@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualBasic.CompilerServices;
 using System;
 using System.Buffers;
+using System.Diagnostics;
 using System.IO;
 using System.Net.WebSockets;
 using System.Text;
@@ -26,6 +27,7 @@ namespace WebSocketLibrary
         private bool disposedValue;
         private const int RECV_BUFFER_SIZE = 8192;
         private const int SEND_BUFFER_SIZE = 8192;
+        private readonly ArraySegment<byte> receiveBuffer;
 
         public delegate byte[] ReceivedBinaryMessage();
         public delegate string ReceivedTextMessage();
@@ -106,7 +108,8 @@ namespace WebSocketLibrary
         /// <param name="url">The WebSocket server URI to connect to.</param>
         public GenericClient(Uri url)
         {
-            _Client.Options.SetBuffer(RECV_BUFFER_SIZE, SEND_BUFFER_SIZE);
+            receiveBuffer = ArrayPool<byte>.Shared.Rent(RECV_BUFFER_SIZE);
+            _Client.Options.SetBuffer(RECV_BUFFER_SIZE, SEND_BUFFER_SIZE, receiveBuffer);
             _ServerUrl = url;
         }
 
@@ -141,20 +144,20 @@ namespace WebSocketLibrary
                 catch (WebSocketException e)
                 {
                     OnErrorState(e, retryMs / 1000);
-                    OnStateChange(_Client.State);
                 }
                 if (!connected)
                 {
                     try
                     {
-                        _Client = new ClientWebSocket();
-                        OnStateChange(_Client.State);
+                        await DisconnectAsync(false);
+                        OnStateChange(WebSocketState.None);
                         await Task.Delay(retryMs, connectionCancellation.Token);
                         retryMs = (int)(
                             retryMs * 2 < TimeSpan.FromMinutes(_MaximumRetryMinutes).TotalMilliseconds
                             ? retryMs * 2
                             : TimeSpan.FromMinutes(_MaximumRetryMinutes).TotalMilliseconds
                         );
+                        _Client = new ClientWebSocket();
                     }
                     catch (TaskCanceledException)
                     {
@@ -163,6 +166,7 @@ namespace WebSocketLibrary
                     }
                 }
             }
+            Debug.Assert(_Client.State == WebSocketState.Open);
             return true;
         }
 
@@ -181,21 +185,48 @@ namespace WebSocketLibrary
             {
                 return true;
             }
-            await _Client.ConnectAsync(_ServerUrl, connectionCancellation.Token);
-            OnStateChange(_Client.State);
-            return true;
+            try
+            {
+                await _Client.ConnectAsync(_ServerUrl, connectionCancellation.Token);
+            }
+            catch (TaskCanceledException e)
+            {
+                OnErrorState(e, -1);
+            }
+            catch (WebSocketException)
+            {
+                throw;
+            }
+            finally
+            {
+                if (_Client != null)
+                {
+                    OnStateChange(_Client.State);
+                }
+            }
+            return _Client != null && _Status == WebSocketState.Open;
         }
 
         /// <summary>
         /// Disconnect and cleanup.
         /// </summary>
         /// <returns>True when completed.</returns>
-        public async Task<bool> DisconnectAsync()
+        public async Task<bool> DisconnectAsync(bool cancelExisting = true)
         {
-            connectionCancellation.Cancel(true);
-            if (_Status == WebSocketState.Open)
+            if (cancelExisting)
             {
-                await _Client.CloseAsync(WebSocketCloseStatus.Empty, null, CancellationToken.None);
+                connectionCancellation.Cancel(true);
+            }
+            if (_Client != null && _Client.State == WebSocketState.Open)
+            {
+                try
+                {
+                    await _Client.CloseAsync(WebSocketCloseStatus.Empty, null, CancellationToken.None);
+                }
+                catch (WebSocketException e)
+                {
+                    OnErrorState(e, -1);
+                }
             }
             if (_Client != null)
             {
@@ -206,7 +237,7 @@ namespace WebSocketLibrary
             }
             else
             {
-                OnStateChange(WebSocketState.Closed);
+                OnStateChange(WebSocketState.None);
             }
             return true;
         }
@@ -217,9 +248,18 @@ namespace WebSocketLibrary
         /// <returns>True if connected, false if cancelled.</returns>
         public async Task ReconnectAsync()
         {
-            await DisconnectAsync();
+            await DisconnectAsync(false);
             _Client = new ClientWebSocket();
-            await AutoReconnectConnectAsync();
+            try
+            {
+                await AutoReconnectConnectAsync();
+            }
+            catch (WebSocketException e)
+            {
+                Debugger.Break();
+                OnErrorState(e, -1);
+            }
+
         }
 
         /// <summary>
@@ -249,22 +289,31 @@ namespace WebSocketLibrary
             {
                 Message = new MemoryStream()
             };
-            ArraySegment<byte> receiveBuffer = ArrayPool<byte>.Shared.Rent(RECV_BUFFER_SIZE);
 
             do
             {
-                receivedMessage.Result = await _Client.ReceiveAsync(receiveBuffer, CancellationToken.None);
+                try
+                {
+                    receivedMessage.Result = await _Client.ReceiveAsync(receiveBuffer, CancellationToken.None);
+                }
+                catch (WebSocketException e)
+                {
+                    receivedMessage.Message.Dispose();
+                    receivedMessage.Message = null;
+                    OnStateChange(_Client.State);
+                    OnErrorState(e, -1);
+                    break;
+                }
                 receivedMessage.Message.Write(receiveBuffer.Array, receiveBuffer.Offset, receivedMessage.Result.Count);
             } while (!receivedMessage.Result.EndOfMessage);
 
-            ArrayPool<byte>.Shared.Return(receiveBuffer.Array);
             return receivedMessage;
         }
 
         /// <summary>
         /// Starts an asynchronous loop for receiving WebSocket messages.
         /// </summary>
-        public async void StartMessageReceiveLoop()
+        public async Task StartMessageReceiveLoop()
         {
             await receiveAsyncSemaphore.WaitAsync();
             while (_Status == WebSocketState.Open || _Status == WebSocketState.CloseReceived)
@@ -272,7 +321,7 @@ namespace WebSocketLibrary
                 try
                 {
                     Models.ReceivedMessage receivedMessage = await ReceiveMessageAsync();
-                    if (receivedMessage.Result.MessageType == WebSocketMessageType.Close)
+                    if (receivedMessage.Result == null || receivedMessage.Result.MessageType == WebSocketMessageType.Close)
                     {
                         break;
                     }
@@ -283,6 +332,8 @@ namespace WebSocketLibrary
                 }
                 catch (WebSocketException e)
                 {
+                    Debugger.Break();
+                    OnStateChange(_Client.State);
                     OnErrorState(e, -1);
                 }
             }
@@ -300,6 +351,7 @@ namespace WebSocketLibrary
                     connectionCancellation.Dispose();
                     sendAsyncSemaphore.Dispose();
                     receiveAsyncSemaphore.Dispose();
+                    ArrayPool<byte>.Shared.Return(receiveBuffer.Array);
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override finalizer
