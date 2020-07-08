@@ -25,7 +25,9 @@ namespace OBSWebSocketLibrary.Models.Requests
         [JsonPropertyName("scene")]
         public string Scene { get; set; }
         [JsonPropertyName("items")]
+#pragma warning disable CA2227 // Collection properties should be read only
         public IList<TypeDefs.ItemObject> Items { get; set; }
+#pragma warning restore CA2227 // Collection properties should be read only
     }
 
     public class SetSceneTransitionOverride : RequestBase

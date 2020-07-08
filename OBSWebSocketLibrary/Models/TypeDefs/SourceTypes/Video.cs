@@ -30,7 +30,9 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
     public class Slideshow : BaseType
     {
         [JsonPropertyName("files")]
+#pragma warning disable CA2227 // Collection properties should be read only
         public IList<ObsFile> Files { get; set; }
+#pragma warning restore CA2227 // Collection properties should be read only
         [JsonPropertyName("playback_behavior")]
         public string PlaybackBehavior { get; set; }
         [JsonPropertyName("slide_time")]
@@ -172,7 +174,9 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         [JsonPropertyName("playback_behavior")]
         public string PlaybackBehavior { get; set; }
         [JsonPropertyName("playlist")]
+#pragma warning disable CA2227 // Collection properties should be read only
         public IList<VlcPlaylistItem> Playlist { get; set; }
+#pragma warning restore CA2227 // Collection properties should be read only
         [JsonPropertyName("shuffle")]
         public bool Shuffle { get; set; }
         [JsonPropertyName("subtitle")]

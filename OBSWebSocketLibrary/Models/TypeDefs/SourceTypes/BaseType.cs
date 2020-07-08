@@ -78,7 +78,9 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
             }
         }
         [JsonIgnore]
+#pragma warning disable CA2227 // Collection properties should be read only
         public IList<ObsMixer> Mixers
+#pragma warning restore CA2227 // Collection properties should be read only
         {
             get { return mixers; }
             set
@@ -98,7 +100,9 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
             }
         }
         [JsonIgnore]
+#pragma warning disable CA2227 // Collection properties should be read only
         public ObservableCollection<FilterTypes.BaseFilter> Filters { get; set; }
+#pragma warning restore CA2227 // Collection properties should be read only
 
         [JsonIgnore]
         public TypeDefs.ObsReplyType Type { get; set; }

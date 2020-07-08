@@ -10,7 +10,9 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         [JsonPropertyName("current-transition")]
         public string CurrentTransition { get; set; }
         [JsonPropertyName("transitions")]
+#pragma warning disable CA2227 // Collection properties should be read only
         public IList<TypeDefs.ObsTransitionName> Transitions { get; set; }
+#pragma warning restore CA2227 // Collection properties should be read only
     }
 
     public class GetCurrentTransition : RequestReplyBase

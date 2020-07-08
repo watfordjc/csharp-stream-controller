@@ -89,7 +89,9 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
             get { return !String.IsNullOrEmpty(VideoDeviceId); }
         }
 
+#pragma warning disable CA2227 // Collection properties should be read only
         public IList<string> FilePaths
+#pragma warning restore CA2227 // Collection properties should be read only
         {
             get { return filePaths; }
             set
@@ -103,7 +105,9 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
             get { return FilePaths != null && FilePaths.Count != 0; }
         }
 
+#pragma warning disable CA2227 // Collection properties should be read only
         public IList<string> Uris
+#pragma warning restore CA2227 // Collection properties should be read only
         {
             get { return uris; }
             set

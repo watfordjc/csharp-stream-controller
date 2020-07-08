@@ -10,7 +10,9 @@ namespace OBSWebSocketLibrary.Models.Events
         [JsonPropertyName("scene-name")]
         public string SceneName { get; set; }
         [JsonPropertyName("scene-items")]
+#pragma warning disable CA2227 // Collection properties should be read only
         public IList<TypeDefs.ObsEventSceneItem> SceneItems { get; set; }
+#pragma warning restore CA2227 // Collection properties should be read only
     }
 
     public class SceneItemAdded : EventBase

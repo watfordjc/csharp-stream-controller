@@ -13,7 +13,9 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         [JsonPropertyName("id_counter")]
         public int IdCounter { get; set; }
         [JsonPropertyName("items")]
+#pragma warning disable CA2227 // Collection properties should be read only
         public IList<ObsSceneItem> Items { get; set; }
+#pragma warning restore CA2227 // Collection properties should be read only
     }
 
     public class Group : BaseType
@@ -27,6 +29,8 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         [JsonPropertyName("id_counter")]
         public int IdCounter { get; set; }
         [JsonPropertyName("items")]
+#pragma warning disable CA2227 // Collection properties should be read only
         public IList<ObsSceneItem> Items { get; set; }
+#pragma warning restore CA2227 // Collection properties should be read only
     }
 }

@@ -58,7 +58,9 @@ namespace OBSWebSocketLibrary.Models.Events
         [JsonPropertyName("sourceName")]
         public string SourceName { get; set; }
         [JsonPropertyName("mixers")]
+#pragma warning disable CA2227 // Collection properties should be read only
         public IList<TypeDefs.ObsMixer> Mixers { get; set; }
+#pragma warning restore CA2227 // Collection properties should be read only
         [JsonPropertyName("hexMixersValue")]
         public string HexMixersValue { get; set; }
     }
@@ -110,6 +112,8 @@ namespace OBSWebSocketLibrary.Models.Events
         [JsonPropertyName("sourceName")]
         public string SourceName { get; set; }
         [JsonPropertyName("filters")]
+#pragma warning disable CA2227 // Collection properties should be read only
         public IList<TypeDefs.ObsFilter> Filters { get; set; }
+#pragma warning restore CA2227 // Collection properties should be read only
     }
 }

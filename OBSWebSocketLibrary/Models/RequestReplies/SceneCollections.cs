@@ -18,6 +18,8 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
     public class ListSceneCollections : RequestReplyBase
     {
         [JsonPropertyName("scene-collections")]
+#pragma warning disable CA2227 // Collection properties should be read only
         public IList<string> SceneCollections { get; set; }
+#pragma warning restore CA2227 // Collection properties should be read only
     }
 }

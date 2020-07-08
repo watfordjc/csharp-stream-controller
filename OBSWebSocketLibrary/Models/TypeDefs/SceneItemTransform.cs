@@ -32,7 +32,9 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         [JsonPropertyName("parentGroupName")]
         public string ParentGroupName { get; set; }
         [JsonPropertyName("groupChildren")]
+#pragma warning disable CA2227 // Collection properties should be read only
         public IList<SceneItemTransform> GroupChildren { get; set; }
+#pragma warning restore CA2227 // Collection properties should be read only
 
         public static implicit operator SceneItemTransform(RequestReplies.GetSceneItemProperties v)
         {

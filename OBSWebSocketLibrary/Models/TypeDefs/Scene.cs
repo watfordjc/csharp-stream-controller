@@ -11,6 +11,8 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         [JsonPropertyName("name")]
         public string Name { get; set; }
         [JsonPropertyName("sources")]
+#pragma warning disable CA2227 // Collection properties should be read only
         public ObservableCollection<SceneItem> Sources { get; set; }
+#pragma warning restore CA2227 // Collection properties should be read only
     }
 }

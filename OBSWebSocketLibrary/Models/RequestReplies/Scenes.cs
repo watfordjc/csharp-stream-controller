@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -14,7 +15,9 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         [JsonPropertyName("name")]
         public string Name { get; set; }
         [JsonPropertyName("sources")]
+#pragma warning disable CA2227 // Collection properties should be read only
         public IList<TypeDefs.SceneItem> Sources { get; set; }
+#pragma warning restore CA2227 // Collection properties should be read only
     }
 
     public class GetSceneList : RequestReplyBase
@@ -22,7 +25,9 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         [JsonPropertyName("current-scene")]
         public string CurrentScene { get; set; }
         [JsonPropertyName("scenes")]
+#pragma warning disable CA2227 // Collection properties should be read only
         public IList<TypeDefs.Scene> Scenes { get; set; }
+#pragma warning restore CA2227 // Collection properties should be read only
     }
 
     public class ReorderSceneItems : RequestReplyBase

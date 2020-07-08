@@ -19,6 +19,8 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
     public class ListProfiles : RequestReplyBase
     {
         [JsonPropertyName("profiles")]
+#pragma warning disable CA2227 // Collection properties should be read only
         public IList<OBSWebSocketLibrary.Models.TypeDefs.ObsProfile> Profiles { get; set; }
+#pragma warning restore CA2227 // Collection properties should be read only
     }
 }

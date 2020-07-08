@@ -87,7 +87,9 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         [JsonPropertyName("parentGroupName")]
         public string ParentGroupName { get; set; }
         [JsonPropertyName("groupChildren")]
+#pragma warning disable CA2227 // Collection properties should be read only
         public ObservableCollection<SceneItem> GroupChildren { get; set; }
+#pragma warning restore CA2227 // Collection properties should be read only
         [JsonIgnore]
         public SourceTypes.BaseType Source
         {

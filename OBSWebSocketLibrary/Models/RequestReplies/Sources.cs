@@ -9,13 +9,17 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
     public class GetSourcesList : RequestReplyBase
     {
         [JsonPropertyName("sources")]
+#pragma warning disable CA2227 // Collection properties should be read only
         public IList<TypeDefs.ObsReplySource> Sources { get; set; }
+#pragma warning restore CA2227 // Collection properties should be read only
     }
 
     public class GetSourceTypesList : RequestReplyBase
     {
         [JsonPropertyName("types")]
+#pragma warning disable CA2227 // Collection properties should be read only
         public IList<TypeDefs.ObsReplyType> Types { get; set; }
+#pragma warning restore CA2227 // Collection properties should be read only
     }
 
     public class GetVolume : RequestReplyBase
@@ -217,7 +221,9 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
     public class GetSourceFilters : RequestReplyBase
     {
         [JsonPropertyName("filters")]
+#pragma warning disable CA2227 // Collection properties should be read only
         public IList<TypeDefs.ObsReplyFilter> Filters { get; set; }
+#pragma warning restore CA2227 // Collection properties should be read only
     }
 
     public class GetSourceFilterInfo : RequestReplyBase
