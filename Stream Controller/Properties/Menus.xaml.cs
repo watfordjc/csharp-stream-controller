@@ -7,7 +7,7 @@ using System.Windows.Controls;
 
 namespace StreamController
 {
-    partial class MenuItemDictionary : ResourceDictionary
+    public partial class MenuItemCollection : ResourceDictionary, ICollection<KeyValuePair<string, object>>
     {
         private void MenuItemExit_Click(object sender, RoutedEventArgs e)
         {
@@ -21,7 +21,7 @@ namespace StreamController
             WindowUtilityLibrary.MakeWindowActive(clickedWindowType);
         }
 
-        public void MenuWindowItemLoaded(object sender, RoutedEventArgs e)
+        private void MenuWindowItemLoaded(object sender, RoutedEventArgs e)
         {
             if (sender == null) { throw new ArgumentNullException(nameof(sender)); }
 
@@ -32,6 +32,38 @@ namespace StreamController
             {
                 ((MenuItem)sender).IsEnabled = false;
             }
+        }
+
+        public void Add(KeyValuePair<string, object> item)
+        {
+            Add(item.Key, item.Value);
+        }
+
+        public bool Contains(KeyValuePair<string, object> item)
+        {
+            return Contains(item.Key);
+        }
+
+        public void CopyTo(KeyValuePair<string, object>[] array, int arrayIndex)
+        {
+            KeyValuePair<string, object>[] newArray = array;
+            ((ICollection<KeyValuePair<string, object>>)this).CopyTo(newArray, arrayIndex);
+        }
+
+        public bool Remove(KeyValuePair<string, object> item)
+        {
+            if (Contains(item.Key)) {
+                Remove(item.Key);
+                return true;
+            } else
+            {
+                return false;
+            }
+        }
+
+        IEnumerator<KeyValuePair<string, object>> IEnumerable<KeyValuePair<string, object>>.GetEnumerator()
+        {
+            return GetEnumerator() as IEnumerator<KeyValuePair<string, object>>;
         }
     }
 }
