@@ -59,21 +59,23 @@ namespace OBSWebSocketLibrary
             return sentMessageGuids.ContainsKey(messageId);
         }
 
-        private void WebSocket_Connected(object sender, WebSocketState state)
+        private async void WebSocket_Connected(object sender, WebSocketState state)
         {
             if (state != WebSocketState.Open) { return; }
+            sentMessageGuids.Clear();
             heartBeatCheck.Elapsed += HeartBeatTimer_Elapsed;
             ReceiveTextMessage += WebSocket_NewTextMessage;
             try
             {
                 _ = StartMessageReceiveLoop();
-            } catch (Exception)
+            }
+            catch (Exception)
             {
                 Debugger.Break();
                 throw;
             }
-            
-            OBS_EnableHeartBeat();
+
+            await OBS_EnableHeartBeat().ConfigureAwait(true);
         }
 
         private void HeartBeatTimer_Elapsed(object sender, ElapsedEventArgs e)
@@ -108,13 +110,13 @@ namespace OBSWebSocketLibrary
             return metadata.RequestGuid;
         }
 
-        private Guid OBS_EnableHeartBeat()
+        private async ValueTask<Guid> OBS_EnableHeartBeat()
         {
             Models.Requests.SetHeartbeat message = new Models.Requests.SetHeartbeat()
             {
                 Enable = true
             };
-            return ObsSend(message).Result;
+            return await ObsSend(message).ConfigureAwait(false);
         }
 
         private void FurtherProcessObsEvent(object sender, Models.TypeDefs.ObsEvent obsEvent)
@@ -129,9 +131,9 @@ namespace OBSWebSocketLibrary
             }
         }
 
-        private void WebSocket_NewTextMessage(object sender, MemoryStream message)
+        private async void WebSocket_NewTextMessage(object sender, MemoryStream message)
         {
-            OBS_ParseJson(message);
+            await OBS_ParseJson(message).ConfigureAwait(false);
         }
 
         private static JsonDocument GetJsonDocumentFromMemoryStream(MemoryStream stream)
@@ -144,7 +146,7 @@ namespace OBSWebSocketLibrary
             return document;
         }
 
-        private void OBS_ParseJson(MemoryStream message)
+        private async Task OBS_ParseJson(MemoryStream message)
         {
             using JsonDocument document = GetJsonDocumentFromMemoryStream(message);
             JsonElement root = document.RootElement;
@@ -191,7 +193,7 @@ namespace OBSWebSocketLibrary
                         default:
                             break;
                     }
-                    ParseReply(message, obsReply);
+                    await ParseReply(message, obsReply).ConfigureAwait(false);
                 }
                 else
                 {
@@ -204,7 +206,8 @@ namespace OBSWebSocketLibrary
                 bool isStreaming = root.TryGetProperty("stream-timecode", out JsonElement jsonStreamTimecode);
                 bool isRecording = root.TryGetProperty("rec-timecode", out JsonElement jsonRecTimecode);
                 Models.TypeDefs.ObsEvent obsEvent = new Models.TypeDefs.ObsEvent();
-                if (Enum.TryParse(updateTypeJson.GetString(), out Data.EventType eventType)) {
+                if (Enum.TryParse(updateTypeJson.GetString(), out Data.EventType eventType))
+                {
                     obsEvent.EventType = eventType;
                 }
                 switch (obsEvent.EventType)
@@ -220,7 +223,7 @@ namespace OBSWebSocketLibrary
                     default:
                         break;
                 }
-                ParseEvent(message, obsEvent);
+                await ParseEvent(message, obsEvent).ConfigureAwait(false);
             }
             else
             {
@@ -253,7 +256,7 @@ namespace OBSWebSocketLibrary
             }
         }
 
-        private async void ParseReply(MemoryStream message, Models.TypeDefs.ObsReply obsReply)
+        private async Task ParseReply(MemoryStream message, Models.TypeDefs.ObsReply obsReply)
         {
             message.Seek(0, SeekOrigin.Begin);
             if (obsReply.Status == "ok" && Enum.IsDefined(typeof(Data.RequestType), obsReply.RequestType))
@@ -269,7 +272,8 @@ namespace OBSWebSocketLibrary
                     case Data.RequestType.GetSourceTypesList:
                         foreach (OBSWebSocketLibrary.Models.TypeDefs.ObsReplyType type in (obsReply.MessageObject as Models.RequestReplies.GetSourceTypesList).Types)
                         {
-                            if (!CanDeserializeSourceType(ObsTypes.ObsTypeNameDictionary[type.TypeId], type.DefaultSettings.GetRawText().AsMemory(), out settingsObject)) {
+                            if (!CanDeserializeSourceType(ObsTypes.ObsTypeNameDictionary[type.TypeId], type.DefaultSettings.GetRawText().AsMemory(), out settingsObject))
+                            {
                                 Trace.WriteLine($"Unknown source type: {type.DisplayName} ({type.TypeId}) is not defined but the server supports it.");
                                 continue;
                             }
@@ -321,7 +325,7 @@ namespace OBSWebSocketLibrary
             }
         }
 
-        private async void ParseEvent(MemoryStream message, Models.TypeDefs.ObsEvent obsEvent)
+        private async Task ParseEvent(MemoryStream message, Models.TypeDefs.ObsEvent obsEvent)
         {
             message.Seek(0, SeekOrigin.Begin);
             obsEvent.MessageObject = await JsonSerializer.DeserializeAsync(message, Data.ObsEvent.GetType(obsEvent.EventType)).ConfigureAwait(false);
@@ -344,7 +348,5 @@ namespace OBSWebSocketLibrary
             }
             NewObsEvent(obsEvent);
         }
-
-
     }
 }
