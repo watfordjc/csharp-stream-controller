@@ -4,19 +4,27 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Networking.Connectivity;
 
-namespace Microsoft.Toolkit.Uwp.Connectivity
+namespace NetworkingWrapperLibrary
 {
     /// <summary>
     /// This class exposes information about the network connectivity.
     /// </summary>
-    public class ConnectionInformation
+    public class ConnectionInformation : INotifyPropertyChanged
     {
         private readonly List<string> networkNames = new List<string>();
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
         /// <summary>
         /// Updates  the current object based on profile passed.
@@ -104,29 +112,82 @@ namespace Microsoft.Toolkit.Uwp.Connectivity
             }
         }
 
+        private bool _isInternetAvailable;
         /// <summary>
         /// Gets a value indicating whether internet is available across all connections.
         /// </summary>
         /// <returns>True if internet can be reached.</returns>
-        public bool IsInternetAvailable { get; private set; }
+        public bool IsInternetAvailable
+        {
+            get { return _isInternetAvailable; }
+            private set
+            {
+                _isInternetAvailable = value;
+                NotifyPropertyChanged();
+            }
+        }
 
+        private ConnectionType _connectionType;
         /// <summary>
         /// Gets connection type for the current Internet Connection Profile.
         /// </summary>
         /// <returns>value of <see cref="ConnectionType"/></returns>
-        public ConnectionType ConnectionType { get; private set; }
+        public ConnectionType ConnectionType
+        {
+            get { return _connectionType; }
+            private set
+            {
+                _connectionType = value;
+                NotifyPropertyChanged();
+            }
+        }
 
+        private NetworkConnectivityLevel _networkConnectivityLevel;
         /// <summary>
         /// Gets connectivity level for the current Internet Connection Profile.
         /// </summary>
         /// <returns>value of <see cref="NetworkConnectivityLevel"/></returns>
-        public NetworkConnectivityLevel ConnectivityLevel { get; private set; }
+        public NetworkConnectivityLevel ConnectivityLevel
+        {
+            get { return _networkConnectivityLevel; }
+            private set
+            {
+                _networkConnectivityLevel = value;
+                ConnectivityLevel2 = (NetworkConnectivityLevel2)value;
+                NotifyPropertyChanged();
+            }
+        }
 
+        private NetworkingWrapperLibrary.NetworkConnectivityLevel2 _networkConnectivityLevel2;
+        /// <summary>
+        /// Gets connectivity level for the current Internet Connection Profile.
+        /// </summary>
+        /// <returns>value of <see cref="NetworkConnectivityLevel2"/></returns>
+        public NetworkingWrapperLibrary.NetworkConnectivityLevel2 ConnectivityLevel2
+        {
+            get { return _networkConnectivityLevel2; }
+            private set
+            {
+                _networkConnectivityLevel2 = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private ConnectionCost _connectionCost;
         /// <summary>
         /// Gets connection cost for the current Internet Connection Profile.
         /// </summary>
         /// <returns>value of <see cref="NetworkConnectivityLevel"/></returns>
-        public ConnectionCost ConnectionCost { get; private set; }
+        public ConnectionCost ConnectionCost
+        {
+            get { return _connectionCost; }
+            private set
+            {
+                _connectionCost = value;
+                NotifyPropertyChanged();
+                NotifyPropertyChanged(nameof(IsInternetOnMeteredConnection));
+            }
+        }
 
         /// <summary>
         /// Gets signal strength for the current Internet Connection Profile.

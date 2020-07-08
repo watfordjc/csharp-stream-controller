@@ -5,7 +5,7 @@
 using System;
 using Windows.Networking.Connectivity;
 
-namespace Microsoft.Toolkit.Uwp.Connectivity
+namespace NetworkingWrapperLibrary
 {
     /// <summary>
     /// This class exposes functionality of NetworkInformation through a singleton.
@@ -25,7 +25,7 @@ namespace Microsoft.Toolkit.Uwp.Connectivity
         /// <summary>
         /// Gets public singleton property.
         /// </summary>
-        public static NetworkHelper Instance => _instance ?? (_instance = new NetworkHelper());
+        public static NetworkHelper Instance => _instance ??= new NetworkHelper();
 
         /// <summary>
         /// Gets instance of <see cref="ConnectionInformation"/>.
@@ -62,9 +62,10 @@ namespace Microsoft.Toolkit.Uwp.Connectivity
 
                     NetworkChanged?.Invoke(this, EventArgs.Empty);
                 }
-                catch
+                catch (Exception)
                 {
                     ConnectionInformation.Reset();
+                    throw;
                 }
             }
         }

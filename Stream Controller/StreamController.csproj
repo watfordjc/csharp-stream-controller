@@ -18,11 +18,13 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Windows.SDK.Contracts" Version="10.0.18362.2005" />
     <PackageReference Include="NAudio" Version="1.10.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\NAudioWrapperLibrary\NAudioWrapperLibrary.csproj" />
+    <ProjectReference Include="..\NetworkingWrapperLibrary\NetworkingWrapperLibrary.csproj" />
     <ProjectReference Include="..\OBSWebSocketLibrary\OBSWebSocketLibrary.csproj" />
     <ProjectReference Include="..\SharedModels\SharedModels.csproj" />
   </ItemGroup>
