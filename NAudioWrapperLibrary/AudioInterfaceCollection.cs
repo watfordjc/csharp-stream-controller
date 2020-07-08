@@ -21,13 +21,12 @@ namespace NAudioWrapperLibrary
     {
         private readonly SynchronizationContext _Context;
         private static readonly MMDeviceEnumerator _Enumerator = new MMDeviceEnumerator();
-        private static readonly ObservableCollection<AudioInterface> _Devices = new ObservableCollection<AudioInterface>();
         private static AudioEndpointNotificationCallback _NotificationCallback = null;
         private static IMMNotificationClient _NotificationClient;
 
         public AudioInterface DefaultRender { get; private set; }
         public AudioInterface DefaultCapture { get; private set; }
-        public static ObservableCollection<AudioInterface> Devices { get { return _Devices; } }
+        public static ObservableCollection<AudioInterface> Devices { get; } = new ObservableCollection<AudioInterface>();
 
         private static readonly Lazy<AudioInterfaceCollection> lazySingleton =
             new Lazy<AudioInterfaceCollection>(
@@ -119,17 +118,17 @@ namespace NAudioWrapperLibrary
 
         public static AudioInterface GetAudioInterfaceById(string deviceId)
         {
-            return _Devices.Where(device => device.ID == deviceId).FirstOrDefault();
+            return Devices.Where(device => device.ID == deviceId).FirstOrDefault();
         }
 
         public static AudioInterface GetAudioInterfaceByName(string deviceName)
         {
-            return _Devices.Where(device => device.FriendlyName == deviceName).FirstOrDefault();
+            return Devices.Where(device => device.FriendlyName == deviceName).FirstOrDefault();
         }
         
         public static AudioInterface GetAudioInterfaceByVolumeNotificationGuid(Guid notificationId)
         {
-            return _Devices.Where(device => device.VolumeNotificationGuid == notificationId).FirstOrDefault();
+            return Devices.Where(device => device.VolumeNotificationGuid == notificationId).FirstOrDefault();
         }
 
         // TODO: Implement methods to propagate events
@@ -155,14 +154,14 @@ namespace NAudioWrapperLibrary
                     Device = _Enumerator.GetDevice(pwstrDeviceId)
                 };
                 mContext.Send(
-                    x => _Devices.Add(device)
+                    x => Devices.Add(device)
                 , null);
             }
 
             void IMMNotificationClient.OnDeviceRemoved(string deviceId)
             {
                 mContext.Send(
-                    x => _Devices.Remove(GetAudioInterfaceById(deviceId))
+                    x => Devices.Remove(GetAudioInterfaceById(deviceId))
                 , null);
             }
 

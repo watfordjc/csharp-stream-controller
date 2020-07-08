@@ -34,8 +34,6 @@ namespace StreamController
     public partial class AudioCheck : Window, IDisposable
     {
         private readonly SynchronizationContext _Context;
-        private static readonly AudioInterfaceCollection audioInterfaces = AudioInterfaceCollection.Instance;
-        private readonly ObservableCollection<AudioInterface> devices = AudioInterfaceCollection.Devices;
         private readonly ObsWsClient webSocket;
         private readonly TaskCompletionSource<bool> audioDevicesEnumerated = new TaskCompletionSource<bool>();
         private string connectionError = String.Empty;
@@ -48,8 +46,8 @@ namespace StreamController
         private ObservableCollection<OBSWebSocketLibrary.Models.TypeDefs.Scene> sceneList;
         private OBSWebSocketLibrary.Models.TypeDefs.Scene currentScene;
         private OBSWebSocketLibrary.Models.RequestReplies.GetSourceTypesList sourceTypes;
-        private Dictionary<string, object> obsSourceDictionary = new Dictionary<string, object>();
-        private Dictionary<int, OBSWebSocketLibrary.Models.TypeDefs.Scene> obsSceneItemSceneDictionary = new Dictionary<int, OBSWebSocketLibrary.Models.TypeDefs.Scene>();
+        private readonly Dictionary<string, object> obsSourceDictionary = new Dictionary<string, object>();
+        private readonly Dictionary<int, OBSWebSocketLibrary.Models.TypeDefs.Scene> obsSceneItemSceneDictionary = new Dictionary<int, OBSWebSocketLibrary.Models.TypeDefs.Scene>();
         private bool disposedValue;
 
         #region Instantiation and initialisation
@@ -72,9 +70,8 @@ namespace StreamController
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             UpdateUIConnectStatus(null, null, null);
-            devices.CollectionChanged += DeviceCollectionChanged;
-            audioInterfaces.DeviceCollectionEnumerated += AudioDevicesEnumerated;
-            audioInterfaces.DefaultDeviceChange += DefaultAudioDeviceChanged;
+            AudioInterfaceCollection.Instance.DeviceCollectionEnumerated += AudioDevicesEnumerated;
+            AudioInterfaceCollection.Instance.DefaultDeviceChange += DefaultAudioDeviceChanged;
             webSocket.SetExponentialBackoff(Preferences.Default.obs_reconnect_min_seconds, Preferences.Default.obs_reconnect_max_minutes);
             webSocket.StateChange += WebSocket_StateChange_ContextSwitch;
             webSocket.ErrorState += WebSocket_Error_ContextSwitch;
@@ -88,17 +85,11 @@ namespace StreamController
 
         #region Audio interfaces
 
-        private void DeviceCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            UpdateUIConnectStatus(null, null, null);
-        }
-
         private void AudioDevicesEnumerated(object sender, bool deviceEnumerationComplete)
         {
             if (deviceEnumerationComplete)
             {
                 audioDevicesEnumerated.SetResult(true);
-                UpdateUIConnectStatus(null, null, null);
             }
         }
 
@@ -113,10 +104,10 @@ namespace StreamController
 
         private void DisplayPortAudioWorkaround()
         {
-            if (audioInterfaces.DefaultRender.FriendlyName.Contains("NVIDIA", StringComparison.Ordinal) && silentAudioEvent?.PlaybackState != PlaybackState.Playing)
+            if (AudioInterfaceCollection.Instance.DefaultRender.FriendlyName.Contains("NVIDIA", StringComparison.Ordinal) && silentAudioEvent?.PlaybackState != PlaybackState.Playing)
             {
                 _ = Task.Run(
-                    () => StartPlaySilence(audioInterfaces.DefaultRender)
+                    () => StartPlaySilence(AudioInterfaceCollection.Instance.DefaultRender)
                 );
             }
             else
@@ -198,7 +189,7 @@ namespace StreamController
                 connectionError = String.Empty;
                 _ReconnectCountdownTimer.Stop();
                 UpdateUIConnectStatus(String.Empty, Brushes.DarkGreen, null);
-                obsSourceDictionary = new Dictionary<string, object>();
+                obsSourceDictionary.Clear();
                 await Obs_Get(OBSWebSocketLibrary.Data.RequestType.GetSourceTypesList).ConfigureAwait(true);
             }
             else if (newState != WebSocketState.Connecting)
@@ -732,9 +723,6 @@ namespace StreamController
 
         private async Task UpdateConnectStatus(string countdownText, Brush brush1, Brush brush2)
         {
-            _Context.Send(
-                _ => tbAudioInterfaceStatus.Text = $"{devices.Count} audio devices",
-                null);
             _Context.Send(
                 _ => tbStatus.Text = connectionError,
                 null);
