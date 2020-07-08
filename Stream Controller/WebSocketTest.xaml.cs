@@ -41,10 +41,12 @@ namespace StreamController
         private int reconnectDelay;
         private bool disposedValue;
         private readonly int SCROLL_BUFFER_MAX_CHARS = 65000;
+        private readonly SynchronizationContext _Context;
 
         public WebSocketTest()
         {
             InitializeComponent();
+            _Context = SynchronizationContext.Current;
             InitialiseWindow();
             Uri obs_uri = new UriBuilder(
                 Preferences.Default.obs_uri_scheme,
@@ -78,10 +80,10 @@ namespace StreamController
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             webSocket.SetExponentialBackoff(Preferences.Default.obs_reconnect_min_seconds, Preferences.Default.obs_reconnect_max_minutes);
-            webSocket.StateChange += WebSocket_StateChange;
-            webSocket.StateChange += WebSocket_Connected;
-            webSocket.ReceiveTextMessage += WebSocket_NewTextMessage;
-            webSocket.ErrorState += WebSocket_ErrorMessage;
+            webSocket.StateChange += WebSocket_StateChange_ContextSwitch;
+            webSocket.StateChange += WebSocket_Connected_ContextSwitch;
+            webSocket.ReceiveTextMessage += WebSocket_NewTextMessage_ContextSwitch;
+            webSocket.ErrorState += WebSocket_ErrorMessage_ContextSwitch;
             if (Preferences.Default.obs_connect_launch)
             {
                 btnTest.IsEnabled = false;
@@ -96,7 +98,14 @@ namespace StreamController
             e.Handled = true;
         }
 
-        private void WebSocket_StateChange(object sender, WebSocketState e)
+        private void WebSocket_StateChange_ContextSwitch(object sender, WebSocketState e)
+        {
+            _Context.Send(
+                x => WebSocket_StateChange(e),
+                null);
+        }
+
+        private void WebSocket_StateChange(WebSocketState e)
         {
             txtStatus.Text = $"Connection Status: {e}";
             if (e == WebSocketState.Closed)
@@ -111,7 +120,14 @@ namespace StreamController
             }
         }
 
-        private void WebSocket_ErrorMessage(object sender, WebSocketLibrary.Models.ErrorMessage errorMessage)
+        private void WebSocket_ErrorMessage_ContextSwitch(object sender, WebSocketLibrary.Models.ErrorMessage errorMessage)
+        {
+            _Context.Send(
+                x => WebSocket_ErrorMessage(errorMessage),
+                null);
+        }
+
+        private void WebSocket_ErrorMessage(WebSocketLibrary.Models.ErrorMessage errorMessage)
         {
             if (errorMessage.Error == null) { return; }
             txtOutput.Text += $"{errorMessage.Error.Message}\n{errorMessage.Error.InnerException?.Message}\n\n";
@@ -121,12 +137,26 @@ namespace StreamController
             }
         }
 
-        private void WebSocket_Connected(object sender, WebSocketState e)
+        private void WebSocket_Connected_ContextSwitch(object sender, WebSocketState e)
+        {
+            _Context.Send(
+                x => WebSocket_Connected(e),
+                null);
+        }
+
+        private static void WebSocket_Connected(WebSocketState e)
         {
             if (e != WebSocketState.Open) { return; }
         }
 
-        private void WebSocket_NewTextMessage(object sender, MemoryStream message)
+        private void WebSocket_NewTextMessage_ContextSwitch(object sender, MemoryStream message)
+        {
+            _Context.Send(
+                x => WebSocket_NewTextMessage(message),
+                null);
+        }
+
+        private void WebSocket_NewTextMessage(MemoryStream message)
         {
             txtOutput.AppendText(Encoding.UTF8.GetString(message.ToArray()));
             txtOutput.AppendText("\n\n");
