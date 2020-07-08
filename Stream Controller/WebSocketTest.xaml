@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:StreamController"
         mc:Ignorable="d"
-        Closing="Window_Closing"
-        Loaded="Window_Loaded"
+        ContentRendered="Window_ContentRendered"
+        Closed="Window_Closed"
         Title="WebSocketTest" Height="450" Width="800"
         FontFamily="Open Sans" FontSize="14">
     <DockPanel>

@@ -69,15 +69,7 @@ namespace StreamController
             this.cbAutoScroll.IsChecked = Preferences.Default.obs_autoscroll;
         }
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            Preferences.Default.obs_width = this.Width;
-            Preferences.Default.obs_height = this.Height;
-            Preferences.Default.obs_left = this.Left;
-            Preferences.Default.obs_top = this.Top;
-        }
-
-        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        private async void Window_ContentRendered(object sender, EventArgs e)
         {
             webSocket.SetExponentialBackoff(Preferences.Default.obs_reconnect_min_seconds, Preferences.Default.obs_reconnect_max_minutes);
             webSocket.StateChange += WebSocket_StateChange_ContextSwitch;
@@ -91,9 +83,24 @@ namespace StreamController
             }
         }
 
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            Preferences.Default.obs_width = this.Width;
+            Preferences.Default.obs_height = this.Height;
+            Preferences.Default.obs_left = this.Left;
+            Preferences.Default.obs_top = this.Top;
+            webSocket.StateChange -= WebSocket_StateChange_ContextSwitch;
+            webSocket.StateChange -= WebSocket_Connected_ContextSwitch;
+            webSocket.ReceiveTextMessage -= WebSocket_NewTextMessage_ContextSwitch;
+            webSocket.ErrorState -= WebSocket_ErrorMessage_ContextSwitch;
+            webSocket.AutoReconnect = false;
+            webSocket.DisconnectAsync(true).ConfigureAwait(true);
+        }
+
         private async void ButtonTest_Click(object sender, RoutedEventArgs e)
         {
             btnTest.IsEnabled = false;
+            webSocket.AutoReconnect = Preferences.Default.obs_auto_reconnect;
             await webSocket.AutoReconnectConnectAsync().ConfigureAwait(true);
             e.Handled = true;
         }
@@ -172,7 +179,8 @@ namespace StreamController
 
         private async void ButtonClose_Click(object sender, RoutedEventArgs e)
         {
-            await webSocket.DisconnectAsync().ConfigureAwait(true);
+            webSocket.AutoReconnect = false;
+            await webSocket.DisconnectAsync(true).ConfigureAwait(true);
             e.Handled = true;
         }
 

@@ -40,10 +40,10 @@ namespace StreamController
         private WaveOutEvent silentAudioEvent = null;
         private static readonly Brush primaryBrush = new SolidColorBrush(Color.FromArgb(0xFF, 0xE2, 0xC1, 0xEA));
         private static readonly Brush secondaryBrush = new SolidColorBrush(Color.FromArgb(0xFF, 0xC5, 0xC0, 0xEB));
-        private CancellationTokenSource pulseCancellationToken = new CancellationTokenSource();
+        private CancellationTokenSource pulseCancellationToken;
         private readonly System.Timers.Timer _ReconnectCountdownTimer = new System.Timers.Timer(1000);
         private int _ReconnectTimeRemaining;
-        private ObservableCollection<OBSWebSocketLibrary.Models.TypeDefs.Scene> sceneList;
+        private readonly ObservableCollection<OBSWebSocketLibrary.Models.TypeDefs.Scene> sceneList = new ObservableCollection<OBSWebSocketLibrary.Models.TypeDefs.Scene>();
         private OBSWebSocketLibrary.Models.TypeDefs.Scene currentScene;
         private OBSWebSocketLibrary.Models.RequestReplies.GetSourceTypesList sourceTypes;
         private readonly Dictionary<string, object> obsSourceDictionary = new Dictionary<string, object>();
@@ -67,10 +67,15 @@ namespace StreamController
             };
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private async void Window_ContentRendered(object sender, EventArgs e)
         {
+            pulseCancellationToken = new CancellationTokenSource();
             UpdateUIConnectStatus(null, null, null);
             AudioInterfaceCollection.Instance.DeviceCollectionEnumerated += AudioDevicesEnumerated;
+            if (AudioInterfaceCollection.Instance.DevicesAreEnumerated)
+            {
+                AudioDevicesEnumerated(this, true);
+            }
             AudioInterfaceCollection.Instance.DefaultDeviceChange += DefaultAudioDeviceChanged;
             webSocket.SetExponentialBackoff(Preferences.Default.obs_reconnect_min_seconds, Preferences.Default.obs_reconnect_max_minutes);
             webSocket.StateChange += WebSocket_StateChange_ContextSwitch;
@@ -78,9 +83,26 @@ namespace StreamController
             webSocket.OnObsEvent += WebSocket_Event_ContextSwitch;
             webSocket.OnObsReply += Websocket_Reply_ContextSwitch;
             _ReconnectCountdownTimer.Elapsed += ReconnectCountdownTimer_Elapsed;
-            ObsWebsocketConnect();
+            await ObsWebsocketConnect().ConfigureAwait(true);
         }
 
+        private async void Window_Closed(object sender, EventArgs e)
+        {
+            AudioInterfaceCollection.Instance.DeviceCollectionEnumerated -= AudioDevicesEnumerated;
+            AudioInterfaceCollection.Instance.DefaultDeviceChange -= DefaultAudioDeviceChanged;
+            webSocket.StateChange -= WebSocket_StateChange_ContextSwitch;
+            webSocket.ErrorState -= WebSocket_Error_ContextSwitch;
+            webSocket.OnObsEvent -= WebSocket_Event_ContextSwitch;
+            webSocket.OnObsReply -= Websocket_Reply_ContextSwitch;
+            _ReconnectCountdownTimer.Elapsed -= ReconnectCountdownTimer_Elapsed;
+            webSocket.AutoReconnect = false;
+            await webSocket.DisconnectAsync(true).ConfigureAwait(true);
+            sceneList.Clear();
+            currentScene = null;
+            sourceTypes = null;
+            obsSourceDictionary.Clear();
+            obsSceneItemSceneDictionary.Clear();
+        }
         #endregion
 
         #region Audio interfaces
@@ -161,9 +183,9 @@ namespace StreamController
 
         #region obs-websocket
 
-        private async void ObsWebsocketConnect()
+        private async Task ObsWebsocketConnect()
         {
-            await webSocket.AutoReconnectConnectAsync().ConfigureAwait(false);
+            await webSocket.AutoReconnectConnectAsync().ConfigureAwait(true);
         }
 
         private void ReconnectCountdownTimer_Elapsed(object sender, ElapsedEventArgs e)
@@ -350,9 +372,10 @@ namespace StreamController
                     break;
                 case OBSWebSocketLibrary.Data.RequestType.GetSceneList:
                     ReadOnlyMemory<char> currentSceneName = (replyObject.MessageObject as OBSWebSocketLibrary.Models.RequestReplies.GetSceneList).CurrentScene.AsMemory();
-                    sceneList = new ObservableCollection<OBSWebSocketLibrary.Models.TypeDefs.Scene>((replyObject.MessageObject as OBSWebSocketLibrary.Models.RequestReplies.GetSceneList).Scenes);
-                    foreach (OBSWebSocketLibrary.Models.TypeDefs.Scene scene in sceneList)
+                    sceneList.Clear();
+                    foreach (OBSWebSocketLibrary.Models.TypeDefs.Scene scene in (replyObject.MessageObject as OBSWebSocketLibrary.Models.RequestReplies.GetSceneList).Scenes)
                     {
+                        sceneList.Add(scene);
                         await PopulateSceneItemSources(scene.Sources, scene).ConfigureAwait(true);
                     }
                     currentScene = sceneList.First(x => x.Name == currentSceneName.ToString());
@@ -775,8 +798,8 @@ namespace StreamController
 
                 // TODO: free unmanaged resources (unmanaged objects) and override finalizer
                 // TODO: set large fields to null
-                silentAudioEvent.Stop();
-                silentAudioEvent.Dispose();
+                silentAudioEvent?.Stop();
+                silentAudioEvent?.Dispose();
                 webSocket.Dispose();
                 disposedValue = true;
             }

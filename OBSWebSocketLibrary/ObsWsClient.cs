@@ -61,7 +61,11 @@ namespace OBSWebSocketLibrary
 
         private async void WebSocket_Connected(object sender, WebSocketState state)
         {
-            if (state != WebSocketState.Open) { return; }
+            if (state != WebSocketState.Open)
+            {
+                ReceiveTextMessage -= WebSocket_NewTextMessage;
+                return;
+            }
             sentMessageGuids.Clear();
             heartBeatCheck.Elapsed += HeartBeatTimer_Elapsed;
             ReceiveTextMessage += WebSocket_NewTextMessage;
@@ -80,6 +84,7 @@ namespace OBSWebSocketLibrary
 
         private void HeartBeatTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
+            heartBeatCheck.Elapsed -= HeartBeatTimer_Elapsed;
             heartBeatCheck.Stop();
             if (AutoReconnect)
             {
@@ -90,7 +95,7 @@ namespace OBSWebSocketLibrary
             else
             {
                 context.Send(
-                    async (x) => await DisconnectAsync().ConfigureAwait(false)
+                    async (x) => await DisconnectAsync(false).ConfigureAwait(false)
                 , null);
             }
         }

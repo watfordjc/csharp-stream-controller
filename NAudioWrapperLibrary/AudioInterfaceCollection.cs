@@ -27,6 +27,7 @@ namespace NAudioWrapperLibrary
         public AudioInterface DefaultRender { get; private set; }
         public AudioInterface DefaultCapture { get; private set; }
         public static ObservableCollection<AudioInterface> Devices { get; } = new ObservableCollection<AudioInterface>();
+        public bool DevicesAreEnumerated { get; private set; }
 
         private static readonly Lazy<AudioInterfaceCollection> lazySingleton =
             new Lazy<AudioInterfaceCollection>(
@@ -79,6 +80,7 @@ namespace NAudioWrapperLibrary
             }
             UpdateDefaultDevice(DataFlow.Render, _Enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console).ID);
             UpdateDefaultDevice(DataFlow.Capture, _Enumerator.GetDefaultAudioEndpoint(DataFlow.Capture, Role.Console).ID);
+            DevicesAreEnumerated = true;
             OnDeviceCollectionEnumerated(true);
         }
 

@@ -166,7 +166,7 @@ namespace WebSocketLibrary
                     }
                 }
             }
-            Debug.Assert(_Client.State == WebSocketState.Open);
+            Debug.Assert(_Client.State == WebSocketState.Open, $"AutoReconnectConnectAsync is about to say a connection is established, but _Client.State is {_Client.State}");
             return true;
         }
 
@@ -215,7 +215,7 @@ namespace WebSocketLibrary
         {
             if (cancelExisting)
             {
-                connectionCancellation.Cancel(true);
+                connectionCancellation?.Cancel(true);
             }
             if (_Client != null && _Client.State == WebSocketState.Open)
             {
@@ -342,7 +342,8 @@ namespace WebSocketLibrary
                     // There can be a long time between messages received... does it matter which thread picks up the next one?
                     Models.ReceivedMessage receivedMessage = await ReceiveMessageAsync().ConfigureAwait(false);
                     // There should currently only be three MessageType: Close, Text, and Binary.
-                    Debug.Assert(Enum.GetNames(typeof(WebSocketMessageType)).Length == 3);
+                    const int expectedMessageTypeCount = 3;
+                    Debug.Assert(Enum.GetNames(typeof(WebSocketMessageType)).Length == expectedMessageTypeCount, $"StartMessageReceiveLoop expected {expectedMessageTypeCount} MessageType, there are {Enum.GetNames(typeof(WebSocketMessageType)).Length}");
                     // Result is null if a connection issue occurred. MessageType==Close if server is closing connection.
                     if (receivedMessage.Result == null || receivedMessage.Result.MessageType == WebSocketMessageType.Close)
                     {
@@ -398,9 +399,9 @@ namespace WebSocketLibrary
 
                 // TODO: free unmanaged resources (unmanaged objects) and override finalizer
                 // TODO: set large fields to null
-                _Client.CloseAsync(WebSocketCloseStatus.Empty, null, CancellationToken.None).GetAwaiter().GetResult();
-                _Client.Abort();
-                _Client.Dispose();
+                _Client?.CloseAsync(WebSocketCloseStatus.Empty, null, CancellationToken.None).GetAwaiter().GetResult();
+                _Client?.Abort();
+                _Client?.Dispose();
                 disposedValue = true;
             }
         }
