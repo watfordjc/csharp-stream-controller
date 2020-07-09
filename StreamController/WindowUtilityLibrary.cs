@@ -10,7 +10,7 @@ using System.Security.Principal;
 using System.Text;
 using System.Windows;
 
-namespace StreamController
+namespace uk.JohnCook.dotnet.StreamController
 {
     /// <summary>
     /// A utility library for Window objects within the Application.

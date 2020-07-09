@@ -4,23 +4,23 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace OBSWebSocketLibrary.Models.RequestReplies
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequestReplies
 {
-    public class SetCurrentProfile : RequestReplyBase
+    public class SetCurrentProfileReply : ReplyBase
     {
     }
 
-    public class GetCurrentProfile : RequestReplyBase
+    public class GetCurrentProfileReply : ReplyBase
     {
         [JsonPropertyName("profile-name")]
         public string ProfileName { get; set; }
     }
 
-    public class ListProfiles : RequestReplyBase
+    public class ListProfilesReply : ReplyBase
     {
         [JsonPropertyName("profiles")]
 #pragma warning disable CA2227 // Collection properties should be read only
-        public IList<OBSWebSocketLibrary.Models.TypeDefs.ObsProfile> Profiles { get; set; }
+        public IList<TypeDefs.ObsWsProfile> Profiles { get; set; }
 #pragma warning restore CA2227 // Collection properties should be read only
     }
 }

@@ -9,7 +9,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace StreamController.SharedModels
+namespace uk.JohnCook.dotnet.StreamController.SharedModels
 {
     public class AudioInterface : INotifyPropertyChanged
     {

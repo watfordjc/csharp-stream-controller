@@ -3,22 +3,22 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace OBSWebSocketLibrary.Models.RequestReplies
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequestReplies
 {
-    public class GetSceneItemProperties : RequestReplyBase
+    public class GetSceneItemPropertiesReply : ReplyBase
     {
         [JsonPropertyName("name")]
         public string Name { get; set; }
         [JsonPropertyName("itemId")]
         public int ItemId { get; set; }
         [JsonPropertyName("position")]
-        public TypeDefs.PositionProperties Position { get; set; }
+        public TypeDefs.ObsWsPositionProperties Position { get; set; }
         [JsonPropertyName("rotation")]
         public double Rotation { get; set; }
         [JsonPropertyName("scale")]
-        public TypeDefs.Coordinates Scale { get; set; }
+        public TypeDefs.ObsWsCoordinates Scale { get; set; }
         [JsonPropertyName("crop")]
-        public TypeDefs.Directions Crop { get; set; }
+        public TypeDefs.ObsWsDirections Crop { get; set; }
         [JsonPropertyName("visible")]
         public bool Visible { get; set; }
         [JsonPropertyName("muted")]
@@ -26,7 +26,7 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         [JsonPropertyName("locked")]
         public bool Locked { get; set; }
         [JsonPropertyName("bounds")]
-        public TypeDefs.BoundsProperties Bounds { get; set; }
+        public TypeDefs.ObsWsBoundsProperties Bounds { get; set; }
         [JsonPropertyName("sourceWidth")]
         public int SourceWidth { get; set; }
         [JsonPropertyName("sourceHeight")]
@@ -41,43 +41,43 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         public string ParentGroupName { get; set; }
         [JsonPropertyName("groupChildren")]
 #pragma warning disable CA2227 // Collection properties should be read only
-        public IList<TypeDefs.SceneItemTransform> GroupChildren { get; set; }
+        public IList<TypeDefs.ObsSceneItemTransform> GroupChildren { get; set; }
 #pragma warning restore CA2227 // Collection properties should be read only
     }
 
-    public class SetSceneItemProperties : RequestReplyBase
+    public class SetSceneItemPropertiesReply : ReplyBase
     {
     }
 
-    public class ResetSceneItem : RequestReplyBase
+    public class ResetSceneItemReply : ReplyBase
     {
     }
 
-    public class SetSceneItemRender : RequestReplyBase
+    public class SetSceneItemRenderReply : ReplyBase
     {
     }
 
-    public class SetSceneItemPosition : RequestReplyBase
+    public class SetSceneItemPositionReply : ReplyBase
     {
     }
 
-    public class SetSceneItemTransform : RequestReplyBase
+    public class SetSceneItemTransformReply : ReplyBase
     {
     }
 
-    public class SetSceneItemCrop : RequestReplyBase
+    public class SetSceneItemCropReply : ReplyBase
     {
     }
 
-    public class DeleteSceneItem : RequestReplyBase
+    public class DeleteSceneItemReply : ReplyBase
     {
     }
 
-    public class DuplicateSceneItem : RequestReplyBase
+    public class DuplicateSceneItemReply : ReplyBase
     {
         [JsonPropertyName("scene")]
         public string Scene { get; set; }
         [JsonPropertyName("item")]
-        public TypeDefs.ItemObject Item { get; set; }
+        public TypeDefs.ObsWsItemObject Item { get; set; }
     }
 }

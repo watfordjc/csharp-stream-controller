@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace OBSWebSocketLibrary.Models.Requests
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequests
 {
-    public class SetCurrentSceneCollection : RequestBase
+    public class SetCurrentSceneCollectionRequest : RequestBase
     {
         [JsonPropertyName("sc-name")]
         public string ScName { get; set; }
     }
 
-    public class GetCurrentSceneCollection : RequestBase
+    public class GetCurrentSceneCollectionRequest : RequestBase
     {
     }
 
-    public class ListSceneCollections : RequestBase
+    public class ListSceneCollectionsRequest : RequestBase
     {
     }
 }

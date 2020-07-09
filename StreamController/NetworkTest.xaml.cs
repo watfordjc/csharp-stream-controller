@@ -9,9 +9,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using NetworkingWrapperLibrary;
+using uk.JohnCook.dotnet.NetworkingWrapperLibrary;
 
-namespace StreamController
+namespace uk.JohnCook.dotnet.StreamController
 {
     /// <summary>
     /// Interaction logic for NetworkTest.xaml

@@ -1,36 +1,36 @@
-﻿using OBSWebSocketLibrary.Models.TypeDefs;
+﻿using uk.JohnCook.dotnet.OBSWebSocketLibrary.TypeDefs;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace OBSWebSocketLibrary.Models.Requests
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequests
 {
-    public class SetCurrentScene : RequestBase
+    public class SetCurrentSceneRequest : RequestBase
     {
         [JsonPropertyName("scene-name")]
         public string SceneName { get; set; }
     }
 
-    public class GetCurrentScene : RequestBase
+    public class GetCurrentSceneRequest : RequestBase
     {
     }
 
-    public class GetSceneList : RequestBase
+    public class GetSceneListRequest : RequestBase
     {
     }
 
-    public class ReorderSceneItems : RequestBase
+    public class ReorderSceneItemsRequest : RequestBase
     {
         [JsonPropertyName("scene")]
         public string Scene { get; set; }
         [JsonPropertyName("items")]
 #pragma warning disable CA2227 // Collection properties should be read only
-        public IList<TypeDefs.ItemObject> Items { get; set; }
+        public IList<TypeDefs.ObsWsItemObject> Items { get; set; }
 #pragma warning restore CA2227 // Collection properties should be read only
     }
 
-    public class SetSceneTransitionOverride : RequestBase
+    public class SetSceneTransitionOverrideRequest : RequestBase
     {
         [JsonPropertyName("sceneName")]
         public string SceneName { get; set; }
@@ -40,13 +40,13 @@ namespace OBSWebSocketLibrary.Models.Requests
         public int TransitionDuration { get; set; }
     }
 
-    public class RemoveSceneTransitionOverride : RequestBase
+    public class RemoveSceneTransitionOverrideRequest : RequestBase
     {
         [JsonPropertyName("sceneName")]
         public string SceneName { get; set; }
     }
 
-    public class GetSceneTransitionOverride : RequestBase
+    public class GetSceneTransitionOverrideRequest : RequestBase
     {
         [JsonPropertyName("sceneName")]
         public string SceneName { get; set; }

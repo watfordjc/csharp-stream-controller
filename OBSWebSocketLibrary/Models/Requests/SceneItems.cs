@@ -4,9 +4,9 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace OBSWebSocketLibrary.Models.Requests
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequests
 {
-    public class GetSceneItemProperties : RequestBase
+    public class GetSceneItemPropertiesRequest : RequestBase
     {
         [JsonPropertyName("scene-name")]
         public string SceneName { get; set; }
@@ -14,41 +14,41 @@ namespace OBSWebSocketLibrary.Models.Requests
         public object Item { get; set; }
     }
 
-    public class SetSceneItemProperties : RequestBase
+    public class SetSceneItemPropertiesRequest : RequestBase
     {
         [JsonPropertyName("scene-name")]
         public string SceneName { get; set; }
         [JsonPropertyName("item")]
         public string Item { get; set; }
         [JsonPropertyName("item")]
-        public TypeDefs.ItemObject ItemObj { get; set; }
+        public TypeDefs.ObsWsItemObject ItemObj { get; set; }
         [JsonPropertyName("position")]
-        public TypeDefs.PositionProperties Position { get; set; }
+        public TypeDefs.ObsWsPositionProperties Position { get; set; }
         [JsonPropertyName("rotation")]
         public double Rotation { get; set; }
         [JsonPropertyName("scale")]
-        public TypeDefs.Coordinates Scale { get; set; }
+        public TypeDefs.ObsWsCoordinates Scale { get; set; }
         [JsonPropertyName("crop")]
-        public TypeDefs.Directions Crop { get; set; }
+        public TypeDefs.ObsWsDirections Crop { get; set; }
         [JsonPropertyName("visible")]
         public bool Visible { get; set; }
         [JsonPropertyName("locked")]
         public bool Locked { get; set; }
         [JsonPropertyName("bounds")]
-        public TypeDefs.BoundsProperties Bounds { get; set; }
+        public TypeDefs.ObsWsBoundsProperties Bounds { get; set; }
     }
 
-    public class ResetSceneItem : RequestBase
+    public class ResetSceneItemRequest : RequestBase
     {
         [JsonPropertyName("scene-name")]
         public string SceneName { get; set; }
         [JsonPropertyName("item")]
         public string Item { get; set; }
         [JsonPropertyName("item")]
-        public TypeDefs.ItemObject ItemObj { get; set; }
+        public TypeDefs.ObsWsItemObject ItemObj { get; set; }
     }
 
-    public class SetSceneItemRender : RequestBase
+    public class SetSceneItemRenderRequest : RequestBase
     {
         [JsonPropertyName("scene-name")]
         public string SceneName { get; set; }
@@ -58,7 +58,7 @@ namespace OBSWebSocketLibrary.Models.Requests
         public bool Render { get; set; }
     }
 
-    public class SetSceneItemPosition : RequestBase
+    public class SetSceneItemPositionRequest : RequestBase
     {
         [JsonPropertyName("scene-name")]
         public string SceneName { get; set; }
@@ -70,7 +70,7 @@ namespace OBSWebSocketLibrary.Models.Requests
         public double Y { get; set; }
     }
 
-    public class SetSceneItemTransform : RequestBase
+    public class SetSceneItemTransformRequest : RequestBase
     {
         [JsonPropertyName("scene-name")]
         public string SceneName { get; set; }
@@ -84,7 +84,7 @@ namespace OBSWebSocketLibrary.Models.Requests
         public double Rotation { get; set; }
     }
 
-    public class SetSceneItemCrop : RequestBase
+    public class SetSceneItemCropRequest : RequestBase
     {
         [JsonPropertyName("scene-name")]
         public string SceneName { get; set; }
@@ -100,21 +100,21 @@ namespace OBSWebSocketLibrary.Models.Requests
         public int Right { get; set; }
     }
 
-    public class DeleteSceneItem : RequestBase
+    public class DeleteSceneItemRequest : RequestBase
     {
         [JsonPropertyName("scene")]
         public string Scene { get; set; }
         [JsonPropertyName("item")]
-        public TypeDefs.ItemObject ItemObj { get; set; }
+        public TypeDefs.ObsWsItemObject ItemObj { get; set; }
     }
 
-    public class DuplicateSceneItem : RequestBase
+    public class DuplicateSceneItemRequest : RequestBase
     {
         [JsonPropertyName("fromScene")]
         public string FromScene { get; set; }
         [JsonPropertyName("toScene")]
         public string ToScene { get; set; }
         [JsonPropertyName("item")]
-        public TypeDefs.ItemObject ItemObj { get; set; }
+        public TypeDefs.ObsWsItemObject ItemObj { get; set; }
     }
 }

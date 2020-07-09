@@ -3,37 +3,37 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace OBSWebSocketLibrary.Models.Requests
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequests
 {
-    public class GetStudioModeStatus : RequestBase
+    public class GetStudioModeStatusRequest : RequestBase
     {
     }
 
-    public class GetPreviewScene : RequestBase
+    public class GetPreviewSceneRequest : RequestBase
     {
     }
 
-    public class SetPreviewScene : RequestBase
+    public class SetPreviewSceneRequest : RequestBase
     {
         [JsonPropertyName("scene-name")]
         public string SceneName { get; set; }
     }
 
-    public class TransitionToProgram : RequestBase
+    public class TransitionToProgramRequest : RequestBase
     {
         [JsonPropertyName("with-transition")]
-        public TypeDefs.ObsRequestTransition WithTransition { get; set; }
+        public TypeDefs.ObsWsRequestTransition WithTransition { get; set; }
     }
 
-    public class EnableStudioMode : RequestBase
+    public class EnableStudioModeRequest : RequestBase
     {
     }
 
-    public class DisableStudioMode : RequestBase
+    public class DisableStudioModeRequest : RequestBase
     {
     }
 
-    public class ToggleStudioMode : RequestBase
+    public class ToggleStudioModeRequest : RequestBase
     {
     }
 }

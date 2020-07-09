@@ -3,25 +3,25 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace OBSWebSocketLibrary.Models.Events
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsEvents
 {
-    public class SwitchTransition : EventBase
+    public class SwitchTransitionObsEvent : EventBase
     {
         [JsonPropertyName("transition-name")]
         public string TransitionName { get; set; }
     }
 
-    public class TransitionListChanged : EventBase
+    public class TransitionListChangedObsEvent : EventBase
     {
     }
 
-    public class TransitionDurationChanged : EventBase
+    public class TransitionDurationChangedObsEvent : EventBase
     {
         [JsonPropertyName("new-duration")]
         public int NewDuration { get; set; }
     }
 
-    public class TransitionBegin : EventBase
+    public class TransitionBeginObsEvent : EventBase
     {
         [JsonPropertyName("name")]
         public string Name { get; set; }
@@ -35,7 +35,7 @@ namespace OBSWebSocketLibrary.Models.Events
         public string ToScene { get; set; }
     }
 
-    public class TransitionEnd : EventBase
+    public class TransitionEndObsEvent : EventBase
     {
         [JsonPropertyName("name")]
         public string Name { get; set; }
@@ -47,7 +47,7 @@ namespace OBSWebSocketLibrary.Models.Events
         public string ToScene { get; set; }
     }
 
-    public class TransitionVideoEnd : EventBase
+    public class TransitionVideoEndObsEvent : EventBase
     {
         [JsonPropertyName("name")]
         public string Name { get; set; }

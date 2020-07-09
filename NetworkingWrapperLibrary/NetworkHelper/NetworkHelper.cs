@@ -5,7 +5,7 @@
 using System;
 using Windows.Networking.Connectivity;
 
-namespace NetworkingWrapperLibrary
+namespace uk.JohnCook.dotnet.NetworkingWrapperLibrary
 {
     /// <summary>
     /// This class exposes functionality of NetworkInformation through a singleton.

@@ -2,21 +2,21 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace OBSWebSocketLibrary.Models.RequestReplies
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequestReplies
 {
-    public class StartStopReplayBuffer : RequestReplyBase
+    public class StartStopReplayBufferReply : ReplyBase
     {
     }
 
-    public class StartReplayBuffer : RequestReplyBase
+    public class StartReplayBufferReply : ReplyBase
     {
     }
 
-    public class StopReplayBuffer : RequestReplyBase
+    public class StopReplayBufferReply : ReplyBase
     {
     }
 
-    public class SaveReplayBuffer : RequestReplyBase
+    public class SaveReplayBufferReply : ReplyBase
     {
     }
 }

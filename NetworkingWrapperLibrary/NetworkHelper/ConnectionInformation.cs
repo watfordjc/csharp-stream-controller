@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.Networking.Connectivity;
 
-namespace NetworkingWrapperLibrary
+namespace uk.JohnCook.dotnet.NetworkingWrapperLibrary
 {
     /// <summary>
     /// This class exposes information about the network connectivity.

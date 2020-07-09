@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.TypeDefs
 {
     public class ImageSource : BaseType
     {
@@ -31,7 +31,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
     {
         [JsonPropertyName("files")]
 #pragma warning disable CA2227 // Collection properties should be read only
-        public IList<ObsFile> Files { get; set; }
+        public IList<ObsWsFile> Files { get; set; }
 #pragma warning restore CA2227 // Collection properties should be read only
         [JsonPropertyName("playback_behavior")]
         public string PlaybackBehavior { get; set; }
@@ -94,7 +94,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         [JsonPropertyName("file")]
         public string File { get; set; }
         [JsonPropertyName("font")]
-        public TypeDefs.Font Font { get; set; }
+        public TypeDefs.ObsWsFont Font { get; set; }
         [JsonPropertyName("outline")]
         public bool Outline { get; set; }
         [JsonPropertyName("gradient")]
@@ -175,7 +175,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         public string PlaybackBehavior { get; set; }
         [JsonPropertyName("playlist")]
 #pragma warning disable CA2227 // Collection properties should be read only
-        public IList<VlcPlaylistItem> Playlist { get; set; }
+        public IList<ObsWsVlcPlaylistItem> Playlist { get; set; }
 #pragma warning restore CA2227 // Collection properties should be read only
         [JsonPropertyName("shuffle")]
         public bool Shuffle { get; set; }

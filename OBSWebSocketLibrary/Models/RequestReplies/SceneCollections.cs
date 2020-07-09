@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace OBSWebSocketLibrary.Models.RequestReplies
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequestReplies
 {
-    public class SetCurrentSceneCollection : RequestReplyBase
+    public class SetCurrentSceneCollectionReply : ReplyBase
     {
     }
 
-    public class GetCurrentSceneCollection : RequestReplyBase
+    public class GetCurrentSceneCollectionReply : ReplyBase
     {
         [JsonPropertyName("sc-name")]
         public string ScName { get; set; }
     }
 
-    public class ListSceneCollections : RequestReplyBase
+    public class ListSceneCollectionsReply : ReplyBase
     {
         [JsonPropertyName("scene-collections")]
 #pragma warning disable CA2227 // Collection properties should be read only

@@ -3,27 +3,27 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace OBSWebSocketLibrary.Models.Events
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsEvents
 {
-    public class SwitchScenes : EventBase
+    public class SwitchScenesObsEvent : EventBase
     {
         [JsonPropertyName("scene-name")]
         public string SceneName { get; set; }
         [JsonPropertyName("sources")]
 #pragma warning disable CA2227 // Collection properties should be read only
-        public IList<TypeDefs.SceneItem> Sources { get; set; }
+        public IList<TypeDefs.ObsWsSceneItem> Sources { get; set; }
 #pragma warning restore CA2227 // Collection properties should be read only
     }
 
-    public class ScenesChanged : EventBase
+    public class ScenesChangedObsEvent : EventBase
     {
     }
 
-    public class SceneCollectionChanged : EventBase
+    public class SceneCollectionChangedObsEvent : EventBase
     {
     }
 
-    public class SceneCollectionListChanged : EventBase
+    public class SceneCollectionListChangedObsEvent : EventBase
     {
     }
 }

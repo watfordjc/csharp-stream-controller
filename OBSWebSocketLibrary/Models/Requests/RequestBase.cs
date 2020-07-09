@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace OBSWebSocketLibrary.Models.Requests
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequests
 {
     public abstract class RequestBase
     {
@@ -14,8 +14,20 @@ namespace OBSWebSocketLibrary.Models.Requests
         [JsonPropertyName("message-id")]
         public Guid MessageId { get { return _guid; } }
         [JsonPropertyName("request-type")]
-        public string RequestTypeName { get { return GetType().Name; } }
+        public string RequestTypeName
+        {
+            get
+            {
+                return Data.ObsWsRequest.GetRequestEnum(GetType()).ToString();
+            }
+        }
         [JsonIgnoreAttribute]
-        public Data.RequestType RequestType { get { return Data.Request.GetRequestEnum(GetType()); } }
+        public Data.ObsRequestType RequestType
+        {
+            get
+            {
+                return Data.ObsWsRequest.GetRequestEnum(GetType());
+            }
+        }
     }
 }

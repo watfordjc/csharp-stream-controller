@@ -4,45 +4,45 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace OBSWebSocketLibrary.Models.Requests
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequests
 {
-    public class GetStreamingStatus : RequestBase
+    public class GetStreamingStatusRequest : RequestBase
     {
     }
 
-    public class StartStopStreaming : RequestBase
+    public class StartStopStreamingRequest : RequestBase
     {
     }
 
-    public class StartStreaming : RequestBase
+    public class StartStreamingRequest : RequestBase
     {
         [JsonPropertyName("stream")]
-        public TypeDefs.ObsStream Stream { get; set; }
+        public TypeDefs.ObsWsStream Stream { get; set; }
     }
 
-    public class StopStreaming : RequestBase
+    public class StopStreamingRequest : RequestBase
     {
     }
 
-    public class SetStreamSettings : RequestBase
+    public class SetStreamSettingsRequest : RequestBase
     {
         [JsonPropertyName("type")]
         public string Type { get; set; }
         [JsonPropertyName("settings")]
-        public TypeDefs.ObsStreamSettings Settings { get; set; }
+        public TypeDefs.ObsWsStreamSettings Settings { get; set; }
         [JsonPropertyName("save")]
         public bool Save { get; set; }
     }
 
-    public class GetStreamSettings : RequestBase
+    public class GetStreamSettingsRequest : RequestBase
     {
     }
 
-    public class SaveStreamSettings : RequestBase
+    public class SaveStreamSettingsRequest : RequestBase
     {
     }
 
-    public class SendCaptions : RequestBase
+    public class SendCaptionsRequest : RequestBase
     {
         [JsonPropertyName("text")]
         public string Text { get; set; }

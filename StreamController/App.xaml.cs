@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace StreamController
+namespace uk.JohnCook.dotnet.StreamController
 {
     /// <summary>
     /// Interaction logic for App.xaml

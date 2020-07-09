@@ -4,9 +4,9 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace OBSWebSocketLibrary.Models.Events
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsEvents
 {
-    public class SourceCreated : EventBase
+    public class SourceCreatedObsEvent : EventBase
     {
         [JsonPropertyName("sourceName")]
         public string SourceName { get; set; }
@@ -19,7 +19,7 @@ namespace OBSWebSocketLibrary.Models.Events
         public object SourceSettingsObj { get; set; }
     }
 
-    public class SourceDestroyed : EventBase
+    public class SourceDestroyedObsEvent : EventBase
     {
         [JsonPropertyName("sourceName")]
         public string SourceName { get; set; }
@@ -29,7 +29,7 @@ namespace OBSWebSocketLibrary.Models.Events
         public string SourceKind { get; set; }
     }
 
-    public class SourceVolumeChanged : EventBase
+    public class SourceVolumeChangedObsEvent : EventBase
     {
         [JsonPropertyName("sourceName")]
         public string SourceName { get; set; }
@@ -37,7 +37,7 @@ namespace OBSWebSocketLibrary.Models.Events
         public float Volume { get; set; }
     }
 
-    public class SourceMuteStateChanged : EventBase
+    public class SourceMuteStateChangedObsEvent : EventBase
     {
         [JsonPropertyName("sourceName")]
         public string SourceName { get; set; }
@@ -45,7 +45,7 @@ namespace OBSWebSocketLibrary.Models.Events
         public bool Muted { get; set; }
     }
 
-    public class SourceAudioSyncOffsetChanged : EventBase
+    public class SourceAudioSyncOffsetChangedObsEvent : EventBase
     {
         [JsonPropertyName("sourceName")]
         public string SourceName { get; set; }
@@ -53,18 +53,18 @@ namespace OBSWebSocketLibrary.Models.Events
         public int SyncOffset { get; set; }
     }
 
-    public class SourceAudioMixersChanged : EventBase
+    public class SourceAudioMixersChangedObsEvent : EventBase
     {
         [JsonPropertyName("sourceName")]
         public string SourceName { get; set; }
         [JsonPropertyName("mixers")]
 #pragma warning disable CA2227 // Collection properties should be read only
-        public IList<TypeDefs.ObsMixer> Mixers { get; set; }
+        public IList<TypeDefs.ObsWsMixer> Mixers { get; set; }
 #pragma warning restore CA2227 // Collection properties should be read only
         [JsonPropertyName("hexMixersValue")]
         public string HexMixersValue { get; set; }
     }
-    public class SourceRenamed : EventBase
+    public class SourceRenamedObsEvent : EventBase
     {
         [JsonPropertyName("previousName")]
         public string PreviousName { get; set; }
@@ -74,7 +74,7 @@ namespace OBSWebSocketLibrary.Models.Events
         public string SourceType { get; set; }
     }
 
-    public class SourceFilterAdded : EventBase
+    public class SourceFilterAddedObsEvent : EventBase
     {
         [JsonPropertyName("sourceName")]
         public string SourceName { get; set; }
@@ -87,7 +87,7 @@ namespace OBSWebSocketLibrary.Models.Events
         public object FilterSettingsObj { get; set; }
     }
 
-    public class SourceFilterRemoved : EventBase
+    public class SourceFilterRemovedObsEvent : EventBase
     {
         [JsonPropertyName("sourceName")]
         public string SourceName { get; set; }
@@ -97,7 +97,7 @@ namespace OBSWebSocketLibrary.Models.Events
         public string FilterType { get; set; }
     }
 
-    public class SourceFilterVisibilityChanged : EventBase
+    public class SourceFilterVisibilityChangedObsEvent : EventBase
     {
         [JsonPropertyName("sourceName")]
         public string SourceName { get; set; }
@@ -107,13 +107,13 @@ namespace OBSWebSocketLibrary.Models.Events
         public bool FilterEnabled { get; set; }
     }
 
-    public class SourceFiltersReordered : EventBase
+    public class SourceFiltersReorderedObsEvent : EventBase
     {
         [JsonPropertyName("sourceName")]
         public string SourceName { get; set; }
         [JsonPropertyName("filters")]
 #pragma warning disable CA2227 // Collection properties should be read only
-        public IList<TypeDefs.ObsFilter> Filters { get; set; }
+        public IList<TypeDefs.ObsWsFilter> Filters { get; set; }
 #pragma warning restore CA2227 // Collection properties should be read only
     }
 }

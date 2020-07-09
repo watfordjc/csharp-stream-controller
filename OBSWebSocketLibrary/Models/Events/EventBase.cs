@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace OBSWebSocketLibrary.Models.Events
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsEvents
 {
     public abstract class EventBase
     {

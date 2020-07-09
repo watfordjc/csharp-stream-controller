@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace OBSWebSocketLibrary.Models.RequestReplies
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequestReplies
 {
-    public class ObsError : RequestReplyBase
+    public class ObsError : ReplyBase
     {
     }
 }

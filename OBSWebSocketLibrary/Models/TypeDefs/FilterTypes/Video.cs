@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace OBSWebSocketLibrary.Models.TypeDefs.FilterTypes
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.TypeDefs
 {
 
     public class MaskFilter : BaseFilter

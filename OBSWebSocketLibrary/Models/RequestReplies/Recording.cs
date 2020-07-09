@@ -3,33 +3,33 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace OBSWebSocketLibrary.Models.RequestReplies
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequestReplies
 {
-    public class StartStopRecording : RequestReplyBase
+    public class StartStopRecordingReply : ReplyBase
     {
     }
 
-    public class StartRecording : RequestReplyBase
+    public class StartRecordingReply : ReplyBase
     {
     }
 
-    public class StopRecording : RequestReplyBase
+    public class StopRecordingReply : ReplyBase
     {
     }
 
-    public class PauseRecording : RequestReplyBase
+    public class PauseRecordingReply : ReplyBase
     {
     }
 
-    public class ResumeRecording : RequestReplyBase
+    public class ResumeRecordingReply : ReplyBase
     {
     }
 
-    public class SetRecordingFolder : RequestReplyBase
+    public class SetRecordingFolderReply : ReplyBase
     {
     }
 
-    public class GetRecordingFolder : RequestReplyBase
+    public class GetRecordingFolderReply : ReplyBase
     {
         [JsonPropertyName("rec-folder")]
         public string RecFolder { get; set; }

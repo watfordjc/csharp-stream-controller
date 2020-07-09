@@ -4,41 +4,41 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace OBSWebSocketLibrary.Models.Requests
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequests
 {
-    public class GetVersion : RequestBase
+    public class GetVersionRequest : RequestBase
     {
     }
 
-    public class GetAuthRequired : RequestBase
+    public class GetAuthRequiredRequest : RequestBase
     {
     }
 
-    public class Authenticate : RequestBase
+    public class AuthenticateRequest : RequestBase
     {
         [JsonPropertyName("auth")]
         public string Auth { get; set; }
     }
 
-    public class SetHeartbeat : RequestBase
+    public class SetHeartbeatRequest : RequestBase
     {
         [JsonPropertyName("enable")]
         public bool Enable { get; set; }
     }
 
-    public class SetFilenameFormatting : RequestBase
+    public class SetFilenameFormattingRequest : RequestBase
     {
     }
 
-    public class GetFilenameFormatting : RequestBase
+    public class GetFilenameFormattingRequest : RequestBase
     {
     }
 
-    public class GetStats : RequestBase
+    public class GetStatsRequest : RequestBase
     {
     }
 
-    public class BroadcastCustomMessage : RequestBase
+    public class BroadcastCustomMessageRequest : RequestBase
     {
         [JsonPropertyName("realm")]
         public string Realm { get; set; }
@@ -46,11 +46,11 @@ namespace OBSWebSocketLibrary.Models.Requests
         public object Data { get; set; }
     }
 
-    public class GetVideoInfo : RequestBase
+    public class GetVideoInfoRequest : RequestBase
     {
     }
 
-    public class OpenProjector : RequestBase
+    public class OpenProjectorRequest : RequestBase
     {
         [JsonPropertyName("type")]
         public string Type { get; set; }

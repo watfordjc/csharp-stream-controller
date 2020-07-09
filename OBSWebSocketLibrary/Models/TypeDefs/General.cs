@@ -4,9 +4,9 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace OBSWebSocketLibrary.Models.TypeDefs
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.TypeDefs
 {
-    public class Coordinates
+    public class ObsWsCoordinates
     {
         [JsonPropertyName("x")]
         public Decimal X { get; set; }
@@ -14,13 +14,13 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         public Decimal Y { get; set; }
     }
 
-    public class PositionProperties : Coordinates
+    public class ObsWsPositionProperties : ObsWsCoordinates
     {
         [JsonPropertyName("alignment")]
         public int Alignment { get; set; }
     }
 
-    public class BoundsProperties : Coordinates
+    public class ObsWsBoundsProperties : ObsWsCoordinates
     {
         [JsonPropertyName("type")]
         public string Type { get; set; }
@@ -28,7 +28,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         public int Alignment { get; set; }
     }
 
-    public class Directions
+    public class ObsWsDirections
     {
         [JsonPropertyName("top")]
         public int Top { get; set; }
@@ -40,7 +40,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         public int Left { get; set; }
     }
 
-    public class Font
+    public class ObsWsFont
     {
         [JsonPropertyName("face")]
         public string FontFace { get; set; }
@@ -52,7 +52,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         public string FontStyle { get; set; }
     }
 
-    public class ItemObject
+    public class ObsWsItemObject
     {
         [JsonPropertyName("name")]
         public string Name { get; set; }
@@ -60,23 +60,23 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         public int Id { get; set; }
     }
 
-    public class ObsProfile
+    public class ObsWsProfile
     {
         [JsonPropertyName("profile-name")]
         public string Name { get; set; }
     }
 
-    public class ObsStream
+    public class ObsWsStream
     {
         [JsonPropertyName("type")]
         public string Type { get; set; }
         [JsonPropertyName("metadata")]
         public object Metadata { get; set; }
         [JsonPropertyName("settings")]
-        public ObsStreamSettings Settings { get; set; }
+        public ObsWsStreamSettings Settings { get; set; }
     }
 
-    public class ObsStreamSettings
+    public class ObsWsStreamSettings
     {
         [JsonPropertyName("server")]
         public string Server { get; set; }
@@ -90,7 +90,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         public string Password { get; set; }
     }
 
-    public class ObsMixer
+    public class ObsWsMixer
     {
         [JsonPropertyName("id")]
         public int Id { get; set; }
@@ -101,28 +101,28 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
     public class ObsRequestMetadata
     {
         public Guid RequestGuid { get; set; }
-        public Data.RequestType OriginalRequestType { get; set; }
+        public Data.ObsRequestType OriginalRequestType { get; set; }
         public object OriginalRequestData { get; set; }
     }
 
-    public class ObsReply
+    public class ObsReplyObject
     {
         public Guid MessageId { get; set; }
-        public Data.RequestType RequestType { get; set; }
-        public Data.SourceType SourceType { get; set; }
+        public Data.ObsRequestType RequestType { get; set; }
+        public Data.ObsSourceType SourceType { get; set; }
         public object MessageObject { get; set; }
         public string Status { get; set; }
         public ObsRequestMetadata RequestMetadata { get; set; }
     }
 
-    public class ObsEvent
+    public class ObsEventObject
     {
-        public Data.EventType EventType { get; set; }
-        public Data.SourceType SourceType { get; set; }
+        public Data.ObsEventType EventType { get; set; }
+        public Data.ObsSourceType SourceType { get; set; }
         public object MessageObject { get; set; }
     }
 
-    public class ObsFilter
+    public class ObsWsFilter
     {
         [JsonPropertyName("name")]
         public string Name { get; set; }
@@ -130,7 +130,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         public string Type { get; set; }
     }
 
-    public class ObsReplyFilter
+    public class ObsWsReplyFilter
     {
         [JsonPropertyName("enabled")]
         public bool Enabled { get; set; }
@@ -143,7 +143,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         public object SettingsObj { get; set; }
     }
 
-    public class ObsReplyType
+    public class ObsWsReplyType
     {
         [JsonPropertyName("typeId")]
         public string TypeId { get; set; }
@@ -156,10 +156,10 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         [JsonIgnore]
         public object DefaultSettingsObj { get; set; }
         [JsonPropertyName("caps")]
-        public ObsTypeCapabilities Caps { get; set; }
+        public ObsWsTypeCapabilities Caps { get; set; }
     }
 
-    public class ObsTypeCapabilities
+    public class ObsWsTypeCapabilities
     {
         [JsonPropertyName("isAsync")]
         public bool IsAsync { get; set; }
@@ -177,7 +177,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         public bool DoNotSelfMonitor { get; set; }
     }
 
-    public class ObsOutputFlags
+    public class ObsWsOutputFlags
     {
         [JsonPropertyName("rawValue")]
         public int RawValue { get; set; }
@@ -193,7 +193,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         public bool Service { get; set; }
     }
 
-    public class ObsOutputSettings
+    public class ObsWsOutputSettings
     {
         [JsonPropertyName("active")]
         public bool Active { get; set; }
@@ -203,7 +203,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         public double Congestion { get; set; }
     }
 
-    public class ObsReplySource
+    public class ObsWsReplySource
     {
         [JsonPropertyName("name")]
         public string Name { get; set; }
@@ -213,12 +213,12 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         public string Type { get; set; }
     }
 
-    public class ObsSceneItem
+    public class ObsWsSceneItem
     {
         [JsonPropertyName("align")]
         public int Align { get; set; }
         [JsonPropertyName("bounds")]
-        public TypeDefs.Coordinates Bounds { get; set; }
+        public TypeDefs.ObsWsCoordinates Bounds { get; set; }
         [JsonPropertyName("bounds_align")]
         public int BoundsAlign { get; set; }
         [JsonPropertyName("bounds_type")]
@@ -240,20 +240,20 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         [JsonPropertyName("name")]
         public string Name { get; set; }
         [JsonPropertyName("pos")]
-        public TypeDefs.Coordinates Pos { get; set; }
+        public TypeDefs.ObsWsCoordinates Pos { get; set; }
         [JsonPropertyName("private_settings")]
         public JsonElement PrivateSettings { get; set; }
         [JsonPropertyName("rot")]
         public Decimal Rot { get; set; }
         [JsonPropertyName("scale")]
-        public TypeDefs.Coordinates Scale { get; set; }
+        public TypeDefs.ObsWsCoordinates Scale { get; set; }
         [JsonPropertyName("scale_filter")]
         public string ScaleFilter { get; set; }
         [JsonPropertyName("visible")]
         public bool Visible { get; set; }
     }
 
-    public class ObsEventSceneItem
+    public class ObsWsEventSceneItem
     {
         [JsonPropertyName("source-name")]
         public string SourceName { get; set; }
@@ -261,13 +261,13 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         public int ItemId { get; set; }
     }
 
-    public class ObsTransitionName
+    public class ObsWsTransitionName
     {
         [JsonPropertyName("name")]
         public string Name { get; set; }
     }
 
-    public class ObsRequestTransition
+    public class ObsWsRequestTransition
     {
         [JsonPropertyName("name")]
         public string Name { get; set; }
@@ -275,7 +275,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         public int Duration { get; set; }
     }
 
-    public class ObsFile
+    public class ObsWsFile
     {
         [JsonPropertyName("hidden")]
         public bool Hidden { get; set; }
@@ -285,7 +285,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         public string Value { get; set; }
     }
 
-    public class VlcPlaylistItem
+    public class ObsWsVlcPlaylistItem
     {
         [JsonPropertyName("hidden")]
         public bool Hidden { get; set; }

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace OBSWebSocketLibrary.Models.RequestReplies
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequestReplies
 {
-    public abstract class RequestReplyBase
+    public abstract class ReplyBase
     {
         [JsonPropertyName("message-id")]
         public string MessageId { get; set; }

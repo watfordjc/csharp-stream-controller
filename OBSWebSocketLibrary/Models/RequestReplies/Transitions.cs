@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace OBSWebSocketLibrary.Models.RequestReplies
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequestReplies
 {
-    public class GetTransitionList : RequestReplyBase
+    public class GetTransitionListReply : ReplyBase
     {
         [JsonPropertyName("current-transition")]
         public string CurrentTransition { get; set; }
         [JsonPropertyName("transitions")]
 #pragma warning disable CA2227 // Collection properties should be read only
-        public IList<TypeDefs.ObsTransitionName> Transitions { get; set; }
+        public IList<TypeDefs.ObsWsTransitionName> Transitions { get; set; }
 #pragma warning restore CA2227 // Collection properties should be read only
     }
 
-    public class GetCurrentTransition : RequestReplyBase
+    public class GetCurrentTransitionReply : ReplyBase
     {
         [JsonPropertyName("name")]
         public string Name { get; set; }
@@ -23,21 +23,21 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         public int Duration { get; set; }
     }
 
-    public class SetCurrentTransition : RequestReplyBase
+    public class SetCurrentTransitionReply : ReplyBase
     {
     }
 
-    public class SetTransitionDuration : RequestReplyBase
+    public class SetTransitionDurationReply : ReplyBase
     {
     }
 
-    public class GetTransitionDuration : RequestReplyBase
+    public class GetTransitionDurationReply : ReplyBase
     {
         [JsonPropertyName("transition-duration")]
         public int Duration { get; set; }
     }
 
-    public class GetTransitionPosition : RequestReplyBase
+    public class GetTransitionPositionReply : ReplyBase
     {
         [JsonPropertyName("position")]
         public double Position { get; set; }

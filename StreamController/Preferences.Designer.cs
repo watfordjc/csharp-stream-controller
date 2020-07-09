@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace StreamController {
+namespace uk.JohnCook.dotnet.StreamController {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

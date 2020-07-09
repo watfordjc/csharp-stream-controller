@@ -5,7 +5,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace StreamController
+namespace uk.JohnCook.dotnet.StreamController
 {
     public partial class MenuItemCollection : ResourceDictionary, ICollection<KeyValuePair<string, object>>
     {

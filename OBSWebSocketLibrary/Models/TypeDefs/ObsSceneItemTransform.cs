@@ -3,24 +3,24 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace OBSWebSocketLibrary.Models.TypeDefs
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.TypeDefs
 {
-    public class SceneItemTransform
+    public class ObsSceneItemTransform
     {
         [JsonPropertyName("position")]
-        public TypeDefs.PositionProperties Position { get; set; }
+        public TypeDefs.ObsWsPositionProperties Position { get; set; }
         [JsonPropertyName("rotation")]
         public double Rotation { get; set; }
         [JsonPropertyName("scale")]
-        public TypeDefs.Coordinates Scale { get; set; }
+        public TypeDefs.ObsWsCoordinates Scale { get; set; }
         [JsonPropertyName("crop")]
-        public TypeDefs.Directions Crop { get; set; }
+        public TypeDefs.ObsWsDirections Crop { get; set; }
         [JsonPropertyName("visible")]
         public bool Visible { get; set; }
         [JsonPropertyName("locked")]
         public bool Locked { get; set; }
         [JsonPropertyName("bounds")]
-        public TypeDefs.BoundsProperties Bounds { get; set; }
+        public TypeDefs.ObsWsBoundsProperties Bounds { get; set; }
         [JsonPropertyName("sourceWidth")]
         public int SourceWidth { get; set; }
         [JsonPropertyName("sourceHeight")]
@@ -33,16 +33,16 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         public string ParentGroupName { get; set; }
         [JsonPropertyName("groupChildren")]
 #pragma warning disable CA2227 // Collection properties should be read only
-        public IList<SceneItemTransform> GroupChildren { get; set; }
+        public IList<ObsSceneItemTransform> GroupChildren { get; set; }
 #pragma warning restore CA2227 // Collection properties should be read only
 
-        public static implicit operator SceneItemTransform(RequestReplies.GetSceneItemProperties v)
+        public static implicit operator ObsSceneItemTransform(ObsRequestReplies.GetSceneItemPropertiesReply v)
         {
             if (v == null) { return null; }
 
-            return new SceneItemTransform
+            return new ObsSceneItemTransform
             {
-                Position = new PositionProperties()
+                Position = new ObsWsPositionProperties()
                 {
                     Alignment = v.Position.Alignment,
                     X = v.Position.X,
@@ -53,7 +53,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
                 Crop = v.Crop,
                 Visible = v.Visible,
                 Locked = v.Locked,
-                Bounds = new BoundsProperties()
+                Bounds = new ObsWsBoundsProperties()
                 {
                     Alignment = v.Bounds.Alignment,
                     Type = v.Bounds.Type,
@@ -69,7 +69,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
             };
         }
 
-        public static SceneItemTransform FromGetSceneItemProperties(RequestReplies.GetSceneItemProperties v)
+        public static ObsSceneItemTransform FromGetSceneItemPropertiesReply(ObsRequestReplies.GetSceneItemPropertiesReply v)
         {
             return v;
         }

@@ -1,16 +1,16 @@
-﻿using OBSWebSocketLibrary.Data;
+﻿using uk.JohnCook.dotnet.OBSWebSocketLibrary.Data;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace OBSWebSocketLibrary.Models.TypeDefs.FilterTypes
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.TypeDefs
 {
     public class BaseFilter : INotifyPropertyChanged
     {
         private string name;
-        private OBSWebSocketLibrary.Data.SourceType type;
+        private ObsSourceType type;
         private bool enabled;
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -29,7 +29,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.FilterTypes
             }
         }
 
-        public OBSWebSocketLibrary.Data.SourceType Type
+        public ObsSourceType Type
         {
             get { return type; }
             set
@@ -49,7 +49,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.FilterTypes
             }
         }
 
-        public static implicit operator BaseFilter(TypeDefs.ObsReplyFilter v)
+        public static implicit operator BaseFilter(ObsWsReplyFilter v)
         {
             if (v == null) { return null; }
 
@@ -60,7 +60,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.FilterTypes
             return converted;
         }
 
-        public static BaseFilter FromObsReplyFilter(TypeDefs.ObsReplyFilter v)
+        public static BaseFilter FromObsWsReplyFilter(ObsWsReplyFilter v)
         {
             return v;
         }

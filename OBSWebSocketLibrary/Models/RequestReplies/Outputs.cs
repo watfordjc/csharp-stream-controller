@@ -3,27 +3,27 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace OBSWebSocketLibrary.Models.RequestReplies
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequestReplies
 {
-    public class ListOutputs : RequestReplyBase
+    public class ListOutputsReply : ReplyBase
     {
         [JsonPropertyName("outputs")]
 #pragma warning disable CA2227 // Collection properties should be read only
-        public IList<TypeDefs.Output> Outputs { get; set; }
+        public IList<TypeDefs.ObsOutput> Outputs { get; set; }
 #pragma warning restore CA2227 // Collection properties should be read only
     }
 
-    public class GetOutputInfo : RequestReplyBase
+    public class GetOutputInfoReply : ReplyBase
     {
         [JsonPropertyName("outputInfo")]
-        public TypeDefs.Output OutputInfo { get; set; }
+        public TypeDefs.ObsOutput OutputInfo { get; set; }
     }
 
-    public class StartOutput : RequestReplyBase
+    public class StartOutputReply : ReplyBase
     {
     }
 
-    public class StopOutput : RequestReplyBase
+    public class StopOutputReply : ReplyBase
     {
     }
 }

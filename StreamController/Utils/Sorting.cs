@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using uk.JohnCook.dotnet.OBSWebSocketLibrary.TypeDefs;
 
-namespace StreamController.Utils
+namespace uk.JohnCook.dotnet.StreamController.Utils
 {
     public class OrderSceneItemsByListOfIds : System.Collections.IComparer
     {
@@ -19,7 +20,7 @@ namespace StreamController.Utils
             if (x == null) { throw new ArgumentNullException(nameof(x)); }
             if (y == null) { throw new ArgumentNullException(nameof(y)); }
 
-            return collectionOrderList.IndexOf((y as OBSWebSocketLibrary.Models.TypeDefs.SceneItem).Id) - collectionOrderList.IndexOf((x as OBSWebSocketLibrary.Models.TypeDefs.SceneItem).Id);
+            return collectionOrderList.IndexOf((y as ObsSceneItem).Id) - collectionOrderList.IndexOf((x as ObsSceneItem).Id);
         }
     }
 

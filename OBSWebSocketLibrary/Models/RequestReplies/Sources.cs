@@ -4,25 +4,25 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace OBSWebSocketLibrary.Models.RequestReplies
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequestReplies
 {
-    public class GetSourcesList : RequestReplyBase
+    public class GetSourcesListReply : ReplyBase
     {
         [JsonPropertyName("sources")]
 #pragma warning disable CA2227 // Collection properties should be read only
-        public IList<TypeDefs.ObsReplySource> Sources { get; set; }
+        public IList<TypeDefs.ObsWsReplySource> Sources { get; set; }
 #pragma warning restore CA2227 // Collection properties should be read only
     }
 
-    public class GetSourceTypesList : RequestReplyBase
+    public class GetSourceTypesListReply : ReplyBase
     {
         [JsonPropertyName("types")]
 #pragma warning disable CA2227 // Collection properties should be read only
-        public IList<TypeDefs.ObsReplyType> Types { get; set; }
+        public IList<TypeDefs.ObsWsReplyType> Types { get; set; }
 #pragma warning restore CA2227 // Collection properties should be read only
     }
 
-    public class GetVolume : RequestReplyBase
+    public class GetVolumeReply : ReplyBase
     {
         [JsonPropertyName("name")]
         public string Name { get; set; }
@@ -32,11 +32,11 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         public bool Muted { get; set; }
     }
 
-    public class SetVolume : RequestReplyBase
+    public class SetVolumeReply : ReplyBase
     {
     }
 
-    public class GetMute : RequestReplyBase
+    public class GetMuteReply : ReplyBase
     {
         [JsonPropertyName("name")]
         public string Name { get; set; }
@@ -44,23 +44,23 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         public bool Muted { get; set; }
     }
 
-    public class SetMute : RequestReplyBase
+    public class SetMuteReply : ReplyBase
     {
     }
 
-    public class ToggleMute : RequestReplyBase
+    public class ToggleMuteReply : ReplyBase
     {
     }
 
-    public class SetSourceName : RequestReplyBase
+    public class SetSourceNameReply : ReplyBase
     {
     }
 
-    public class SetSyncOffset : RequestReplyBase
+    public class SetSyncOffsetReply : ReplyBase
     {
     }
 
-    public class GetSyncOffset : RequestReplyBase
+    public class GetSyncOffsetReply : ReplyBase
     {
         [JsonPropertyName("name")]
         public string Name { get; set; }
@@ -68,7 +68,7 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         public int Offset { get; set; }
     }
 
-    public class GetSourceSettings : RequestReplyBase
+    public class GetSourceSettingsReply : ReplyBase
     {
         [JsonPropertyName("sourceName")]
         public string SourceName { get; set; }
@@ -79,7 +79,7 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         public object SourceSettingsObj { get; set; }
     }
 
-    public class SetSourceSettings : RequestReplyBase
+    public class SetSourceSettingsReply : ReplyBase
     {
         [JsonPropertyName("sourceName")]
         public string SourceName { get; set; }
@@ -90,7 +90,7 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         public object SourceSettingsObj { get; set; }
 
     }
-    public class GetTextGDIPlusProperties : RequestReplyBase
+    public class GetTextGDIPlusPropertiesReply : ReplyBase
     {
         [JsonPropertyName("source")]
         public string Source { get; set; }
@@ -117,7 +117,7 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         [JsonPropertyName("read_from_file")]
         public bool ReadFromFile { get; set; }
         [JsonPropertyName("font")]
-        public TypeDefs.Font Font { get; set; }
+        public TypeDefs.ObsWsFont Font { get; set; }
         [JsonPropertyName("gradient")]
         public bool Gradient { get; set; }
         [JsonPropertyName("gradient_color")]
@@ -142,11 +142,11 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         public bool Vertical { get; set; }
     }
 
-    public class SetTextGDIPlusProperties : RequestReplyBase
+    public class SetTextGDIPlusPropertiesReply : ReplyBase
     {
     }
 
-    public class GetTextFreetype2Properties : RequestReplyBase
+    public class GetTextFreetype2PropertiesReply : ReplyBase
     {
         [JsonPropertyName("source")]
         public string Source { get; set; }
@@ -159,7 +159,7 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         [JsonPropertyName("drop_shadow")]
         public bool DropShadow { get; set; }
         [JsonPropertyName("font")]
-        public TypeDefs.Font Font { get; set; }
+        public TypeDefs.ObsWsFont Font { get; set; }
         [JsonPropertyName("from_file")]
         public bool FromFile { get; set; }
         [JsonPropertyName("log_mode")]
@@ -174,11 +174,11 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         public bool WordWrap { get; set; }
     }
 
-    public class SetTextFreetype2Properties : RequestReplyBase
+    public class SetTextFreetype2PropertiesReply : ReplyBase
     {
     }
 
-    public class GetBrowserSourceProperties : RequestReplyBase
+    public class GetBrowserSourcePropertiesReply : ReplyBase
     {
         [JsonPropertyName("source")]
         public string Source { get; set; }
@@ -200,11 +200,11 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         public bool Shutdown { get; set; }
     }
 
-    public class SetBrowserSourceProperties : RequestReplyBase
+    public class SetBrowserSourcePropertiesReply : ReplyBase
     {
     }
 
-    public class GetSpecialSources : RequestReplyBase
+    public class GetSpecialSourcesReply : ReplyBase
     {
         [JsonPropertyName("desktop-1")]
         public string Desktop1 { get; set; }
@@ -218,15 +218,15 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         public string Mic3 { get; set; }
     }
 
-    public class GetSourceFilters : RequestReplyBase
+    public class GetSourceFiltersReply : ReplyBase
     {
         [JsonPropertyName("filters")]
 #pragma warning disable CA2227 // Collection properties should be read only
-        public IList<TypeDefs.ObsReplyFilter> Filters { get; set; }
+        public IList<TypeDefs.ObsWsReplyFilter> Filters { get; set; }
 #pragma warning restore CA2227 // Collection properties should be read only
     }
 
-    public class GetSourceFilterInfo : RequestReplyBase
+    public class GetSourceFilterInfoReply : ReplyBase
     {
         [JsonPropertyName("enabled")]
         public bool Enabled { get; set; }
@@ -239,41 +239,41 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         public object SettingsObj { get; set; }
     }
 
-    public class AddFilterToSource : RequestReplyBase
+    public class AddFilterToSourceReply : ReplyBase
     {
     }
 
-    public class RemoveFilterFromSource : RequestReplyBase
+    public class RemoveFilterFromSourceReply : ReplyBase
     {
     }
 
-    public class ReorderSourceFilter : RequestReplyBase
+    public class ReorderSourceFilterReply : ReplyBase
     {
     }
 
-    public class MoveSourceFilter : RequestReplyBase
+    public class MoveSourceFilterReply : ReplyBase
     {
     }
 
-    public class SetSourceFilterSettings : RequestReplyBase
+    public class SetSourceFilterSettingsReply : ReplyBase
     {
     }
 
-    public class SetSourceFilterVisibility : RequestReplyBase
+    public class SetSourceFilterVisibilityReply : ReplyBase
     {
     }
 
-    public class GetAudioMonitorType : RequestReplyBase
+    public class GetAudioMonitorTypeReply : ReplyBase
     {
         [JsonPropertyName("monitorType")]
         public string MonitorType { get; set; }
     }
 
-    public class SetAudioMonitorType : RequestReplyBase
+    public class SetAudioMonitorTypeReply : ReplyBase
     {
     }
 
-    public class TakeSourceScreenshot : RequestReplyBase
+    public class TakeSourceScreenshotReply : ReplyBase
     {
         [JsonPropertyName("sourceName")]
         public string SourceName { get; set; }

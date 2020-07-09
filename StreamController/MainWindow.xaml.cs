@@ -7,10 +7,10 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using NAudio.CoreAudioApi;
-using NAudioWrapperLibrary;
-using StreamController.SharedModels;
+using uk.JohnCook.dotnet.NAudioWrapperLibrary;
+using uk.JohnCook.dotnet.StreamController.SharedModels;
 
-namespace StreamController
+namespace uk.JohnCook.dotnet.StreamController
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

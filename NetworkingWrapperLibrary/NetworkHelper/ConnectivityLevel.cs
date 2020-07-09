@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace NetworkingWrapperLibrary
+namespace uk.JohnCook.dotnet.NetworkingWrapperLibrary
 {
     //
     // Summary:

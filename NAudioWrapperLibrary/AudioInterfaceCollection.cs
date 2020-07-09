@@ -12,9 +12,9 @@ using System.Threading.Tasks;
 using NAudio;
 using NAudio.CoreAudioApi;
 using NAudio.CoreAudioApi.Interfaces;
-using StreamController.SharedModels;
+using uk.JohnCook.dotnet.StreamController.SharedModels;
 
-namespace NAudioWrapperLibrary
+namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
 {
 
     public sealed class AudioInterfaceCollection : ObservableCollection<MMDevice>, IDisposable

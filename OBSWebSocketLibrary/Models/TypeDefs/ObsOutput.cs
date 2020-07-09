@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace OBSWebSocketLibrary.Models.TypeDefs
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.TypeDefs
 {
-    public class Output
+    public class ObsOutput
     {
         [JsonPropertyName("name")]
         public string Name { get; set; }
@@ -16,9 +16,9 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         [JsonPropertyName("height")]
         public int Height { get; set; }
         [JsonPropertyName("flags")]
-        public TypeDefs.ObsOutputFlags Flags { get; set; }
+        public TypeDefs.ObsWsOutputFlags Flags { get; set; }
         [JsonPropertyName("settings")]
-        public TypeDefs.ObsOutputSettings Settings { get; set; }
+        public TypeDefs.ObsWsOutputSettings Settings { get; set; }
         [JsonPropertyName("totalFrames")]
         public int TotalFrames { get; set; }
         [JsonPropertyName("droppedFrames")]

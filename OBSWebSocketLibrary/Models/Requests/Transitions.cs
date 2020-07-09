@@ -3,33 +3,33 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace OBSWebSocketLibrary.Models.Requests
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequests
 {
-    public class GetTransitionList : RequestBase
+    public class GetTransitionListRequest : RequestBase
     {
     }
 
-    public class GetCurrentTransition : RequestBase
+    public class GetCurrentTransitionRequest : RequestBase
     {
     }
 
-    public class SetCurrentTransition : RequestBase
+    public class SetCurrentTransitionRequest : RequestBase
     {
         [JsonPropertyName("transition-name")]
         public string TransitionName { get; set; }
     }
 
-    public class SetTransitionDuration : RequestBase
+    public class SetTransitionDurationRequest : RequestBase
     {
         [JsonPropertyName("duration")]
         public int Duration { get; set; }
     }
 
-    public class GetTransitionDuration : RequestBase
+    public class GetTransitionDurationRequest : RequestBase
     {
     }
 
-    public class GetTransitionPosition : RequestBase
+    public class GetTransitionPositionRequest : RequestBase
     {
     }
 }

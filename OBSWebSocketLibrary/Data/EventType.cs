@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace OBSWebSocketLibrary.Data
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.Data
 {
-    public enum EventType
+    public enum ObsEventType
     {
         SwitchScenes = 1,
         ScenesChanged = 2,
@@ -59,64 +59,64 @@ namespace OBSWebSocketLibrary.Data
         StudioModeSwitched = 51
     }
 
-    public static class ObsEvent
+    public static class ObsWsEvent
     {
-        private static readonly Dictionary<EventType, Type> eventDictionary = new Dictionary<EventType, Type>()
+        private static readonly Dictionary<ObsEventType, Type> eventDictionary = new Dictionary<ObsEventType, Type>()
         {
-            { EventType.SwitchScenes, typeof(Models.Events.SwitchScenes) },
-            { EventType.ScenesChanged, typeof(Models.Events.ScenesChanged) },
-            { EventType.SceneCollectionChanged, typeof(Models.Events.SceneCollectionChanged) },
-            { EventType.SceneCollectionListChanged, typeof(Models.Events.SceneCollectionListChanged) },
-            { EventType.SwitchTransition, typeof(Models.Events.SwitchTransition) },
-            { EventType.TransitionListChanged, typeof(Models.Events.TransitionListChanged) },
-            { EventType.TransitionDurationChanged, typeof(Models.Events.TransitionDurationChanged) },
-            { EventType.TransitionBegin, typeof(Models.Events.TransitionBegin) },
-            { EventType.TransitionEnd, typeof(Models.Events.TransitionEnd) },
-            { EventType.TransitionVideoEnd, typeof(Models.Events.TransitionVideoEnd) },
-            { EventType.ProfileChanged, typeof(Models.Events.ProfileChanged) },
-            { EventType.ProfileListChanged, typeof(Models.Events.ProfileListChanged) },
-            { EventType.StreamStarting, typeof(Models.Events.StreamStarting) },
-            { EventType.StreamStarted, typeof(Models.Events.StreamStarted) },
-            { EventType.StreamStopping, typeof(Models.Events.StreamStopping) },
-            { EventType.StreamStopped, typeof(Models.Events.StreamStopped) },
-            { EventType.StreamStatus, typeof(Models.Events.StreamStatus) },
-            { EventType.RecordingStarting, typeof(Models.Events.RecordingStarting) },
-            { EventType.RecordingStarted, typeof(Models.Events.RecordingStarted) },
-            { EventType.RecordingStopping, typeof(Models.Events.RecordingStopping) },
-            { EventType.RecordingStopped, typeof(Models.Events.RecordingStopped) },
-            { EventType.RecordingPaused, typeof(Models.Events.RecordingPaused) },
-            { EventType.RecordingResumed, typeof(Models.Events.RecordingResumed) },
-            { EventType.ReplayStarting, typeof(Models.Events.ReplayStarting) },
-            { EventType.ReplayStarted, typeof(Models.Events.ReplayStarted) },
-            { EventType.ReplayStopping, typeof(Models.Events.ReplayStopping) },
-            { EventType.ReplayStopped, typeof(Models.Events.ReplayStopped) },
-            { EventType.Exiting, typeof(Models.Events.Exiting) },
-            { EventType.Heartbeat, typeof(Models.Events.Heartbeat) },
-            { EventType.BroadcastCustomMessage, typeof(Models.Events.BroadcastCustomMessage) },
-            { EventType.SourceCreated, typeof(Models.Events.SourceCreated) },
-            { EventType.SourceDestroyed, typeof(Models.Events.SourceDestroyed) },
-            { EventType.SourceVolumeChanged, typeof(Models.Events.SourceVolumeChanged) },
-            { EventType.SourceMuteStateChanged, typeof(Models.Events.SourceMuteStateChanged) },
-            { EventType.SourceAudioSyncOffsetChanged, typeof(Models.Events.SourceAudioSyncOffsetChanged) },
-            { EventType.SourceAudioMixersChanged, typeof(Models.Events.SourceAudioMixersChanged) },
-            { EventType.SourceRenamed, typeof(Models.Events.SourceRenamed) },
-            { EventType.SourceFilterAdded, typeof(Models.Events.SourceFilterAdded) },
-            { EventType.SourceFilterRemoved, typeof(Models.Events.SourceFilterRemoved) },
-            { EventType.SourceFilterVisibilityChanged, typeof(Models.Events.SourceFilterVisibilityChanged) },
-            { EventType.SourceFiltersReordered, typeof(Models.Events.SourceFiltersReordered) },
-            { EventType.SourceOrderChanged, typeof(Models.Events.SourceOrderChanged) },
-            { EventType.SceneItemAdded, typeof(Models.Events.SceneItemAdded) },
-            { EventType.SceneItemRemoved, typeof(Models.Events.SceneItemRemoved) },
-            { EventType.SceneItemVisibilityChanged, typeof(Models.Events.SceneItemVisibilityChanged) },
-            { EventType.SceneItemLockChanged, typeof(Models.Events.SceneItemLockChanged) },
-            { EventType.SceneItemTransformChanged, typeof(Models.Events.SceneItemTransformChanged) },
-            { EventType.SceneItemSelected, typeof(Models.Events.SceneItemSelected) },
-            { EventType.SceneItemDeselected, typeof(Models.Events.SceneItemDeselected) },
-            { EventType.PreviewSceneChanged, typeof(Models.Events.PreviewSceneChanged) },
-            { EventType.StudioModeSwitched, typeof(Models.Events.StudioModeSwitched) }
+            { ObsEventType.SwitchScenes, typeof(ObsEvents.SwitchScenesObsEvent) },
+            { ObsEventType.ScenesChanged, typeof(ObsEvents.ScenesChangedObsEvent) },
+            { ObsEventType.SceneCollectionChanged, typeof(ObsEvents.SceneCollectionChangedObsEvent) },
+            { ObsEventType.SceneCollectionListChanged, typeof(ObsEvents.SceneCollectionListChangedObsEvent) },
+            { ObsEventType.SwitchTransition, typeof(ObsEvents.SwitchTransitionObsEvent) },
+            { ObsEventType.TransitionListChanged, typeof(ObsEvents.TransitionListChangedObsEvent) },
+            { ObsEventType.TransitionDurationChanged, typeof(ObsEvents.TransitionDurationChangedObsEvent) },
+            { ObsEventType.TransitionBegin, typeof(ObsEvents.TransitionBeginObsEvent) },
+            { ObsEventType.TransitionEnd, typeof(ObsEvents.TransitionEndObsEvent) },
+            { ObsEventType.TransitionVideoEnd, typeof(ObsEvents.TransitionVideoEndObsEvent) },
+            { ObsEventType.ProfileChanged, typeof(ObsEvents.ProfileChangedObsEvent) },
+            { ObsEventType.ProfileListChanged, typeof(ObsEvents.ProfileListChangedObsEvent) },
+            { ObsEventType.StreamStarting, typeof(ObsEvents.StreamStartingObsEvent) },
+            { ObsEventType.StreamStarted, typeof(ObsEvents.StreamStartedObsEvent) },
+            { ObsEventType.StreamStopping, typeof(ObsEvents.StreamStoppingObsEvent) },
+            { ObsEventType.StreamStopped, typeof(ObsEvents.StreamStoppedObsEvent) },
+            { ObsEventType.StreamStatus, typeof(ObsEvents.StreamStatusObsEvent) },
+            { ObsEventType.RecordingStarting, typeof(ObsEvents.RecordingStartingObsEvent) },
+            { ObsEventType.RecordingStarted, typeof(ObsEvents.RecordingStartedObsEvent) },
+            { ObsEventType.RecordingStopping, typeof(ObsEvents.RecordingStoppingObsEvent) },
+            { ObsEventType.RecordingStopped, typeof(ObsEvents.RecordingStoppedObsEvent) },
+            { ObsEventType.RecordingPaused, typeof(ObsEvents.RecordingPausedObsEvent) },
+            { ObsEventType.RecordingResumed, typeof(ObsEvents.RecordingResumedObsEvent) },
+            { ObsEventType.ReplayStarting, typeof(ObsEvents.ReplayStartingObsEvent) },
+            { ObsEventType.ReplayStarted, typeof(ObsEvents.ReplayStartedObsEvent) },
+            { ObsEventType.ReplayStopping, typeof(ObsEvents.ReplayStoppingObsEvent) },
+            { ObsEventType.ReplayStopped, typeof(ObsEvents.ReplayStoppedObsEvent) },
+            { ObsEventType.Exiting, typeof(ObsEvents.ExitingObsEvent) },
+            { ObsEventType.Heartbeat, typeof(ObsEvents.HeartbeatObsEvent) },
+            { ObsEventType.BroadcastCustomMessage, typeof(ObsEvents.BroadcastCustomMessageObsEvent) },
+            { ObsEventType.SourceCreated, typeof(ObsEvents.SourceCreatedObsEvent) },
+            { ObsEventType.SourceDestroyed, typeof(ObsEvents.SourceDestroyedObsEvent) },
+            { ObsEventType.SourceVolumeChanged, typeof(ObsEvents.SourceVolumeChangedObsEvent) },
+            { ObsEventType.SourceMuteStateChanged, typeof(ObsEvents.SourceMuteStateChangedObsEvent) },
+            { ObsEventType.SourceAudioSyncOffsetChanged, typeof(ObsEvents.SourceAudioSyncOffsetChangedObsEvent) },
+            { ObsEventType.SourceAudioMixersChanged, typeof(ObsEvents.SourceAudioMixersChangedObsEvent) },
+            { ObsEventType.SourceRenamed, typeof(ObsEvents.SourceRenamedObsEvent) },
+            { ObsEventType.SourceFilterAdded, typeof(ObsEvents.SourceFilterAddedObsEvent) },
+            { ObsEventType.SourceFilterRemoved, typeof(ObsEvents.SourceFilterRemovedObsEvent) },
+            { ObsEventType.SourceFilterVisibilityChanged, typeof(ObsEvents.SourceFilterVisibilityChangedObsEvent) },
+            { ObsEventType.SourceFiltersReordered, typeof(ObsEvents.SourceFiltersReorderedObsEvent) },
+            { ObsEventType.SourceOrderChanged, typeof(ObsEvents.SourceOrderChangedObsEvent) },
+            { ObsEventType.SceneItemAdded, typeof(ObsEvents.SceneItemAddedObsEvent) },
+            { ObsEventType.SceneItemRemoved, typeof(ObsEvents.SceneItemRemovedObsEvent) },
+            { ObsEventType.SceneItemVisibilityChanged, typeof(ObsEvents.SceneItemVisibilityChangedObsEvent) },
+            { ObsEventType.SceneItemLockChanged, typeof(ObsEvents.SceneItemLockChangedObsEvent) },
+            { ObsEventType.SceneItemTransformChanged, typeof(ObsEvents.SceneItemTransformChangedObsEvent) },
+            { ObsEventType.SceneItemSelected, typeof(ObsEvents.SceneItemSelectedObsEvent) },
+            { ObsEventType.SceneItemDeselected, typeof(ObsEvents.SceneItemDeselectedObsEvent) },
+            { ObsEventType.PreviewSceneChanged, typeof(ObsEvents.PreviewSceneChangedObsEvent) },
+            { ObsEventType.StudioModeSwitched, typeof(ObsEvents.StudioModeSwitchedObsEvent) }
         };
 
-        public static Type GetType(EventType eventType)
+        public static Type GetType(ObsEventType eventType)
         {
             return eventDictionary.TryGetValue(eventType, out Type value) ? value : null;
         }

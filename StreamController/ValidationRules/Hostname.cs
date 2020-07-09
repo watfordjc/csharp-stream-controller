@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Text;
 using System.Windows.Controls;
 
-namespace StreamController.ValidationRules
+namespace uk.JohnCook.dotnet.StreamController.ValidationRules
 {
     public class Hostname : ValidationRule
     {

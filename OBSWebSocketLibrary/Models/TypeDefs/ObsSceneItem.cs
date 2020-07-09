@@ -4,14 +4,14 @@ using System.Collections.ObjectModel;
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace OBSWebSocketLibrary.Models.TypeDefs
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.TypeDefs
 {
-    public class SceneItem
+    public class ObsSceneItem
     {
         private string nameTmp = String.Empty;
         private bool mutedTmp = false;
         private double volumeTmp = 0;
-        private SourceTypes.BaseType source;
+        private BaseType source;
         private int syncOffsetTmp = 0;
 
         [JsonPropertyName("cy")]
@@ -88,10 +88,10 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
         public string ParentGroupName { get; set; }
         [JsonPropertyName("groupChildren")]
 #pragma warning disable CA2227 // Collection properties should be read only
-        public ObservableCollection<SceneItem> GroupChildren { get; set; }
+        public ObservableCollection<ObsSceneItem> GroupChildren { get; set; }
 #pragma warning restore CA2227 // Collection properties should be read only
         [JsonIgnore]
-        public SourceTypes.BaseType Source
+        public BaseType Source
         {
             get { return source; }
             set
@@ -107,7 +107,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs
             }
         }
         [JsonIgnore]
-        public SceneItemTransform Transform { get; set; }
+        public ObsSceneItemTransform Transform { get; set; }
         [JsonIgnore]
         public int SyncOffset
         {

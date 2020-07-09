@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace OBSWebSocketLibrary.Models.RequestReplies
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequestReplies
 {
-    public class GetVersion : RequestReplyBase
+    public class GetVersionReply : ReplyBase
     {
         [JsonPropertyName("version")]
         public double Version { get; set; }
@@ -19,7 +19,7 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         public string SupportedImageExportFormats { get; set; }
     }
 
-    public class GetAuthRequired : RequestReplyBase
+    public class GetAuthRequiredReply : ReplyBase
     {
         [JsonPropertyName("authRequired")]
         public bool AuthRequired { get; set; }
@@ -29,31 +29,31 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         public string Salt { get; set; }
     }
 
-    public class Authenticate : RequestReplyBase
+    public class AuthenticateReply : ReplyBase
     {
     }
 
-    public class SetHeartbeat : RequestReplyBase
+    public class SetHeartbeatReply : ReplyBase
     {
     }
 
-    public class SetFilenameFormatting : RequestReplyBase
+    public class SetFilenameFormattingReply : ReplyBase
     {
     }
 
-    public class GetFilenameFormatting : RequestReplyBase
+    public class GetFilenameFormattingReply : ReplyBase
     {
     }
 
-    public class GetStats : RequestReplyBase
+    public class GetStatsReply : ReplyBase
     {
     }
 
-    public class BroadcastCustomMessage : RequestReplyBase
+    public class BroadcastCustomMessageReply : ReplyBase
     {
     }
 
-    public class GetVideoInfo : RequestReplyBase
+    public class GetVideoInfoReply : ReplyBase
     {
         [JsonPropertyName("baseWidth")]
         public int BaseWidth { get; set; }
@@ -75,7 +75,7 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         public string ColorRange { get; set; }
     }
 
-    public class OpenProjector : RequestReplyBase
+    public class OpenProjectorReply : ReplyBase
     {
     }
 }

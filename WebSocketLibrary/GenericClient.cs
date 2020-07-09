@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace WebSocketLibrary
+namespace uk.JohnCook.dotnet.WebSocketLibrary
 {
     /// <summary>
     /// A generic WebSocketClient object with genericised handling
@@ -23,7 +23,7 @@ namespace WebSocketLibrary
         private readonly SemaphoreSlim receiveAsyncSemaphore = new SemaphoreSlim(1);
         private int _RetrySeconds = 5;
         private int _MaximumRetryMinutes = 10;
-        private Models.ErrorMessage errorMessage = new Models.ErrorMessage();
+        private WsClientErrorMessage errorMessage = new WsClientErrorMessage();
         private bool disposedValue;
         private const int RECV_BUFFER_SIZE = 8192;
         private const int SEND_BUFFER_SIZE = 8192;
@@ -37,13 +37,13 @@ namespace WebSocketLibrary
         public event EventHandler<MemoryStream> ReceiveBinaryMessage;
         public event EventHandler<MemoryStream> ReceiveTextMessage;
         public event EventHandler<WebSocketState> StateChange;
-        public event EventHandler<Models.ErrorMessage> ErrorState;
+        public event EventHandler<WsClientErrorMessage> ErrorState;
 
         /// <summary>
         /// Calls correct event invocation method depending on MessageType.
         /// </summary>
         /// <param name="receivedMessage">A ReceivedMessage instance.</param>
-        private void ParseMessage(Models.ReceivedMessage receivedMessage)
+        private void ParseMessage(WsClientReceivedMessage receivedMessage)
         {
             receivedMessage.Message.Seek(0, SeekOrigin.Begin);
             if (receivedMessage.Result.MessageType == WebSocketMessageType.Text)
@@ -94,7 +94,7 @@ namespace WebSocketLibrary
         /// <param name="reconnectDelay">The current reconnection attempt delay.</param>
         protected virtual void OnErrorState(Exception e, int reconnectDelay)
         {
-            errorMessage = new Models.ErrorMessage
+            errorMessage = new WsClientErrorMessage
             {
                 Error = e,
                 ReconnectDelay = reconnectDelay
@@ -298,9 +298,9 @@ namespace WebSocketLibrary
         /// Receive a WebSocket message.
         /// </summary>
         /// <returns>A ReceivedMessage object containing Result and Message.</returns>
-        private async Task<Models.ReceivedMessage> ReceiveMessageAsync()
+        private async Task<WsClientReceivedMessage> ReceiveMessageAsync()
         {
-            Models.ReceivedMessage receivedMessage = new Models.ReceivedMessage
+            WsClientReceivedMessage receivedMessage = new WsClientReceivedMessage
             {
                 Message = new MemoryStream()
             };
@@ -340,7 +340,7 @@ namespace WebSocketLibrary
                 try
                 {
                     // There can be a long time between messages received... does it matter which thread picks up the next one?
-                    Models.ReceivedMessage receivedMessage = await ReceiveMessageAsync().ConfigureAwait(false);
+                    WsClientReceivedMessage receivedMessage = await ReceiveMessageAsync().ConfigureAwait(false);
                     // There should currently only be three MessageType: Close, Text, and Binary.
                     const int expectedMessageTypeCount = 3;
                     Debug.Assert(Enum.GetNames(typeof(WebSocketMessageType)).Length == expectedMessageTypeCount, $"StartMessageReceiveLoop expected {expectedMessageTypeCount} MessageType, there are {Enum.GetNames(typeof(WebSocketMessageType)).Length}");

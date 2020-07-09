@@ -4,12 +4,12 @@ using System.IO;
 using System.Net.WebSockets;
 using System.Text;
 
-namespace WebSocketLibrary.Models
+namespace uk.JohnCook.dotnet.WebSocketLibrary
 {
     /// <summary>
     /// Object containing a WebSocketReceiveResult and a received byte[].
     /// </summary>
-    public class ReceivedMessage
+    public class WsClientReceivedMessage
     {
         public WebSocketReceiveResult Result { get; set; }
         public MemoryStream Message { get; set; }
@@ -18,7 +18,7 @@ namespace WebSocketLibrary.Models
     /// <summary>
     /// Object containing an Exception and current reconnect delay.
     /// </summary>
-    public class ErrorMessage
+    public class WsClientErrorMessage
     {
         public Exception Error { get; set; }
         public int ReconnectDelay { get; set; }

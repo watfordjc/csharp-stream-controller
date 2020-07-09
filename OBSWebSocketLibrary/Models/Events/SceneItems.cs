@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace OBSWebSocketLibrary.Models.Events
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsEvents
 {
-    public class SourceOrderChanged : EventBase
+    public class SourceOrderChangedObsEvent : EventBase
     {
         [JsonPropertyName("scene-name")]
         public string SceneName { get; set; }
         [JsonPropertyName("scene-items")]
 #pragma warning disable CA2227 // Collection properties should be read only
-        public IList<TypeDefs.ObsEventSceneItem> SceneItems { get; set; }
+        public IList<TypeDefs.ObsWsEventSceneItem> SceneItems { get; set; }
 #pragma warning restore CA2227 // Collection properties should be read only
     }
 
-    public class SceneItemAdded : EventBase
+    public class SceneItemAddedObsEvent : EventBase
     {
         [JsonPropertyName("scene-name")]
         public string SceneName { get; set; }
@@ -25,7 +25,7 @@ namespace OBSWebSocketLibrary.Models.Events
         public int ItemId { get; set; }
     }
 
-    public class SceneItemRemoved : EventBase
+    public class SceneItemRemovedObsEvent : EventBase
     {
         [JsonPropertyName("scene-name")]
         public string SceneName { get; set; }
@@ -35,7 +35,7 @@ namespace OBSWebSocketLibrary.Models.Events
         public int ItemId { get; set; }
     }
 
-    public class SceneItemVisibilityChanged : EventBase
+    public class SceneItemVisibilityChangedObsEvent : EventBase
     {
         [JsonPropertyName("scene-name")]
         public string SceneName { get; set; }
@@ -47,7 +47,7 @@ namespace OBSWebSocketLibrary.Models.Events
         public bool ItemVisible { get; set; }
     }
 
-    public class SceneItemLockChanged : EventBase
+    public class SceneItemLockChangedObsEvent : EventBase
     {
         [JsonPropertyName("scene-name")]
         public string SceneName { get; set; }
@@ -59,7 +59,7 @@ namespace OBSWebSocketLibrary.Models.Events
         public bool ItemLocked { get; set; }
     }
 
-    public class SceneItemTransformChanged : EventBase
+    public class SceneItemTransformChangedObsEvent : EventBase
     {
         [JsonPropertyName("scene-name")]
         public string SceneName { get; set; }
@@ -68,10 +68,10 @@ namespace OBSWebSocketLibrary.Models.Events
         [JsonPropertyName("item-id")]
         public int ItemId { get; set; }
         [JsonPropertyName("transform")]
-        public TypeDefs.SceneItemTransform Transform { get; set; }
+        public TypeDefs.ObsSceneItemTransform Transform { get; set; }
     }
 
-    public class SceneItemSelected : EventBase
+    public class SceneItemSelectedObsEvent : EventBase
     {
         [JsonPropertyName("scene-name")]
         public string SceneName { get; set; }
@@ -81,7 +81,7 @@ namespace OBSWebSocketLibrary.Models.Events
         public int ItemId { get; set; }
     }
 
-    public class SceneItemDeselected : EventBase
+    public class SceneItemDeselectedObsEvent : EventBase
     {
         [JsonPropertyName("scene-name")]
         public string SceneName { get; set; }

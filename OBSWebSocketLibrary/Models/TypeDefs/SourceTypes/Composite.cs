@@ -4,7 +4,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.TypeDefs
 {
     public class Scene : BaseType
     {
@@ -14,7 +14,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         public int IdCounter { get; set; }
         [JsonPropertyName("items")]
 #pragma warning disable CA2227 // Collection properties should be read only
-        public IList<ObsSceneItem> Items { get; set; }
+        public IList<ObsWsSceneItem> Items { get; set; }
 #pragma warning restore CA2227 // Collection properties should be read only
     }
 
@@ -30,7 +30,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         public int IdCounter { get; set; }
         [JsonPropertyName("items")]
 #pragma warning disable CA2227 // Collection properties should be read only
-        public IList<ObsSceneItem> Items { get; set; }
+        public IList<ObsWsSceneItem> Items { get; set; }
 #pragma warning restore CA2227 // Collection properties should be read only
     }
 }

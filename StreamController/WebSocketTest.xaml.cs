@@ -27,9 +27,10 @@ using System.Windows.Media;
 using System.Windows.Media.Converters;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using OBSWebSocketLibrary;
+using uk.JohnCook.dotnet.OBSWebSocketLibrary;
+using uk.JohnCook.dotnet.WebSocketLibrary;
 
-namespace StreamController
+namespace uk.JohnCook.dotnet.StreamController
 {
     /// <summary>
     /// Interaction logic for WebSocketTest.xaml
@@ -127,14 +128,14 @@ namespace StreamController
             }
         }
 
-        private void WebSocket_ErrorMessage_ContextSwitch(object sender, WebSocketLibrary.Models.ErrorMessage errorMessage)
+        private void WebSocket_ErrorMessage_ContextSwitch(object sender, WsClientErrorMessage errorMessage)
         {
             _Context.Send(
                 x => WebSocket_ErrorMessage(errorMessage),
                 null);
         }
 
-        private void WebSocket_ErrorMessage(WebSocketLibrary.Models.ErrorMessage errorMessage)
+        private void WebSocket_ErrorMessage(WsClientErrorMessage errorMessage)
         {
             if (errorMessage.Error == null) { return; }
             txtOutput.Text += $"{errorMessage.Error.Message}\n{errorMessage.Error.InnerException?.Message}\n\n";

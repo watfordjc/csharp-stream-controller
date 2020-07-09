@@ -3,25 +3,25 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace OBSWebSocketLibrary.Models.Requests
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequests
 {
-    public class ListOutputs : RequestBase
+    public class ListOutputsRequest : RequestBase
     {
     }
 
-    public class GetOutputInfo : RequestBase
-    {
-        [JsonPropertyName("outputName")]
-        public string OutputName { get; set; }
-    }
-
-    public class StartOutput : RequestBase
+    public class GetOutputInfoRequest : RequestBase
     {
         [JsonPropertyName("outputName")]
         public string OutputName { get; set; }
     }
 
-    public class StopOutput : RequestBase
+    public class StartOutputRequest : RequestBase
+    {
+        [JsonPropertyName("outputName")]
+        public string OutputName { get; set; }
+    }
+
+    public class StopOutputRequest : RequestBase
     {
         [JsonPropertyName("outputName")]
         public string OutputName { get; set; }

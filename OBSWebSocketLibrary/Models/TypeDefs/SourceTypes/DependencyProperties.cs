@@ -1,11 +1,11 @@
-﻿using StreamController.SharedModels;
+﻿using uk.JohnCook.dotnet.StreamController.SharedModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.TypeDefs
 {
     public class DependencyProperties : INotifyPropertyChanged
     {

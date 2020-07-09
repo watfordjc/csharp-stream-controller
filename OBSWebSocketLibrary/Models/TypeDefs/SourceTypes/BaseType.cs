@@ -5,9 +5,9 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json.Serialization;
-using StreamController.SharedModels;
+using uk.JohnCook.dotnet.StreamController.SharedModels;
 
-namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.TypeDefs
 {
     public class BaseType : INotifyPropertyChanged
     {
@@ -16,13 +16,13 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         private int syncOffset;
         private string name;
         private string monitorType;
-        private IList<ObsMixer> mixers;
+        private IList<ObsWsMixer> mixers;
         private string hexMixersValue;
 
         public BaseType()
         {
             Dependencies = new DependencyProperties();
-            Filters = new ObservableCollection<FilterTypes.BaseFilter>();
+            Filters = new ObservableCollection<BaseFilter>();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -79,7 +79,7 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         }
         [JsonIgnore]
 #pragma warning disable CA2227 // Collection properties should be read only
-        public IList<ObsMixer> Mixers
+        public IList<ObsWsMixer> Mixers
 #pragma warning restore CA2227 // Collection properties should be read only
         {
             get { return mixers; }
@@ -101,11 +101,11 @@ namespace OBSWebSocketLibrary.Models.TypeDefs.SourceTypes
         }
         [JsonIgnore]
 #pragma warning disable CA2227 // Collection properties should be read only
-        public ObservableCollection<FilterTypes.BaseFilter> Filters { get; set; }
+        public ObservableCollection<BaseFilter> Filters { get; set; }
 #pragma warning restore CA2227 // Collection properties should be read only
 
         [JsonIgnore]
-        public TypeDefs.ObsReplyType Type { get; set; }
+        public TypeDefs.ObsWsReplyType Type { get; set; }
 
         [JsonIgnore]
         public DependencyProperties Dependencies { get; set; }

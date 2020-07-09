@@ -4,17 +4,17 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace OBSWebSocketLibrary.Models.Requests
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequests
 {
-    public class GetSourcesList : RequestBase
+    public class GetSourcesListRequest : RequestBase
     {
     }
 
-    public class GetSourceTypesList : RequestBase
+    public class GetSourceTypesListRequest : RequestBase
     {
     }
 
-    public class GetVolume : RequestBase
+    public class GetVolumeRequest : RequestBase
     {
         [JsonPropertyName("source")]
         public string Source { get; set; }
@@ -22,7 +22,7 @@ namespace OBSWebSocketLibrary.Models.Requests
         public bool UseDecibel { get; set; }
     }
 
-    public class SetVolume : RequestBase
+    public class SetVolumeRequest : RequestBase
     {
         [JsonPropertyName("source")]
         public string Source { get; set; }
@@ -32,13 +32,13 @@ namespace OBSWebSocketLibrary.Models.Requests
         public bool UseDecibel { get; set; }
     }
 
-    public class GetMute : RequestBase
+    public class GetMuteRequest : RequestBase
     {
         [JsonPropertyName("source")]
         public string Source { get; set; }
     }
 
-    public class SetMute : RequestBase
+    public class SetMuteRequest : RequestBase
     {
         [JsonPropertyName("source")]
         public string Source { get; set; }
@@ -46,13 +46,13 @@ namespace OBSWebSocketLibrary.Models.Requests
         public bool Mute { get; set; }
     }
 
-    public class ToggleMute : RequestBase
+    public class ToggleMuteRequest : RequestBase
     {
         [JsonPropertyName("source")]
         public string Source { get; set; }
     }
 
-    public class SetSourceName : RequestBase
+    public class SetSourceNameRequest : RequestBase
     {
         [JsonPropertyName("sourceName")]
         public string SourceName { get; set; }
@@ -60,7 +60,7 @@ namespace OBSWebSocketLibrary.Models.Requests
         public string NewName { get; set; }
     }
 
-    public class SetSyncOffset : RequestBase
+    public class SetSyncOffsetRequest : RequestBase
     {
         [JsonPropertyName("source")]
         public string Source { get; set; }
@@ -68,13 +68,13 @@ namespace OBSWebSocketLibrary.Models.Requests
         public int Offset { get; set; }
     }
 
-    public class GetSyncOffset : RequestBase
+    public class GetSyncOffsetRequest : RequestBase
     {
         [JsonPropertyName("source")]
         public string Source { get; set; }
     }
 
-    public class GetSourceSettings : RequestBase
+    public class GetSourceSettingsRequest : RequestBase
     {
         [JsonPropertyName("sourceName")]
         public string SourceName { get; set; }
@@ -82,7 +82,7 @@ namespace OBSWebSocketLibrary.Models.Requests
         public string SourceType { get; set; }
     }
 
-    public class SetSourceSettings : RequestBase
+    public class SetSourceSettingsRequest : RequestBase
     {
         [JsonPropertyName("sourceName")]
         public string SourceName { get; set; }
@@ -92,13 +92,13 @@ namespace OBSWebSocketLibrary.Models.Requests
         public object SourceSettings { get; set; }
     }
 
-    public class GetTextGDIPlusProperties : RequestBase
+    public class GetTextGDIPlusPropertiesRequest : RequestBase
     {
         [JsonPropertyName("source")]
         public string Source { get; set; }
     }
 
-    public class SetTextGDIPlusProperties : RequestBase
+    public class SetTextGDIPlusPropertiesRequest : RequestBase
     {
         [JsonPropertyName("source")]
         public string Source { get; set; }
@@ -125,7 +125,7 @@ namespace OBSWebSocketLibrary.Models.Requests
         [JsonPropertyName("read_from_file")]
         public bool ReadFromFile { get; set; }
         [JsonPropertyName("font")]
-        public TypeDefs.Font Font { get; set; }
+        public TypeDefs.ObsWsFont Font { get; set; }
         [JsonPropertyName("gradient")]
         public bool Gradient { get; set; }
         [JsonPropertyName("gradient_color")]
@@ -150,13 +150,13 @@ namespace OBSWebSocketLibrary.Models.Requests
         public bool Vertical { get; set; }
     }
 
-    public class GetTextFreetype2Properties : RequestBase
+    public class GetTextFreetype2PropertiesRequest : RequestBase
     {
         [JsonPropertyName("source")]
         public string Source { get; set; }
     }
 
-    public class SetTextFreetype2Properties : RequestBase
+    public class SetTextFreetype2PropertiesRequest : RequestBase
     {
         [JsonPropertyName("source")]
         public string Source { get; set; }
@@ -169,7 +169,7 @@ namespace OBSWebSocketLibrary.Models.Requests
         [JsonPropertyName("drop_shadow")]
         public bool DropShadow { get; set; }
         [JsonPropertyName("font")]
-        public TypeDefs.Font Font { get; set; }
+        public TypeDefs.ObsWsFont Font { get; set; }
         [JsonPropertyName("from_file")]
         public bool FromFile { get; set; }
         [JsonPropertyName("log_mode")]
@@ -184,13 +184,13 @@ namespace OBSWebSocketLibrary.Models.Requests
         public bool WordWrap { get; set; }
     }
 
-    public class GetBrowserSourceProperties : RequestBase
+    public class GetBrowserSourcePropertiesRequest : RequestBase
     {
         [JsonPropertyName("source")]
         public string Source { get; set; }
     }
 
-    public class SetBrowserSourceProperties : RequestBase
+    public class SetBrowserSourcePropertiesRequest : RequestBase
     {
         [JsonPropertyName("source")]
         public string Source { get; set; }
@@ -214,17 +214,17 @@ namespace OBSWebSocketLibrary.Models.Requests
         public bool Render { get; set; }
     }
 
-    public class GetSpecialSources : RequestBase
+    public class GetSpecialSourcesRequest : RequestBase
     {
     }
 
-    public class GetSourceFilters : RequestBase
+    public class GetSourceFiltersRequest : RequestBase
     {
         [JsonPropertyName("sourceName")]
         public string SourceName { get; set; }
     }
 
-    public class GetSourceFilterInfo : RequestBase
+    public class GetSourceFilterInfoRequest : RequestBase
     {
         [JsonPropertyName("sourceName")]
         public string SourceName { get; set; }
@@ -232,7 +232,7 @@ namespace OBSWebSocketLibrary.Models.Requests
         public string FilterName { get; set; }
     }
 
-    public class AddFilterToSource : RequestBase
+    public class AddFilterToSourceRequest : RequestBase
     {
         [JsonPropertyName("sourceName")]
         public string SourceName { get; set; }
@@ -244,7 +244,7 @@ namespace OBSWebSocketLibrary.Models.Requests
         public object FilterSettings { get; set; }
     }
 
-    public class RemoveFilterFromSource : RequestBase
+    public class RemoveFilterFromSourceRequest : RequestBase
     {
         [JsonPropertyName("sourceName")]
         public string SourceName { get; set; }
@@ -252,7 +252,7 @@ namespace OBSWebSocketLibrary.Models.Requests
         public string FilterName { get; set; }
     }
 
-    public class ReorderSourceFilter : RequestBase
+    public class ReorderSourceFilterRequest : RequestBase
     {
         [JsonPropertyName("sourceName")]
         public string SourceName { get; set; }
@@ -262,7 +262,7 @@ namespace OBSWebSocketLibrary.Models.Requests
         public int NewIndex { get; set; }
     }
 
-    public class MoveSourceFilter : RequestBase
+    public class MoveSourceFilterRequest : RequestBase
     {
         [JsonPropertyName("sourceName")]
         public string SourceName { get; set; }
@@ -272,7 +272,7 @@ namespace OBSWebSocketLibrary.Models.Requests
         public string MovementType { get; set; }
     }
 
-    public class SetSourceFilterSettings : RequestBase
+    public class SetSourceFilterSettingsRequest : RequestBase
     {
         [JsonPropertyName("sourceName")]
         public string SourceName { get; set; }
@@ -282,7 +282,7 @@ namespace OBSWebSocketLibrary.Models.Requests
         public object FilterSettings { get; set; }
     }
 
-    public class SetSourceFilterVisibility : RequestBase
+    public class SetSourceFilterVisibilityRequest : RequestBase
     {
         [JsonPropertyName("sourceName")]
         public string SourceName { get; set; }
@@ -292,13 +292,13 @@ namespace OBSWebSocketLibrary.Models.Requests
         public bool FilterEnabled { get; set; }
     }
 
-    public class GetAudioMonitorType : RequestBase
+    public class GetAudioMonitorTypeRequest : RequestBase
     {
         [JsonPropertyName("sourceName")]
         public string SourceName { get; set; }
     }
 
-    public class SetAudioMonitorType : RequestBase
+    public class SetAudioMonitorTypeRequest : RequestBase
     {
         [JsonPropertyName("sourceName")]
         public string SourceName { get; set; }
@@ -306,7 +306,7 @@ namespace OBSWebSocketLibrary.Models.Requests
         public string MonitorType { get; set; }
     }
 
-    public class TakeSourceScreenshot : RequestBase
+    public class TakeSourceScreenshotRequest : RequestBase
     {
         [JsonPropertyName("sourceName")]
         public string SourceName { get; set; }

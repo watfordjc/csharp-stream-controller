@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace OBSWebSocketLibrary.Models.RequestReplies
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequestReplies
 {
-    public class GetStreamingStatus : RequestReplyBase
+    public class GetStreamingStatusReply : ReplyBase
     {
         [JsonPropertyName("streaming")]
         public bool Streaming { get; set; }
@@ -19,35 +19,35 @@ namespace OBSWebSocketLibrary.Models.RequestReplies
         public bool PreviewOnly { get; set; }
     }
 
-    public class StartStopStreaming : RequestReplyBase
+    public class StartStopStreamingReply : ReplyBase
     {
     }
 
-    public class StartStreaming : RequestReplyBase
+    public class StartStreamingReply : ReplyBase
     {
     }
 
-    public class StopStreaming : RequestReplyBase
+    public class StopStreamingReply : ReplyBase
     {
     }
 
-    public class SetStreamSettings : RequestReplyBase
+    public class SetStreamSettingsReply : ReplyBase
     {
     }
 
-    public class GetStreamSettings : RequestReplyBase
+    public class GetStreamSettingsReply : ReplyBase
     {
         [JsonPropertyName("type")]
         public string Type { get; set; }
         [JsonPropertyName("settings")]
-        public TypeDefs.ObsStreamSettings Settings { get; set; }
+        public TypeDefs.ObsWsStreamSettings Settings { get; set; }
     }
 
-    public class SaveStreamSettings : RequestReplyBase
+    public class SaveStreamSettingsReply : ReplyBase
     {
     }
 
-    public class SendCaptions : RequestReplyBase
+    public class SendCaptionsReply : ReplyBase
     {
     }
 }

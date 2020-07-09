@@ -3,29 +3,29 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace OBSWebSocketLibrary.Models.Events
+namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsEvents
 {
-    public class StreamStarting : EventBase
+    public class StreamStartingObsEvent : EventBase
     {
         [JsonPropertyName("preview-only")]
         public bool PreviewOnly { get; set; }
     }
 
-    public class StreamStarted : EventBase
+    public class StreamStartedObsEvent : EventBase
     {
     }
 
-    public class StreamStopping : EventBase
+    public class StreamStoppingObsEvent : EventBase
     {
         [JsonPropertyName("preview-only")]
         public bool PreviewOnly { get; set; }
     }
 
-    public class StreamStopped : EventBase
+    public class StreamStoppedObsEvent : EventBase
     {
     }
 
-    public class StreamStatus : EventBase
+    public class StreamStatusObsEvent : EventBase
     {
         [JsonPropertyName("streaming")]
         public bool Streaming { get; set; }
