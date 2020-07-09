@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+  <!-- Constant(?) GUIDs for different platforms. -->
+  <?if $(var.Platform) = x64 ?>
+  <?define ProductCode = "{E3608DD8-430B-4375-8801-DD6057622B15}" ?>
+  <?elseif $(var.Platform)= x86 ?>
+  <?define ProductCode = "{151A95EB-469E-42B3-81E5-16F6323DE030}" ?>
+  <?endif?>
+
+  <Fragment>
+
+    <!-- Install! -->
+    <Directory Id="TARGETDIR" Name="SourceDir">
+
+      <!-- \Program Files\ or \Program Files (x86)\ -->
+      <Directory Id="ProgramFiles6432Folder">
+        <Directory Id="ProgramCreatorFolder" Name="!(loc.ProgramCreatorCompany)">
+          <Directory Id="INSTALLFOLDER" Name="!(loc.ProgramInstallationDirectory)" />
+        </Directory>
+      </Directory>
+
+      <!-- Start Menu shortcut folders -->
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="ProgramCreatorStartMenuFolder" Name="!(loc.ProgramCreatorCompany)">
+        </Directory>
+      </Directory>
+
+    </Directory>
+
+    <!-- Start Menu shortcuts -->
+    <DirectoryRef Id="ProgramCreatorStartMenuFolder">
+      <Component Id="ApplicationShortcut" Guid="{AF608A25-FE19-4515-9555-3CE74F9598AA}">
+
+        <Shortcut Id="ApplicationShortcut"
+                  Name="!(loc.ProductName)"
+                  Description="!(loc.Description)"
+                  Target="[INSTALLFOLDER]StreamController.exe"
+                  Directory="ProgramCreatorStartMenuFolder"
+                  WorkingDirectory="APPLICATIONROOTDIRECTORY" />
+
+        <Shortcut Id="UninstallApplicationStartMenuShortcut"
+                  Name="Uninstall !(loc.ProductName)"
+                  Description="Uninstalls for !(loc.Description)"
+                  Target="[System64Folder]msiexec.exe"
+                  Arguments="/x $(var.ProductCode)" />
+        <RemoveFolder Id="CleanUpShortcut" Directory="ProgramCreatorStartMenuFolder" On="uninstall" />
+        <RegistryKey Root="HKCU" Key="!(loc.ProgramCreatorCompany)\!(loc.ProductName)\Uninstall">
+          <RegistryValue Name="installed" Type="integer" Value="1" KeyPath="yes" />
+        </RegistryKey>
+      </Component>
+    </DirectoryRef>
+
+  </Fragment>
+</Wix>

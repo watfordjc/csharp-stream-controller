@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WixLocalization
+  Culture="en-us"
+  xmlns="http://schemas.microsoft.com/wix/2006/localization">
+<!-- TODO: Work out how to create a localisation file for en-gb Culture without errors/warnings. -->
+  <String Id="ProductName">Stream Controller</String>
+  <String Id="ProductName_x86">Stream Controller (32 bit)</String>
+  <String Id="ProductName_x64">Stream Controller (64 bit)</String>
+  <String Id="LocaleID">2057</String>
+  <String Id="Company">John Cook</String>
+  <String Id="SupportPage">https://twitter.com/WatfordJC</String>
+  <String Id="GitPage">https://github.com/watfordjc/csharp-stream-controller</String>
+  <String Id="Description">A connectivity hub for streaming.</String>
+  <String Id="Keywords">OBS, Stream, Streaming, Control, Controller, Deck</String>
+  <String Id="Comments">Work In Progress</String>
+  <String Id="DowngradeErrorMessage">A newer version of Stream Controller is already installed.</String>
+  <String Id="ProgramCreatorCompany">John Cook</String>
+  <String Id="ProgramInstallationDirectory">Stream Controller Test</String>
+</WixLocalization>

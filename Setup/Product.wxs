@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+  <!-- Constant(?) GUIDs for different platforms. -->
+  <?if $(var.Platform) = x64 ?>
+  <?define ProductCode = "{E3608DD8-430B-4375-8801-DD6057622B15}" ?>
+  <?elseif $(var.Platform)= x86 ?>
+  <?define ProductCode = "{151A95EB-469E-42B3-81E5-16F6323DE030}" ?>
+  <?endif?>
+
+  <!-- Upgrade code constant - don't change. -->
+  <?define UpgradeCode = "{B6E18BF2-8A05-4EE6-A415-818520A777E1}" ?>
+
+  <!-- Main product -->
+  <Product Id="$(var.ProductCode)"
+           Name="!(loc.ProductName_$(var.Platform))"
+           Language="!(loc.LocaleID)"
+           Version="$(var.BuildVersion)"
+           Manufacturer="!(loc.Company)"
+           UpgradeCode="$(var.UpgradeCode)">
+
+    <!-- Package details -->
+    <Package InstallerVersion="200"
+             Compressed="yes"
+             InstallScope="perMachine"
+             Manufacturer="!(loc.Company)"
+             Description="!(loc.Description)"
+             Keywords="!(loc.Keywords)"
+             Comments="!(loc.Comments)"
+             Languages="!(loc.LocaleID)"
+             />
+
+    <!-- For major upgrades -->
+    <MajorUpgrade
+      DowngradeErrorMessage="!(loc.DowngradeErrorMessage)" />
+    <!-- Cabinet file stuff -->
+    <MediaTemplate EmbedCab="yes"  />
+
+    <!-- Icon definition -->
+
+    <Icon Id="icon.ico" SourceFile="$(var.StreamController.ProjectDir)icon.ico" />
+
+    <!-- Icon for installer -->
+    <Property Id="ARPPRODUCTICON">icon.ico</Property>
+    <Property Id="ARPHELPLINK">!(loc.SupportPage)</Property>
+    <Property Id="ARPURLINFOABOUT">!(loc.GitPage)</Property>
+    <Property Id="ARPCOMMENTS">!(loc.Comments)</Property>
+
+    <!-- Custom dialog background image 493x312 -->
+    <!--
+    <WixVariable Id="WixUIDialogBmp" Value="$(var.ProjectDir)Assets\Background.bmp" />
+    -->
+    <!-- Custom installer banner image 493x58 -->
+    <!--
+    <WixVariable Id="WixUIBannerBmp" Value="$(var.ProjectDir)Assets\Banner.bmp" />
+    -->
+    <!-- Definitions of things to be installed. -->
+    <Feature Id="ProductFeature"
+             Title="StreamController"
+             Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+      <ComponentGroupRef Id="PublishedComponents" />
+    </Feature>
+
+    <!-- Installer UI -->
+    <UI Id="UserInterface">
+      <Property Id="WIXUI_INSTALLDIR" Value="TARGETDIR" />
+      <Property Id="WixUI_Mode" Value="Custom" />
+      <UIRef Id="WixUI_Common" />
+
+      <TextStyle Id="WixUI_Font_Normal" FaceName="Segoe UI" Size="10" />
+      <TextStyle Id="WixUI_Font_Bigger" FaceName="Segoe UI" Size="13" Bold="yes" />
+      <TextStyle Id="WixUI_Font_Title"  FaceName="Segoe UI" Size="9" Bold="yes" />
+
+      <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
+
+      <Property Id="WixUI_Ico_Info" Value="icon.ico" />
+
+      <DialogRef Id="ProgressDlg" />
+      <DialogRef Id="ErrorDlg" />
+      <DialogRef Id="FilesInUse" />
+      <DialogRef Id="FatalError" />
+      <DialogRef Id="UserExit" />
+
+      <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
+      <Publish Dialog="WelcomeDlg" Control="Next" Event="EndDialog" Value="Return" Order="2"></Publish>
+    </UI>
+
+  </Product>
+</Wix>
