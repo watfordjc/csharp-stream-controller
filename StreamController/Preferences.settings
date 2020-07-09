@@ -1,5 +1,5 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Stream_Controller" GeneratedClassName="Preferences">
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="uk.JohnCook.dotnet.StreamController" GeneratedClassName="Preferences">
   <Profiles />
   <Settings>
     <Setting Name="obs_connect_launch" Type="System.Boolean" Scope="User">

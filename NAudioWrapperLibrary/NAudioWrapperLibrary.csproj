@@ -8,6 +8,7 @@
     <Authors>John Cook</Authors>
     <Copyright>Copyright © John Cook 2020</Copyright>
     <Platforms>AnyCPU;x64;x86</Platforms>
+    <RootNamespace>uk.JohnCook.dotnet.NAudioWrapperLibrary</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

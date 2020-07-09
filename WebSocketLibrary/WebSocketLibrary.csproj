@@ -8,6 +8,7 @@
     <FileVersion>0.1.0.0</FileVersion>
     <Copyright>Copyright © John Cook 2020</Copyright>
     <Platforms>AnyCPU;x64;x86</Platforms>
+    <RootNamespace>uk.JohnCook.dotnet.WebSocketLibrary</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
