@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29509.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StreamController", "Stream Controller\StreamController.csproj", "{C0C6BAF1-99E3-4B3B-909B-A6797594B7CD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StreamController", "StreamController\StreamController.csproj", "{C0C6BAF1-99E3-4B3B-909B-A6797594B7CD}"
 	ProjectSection(ProjectDependencies) = postProject
 		{88133766-B2CD-415E-AFE0-18F9E6BCF0B0} = {88133766-B2CD-415E-AFE0-18F9E6BCF0B0}
 		{1E989DD4-F972-4C97-90F0-5096F578EBC0} = {1E989DD4-F972-4C97-90F0-5096F578EBC0}
