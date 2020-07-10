@@ -315,7 +315,7 @@ namespace uk.JohnCook.dotnet.StreamController
                     SceneItemLockChanged_Event((SceneItemLockChangedObsEvent)eventObject.MessageObject);
                     break;
                 case ObsEventType.SceneCollectionChanged:
-                    await Obs_Get(ObsRequestType.GetSourcesList).ConfigureAwait(true);
+                    tbTransitioning.Text = String.Empty;
                     break;
                 case ObsEventType.SourceAudioMixersChanged:
                     SourceAudioMixersChanged_Event((SourceAudioMixersChangedObsEvent)eventObject.MessageObject);
@@ -382,6 +382,7 @@ namespace uk.JohnCook.dotnet.StreamController
                         sceneList.Add(scene);
                         await PopulateSceneItemSources(scene.Sources, scene).ConfigureAwait(true);
                     }
+                    Debug.Assert(sceneList.Any(x => x.Name == currentSceneName.ToString()), $"Scene {currentSceneName} wasn't added to sceneList.");
                     currentScene = sceneList.First(x => x.Name == currentSceneName.ToString());
                     await UpdateSceneInformation().ConfigureAwait(true);
                     break;
@@ -402,8 +403,10 @@ namespace uk.JohnCook.dotnet.StreamController
                 case ObsRequestType.GetSourceSettings:
                     GetSourceSettingsReply sourceSettings = (GetSourceSettingsReply)replyObject.MessageObject;
                     BaseType newSource = (BaseType)sourceSettings.SourceSettingsObj;
+                    newSource.Name = sourceSettings.SourceName;
+                    Debug.Assert(sourceTypes.Types.Any(x => x.TypeId == sourceSettings.SourceType), $"Source type {sourceSettings.SourceType} isn't in list from server.");
                     newSource.Type = sourceTypes.Types.First(x => x.TypeId == sourceSettings.SourceType);
-                    obsSourceDictionary[sourceSettings.SourceName] = newSource;
+                    obsSourceDictionary[newSource.Name] = newSource;
                     await Obs_Get(ObsRequestType.GetSourceFilters, sourceSettings.SourceName).ConfigureAwait(true);
                     break;
                 case ObsRequestType.GetSourceFilters:
@@ -476,29 +479,35 @@ namespace uk.JohnCook.dotnet.StreamController
 
             foreach (BaseType source in obsSourceDictionary.Values)
             {
-                switch (ObsTypes.ObsTypeNameDictionary[source.Type.TypeId])
-                {
-                    case ObsSourceType.WasapiOutputCapture:
-                    case ObsSourceType.WasapiInputCapture:
-                    case ObsSourceType.DShowInput:
-                        break;
-                    default:
-                        continue;
-                }
-                DependencyProperties dependencies = source.Dependencies;
-                if (source.Type.TypeId == ObsTypes.ObsTypeNameDictionary.First(x => x.Value == ObsSourceType.DShowInput).Key)
-                {
-                    ReadOnlyMemory<char> deviceName = ((DShowInput)source).AudioDeviceId.AsMemory();
-                    dependencies.AudioDeviceId = AudioInterfaceCollection.GetAudioInterfaceByName(deviceName[0..^1].ToString()).ID;
-                }
-                dependencies.AudioInterface = AudioInterfaceCollection.GetAudioInterfaceById(dependencies.AudioDeviceId);
-                //Trace.WriteLine($"{sourceReply.SourceName} -> {sourceReply.SourceType} -> device_id: {audioInterface?.ID} AKA {audioInterface?.FriendlyName}");
-                // WASAPI and DirectShow source types should reference an audio device
-                if (!dependencies.HasAudioInterface)
-                {
-                    dependencies.DependencyProblem = true;
-                    continue;
-                }
+                GetDeviceIdForSource(source);
+            }
+        }
+
+        private static void GetDeviceIdForSource(BaseType source)
+        {
+            switch (ObsTypes.ObsTypeNameDictionary[source.Type.TypeId])
+            {
+                case ObsSourceType.WasapiOutputCapture:
+                case ObsSourceType.WasapiInputCapture:
+                case ObsSourceType.DShowInput:
+                    break;
+                default:
+                    return;
+            }
+            DependencyProperties dependencies = source.Dependencies;
+            Debug.Assert(ObsTypes.ObsTypeNameDictionary.ContainsValue(ObsSourceType.DShowInput), "DShowInput not in type dictionary.");
+            if (source.Type.TypeId == ObsTypes.ObsTypeNameDictionary.First(x => x.Value == ObsSourceType.DShowInput).Key)
+            {
+                ReadOnlyMemory<char> deviceName = ((DShowInput)source).AudioDeviceId.AsMemory();
+                dependencies.AudioDeviceId = AudioInterfaceCollection.GetAudioInterfaceByName(deviceName[0..^1].ToString()).ID;
+            }
+            dependencies.AudioInterface = AudioInterfaceCollection.GetAudioInterfaceById(dependencies.AudioDeviceId);
+            //Trace.WriteLine($"{sourceReply.SourceName} -> {sourceReply.SourceType} -> device_id: {audioInterface?.ID} AKA {audioInterface?.FriendlyName}");
+            // WASAPI and DirectShow source types should reference an audio device
+            if (!dependencies.HasAudioInterface)
+            {
+                dependencies.DependencyProblem = true;
+                return;
             }
         }
 
@@ -546,25 +555,55 @@ namespace uk.JohnCook.dotnet.StreamController
 
         private void SceneItemRemoved_Event(SceneItemRemovedObsEvent messageObject)
         {
-            ObsSceneItem sceneItemToRemove = sceneList.First(x => x.Name == messageObject.SceneName).Sources.First(x => x.Name == messageObject.ItemName);
-            sceneList.First(x => x.Name == messageObject.SceneName).Sources.Remove(sceneItemToRemove);
+            if (!sceneList.Any(x => x.Name == messageObject.SceneName)) { return; }
+
+            ObsScene scene = sceneList.First(x => x.Name == messageObject.SceneName);
+            ObsSceneItem sceneItem = scene.Sources.FirstOrDefault(x => x.Name == messageObject.ItemName);
+            if (sceneItem != default)
+            {
+                scene.Sources.Remove(sceneItem);
+            }
         }
 
         private void SourceCreated_Event(SourceCreatedObsEvent messageObject)
         {
             ObsSourceType sourceType = ObsTypes.ObsTypeNameDictionary[messageObject.SourceKind];
-            object createdSource = ObsWsSourceType.GetInstanceOfType(sourceType);
-            (createdSource as BaseType).Type = sourceTypes.Types.First(x => x.TypeId == messageObject.SourceKind);
+            object createdSource = messageObject.SourceSettingsObj;
+            ObsWsReplyType replyType = sourceTypes.Types.FirstOrDefault(x => x.TypeId == messageObject.SourceKind);
+            if (replyType == default) { return; }
+
+            (createdSource as BaseType).Type = replyType;
+            (createdSource as BaseType).Name = messageObject.SourceName;
             obsSourceDictionary[messageObject.SourceName] = createdSource;
+            GetDeviceIdForSource(createdSource as BaseType);
+            if (sourceType == ObsSourceType.Scene)
+            {
+                ObsScene newScene = new ObsScene()
+                {
+                    Name = (createdSource as Scene).Name,
+                    Sources = new ObservableCollection<ObsSceneItem>()
+                };
+                sceneList.Add(newScene);
+            }
         }
 
         private void SourceDestroyed_Event(SourceDestroyedObsEvent messageObject)
         {
             obsSourceDictionary.Remove(messageObject.SourceName);
+            if (ObsTypes.ObsTypeNameDictionary[messageObject.SourceKind] == ObsSourceType.Scene)
+            {
+                ObsScene scene = sceneList.FirstOrDefault(x => x.Name == messageObject.SourceName);
+                if (scene != default)
+                {
+                    sceneList.Remove(scene);
+                }
+            }
         }
 
         private void SceneItemAdded_Event(SceneItemAddedObsEvent messageObject)
         {
+            // Don't add scenes to themselves
+            if (messageObject.SceneName == messageObject.ItemName) { return; }
             if (!obsSourceDictionary.TryGetValue(messageObject.ItemName, out object source))
             {
                 return;
@@ -584,10 +623,13 @@ namespace uk.JohnCook.dotnet.StreamController
 
         private void SceneItemTransformChanged_Event(SceneItemTransformChangedObsEvent messageObject)
         {
-            if (sceneList.Any(x => x.Name == messageObject.SceneName))
+            if (!sceneList.Any(x => x.Name == messageObject.SceneName)) { return; }
+
+            ObsScene existingScene = sceneList.First(x => x.Name == messageObject.SceneName);
+            ObsSceneItem existingSceneItem = existingScene.Sources.FirstOrDefault(x => x.Name == messageObject.ItemName);
+            if (existingSceneItem != default)
             {
-                ObsSceneItem existingScene = sceneList.First(x => x.Name == messageObject.SceneName).Sources.First(x => x.Name == messageObject.ItemName);
-                existingScene.Transform = messageObject.Transform;
+                existingSceneItem.Transform = messageObject.Transform;
             }
         }
 
@@ -619,14 +661,26 @@ namespace uk.JohnCook.dotnet.StreamController
 
         private void SceneItemVisibilityChanged_Event(SceneItemVisibilityChangedObsEvent messageObject)
         {
-            ObsSceneItem existingScene = sceneList.First(x => x.Name == messageObject.SceneName).Sources.First(x => x.Name == messageObject.ItemName);
-            existingScene.Render = messageObject.ItemVisible;
+            if (!sceneList.Any(x => x.Name == messageObject.SceneName)) { return; }
+
+            ObsScene scene = sceneList.First(x => x.Name == messageObject.SceneName);
+            ObsSceneItem sceneItem = scene.Sources.FirstOrDefault(x => x.Name == messageObject.ItemName);
+            if (sceneItem != default)
+            {
+                sceneItem.Render = messageObject.ItemVisible;
+            }
         }
 
         private void SceneItemLockChanged_Event(SceneItemLockChangedObsEvent messageObject)
         {
-            ObsSceneItem existingScene = sceneList.First(x => x.Name == messageObject.SceneName).Sources.First(x => x.Name == messageObject.ItemName);
-            existingScene.Locked = messageObject.ItemLocked;
+            if (!sceneList.Any(x => x.Name == messageObject.SceneName)) { return; }
+
+            ObsScene scene = sceneList.First(x => x.Name == messageObject.SceneName);
+            ObsSceneItem sceneItem = scene.Sources.FirstOrDefault(x => x.Name == messageObject.ItemName);
+            if (sceneItem != default)
+            {
+                sceneItem.Locked = messageObject.ItemLocked;
+            }
         }
 
         private void SourceAudioMixersChanged_Event(SourceAudioMixersChangedObsEvent messageObject)
@@ -655,8 +709,11 @@ namespace uk.JohnCook.dotnet.StreamController
         private void SourceFilterVisibilityChanged_Event(SourceFilterVisibilityChangedObsEvent messageObject)
         {
             BaseType source = (BaseType)obsSourceDictionary[messageObject.SourceName];
-            BaseFilter filter = source.Filters.First(x => x.Name == messageObject.FilterName);
-            filter.Enabled = messageObject.FilterEnabled;
+            BaseFilter filter = source.Filters.FirstOrDefault(x => x.Name == messageObject.FilterName);
+            if (filter != default)
+            {
+                filter.Enabled = messageObject.FilterEnabled;
+            }
         }
 
         private void SourceFiltersReordered_Event(SourceFiltersReorderedObsEvent messageObject)
@@ -665,8 +722,11 @@ namespace uk.JohnCook.dotnet.StreamController
             List<string> collectionOrderList = messageObject.Filters.Select(x => x.Name).ToList();
             for (int i = 0; i < collectionOrderList.Count; i++)
             {
-                BaseFilter filter = source.Filters.First(x => x.Name == collectionOrderList[i]);
-                source.Filters.Move(source.Filters.IndexOf(filter), i);
+                BaseFilter filter = source.Filters.FirstOrDefault(x => x.Name == collectionOrderList[i]);
+                if (filter != default)
+                {
+                    source.Filters.Move(source.Filters.IndexOf(filter), i);
+                }
             }
         }
 

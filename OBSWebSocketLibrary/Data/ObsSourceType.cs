@@ -113,7 +113,7 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.Data
     {
         private static readonly Dictionary<ObsSourceType, Type> sourceTypeSettingsDictionary = new Dictionary<ObsSourceType, Type>()
         {
-            { ObsSourceType.Scene, typeof(TypeDefs.ObsScene) },
+            { ObsSourceType.Scene, typeof(TypeDefs.Scene) },
             { ObsSourceType.Group, typeof(TypeDefs.Group) },
             { ObsSourceType.AudioLine, typeof(TypeDefs.AudioLine) },
             { ObsSourceType.ImageSource, typeof(TypeDefs.ImageSource) },
