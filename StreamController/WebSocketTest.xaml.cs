@@ -28,6 +28,9 @@ using System.Windows.Media.Converters;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using uk.JohnCook.dotnet.OBSWebSocketLibrary;
+using uk.JohnCook.dotnet.OBSWebSocketLibrary.Data;
+using uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsEvents;
+using uk.JohnCook.dotnet.OBSWebSocketLibrary.TypeDefs;
 using uk.JohnCook.dotnet.WebSocketLibrary;
 
 namespace uk.JohnCook.dotnet.StreamController
@@ -76,11 +79,92 @@ namespace uk.JohnCook.dotnet.StreamController
             webSocket.StateChange += WebSocket_StateChange_ContextSwitch;
             webSocket.StateChange += WebSocket_Connected_ContextSwitch;
             webSocket.ReceiveTextMessage += WebSocket_NewTextMessage_ContextSwitch;
+            //webSocket.OnObsEvent += WebSocket_NewObsEvent_ContextSwitch;
             webSocket.ErrorState += WebSocket_ErrorMessage_ContextSwitch;
             if (Preferences.Default.obs_connect_launch)
             {
                 btnTest.IsEnabled = false;
                 await webSocket.AutoReconnectConnectAsync().ConfigureAwait(true);
+            }
+        }
+
+        private void WebSocket_NewObsEvent_ContextSwitch(object sender, ObsEventObject e)
+        {
+            _Context.Send(
+                x => WebSocket_NewObsEvent(e),
+                null);
+        }
+
+        private void WebSocket_NewObsEvent(ObsEventObject obsEventObject)
+        {
+            EventBase obsEvent = obsEventObject.MessageObject as EventBase;
+            switch (obsEventObject.EventType)
+            {
+                case ObsEventType.SourceFilterRemoved:
+                    SourceFilterRemovedObsEvent temp1 = (obsEvent as SourceFilterRemovedObsEvent);
+                    txtOutput.AppendText($"{temp1.UpdateType}: {temp1.FilterName} ({temp1.FilterType}) removed from {temp1.SourceName}\n");
+                    break;
+                case ObsEventType.SourceDestroyed:
+                    SourceDestroyedObsEvent temp2 = (obsEvent as SourceDestroyedObsEvent);
+                    txtOutput.AppendText($"{temp2.UpdateType}: {temp2.SourceName} ({temp2.SourceType})\n");
+                    break;
+                case ObsEventType.SourceCreated:
+                    SourceCreatedObsEvent temp3 = (obsEvent as SourceCreatedObsEvent);
+                    txtOutput.AppendText($"{temp3.UpdateType}: {temp3.SourceName} ({temp3.SourceKind})\n");
+                    break;
+                case ObsEventType.SourceVolumeChanged:
+                    SourceVolumeChangedObsEvent temp4 = (obsEvent as SourceVolumeChangedObsEvent);
+                    txtOutput.AppendText($"{temp4.UpdateType}: {temp4.SourceName}'s volume now at {temp4.Volume}\n");
+                    break;
+                case ObsEventType.SourceAudioSyncOffsetChanged:
+                    SourceAudioSyncOffsetChangedObsEvent temp5 = (obsEvent as SourceAudioSyncOffsetChangedObsEvent);
+                    txtOutput.AppendText($"{temp5.UpdateType}: {temp5.SourceName}'s audio offset is now {temp5.SyncOffset}\n");
+                    break;
+                case ObsEventType.SourceMuteStateChanged:
+                    SourceMuteStateChangedObsEvent temp6 = (obsEvent as SourceMuteStateChangedObsEvent);
+                    txtOutput.AppendText($"{temp6.UpdateType}: {temp6.SourceName} now has a muted state of {temp6.Muted}\n");
+                    break;
+                case ObsEventType.SourceFilterAdded:
+                    SourceFilterAddedObsEvent temp7 = (obsEvent as SourceFilterAddedObsEvent);
+                    txtOutput.AppendText($"{temp7.UpdateType}: {temp7.FilterName} ({temp7.FilterType}) added to {temp7.SourceName}\n");
+                    break;
+                case ObsEventType.SceneItemAdded:
+                    SceneItemAddedObsEvent temp8 = (obsEvent as SceneItemAddedObsEvent);
+                    txtOutput.AppendText($"{temp8.UpdateType}: {temp8.ItemName} added to {temp8.SceneName}\n");
+                    break;
+                case ObsEventType.SceneItemTransformChanged:
+                    SceneItemTransformChangedObsEvent temp9 = (obsEvent as SceneItemTransformChangedObsEvent);
+                    txtOutput.AppendText($"{temp9.UpdateType}: Transform changed on {temp9.ItemName} in {temp9.SceneName}\n");
+                    break;
+                case ObsEventType.SwitchScenes:
+                    SwitchScenesObsEvent temp10 = (obsEvent as SwitchScenesObsEvent);
+                    txtOutput.AppendText($"{temp10.UpdateType}: Switching to {temp10.SceneName}; {temp10.Sources.Count} sources in the scene.\n");
+                    break;
+                case ObsEventType.SceneCollectionChanged:
+                    SceneCollectionChangedObsEvent temp11 = (obsEvent as SceneCollectionChangedObsEvent);
+                    txtOutput.AppendText($"{temp11.UpdateType}: Scene collection has changed.\n");
+                    break;
+                case ObsEventType.TransitionListChanged:
+                    TransitionListChangedObsEvent temp12 = (obsEvent as TransitionListChangedObsEvent);
+                    txtOutput.AppendText($"{temp12.UpdateType}: Transition list has changed.\n");
+                    break;
+                case ObsEventType.SwitchTransition:
+                    SwitchTransitionObsEvent temp13 = (obsEvent as SwitchTransitionObsEvent);
+                    txtOutput.AppendText($"{temp13.UpdateType}: Using transition {temp13.TransitionName}\n");
+                    break;
+                case ObsEventType.ScenesChanged:
+                    ScenesChangedObsEvent temp14 = (obsEvent as ScenesChangedObsEvent);
+                    txtOutput.AppendText($"{temp14.UpdateType}: The scene list has been modified.\n");
+                    break;
+                default:
+                    txtOutput.AppendText((obsEventObject.MessageObject as EventBase).UpdateType);
+                    txtOutput.AppendText("\n");
+                    break;
+            }
+
+            if (autoscroll == true)
+            {
+                svScroll.ScrollToBottom();
             }
         }
 

@@ -120,5 +120,11 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.Data
         {
             return eventDictionary.TryGetValue(eventType, out Type value) ? value : null;
         }
+
+        public static Type GetType(string obsEventType)
+        {
+            ObsEventType type = (ObsEventType)Enum.Parse(typeof(ObsEventType), obsEventType);
+            return eventDictionary.TryGetValue(type, out Type value) ? value : null; ;
+        }
     }
 }
