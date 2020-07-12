@@ -61,10 +61,14 @@
                     </TextBox>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
+                    <CheckBox Content="Use Password:" Margin="8 8 4 8" x:Name="cbUsePassword" IsChecked="{Binding Path=obs_use_password, Source={x:Static local:Preferences.Default}, Mode=OneWay}" />
+                    <PasswordBox MinWidth="160" PasswordChar="_" x:Name="pbPassword" Margin="0 8" IsEnabled="{Binding ElementName=cbUsePassword, Path=IsChecked}" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
                     <CheckBox Content="Connect on Launch" Margin="8" x:Name="cbConnectLaunch" IsChecked="{Binding Path=obs_connect_launch, Source={x:Static local:Preferences.Default}, Mode=TwoWay}" />
                     <CheckBox Content="Automatically Reconnect" Margin="8" x:Name="cbAutoReconnect" IsChecked="{Binding Path=obs_auto_reconnect, Source={x:Static local:Preferences.Default}, Mode=TwoWay}" />
                 </StackPanel>
-                <GroupBox Header="Exponential Backoff" Margin="8">
+                <GroupBox Header="Exponential Back-off" Margin="8">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -99,7 +103,7 @@
                         <TextBlock Grid.Row="1" Grid.Column="2" Text="minutes" Margin="2 8" VerticalAlignment="Center" />
                     </Grid>
                 </GroupBox>
-                <CheckBox Content="Autoscroll" VerticalContentAlignment="Center" Margin="8" x:Name="cbAutoscroll" IsChecked="{Binding Path=obs_autoscroll, Source={x:Static local:Preferences.Default}, Mode=TwoWay}" />
+                <CheckBox Content="Auto-scroll" VerticalContentAlignment="Center" Margin="8" x:Name="cbAutoscroll" IsChecked="{Binding Path=obs_autoscroll, Source={x:Static local:Preferences.Default}, Mode=TwoWay}" />
             </StackPanel>
         </GroupBox>
     </Grid>

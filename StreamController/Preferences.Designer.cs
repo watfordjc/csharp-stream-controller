@@ -202,5 +202,29 @@ namespace uk.JohnCook.dotnet.StreamController {
                 this["obs_uri_scheme"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool obs_use_password {
+            get {
+                return ((bool)(this["obs_use_password"]));
+            }
+            set {
+                this["obs_use_password"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string obs_password {
+            get {
+                return ((string)(this["obs_password"]));
+            }
+            set {
+                this["obs_password"] = value;
+            }
+        }
     }
 }

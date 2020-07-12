@@ -47,5 +47,11 @@
     <Setting Name="obs_uri_scheme" Type="System.String" Scope="User">
       <Value Profile="(Default)">ws</Value>
     </Setting>
+    <Setting Name="obs_use_password" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="obs_password" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>
