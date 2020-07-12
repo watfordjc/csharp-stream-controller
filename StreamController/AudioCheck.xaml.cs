@@ -88,7 +88,14 @@ namespace uk.JohnCook.dotnet.StreamController
             webSocket.OnObsEvent += WebSocket_Event_ContextSwitch;
             webSocket.OnObsReply += Websocket_Reply_ContextSwitch;
             _ReconnectCountdownTimer.Elapsed += ReconnectCountdownTimer_Elapsed;
+            UpdateTrayIcon();
             await ObsWebsocketConnect().ConfigureAwait(true);
+        }
+
+        private void UpdateTrayIcon()
+        {
+            NotifyIcon.Icon = Properties.Resources.icon;
+            NotifyIcon.Visibility = Visibility.Visible;
         }
 
         private async void Window_Closed(object sender, EventArgs e)
@@ -107,6 +114,7 @@ namespace uk.JohnCook.dotnet.StreamController
             sourceTypes = null;
             obsSourceDictionary.Clear();
             obsSceneItemSceneDictionary.Clear();
+            NotifyIcon.Dispose();
         }
         #endregion
 
@@ -216,12 +224,14 @@ namespace uk.JohnCook.dotnet.StreamController
                 connectionError = String.Empty;
                 _ReconnectCountdownTimer.Stop();
                 UpdateUIConnectStatus(String.Empty, Brushes.DarkGreen, null);
+                NotifyIcon.Icon = Properties.Resources.icon_dark_green;
                 obsSourceDictionary.Clear();
             }
             else if (newState != WebSocketState.Connecting)
             {
                 _ReconnectCountdownTimer.Start();
                 UpdateUIConnectStatus(null, Brushes.Red, null);
+                NotifyIcon.Icon = Properties.Resources.icon_red;
             }
             else
             {
@@ -232,6 +242,7 @@ namespace uk.JohnCook.dotnet.StreamController
                 connectionError = String.Empty;
                 _ReconnectCountdownTimer.Stop();
                 UpdateUIConnectStatus("\u2026", Brushes.DarkGoldenrod, null);
+                NotifyIcon.Icon = Properties.Resources.dark_golden_rod;
             }
         }
 
@@ -835,6 +846,13 @@ namespace uk.JohnCook.dotnet.StreamController
                 _Context.Send(
                     _ => sbCircleStatus.Fill = brush1,
                     null);
+                if (brush1 == primaryBrush)
+                {
+                    NotifyIcon.Icon = Properties.Resources.icon;
+                } else if (brush1 == secondaryBrush)
+                {
+                    NotifyIcon.Icon = Properties.Resources.icon_secondary;
+                }
             }
             if (brush2 != null)
             {
@@ -842,6 +860,7 @@ namespace uk.JohnCook.dotnet.StreamController
                 _Context.Send(
                     _ => sbCircleStatus.Fill = brush2,
                     null);
+                NotifyIcon.Icon = Properties.Resources.icon_neutral;
             }
         }
 

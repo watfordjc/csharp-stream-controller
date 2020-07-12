@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:uk.JohnCook.dotnet.StreamController"
+        xmlns:tb="http://www.hardcodet.net/taskbar"
         mc:Ignorable="d"
         FontFamily="Open Sans"
         FontSize="14"
@@ -11,6 +12,11 @@
         Closed="Window_Closed"
         Title="AudioCheck" Height="450" Width="800">
     <DockPanel>
+        <tb:TaskbarIcon
+            x:Name="NotifyIcon"
+            ToolTipText="Stream Controller"
+            Visibility="Collapsed"
+            MenuActivation="RightClick" />
         <Menu DockPanel.Dock="Top" ItemsSource="{StaticResource ResourceKey=MenuItems}" />
         <StatusBar DockPanel.Dock="Bottom" Height="auto" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" Padding="2">
             <StatusBarItem DockPanel.Dock="Right">
