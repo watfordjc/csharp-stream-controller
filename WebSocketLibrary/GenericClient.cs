@@ -114,7 +114,7 @@ namespace uk.JohnCook.dotnet.WebSocketLibrary
         }
 
         /// <summary>
-        /// Configure exponential backoff for reconnection attempts.
+        /// Configure exponential back-off for reconnection attempts.
         /// </summary>
         /// <param name="initialRetrySeconds">Delay between connection error and first reconnection attempt (seconds).</param>
         /// <param name="maximumRetryMinutes">Maximum delay between connection attempts (minutes).</param>
@@ -208,7 +208,7 @@ namespace uk.JohnCook.dotnet.WebSocketLibrary
         }
 
         /// <summary>
-        /// Disconnect and cleanup.
+        /// Disconnect and clean-up.
         /// </summary>
         /// <returns>True when completed.</returns>
         public async Task<bool> DisconnectAsync(bool cancelExisting = true)
@@ -243,7 +243,7 @@ namespace uk.JohnCook.dotnet.WebSocketLibrary
         }
 
         /// <summary>
-        /// Disconnect and cleanup, then reconnect (automatic retries).
+        /// Disconnect and clean-up, then reconnect (automatic retries).
         /// </summary>
         /// <returns>True if connected, false if cancelled.</returns>
         public async Task ReconnectAsync()

@@ -14,7 +14,6 @@ namespace uk.JohnCook.dotnet.StreamController.SharedModels
     public class AudioInterface : INotifyPropertyChanged
     {
         private MMDevice _Device;
-        // TODO: Design model for NAudio and obs-websocket
 
         public string ID { get; private set; }
         public DataFlow DataFlow { get; private set; }
