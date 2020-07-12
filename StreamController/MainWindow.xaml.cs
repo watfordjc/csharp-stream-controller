@@ -43,5 +43,10 @@ namespace uk.JohnCook.dotnet.StreamController
                 group_default_capture.DataContext = AudioInterfaceCollection.Instance.DefaultCapture;
             }
         }
+
+        private void BtnMakeDefaultRender_Click(object sender, RoutedEventArgs e)
+        {
+            AudioInterfaceCollection.ChangeDefaultDevice((cb_interfaces.SelectedItem as AudioInterface).ID);
+        }
     }
 }

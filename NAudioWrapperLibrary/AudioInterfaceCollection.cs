@@ -104,6 +104,12 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
             , null);
         }
 
+        public static void ChangeDefaultDevice(string defaultDeviceId)
+        {
+            AudioDeviceCmdlets.PolicyConfigClient policyConfigClient = new AudioDeviceCmdlets.PolicyConfigClient();
+            policyConfigClient.SetDefaultEndpoint(defaultDeviceId, Role.Console);
+        }
+
         private void UpdateDefaultDevice(DataFlow flow, string defaultDeviceId)
         {
             if (flow == DataFlow.Render)

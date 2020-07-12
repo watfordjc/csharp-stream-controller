@@ -57,6 +57,7 @@
                                     <RowDefinition />
                                     <RowDefinition />
                                     <RowDefinition />
+                                    <RowDefinition />
                                 </Grid.RowDefinitions>
                                 <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" VerticalAlignment="Center" Margin="0 0 8 0" />
                                 <TextBlock Grid.Row="0" Grid.Column="1" x:Name="interface_name" Text="{Binding FriendlyName}" />
@@ -68,6 +69,7 @@
                                 <TextBlock Grid.Row="3" Grid.Column="1" x:Name="interface_volume" Text="{Binding Volume,StringFormat={}{0}%}" Visibility="{Binding IsActive, Converter={StaticResource BoolToVisibility}}" />
                                 <TextBlock Grid.Row="4" Grid.Column="0" x:Name="interface_muted_label" Text="Muted:" VerticalAlignment="Center" Margin="0 0 8 0" Visibility="{Binding IsActive, Converter={StaticResource BoolToVisibility}}" />
                                 <TextBlock Grid.Row="4" Grid.Column="1" x:Name="interface_muted" Text="{Binding Muted}" Visibility="{Binding IsActive, Converter={StaticResource BoolToVisibility}}" />
+                                <Button Grid.Row="5" Grid.Column="0" x:Name="btnMakeDefaultRender" Margin="0 8" Padding="4" Content="Make Default" Visibility="{Binding IsActive, Converter={StaticResource BoolToVisibility}}" Click="BtnMakeDefaultRender_Click" />
                             </Grid>
                         </GroupBox>
                         <Grid>
