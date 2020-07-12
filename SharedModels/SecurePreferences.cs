@@ -13,12 +13,8 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Unicode;
-using System.Windows.Shell;
-using Windows.Devices.Printers;
-using Windows.Foundation.Metadata;
-using Windows.Security.Cryptography.Core;
 
-namespace uk.JohnCook.dotnet.StreamController.Utils
+namespace uk.JohnCook.dotnet.StreamController.SharedModels
 {
     public class SecurePreferences
     {
@@ -143,21 +139,17 @@ namespace uk.JohnCook.dotnet.StreamController.Utils
 
             // SHA256 hash to check consistency
             string unencryptedAesKeyHash = BitConverter.ToString(sha256.ComputeHash(SuperRandomSymmetricKey)).ToUpperInvariant().Replace("-", String.Empty, StringComparison.Ordinal);
-            Trace.WriteLine($"AES key has hash {unencryptedAesKeyHash}");
 
             // SPKI of asymmetric keypair formatted in same way as HTTP-Public-Key-Header to check it doesn't change
             X509SubjectKeyIdentifierExtension spki = new X509SubjectKeyIdentifierExtension(rsaProvider.ExportSubjectPublicKeyInfo(), false);
-            Trace.WriteLine($"RSA public key is {Transform.ToBase64(Transform.FromHex(spki.SubjectKeyIdentifier))} ({rsaProvider.KeySize} bits)");
 
             // Encrypted AES key in base 64 should be impossible to decrypt even with the IV
             string encryptedAesKeyBase64 = AsymmetricEncryptToBase64(rsaProvider, SuperRandomSymmetricKey);
-            Trace.WriteLine($"Encrypted AES key is, in base64: {encryptedAesKeyBase64}");
             Array.Clear(SuperRandomSymmetricKey, 0, SuperRandomSymmetricKey.Length);
 
             // SHA256 hash of decrypted AES key to check consistency
             Span<byte> decryptedAesKey = AsymmetricDecryptFromBase64(rsaProvider, encryptedAesKeyBase64);
             string aesKeyHash = BitConverter.ToString(sha256.ComputeHash(decryptedAesKey.ToArray())).ToUpperInvariant().Replace("-", String.Empty, StringComparison.Ordinal);
-            Trace.WriteLine($"Decrypted AES key has hash {aesKeyHash}");
 
             return encryptedAesKeyBase64;
         }
@@ -172,7 +164,7 @@ namespace uk.JohnCook.dotnet.StreamController.Utils
         {
             byte[] encryptedBytes = rsaProvider.Encrypt(data, true);
             Span<byte> base64 = ArrayPool<byte>.Shared.Rent(encryptedBytes.Length * 4);
-            Base64.EncodeToUtf8(encryptedBytes, base64, out int consumed, out int written, true);
+            Base64.EncodeToUtf8(encryptedBytes, base64, out int _, out int written, true);
             string base64String = Encoding.UTF8.GetString(base64.Slice(0, written));
             ArrayPool<byte>.Shared.Return(base64.ToArray());
             return base64String;
@@ -181,7 +173,7 @@ namespace uk.JohnCook.dotnet.StreamController.Utils
         /// <summary>
         /// Decrypts data using RSA
         /// </summary>
-        /// <param name="rsaProvider">The RSA provider incudling a private key.</param>
+        /// <param name="rsaProvider">The RSA provider including a private key.</param>
         /// <param name="ciphertext">The base64 encoded encrypted data to decrypt.</param>
         /// <returns>The decrypted data as a byte array.</returns>
         private static byte[] AsymmetricDecryptFromBase64(RSACryptoServiceProvider rsaProvider, string ciphertext)
@@ -198,6 +190,33 @@ namespace uk.JohnCook.dotnet.StreamController.Utils
             ArrayPool<byte>.Shared.Return(poolRef.ToArray());
 
             return rsaProvider.Decrypt(decryptedData.Slice(0, written).ToArray(), true);
+        }
+
+        public static char[] CreateAuthResponse(string preference, string salt, string challenge, byte[] associatedData = null)
+        {
+            if (preference == null) { throw new ArgumentNullException(nameof(preference)); }
+
+            using SHA256 sha256 = SHA256.Create();
+
+            char[] password = new char[preference.Length];
+            GetString(preference, ref password, associatedData);
+
+            char[] secret_string = String.Concat(password.AsSpan(), salt.AsSpan()).ToArray();
+            Array.Clear(password, 0, password.Length);
+            byte[] secret_hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(secret_string));
+            Array.Clear(secret_string, 0, secret_string.Length);
+            byte[] secret = new byte[preference.Length];
+            Base64.EncodeToUtf8(secret_hash, secret, out int consumed, out int written);
+            Array.Clear(secret_hash, 0, secret_hash.Length);
+
+            char[] auth_response_string = String.Concat(Encoding.UTF8.GetString(secret.AsSpan().Slice(0, written)), challenge).ToArray();
+            Array.Clear(secret, 0, written);
+            byte[] auth_response_hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(auth_response_string));
+            Array.Clear(auth_response_string, 0, auth_response_string.Length);
+            byte[] auth_response = new byte[preference.Length];
+            Base64.EncodeToUtf8(auth_response_hash, auth_response, out consumed, out written);
+
+            return Encoding.UTF8.GetString(auth_response.AsSpan().Slice(0, written)).ToCharArray();
         }
     }
 

@@ -18,6 +18,9 @@ using uk.JohnCook.dotnet.OBSWebSocketLibrary.TypeDefs;
 using uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequests;
 using uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequestReplies;
 using uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsEvents;
+using uk.JohnCook.dotnet.StreamController.SharedModels;
+using System.Resources;
+using System.Globalization;
 
 namespace uk.JohnCook.dotnet.OBSWebSocketLibrary
 {
@@ -26,10 +29,13 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary
     /// </summary>
     public class ObsWsClient : GenericClient
     {
+        private readonly ResourceManager rm = new ResourceManager("uk.JohnCook.dotnet.OBSWebSocketLibrary.Properties.Resources", typeof(ObsWsClient).Assembly);
         private readonly SynchronizationContext context;
         public bool AutoReconnect { get; set; }
         private readonly System.Timers.Timer heartBeatCheck = new System.Timers.Timer(8000);
         private readonly Dictionary<Guid, ObsRequestMetadata> sentMessageGuids = new Dictionary<Guid, ObsRequestMetadata>();
+        public string PasswordPreference { get; set; }
+        public bool CanSend { get; private set; }
 
         public ObsWsClient(Uri url) : base(url)
         {
@@ -84,7 +90,7 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary
                 throw;
             }
 
-            await OBS_EnableHeartBeat().ConfigureAwait(true);
+            await OBS_GetAuthRequired().ConfigureAwait(true);
         }
 
         private void HeartBeatTimer_Elapsed(object sender, ElapsedEventArgs e)
@@ -120,6 +126,12 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary
             return metadata.RequestGuid;
         }
 
+        private async ValueTask<Guid> OBS_GetAuthRequired()
+        {
+            GetAuthRequiredRequest message = new GetAuthRequiredRequest();
+            return await ObsSend(message).ConfigureAwait(false);
+        }
+
         private async ValueTask<Guid> OBS_EnableHeartBeat()
         {
             SetHeartbeatRequest message = new SetHeartbeatRequest()
@@ -127,6 +139,11 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary
                 Enable = true
             };
             return await ObsSend(message).ConfigureAwait(false);
+        }
+
+        private void PopulateAuthenticateRequest(ref AuthenticateRequest authenticateRequest, GetAuthRequiredReply getAuth)
+        {
+            authenticateRequest.Auth = new String(SecurePreferences.CreateAuthResponse(PasswordPreference, getAuth.Salt, getAuth.Challenge, null));
         }
 
         private void FurtherProcessObsEvent(object sender, ObsEventObject obsEvent)
@@ -279,6 +296,25 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary
 
                 switch (obsReply.RequestType)
                 {
+                    case ObsRequestType.GetAuthRequired:
+                        GetAuthRequiredReply getAuthRequiredReply = obsReply.MessageObject as GetAuthRequiredReply;
+                        CanSend = !getAuthRequiredReply.AuthRequired;
+                        if (!CanSend)
+                        {
+                            AuthenticateRequest authRequest = new AuthenticateRequest();
+                            if (PasswordPreference == null || PasswordPreference.Length == 0)
+                            {
+                                OnErrorState(new Exception(rm.GetString("auth_required_no_password", CultureInfo.CurrentUICulture)), -1);
+                                break;
+                            }
+                            PopulateAuthenticateRequest(ref authRequest, getAuthRequiredReply);
+                            await ObsSend(authRequest).ConfigureAwait(true);
+                        }
+                        else
+                        {
+                            await OBS_EnableHeartBeat().ConfigureAwait(true);
+                        }
+                        break;
                     case ObsRequestType.GetSourceTypesList:
                         foreach (ObsWsReplyType type in (obsReply.MessageObject as GetSourceTypesListReply).Types)
                         {
@@ -314,6 +350,10 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary
                         if (!CanDeserializeSourceType(obsReply.SourceType, settingsJson, out settingsObject)) { break; }
                         (obsReply.MessageObject as GetSourceFilterInfoReply).SettingsObj = settingsObject;
                         break;
+                    case ObsRequestType.Authenticate:
+                        CanSend = true;
+                        await OBS_EnableHeartBeat().ConfigureAwait(true);
+                        break;
                     default:
                         break;
                 }
@@ -331,7 +371,7 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary
                         ),
                     ReconnectDelay = -1
                 };
-                base.OnErrorState(errorMessage.Error, errorMessage.ReconnectDelay);
+                OnErrorState(errorMessage.Error, errorMessage.ReconnectDelay);
             }
         }
 

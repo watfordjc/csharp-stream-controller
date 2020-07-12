@@ -66,7 +66,7 @@ namespace uk.JohnCook.dotnet.StreamController
                 }
             } else if (cbUsePassword.IsChecked.Value)
             {
-                Utils.SecurePreferences securePreferences = new Utils.SecurePreferences();
+                SharedModels.SecurePreferences securePreferences = new SharedModels.SecurePreferences();
                 char[] password = pbPassword.Password.ToArray();
                 string output = String.Empty;
                 _ = securePreferences.StoreString(ref output, ref password);

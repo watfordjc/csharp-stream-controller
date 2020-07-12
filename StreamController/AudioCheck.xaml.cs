@@ -67,7 +67,8 @@ namespace uk.JohnCook.dotnet.StreamController
                 ).Uri;
             webSocket = new ObsWsClient(obs_uri)
             {
-                AutoReconnect = Preferences.Default.obs_auto_reconnect
+                AutoReconnect = Preferences.Default.obs_auto_reconnect,
+                PasswordPreference = Preferences.Default.obs_password
             };
         }
 
@@ -208,7 +209,7 @@ namespace uk.JohnCook.dotnet.StreamController
                 null);
         }
 
-        private async void WebSocket_StateChange(WebSocketState newState)
+        private void WebSocket_StateChange(WebSocketState newState)
         {
             if (newState == WebSocketState.Open)
             {
@@ -216,7 +217,6 @@ namespace uk.JohnCook.dotnet.StreamController
                 _ReconnectCountdownTimer.Stop();
                 UpdateUIConnectStatus(String.Empty, Brushes.DarkGreen, null);
                 obsSourceDictionary.Clear();
-                await Obs_Get(ObsRequestType.GetSourceTypesList).ConfigureAwait(true);
             }
             else if (newState != WebSocketState.Connecting)
             {
@@ -225,6 +225,10 @@ namespace uk.JohnCook.dotnet.StreamController
             }
             else
             {
+                if (webSocket.PasswordPreference != Preferences.Default.obs_password)
+                {
+                    webSocket.PasswordPreference = Preferences.Default.obs_password;
+                }
                 connectionError = String.Empty;
                 _ReconnectCountdownTimer.Stop();
                 UpdateUIConnectStatus("\u2026", Brushes.DarkGoldenrod, null);
@@ -369,6 +373,13 @@ namespace uk.JohnCook.dotnet.StreamController
         {
             switch (replyObject.RequestType)
             {
+                case ObsRequestType.GetAuthRequired:
+                case ObsRequestType.Authenticate:
+                    if (webSocket.CanSend)
+                    {
+                        await Obs_Get(ObsRequestType.GetSourceTypesList).ConfigureAwait(true);
+                    }
+                    break;
                 case ObsRequestType.GetCurrentScene:
                     currentScene = replyObject.MessageObject as ObsScene;
                     await PopulateSceneItemSources(currentScene.Sources, currentScene).ConfigureAwait(true);
