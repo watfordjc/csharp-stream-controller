@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 using NAudio;
 using NAudio.CoreAudioApi;
 using NAudio.CoreAudioApi.Interfaces;
-using uk.JohnCook.dotnet.StreamController.SharedModels;
 
 namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
 {
@@ -133,7 +132,7 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
         {
             return Devices.Where(device => device.FriendlyName == deviceName).FirstOrDefault();
         }
-        
+
         public static AudioInterface GetAudioInterfaceByVolumeNotificationGuid(Guid notificationId)
         {
             return Devices.Where(device => device.VolumeNotificationGuid == notificationId).FirstOrDefault();

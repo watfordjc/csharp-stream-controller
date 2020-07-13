@@ -38,6 +38,9 @@
                                 <DataTrigger Binding="{Binding DataFlow}" Value="{x:Static na:DataFlow.Capture}">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
+                                <DataTrigger Binding="{Binding IsDefaultRender}" Value="True">
+                                    <Setter Property="IsChecked" Value="True" />
+                                </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </ContextMenu.ItemContainerStyle>

@@ -29,7 +29,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using uk.JohnCook.dotnet.StreamController.SharedModels;
 
 namespace uk.JohnCook.dotnet.StreamController
 {
@@ -155,7 +154,7 @@ namespace uk.JohnCook.dotnet.StreamController
             }
         }
 
-        private Task StartPlaySilence(SharedModels.AudioInterface audioInterface)
+        private Task StartPlaySilence(AudioInterface audioInterface)
         {
             if (audioInterface.IsActive && silentAudioEvent?.PlaybackState != PlaybackState.Playing)
             {
@@ -180,7 +179,7 @@ namespace uk.JohnCook.dotnet.StreamController
             return Task.CompletedTask;
         }
 
-        private static int GetWaveOutDeviceNumber(SharedModels.AudioInterface audioInterface)
+        private static int GetWaveOutDeviceNumber(AudioInterface audioInterface)
         {
             int deviceNameMaxLength = Math.Min(audioInterface.FriendlyName.Length, 31);
             string deviceNameTruncated = audioInterface.FriendlyName.Substring(0, deviceNameMaxLength);

@@ -8,8 +8,9 @@ using System.Reflection.Metadata.Ecma335;
 using System.Security.Cryptography.X509Certificates;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Collections.ObjectModel;
 
-namespace uk.JohnCook.dotnet.StreamController.SharedModels
+namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
 {
     public class AudioInterface : INotifyPropertyChanged
     {
@@ -24,6 +25,8 @@ namespace uk.JohnCook.dotnet.StreamController.SharedModels
         public Guid VolumeNotificationGuid { get; set; }
         public string AudioDeviceName { get; set; }
         public bool IsActive { get; private set; }
+        public bool IsDefaultRender {  get { return AudioInterfaceCollection.Instance.DefaultRender == this; } }
+        public bool IsDefaultCapture { get { return AudioInterfaceCollection.Instance.DefaultCapture == this; } }
 
         public MMDevice Device
         {
@@ -37,6 +40,12 @@ namespace uk.JohnCook.dotnet.StreamController.SharedModels
                 SetProperties(value.State);
             }
         }
+
+        public AudioInterface()
+        {
+            AudioInterfaceCollection.Instance.DefaultDeviceChange += Instance_DefaultDeviceChange;
+        }
+
 
         public void SetProperties(DeviceState state)
         {
@@ -68,6 +77,21 @@ namespace uk.JohnCook.dotnet.StreamController.SharedModels
             }
             // Notify all properties have changed.
             OnPropertyChanged(null);
+        }
+
+        private void Instance_DefaultDeviceChange(object sender, DataFlow dataFlow)
+        {
+            switch (dataFlow)
+            {
+                case DataFlow.Render:
+                    OnPropertyChanged(nameof(IsDefaultRender));
+                    break;
+                case DataFlow.Capture:
+                    OnPropertyChanged(nameof(IsDefaultCapture));
+                    break;
+                default:
+                    break;
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
