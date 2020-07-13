@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:uk.JohnCook.dotnet.StreamController"
+        xmlns:na="clr-namespace:NAudio.CoreAudioApi;assembly=NAudio"
         xmlns:tb="http://www.hardcodet.net/taskbar"
         mc:Ignorable="d"
         FontFamily="Open Sans"
@@ -16,7 +17,33 @@
             x:Name="NotifyIcon"
             ToolTipText="Stream Controller"
             Visibility="Collapsed"
-            MenuActivation="RightClick" />
+            MenuActivation="RightClick">
+            <tb:TaskbarIcon.ContextMenu>
+                <ContextMenu x:Name="cmTrayMenu">
+                    <ContextMenu.ItemTemplate>
+                        <DataTemplate DataType="MenuItem">
+                            <MenuItem Click="SystemTrayMenuItem_Click">
+                                <MenuItem.Header>
+                                    <TextBlock x:Name="friendlyName" Text="{Binding FriendlyName}" />
+                                </MenuItem.Header>
+                            </MenuItem>
+                        </DataTemplate>
+                    </ContextMenu.ItemTemplate>
+                    <ContextMenu.ItemContainerStyle>
+                        <Style TargetType="MenuItem">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsActive}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding DataFlow}" Value="{x:Static na:DataFlow.Capture}">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ContextMenu.ItemContainerStyle>
+                </ContextMenu>
+            </tb:TaskbarIcon.ContextMenu>
+        </tb:TaskbarIcon>
         <Menu DockPanel.Dock="Top" ItemsSource="{StaticResource ResourceKey=MenuItems}" />
         <StatusBar DockPanel.Dock="Bottom" Height="auto" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" Padding="2">
             <StatusBarItem DockPanel.Dock="Right">

@@ -29,6 +29,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using uk.JohnCook.dotnet.StreamController.SharedModels;
 
 namespace uk.JohnCook.dotnet.StreamController
 {
@@ -126,6 +127,7 @@ namespace uk.JohnCook.dotnet.StreamController
             {
                 audioDevicesEnumerated.SetResult(true);
             }
+            cmTrayMenu.ItemsSource = AudioInterfaceCollection.Devices;
         }
 
         private async void DefaultAudioDeviceChanged(object sender, DataFlow dataFlow)
@@ -190,6 +192,12 @@ namespace uk.JohnCook.dotnet.StreamController
                 }
             }
             return -1;
+        }
+
+
+        private void SystemTrayMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            AudioInterfaceCollection.ChangeDefaultDevice(((sender as MenuItem).DataContext as AudioInterface).ID);
         }
 
         #endregion
