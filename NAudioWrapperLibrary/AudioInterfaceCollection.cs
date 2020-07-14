@@ -123,6 +123,12 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
             audioPolicyConfig.SetDefaultEndPoint(audioInterface.ID, processId);
         }
 
+        public static void ClearAllApplicationDefaultDevices(DataFlow dataFlow)
+        {
+            EarTrumpet.DataModel.WindowsAudio.Internal.AudioPolicyConfig audioPolicyConfig = new EarTrumpet.DataModel.WindowsAudio.Internal.AudioPolicyConfig(dataFlow);
+            audioPolicyConfig.ClearDefaultEndPoints();
+        }
+
         private void UpdateDefaultDevice(DataFlow flow, string defaultDeviceId)
         {
             if (flow == DataFlow.Render)

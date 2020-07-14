@@ -83,5 +83,11 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary.EarTrumpet.DataModel.WindowsAu
                 return null;
             }
         }
+
+        public void ClearDefaultEndPoints()
+        {
+            EnsurePolicyConfig();
+            Marshal.ThrowExceptionForHR(_sharedPolicyConfig.ClearAllPersistedApplicationDefaultEndpoints());
+        }
     }
 }

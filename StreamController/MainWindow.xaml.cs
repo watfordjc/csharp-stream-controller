@@ -29,6 +29,22 @@ namespace uk.JohnCook.dotnet.StreamController
             AudioInterfaceCollection.Instance.DefaultDeviceChange += OnDefaultDeviceChanged;
             if (AudioInterfaceCollection.Instance.DefaultRender != null) { OnDefaultDeviceChanged(this, DataFlow.Render); }
             if (AudioInterfaceCollection.Instance.DefaultCapture != null) { OnDefaultDeviceChanged(this, DataFlow.Capture); }
+            cb_applications.ItemsSource = Process.GetProcesses();
+            cb_applications.SelectionChanged += Cb_applications_SelectionChanged;
+        }
+
+        private void Cb_applications_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            int processId = (e.AddedItems[0] as Process).Id;
+            UpdateApplicationAudioDevices(processId);
+        }
+
+        private void UpdateApplicationAudioDevices(int processId)
+        {
+            AudioInterface applicationRender = AudioInterfaceCollection.GetDefaultApplicationDevice(DataFlow.Render, processId);
+            AudioInterface applicationCapture = AudioInterfaceCollection.GetDefaultApplicationDevice(DataFlow.Capture, processId);
+            app_render.Text = applicationRender?.FriendlyName ?? "Default";
+            app_capture.Text = applicationCapture?.FriendlyName ?? "Default";
         }
 
         private void OnDefaultDeviceChanged(object sender, DataFlow flow)
@@ -47,6 +63,21 @@ namespace uk.JohnCook.dotnet.StreamController
         private void BtnMakeDefaultRender_Click(object sender, RoutedEventArgs e)
         {
             AudioInterfaceCollection.ChangeDefaultDevice((cb_interfaces.SelectedItem as AudioInterface).ID);
+        }
+
+        private void BtnSetApplicationDefault_Click(object sender, RoutedEventArgs e)
+        {
+            int processId = (cb_applications.SelectedItem as Process).Id;
+            AudioInterface currentInterface = (cb_interfaces.SelectedItem as AudioInterface);
+            AudioInterfaceCollection.ChangeDefaultApplicationDevice(currentInterface, processId);
+            UpdateApplicationAudioDevices(processId);
+        }
+
+        private void BtnResetAllApplicationDefault_Click(object sender, RoutedEventArgs e)
+        {
+            int processId = (cb_applications.SelectedItem as Process).Id;
+            AudioInterfaceCollection.ClearAllApplicationDefaultDevices(DataFlow.All);
+            UpdateApplicationAudioDevices(processId);
         }
     }
 }

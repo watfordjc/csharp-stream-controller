@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:uk.JohnCook.dotnet.StreamController"
         mc:Ignorable="d"
         FontFamily="Open Sans"
-        Title="Stream Control" Height="450" Width="800">
+        Title="Stream Control" Height="600" Width="960">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
     </Window.Resources>
@@ -16,7 +16,7 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="20" />
-                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="auto" MinWidth="400" />
                     <ColumnDefinition Width="auto" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="auto" />
@@ -83,6 +83,65 @@
                                 <RowDefinition />
                             </Grid.RowDefinitions>
                         </Grid>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox x:Name="applications" Header="Applications" Grid.Column="3" Grid.Row="1" Margin="0,0,8,8" Padding="8" Grid.ColumnSpan="2">
+                    <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Application:" VerticalAlignment="Center" Margin="0 0 8 0" />
+                            <ComboBox x:Name="cb_applications" IsEditable="False" Height="auto">
+                                <ComboBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <VirtualizingStackPanel />
+                                    </ItemsPanelTemplate>
+                                </ComboBox.ItemsPanel>
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding ProcessName}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                                <ComboBox.ItemContainerStyle>
+                                    <Style TargetType="ComboBoxItem">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding MainWindowTitle}" Value="">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding MainWindowTitle}" Value="{x:Null}">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ComboBox.ItemContainerStyle>
+                            </ComboBox>
+                        </StackPanel>
+                    <GroupBox x:Name="current_application" Header="Application" Margin="8" Padding="8" DataContext="{Binding ElementName=cb_applications, Path=SelectedItem}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" VerticalAlignment="Center" Margin="0 0 8 0" />
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding ProcessName}" />
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="PID:" VerticalAlignment="Center" Margin="0 0 8 0" />
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Id}" />
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Main Window:" VerticalAlignment="Center" Margin="0 0 8 0" />
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding MainWindowTitle}" />
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Render Device:" VerticalAlignment="Center" Margin="0 0 8 0" />
+                            <TextBlock Grid.Row="3" Grid.Column="1" x:Name="app_render" />
+                            <TextBlock Grid.Row="4" Grid.Column="0" Text="Capture Device:" VerticalAlignment="Center" Margin="0 0 8 0" />
+                                <TextBlock Grid.Row="4" Grid.Column="1" x:Name="app_capture" />
+                                <Button Grid.Row="5" Grid.Column="0" Margin="0 8" Padding="4" Content="Use Interface for Console Audio" Click="BtnSetApplicationDefault_Click" MaxWidth="300" HorizontalAlignment="Left" />
+                            </Grid>
+                        </GroupBox>
+                        <Button Grid.Row="5" Grid.Column="1" Margin="8 8" Padding="4" Content="Reset Audio Interfaces for All Applications" Click="BtnResetAllApplicationDefault_Click" MaxWidth="300" HorizontalAlignment="Left" />
                     </StackPanel>
                 </GroupBox>
                 <GroupBox x:Name="group_default_render" Header="Default Render Interface" Grid.Column="1" Grid.Row="2" Margin="0,8,8,8" Padding="8" Grid.ColumnSpan="2">
