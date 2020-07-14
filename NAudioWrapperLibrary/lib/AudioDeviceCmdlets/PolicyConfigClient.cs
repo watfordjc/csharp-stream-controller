@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace uk.JohnCook.dotnet.NAudioWrapperLibrary.AudioDeviceCmdlets
@@ -22,6 +23,7 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary.AudioDeviceCmdlets
             _PolicyConfigVista = new CPolicyConfigClient() as IPolicyConfigVista;
             if (_PolicyConfigVista != null) { return; }
 
+            Debug.Assert(!(_PolicyConfig == null && _PolicyConfigVista == null), "Have Microsoft changed the Guid for IPolicyConfig again?");
             _PolicyConfig10 = new CPolicyConfigClient() as IPolicyConfig10;
         }
 
