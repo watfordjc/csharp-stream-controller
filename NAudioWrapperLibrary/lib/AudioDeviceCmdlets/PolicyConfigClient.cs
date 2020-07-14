@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 namespace uk.JohnCook.dotnet.NAudioWrapperLibrary.AudioDeviceCmdlets
 {
     [ComImport, Guid("870af99c-171d-4f9e-af0d-e63df40c2bc9")]
-    internal class _PolicyConfigClient
+    internal class CPolicyConfigClient
     {
     }
 
@@ -16,32 +16,30 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary.AudioDeviceCmdlets
 
         public PolicyConfigClient()
         {
-            _PolicyConfig = new _PolicyConfigClient() as IPolicyConfig;
-            if (_PolicyConfig != null)
-                return;
+            _PolicyConfig = new CPolicyConfigClient() as IPolicyConfig;
+            if (_PolicyConfig != null) { return; }
 
-            _PolicyConfigVista = new _PolicyConfigClient() as IPolicyConfigVista;
-            if (_PolicyConfigVista != null)
-                return;
+            _PolicyConfigVista = new CPolicyConfigClient() as IPolicyConfigVista;
+            if (_PolicyConfigVista != null) { return; }
 
-            _PolicyConfig10 = new _PolicyConfigClient() as IPolicyConfig10;
+            _PolicyConfig10 = new CPolicyConfigClient() as IPolicyConfig10;
         }
 
-        public void SetDefaultEndpoint(string devID, NAudio.CoreAudioApi.Role eRole)
+        public void SetDefaultEndpoint(string deviceId, NAudio.CoreAudioApi.Role role)
         {
             if (_PolicyConfig != null)
             {
-                Marshal.ThrowExceptionForHR(_PolicyConfig.SetDefaultEndpoint(devID, eRole));
+                Marshal.ThrowExceptionForHR(_PolicyConfig.SetDefaultEndpoint(deviceId, role));
                 return;
             }
             if (_PolicyConfigVista != null)
             {
-                Marshal.ThrowExceptionForHR(_PolicyConfigVista.SetDefaultEndpoint(devID, eRole));
+                Marshal.ThrowExceptionForHR(_PolicyConfigVista.SetDefaultEndpoint(deviceId, role));
                 return;
             }
             if (_PolicyConfig10 != null)
             {
-                Marshal.ThrowExceptionForHR(_PolicyConfig10.SetDefaultEndpoint(devID, eRole));
+                Marshal.ThrowExceptionForHR(_PolicyConfig10.SetDefaultEndpoint(deviceId, role));
             }
         }
     }

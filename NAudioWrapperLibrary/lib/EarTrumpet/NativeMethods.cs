@@ -3,9 +3,9 @@ using System.Runtime.InteropServices;
 
 namespace uk.JohnCook.dotnet.NAudioWrapperLibrary.EarTrumpet.Interop
 {
-    static class Combase
+    static class NativeMethods
     {
-        [DllImport("combase.dll", PreserveSig = false)]
+        [DllImport("combase.dll", PreserveSig = false, BestFitMapping = false, CharSet = CharSet.Ansi, ThrowOnUnmappableChar = true)]
         public static extern void RoGetActivationFactory(
             [MarshalAs(UnmanagedType.HString)] string activatableClassId,
             [In] ref Guid iid,

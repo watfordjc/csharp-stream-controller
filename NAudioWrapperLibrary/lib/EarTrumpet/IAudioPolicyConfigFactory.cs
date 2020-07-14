@@ -9,6 +9,9 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary.EarTrumpet.Interop.MMDeviceAPI
     [InterfaceType(ComInterfaceType.InterfaceIsIInspectable)]
     public interface IAudioPolicyConfigFactory
     {
+        // Disable CA/IDE warnings for non-implemented methods.
+#pragma warning disable CA1707 // Identifiers should not contain underscores
+#pragma warning disable IDE1006 // Naming Styles
         int __incomplete__add_CtxVolumeChange();
         int __incomplete__remove_CtxVolumeChanged();
         int __incomplete__add_RingerVibrateStateChanged();
@@ -28,11 +31,13 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary.EarTrumpet.Interop.MMDeviceAPI
         int __incomplete__GetCurrentChatApplications();
         int __incomplete__add_ChatContextChanged();
         int __incomplete__remove_ChatContextChanged();
+#pragma warning restore IDE1006 // Naming Styles
+#pragma warning restore CA1707 // Identifiers should not contain underscores
         [PreserveSig]
-        HResult SetPersistedDefaultAudioEndpoint(uint processId, DataFlow flow, Role role, IntPtr deviceId);
+        int SetPersistedDefaultAudioEndpoint(uint processId, DataFlow flow, Role role, IntPtr deviceId);
         [PreserveSig]
-        HResult GetPersistedDefaultAudioEndpoint(uint processId, DataFlow flow, Role role, [Out, MarshalAs(UnmanagedType.HString)] out string deviceId);
+        int GetPersistedDefaultAudioEndpoint(uint processId, DataFlow flow, Role role, [Out, MarshalAs(UnmanagedType.HString)] out string deviceId);
         [PreserveSig]
-        HResult ClearAllPersistedApplicationDefaultEndpoints();
+        int ClearAllPersistedApplicationDefaultEndpoints();
     }
 }

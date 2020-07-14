@@ -4,6 +4,8 @@ using uk.JohnCook.dotnet.NAudioWrapperLibrary.EarTrumpet.Interop.MMDeviceAPI;
 using System;
 using System.Diagnostics;
 using NAudio.CoreAudioApi;
+using NAudio.Utils;
+using System.Runtime.InteropServices;
 
 namespace uk.JohnCook.dotnet.NAudioWrapperLibrary.EarTrumpet.DataModel.WindowsAudio.Internal
 {
@@ -14,7 +16,7 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary.EarTrumpet.DataModel.WindowsAu
         private const string MMDEVAPI_TOKEN = @"\\?\SWD#MMDEVAPI#";
 
         private IAudioPolicyConfigFactory _sharedPolicyConfig;
-        private DataFlow _flow;
+        private readonly DataFlow _flow;
 
         public AudioPolicyConfig(DataFlow flow)
         {
@@ -34,53 +36,52 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary.EarTrumpet.DataModel.WindowsAu
             return $"{MMDEVAPI_TOKEN}{deviceId}{(_flow == DataFlow.Render ? DEVINTERFACE_AUDIO_RENDER : DEVINTERFACE_AUDIO_CAPTURE)}";
         }
 
-        private string UnpackDeviceId(string deviceId)
+        private static string UnpackDeviceId(string deviceId)
         {
-            if (deviceId.StartsWith(MMDEVAPI_TOKEN)) deviceId = deviceId.Remove(0, MMDEVAPI_TOKEN.Length);
-            if (deviceId.EndsWith(DEVINTERFACE_AUDIO_RENDER)) deviceId = deviceId.Remove(deviceId.Length - DEVINTERFACE_AUDIO_RENDER.Length);
-            if (deviceId.EndsWith(DEVINTERFACE_AUDIO_CAPTURE)) deviceId = deviceId.Remove(deviceId.Length - DEVINTERFACE_AUDIO_CAPTURE.Length);
+            if (deviceId.StartsWith(MMDEVAPI_TOKEN, StringComparison.Ordinal)) deviceId = deviceId.Remove(0, MMDEVAPI_TOKEN.Length);
+            if (deviceId.EndsWith(DEVINTERFACE_AUDIO_RENDER, StringComparison.Ordinal)) deviceId = deviceId.Remove(deviceId.Length - DEVINTERFACE_AUDIO_RENDER.Length);
+            if (deviceId.EndsWith(DEVINTERFACE_AUDIO_CAPTURE, StringComparison.Ordinal)) deviceId = deviceId.Remove(deviceId.Length - DEVINTERFACE_AUDIO_CAPTURE.Length);
             return deviceId;
         }
 
         public void SetDefaultEndPoint(string deviceId, int processId)
         {
-            Trace.WriteLine($"AudioPolicyConfigService SetDefaultEndPoint {deviceId} {processId}");
-            try
+            EnsurePolicyConfig();
+
+            IntPtr hstring = IntPtr.Zero;
+
+            if (!string.IsNullOrWhiteSpace(deviceId))
             {
-                EnsurePolicyConfig();
-
-                IntPtr hstring = IntPtr.Zero;
-
-                if (!string.IsNullOrWhiteSpace(deviceId))
-                {
-                    var str = GenerateDeviceId(deviceId);
-                    Combase.WindowsCreateString(str, (uint)str.Length, out hstring);
-                }
-
-                _sharedPolicyConfig.SetPersistedDefaultAudioEndpoint((uint)processId, _flow, Role.Multimedia, hstring);
-                _sharedPolicyConfig.SetPersistedDefaultAudioEndpoint((uint)processId, _flow, Role.Console, hstring);
+                var str = GenerateDeviceId(deviceId);
+                NativeMethods.WindowsCreateString(str, (uint)str.Length, out hstring);
             }
-            catch (Exception ex)
+
+            int hr1, hr2;
+            hr1 = _sharedPolicyConfig.SetPersistedDefaultAudioEndpoint((uint)processId, _flow, Role.Multimedia, hstring);
+            hr2 = _sharedPolicyConfig.SetPersistedDefaultAudioEndpoint((uint)processId, _flow, Role.Console, hstring);
+
+            if (hr1 != HResult.S_OK || hr2 != HResult.S_OK)
             {
-                Trace.WriteLine($"{ex}");
+                // Print error or throw exception? Print error for now.
+                Trace.WriteLine($"Error in {nameof(SetDefaultEndPoint)} for {processId}: MultimediaResult={Marshal.GetExceptionForHR(hr1)}, ConsoleResult={Marshal.GetExceptionForHR(hr2)}");
             }
         }
 
         public string GetDefaultEndPoint(int processId)
         {
-            try
-            {
-                EnsurePolicyConfig();
+            int hr;
+            EnsurePolicyConfig();
 
-                _sharedPolicyConfig.GetPersistedDefaultAudioEndpoint((uint)processId, _flow, Role.Multimedia | Role.Console, out string deviceId);
+            hr = _sharedPolicyConfig.GetPersistedDefaultAudioEndpoint((uint)processId, _flow, Role.Multimedia | Role.Console, out string deviceId);
+            if (hr == HResult.S_OK)
+            {
                 return UnpackDeviceId(deviceId);
             }
-            catch (Exception ex)
+            else
             {
-                Trace.WriteLine($"{ex}");
+                Trace.WriteLine($"{Marshal.GetExceptionForHR(hr)}");
+                return null;
             }
-
-            return null;
         }
     }
 }
