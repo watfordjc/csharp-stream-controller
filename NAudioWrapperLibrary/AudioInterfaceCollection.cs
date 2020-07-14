@@ -109,6 +109,20 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
             policyConfigClient.SetDefaultEndpoint(defaultDeviceId, Role.Console);
         }
 
+        public static AudioInterface GetDefaultApplicationDevice(DataFlow dataFlow, int processId)
+        {
+            EarTrumpet.DataModel.WindowsAudio.Internal.AudioPolicyConfig audioPolicyConfig = new EarTrumpet.DataModel.WindowsAudio.Internal.AudioPolicyConfig(dataFlow);
+            return GetAudioInterfaceById(audioPolicyConfig.GetDefaultEndPoint(processId));
+        }
+
+        public static void ChangeDefaultApplicationDevice(AudioInterface audioInterface, int processId)
+        {
+            if (audioInterface == null) { throw new ArgumentNullException(nameof(audioInterface)); }
+
+            EarTrumpet.DataModel.WindowsAudio.Internal.AudioPolicyConfig audioPolicyConfig = new EarTrumpet.DataModel.WindowsAudio.Internal.AudioPolicyConfig(audioInterface.DataFlow);
+            audioPolicyConfig.SetDefaultEndPoint(audioInterface.ID, processId);
+        }
+
         private void UpdateDefaultDevice(DataFlow flow, string defaultDeviceId)
         {
             if (flow == DataFlow.Render)
