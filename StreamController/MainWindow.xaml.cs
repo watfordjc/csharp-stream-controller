@@ -8,7 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using NAudio.CoreAudioApi;
 using uk.JohnCook.dotnet.NAudioWrapperLibrary;
-using uk.JohnCook.dotnet.StreamController.SharedModels;
+using System.Threading.Tasks;
 
 namespace uk.JohnCook.dotnet.StreamController
 {
@@ -80,13 +80,13 @@ namespace uk.JohnCook.dotnet.StreamController
             UpdateApplicationAudioDevices(processId);
         }
 
-        private void BtnToggleAllApplicationDefault_Click(object sender, RoutedEventArgs e)
+        private async void BtnToggleAllApplicationDefault_Click(object sender, RoutedEventArgs e)
         {
-            foreach (Process process in Process.GetProcesses())
-            {
-                if (String.IsNullOrEmpty(process.MainWindowTitle)) { continue; }
-                AudioInterfaceCollection.ToggleDefaultApplicationDevice(process.Id);
-            }
+            (e.OriginalSource as Button).IsEnabled = false;
+            await Task.Run(
+                () => AudioInterfaceCollection.ToggleAllDefaultApplicationDevice()
+                ).ConfigureAwait(true);
+            (e.OriginalSource as Button).IsEnabled = true;
         }
     }
 }

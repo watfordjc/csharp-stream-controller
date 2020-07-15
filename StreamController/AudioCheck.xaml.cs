@@ -897,9 +897,13 @@ namespace uk.JohnCook.dotnet.StreamController
         }
 
 
-        private void SystemTrayToggleCustomAudio_Click(object sender, RoutedEventArgs e)
+        private async void SystemTrayToggleCustomAudio_Click(object sender, RoutedEventArgs e)
         {
-            AudioInterfaceCollection.ToggleAllDefaultApplicationDevice();
+            (e.OriginalSource as MenuItem).IsEnabled = false;
+            await Task.Run(
+                () => AudioInterfaceCollection.ToggleAllDefaultApplicationDevice()
+                ).ConfigureAwait(true);
+            (e.OriginalSource as MenuItem).IsEnabled = true;
         }
 
         private void SystemTrayExit_Click(object sender, RoutedEventArgs e)
