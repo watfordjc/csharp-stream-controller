@@ -19,31 +19,57 @@
             Visibility="Collapsed"
             MenuActivation="RightClick">
             <tb:TaskbarIcon.ContextMenu>
-                <ContextMenu x:Name="cmTrayMenu">
-                    <ContextMenu.ItemTemplate>
-                        <DataTemplate DataType="MenuItem">
-                            <MenuItem Click="SystemTrayMenuItem_Click">
-                                <MenuItem.Header>
-                                    <TextBlock x:Name="friendlyName" Text="{Binding FriendlyName}" />
-                                </MenuItem.Header>
-                            </MenuItem>
-                        </DataTemplate>
-                    </ContextMenu.ItemTemplate>
-                    <ContextMenu.ItemContainerStyle>
-                        <Style TargetType="MenuItem">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsActive}" Value="False">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding DataFlow}" Value="{x:Static na:DataFlow.Capture}">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding IsDefaultRender}" Value="True">
-                                    <Setter Property="IsChecked" Value="True" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ContextMenu.ItemContainerStyle>
+                <ContextMenu>
+                    <MenuItem Header="Default _Render" x:Name="taskbarRenderMenu">
+                        <MenuItem.ItemTemplate>
+                            <DataTemplate DataType="MenuItem">
+                                <TextBlock Text="{Binding FriendlyName}" />
+                            </DataTemplate>
+                        </MenuItem.ItemTemplate>
+                        <MenuItem.ItemContainerStyle>
+                            <Style TargetType="MenuItem">
+                                <EventSetter Event="Click" Handler="SystemTrayRenderDefault_Click" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsActive}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding DataFlow}" Value="{x:Static na:DataFlow.Capture}">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsDefaultRender}" Value="True">
+                                        <Setter Property="IsChecked" Value="True" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </MenuItem.ItemContainerStyle>
+                    </MenuItem>
+                    <MenuItem Header="Default _Capture" x:Name="taskbarCaptureMenu">
+                        <MenuItem.ItemTemplate>
+                            <DataTemplate DataType="MenuItem">
+                                <TextBlock Text="{Binding FriendlyName}" />
+                            </DataTemplate>
+                        </MenuItem.ItemTemplate>
+                        <MenuItem.ItemContainerStyle>
+                            <Style TargetType="MenuItem">
+                                <EventSetter Event="Click" Handler="SystemTrayCaptureDefault_Click" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsActive}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding DataFlow}" Value="{x:Static na:DataFlow.Render}">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsDefaultCapture}" Value="True">
+                                        <Setter Property="IsChecked" Value="True" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </MenuItem.ItemContainerStyle>
+                    </MenuItem>
+                    <Separator />
+                    <MenuItem Header="E_nsure Custom Audio" Click="SystemTrayToggleCustomAudio_Click" />
+                    <Separator />
+                    <MenuItem Header="E_xit" Click="SystemTrayExit_Click" />
                 </ContextMenu>
             </tb:TaskbarIcon.ContextMenu>
         </tb:TaskbarIcon>

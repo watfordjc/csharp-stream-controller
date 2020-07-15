@@ -134,14 +134,25 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
             AudioInterface renderDevice = GetDefaultApplicationDevice(DataFlow.Render, processId);
             if (renderDevice != null)
             {
+                Trace.WriteLine($"Toggling PID {processId} render device to default and back to {renderDevice.FriendlyName}.");
                 ChangeDefaultApplicationDevice(Instance.DefaultRender, processId);
                 ChangeDefaultApplicationDevice(renderDevice, processId);
             }
             AudioInterface captureDevice = GetDefaultApplicationDevice(DataFlow.Capture, processId);
             if (captureDevice != null)
             {
+                Trace.WriteLine($"Toggling PID {processId} capture device to default and back to {captureDevice.FriendlyName}.");
                 ChangeDefaultApplicationDevice(Instance.DefaultCapture, processId);
                 ChangeDefaultApplicationDevice(captureDevice, processId);
+            }
+        }
+
+        public static void ToggleAllDefaultApplicationDevice()
+        {
+            foreach (Process process in Process.GetProcesses())
+            {
+                if (String.IsNullOrEmpty(process.MainWindowTitle)) { continue; }
+                ToggleDefaultApplicationDevice(process.Id);
             }
         }
 

@@ -126,7 +126,8 @@ namespace uk.JohnCook.dotnet.StreamController
             {
                 audioDevicesEnumerated.SetResult(true);
             }
-            cmTrayMenu.ItemsSource = AudioInterfaceCollection.Devices;
+            taskbarRenderMenu.ItemsSource = AudioInterfaceCollection.Devices;
+            taskbarCaptureMenu.ItemsSource = AudioInterfaceCollection.Devices;
         }
 
         private async void DefaultAudioDeviceChanged(object sender, DataFlow dataFlow)
@@ -191,12 +192,6 @@ namespace uk.JohnCook.dotnet.StreamController
                 }
             }
             return -1;
-        }
-
-
-        private void SystemTrayMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            AudioInterfaceCollection.ChangeDefaultDevice(((sender as MenuItem).DataContext as AudioInterface).ID);
         }
 
         #endregion
@@ -887,6 +882,36 @@ namespace uk.JohnCook.dotnet.StreamController
             return Task.CompletedTask;
         }
 
+
+        #region System Tray Context Menu
+
+        private void SystemTrayRenderDefault_Click(object sender, RoutedEventArgs e)
+        {
+            AudioInterfaceCollection.ChangeDefaultDevice(((sender as MenuItem).DataContext as AudioInterface).ID);
+        }
+
+
+        private void SystemTrayCaptureDefault_Click(object sender, RoutedEventArgs e)
+        {
+            AudioInterfaceCollection.ChangeDefaultDevice(((sender as MenuItem).DataContext as AudioInterface).ID);
+        }
+
+
+        private void SystemTrayToggleCustomAudio_Click(object sender, RoutedEventArgs e)
+        {
+            AudioInterfaceCollection.ToggleAllDefaultApplicationDevice();
+        }
+
+        private void SystemTrayExit_Click(object sender, RoutedEventArgs e)
+        {
+            App.Current.Shutdown();
+        }
+
+        #endregion
+
+        #endregion
+
+        #region dispose
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
@@ -919,7 +944,6 @@ namespace uk.JohnCook.dotnet.StreamController
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
-
         #endregion
     }
 }
