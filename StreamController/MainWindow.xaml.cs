@@ -79,5 +79,14 @@ namespace uk.JohnCook.dotnet.StreamController
             AudioInterfaceCollection.ClearAllApplicationDefaultDevices(DataFlow.All);
             UpdateApplicationAudioDevices(processId);
         }
+
+        private void BtnToggleAllApplicationDefault_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (Process process in Process.GetProcesses())
+            {
+                if (String.IsNullOrEmpty(process.MainWindowTitle)) { continue; }
+                AudioInterfaceCollection.ToggleDefaultApplicationDevice(process.Id);
+            }
+        }
     }
 }

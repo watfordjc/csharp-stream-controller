@@ -141,7 +141,10 @@
                                 <Button Grid.Row="5" Grid.Column="0" Margin="0 8" Padding="4" Content="Use Interface for Console Audio" Click="BtnSetApplicationDefault_Click" MaxWidth="300" HorizontalAlignment="Left" />
                             </Grid>
                         </GroupBox>
-                        <Button Grid.Row="5" Grid.Column="1" Margin="8 8" Padding="4" Content="Reset Audio Interfaces for All Applications" Click="BtnResetAllApplicationDefault_Click" MaxWidth="300" HorizontalAlignment="Left" />
+                        <StackPanel Orientation="Horizontal" Grid.Row="5" Grid.Column="0" HorizontalAlignment="Left">
+                        <Button Margin="8 8" Padding="4" Content="Reset Custom Devices for All Apps" Click="BtnResetAllApplicationDefault_Click" />
+                        <Button Margin="8 8" Padding="4" Content="Toggle Custom Devices for All Apps" Click="BtnToggleAllApplicationDefault_Click" />
+                        </StackPanel>
                     </StackPanel>
                 </GroupBox>
                 <GroupBox x:Name="group_default_render" Header="Default Render Interface" Grid.Column="1" Grid.Row="2" Margin="0,8,8,8" Padding="8" Grid.ColumnSpan="2">

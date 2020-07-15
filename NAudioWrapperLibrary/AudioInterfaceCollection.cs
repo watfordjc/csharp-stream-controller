@@ -129,6 +129,22 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
             audioPolicyConfig.ClearDefaultEndPoints();
         }
 
+        public static void ToggleDefaultApplicationDevice(int processId)
+        {
+            AudioInterface renderDevice = GetDefaultApplicationDevice(DataFlow.Render, processId);
+            if (renderDevice != null)
+            {
+                ChangeDefaultApplicationDevice(Instance.DefaultRender, processId);
+                ChangeDefaultApplicationDevice(renderDevice, processId);
+            }
+            AudioInterface captureDevice = GetDefaultApplicationDevice(DataFlow.Capture, processId);
+            if (captureDevice != null)
+            {
+                ChangeDefaultApplicationDevice(Instance.DefaultCapture, processId);
+                ChangeDefaultApplicationDevice(captureDevice, processId);
+            }
+        }
+
         private void UpdateDefaultDevice(DataFlow flow, string defaultDeviceId)
         {
             if (flow == DataFlow.Render)
