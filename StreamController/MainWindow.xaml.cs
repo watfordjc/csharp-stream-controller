@@ -3,7 +3,6 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using NAudio.CoreAudioApi;
@@ -21,6 +20,7 @@ namespace uk.JohnCook.dotnet.StreamController
         {
             InitializeComponent();
             PopulateAudioInterfaces();
+            PopulateApplications();
         }
 
         private void PopulateAudioInterfaces()
@@ -29,14 +29,46 @@ namespace uk.JohnCook.dotnet.StreamController
             AudioInterfaceCollection.Instance.DefaultDeviceChange += OnDefaultDeviceChanged;
             if (AudioInterfaceCollection.Instance.DefaultRender != null) { OnDefaultDeviceChanged(this, DataFlow.Render); }
             if (AudioInterfaceCollection.Instance.DefaultCapture != null) { OnDefaultDeviceChanged(this, DataFlow.Capture); }
-            cb_applications.ItemsSource = Process.GetProcesses();
-            cb_applications.SelectionChanged += Cb_applications_SelectionChanged;
         }
 
-        private void Cb_applications_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void PopulateApplications()
         {
-            int processId = (e.AddedItems[0] as Process).Id;
-            UpdateApplicationAudioDevices(processId);
+            cb_applications.ItemsSource = ProcessCollection.Processes;
+            ProcessCollection.Instance.CollectionEnumerated += Processes_CollectionEnumerated;
+            ProcessCollection.Instance.CollectionChanged += Processes_CollectionChanged;
+            cb_applications.SelectionChanged += ApplicationsComboBox_SelectionChanged;
+        }
+
+        private void Processes_CollectionEnumerated(object sender, EventArgs e)
+        {
+            int currentProcessId = Process.GetCurrentProcess().Id;
+            cb_applications.SelectedItem = ProcessCollection.Processes.FirstOrDefault(x => x.Id == currentProcessId);
+        }
+
+        private void Processes_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            ObservableProcess currentProcess = cb_applications.SelectedItem as ObservableProcess;
+            if (e.OldItems == null) {
+                return;
+            }
+            if (currentProcess == null && e.Action == NotifyCollectionChangedAction.Move)
+            {
+                currentProcess = e.NewItems[0] as ObservableProcess;
+                cb_applications.SelectedItem = currentProcess;
+            }
+            if (currentProcess == null || (e.OldItems.Contains(currentProcess) && e.Action == NotifyCollectionChangedAction.Remove))
+            {
+                cb_applications.SelectedItem = ProcessCollection.Processes.FirstOrDefault(x => x.Id == Process.GetCurrentProcess().Id);
+            }
+        }
+
+        private void ApplicationsComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count > 0)
+            {
+                int processId = (e.AddedItems[0] as ObservableProcess).Id;
+                UpdateApplicationAudioDevices(processId);
+            }
         }
 
         private void UpdateApplicationAudioDevices(int processId)
@@ -67,7 +99,7 @@ namespace uk.JohnCook.dotnet.StreamController
 
         private void BtnSetApplicationDefault_Click(object sender, RoutedEventArgs e)
         {
-            int processId = (cb_applications.SelectedItem as Process).Id;
+            int processId = (cb_applications.SelectedItem as ObservableProcess).Id;
             AudioInterface currentInterface = (cb_interfaces.SelectedItem as AudioInterface);
             AudioInterfaceCollection.ChangeDefaultApplicationDevice(currentInterface, processId);
             UpdateApplicationAudioDevices(processId);
@@ -75,7 +107,7 @@ namespace uk.JohnCook.dotnet.StreamController
 
         private void BtnResetAllApplicationDefault_Click(object sender, RoutedEventArgs e)
         {
-            int processId = (cb_applications.SelectedItem as Process).Id;
+            int processId = (cb_applications.SelectedItem as ObservableProcess).Id;
             AudioInterfaceCollection.ClearAllApplicationDefaultDevices(DataFlow.All);
             UpdateApplicationAudioDevices(processId);
         }
