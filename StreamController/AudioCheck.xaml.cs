@@ -76,12 +76,12 @@ namespace uk.JohnCook.dotnet.StreamController
         {
             pulseCancellationToken = new CancellationTokenSource();
             UpdateUIConnectStatus(null, null, null);
-            AudioInterfaceCollection.Instance.DeviceCollectionEnumerated += AudioDevicesEnumerated;
+            AudioInterfaceCollection.Instance.CollectionEnumerated += AudioDevicesEnumerated;
             if (AudioInterfaceCollection.Instance.DevicesAreEnumerated)
             {
-                AudioDevicesEnumerated(this, true);
+                AudioDevicesEnumerated(this, EventArgs.Empty);
             }
-            AudioInterfaceCollection.Instance.DefaultDeviceChange += DefaultAudioDeviceChanged;
+            AudioInterfaceCollection.Instance.DefaultDeviceChanged += DefaultAudioDeviceChanged;
             webSocket.SetExponentialBackoff(Preferences.Default.obs_reconnect_min_seconds, Preferences.Default.obs_reconnect_max_minutes);
             webSocket.StateChange += WebSocket_StateChange_ContextSwitch;
             webSocket.ErrorState += WebSocket_Error_ContextSwitch;
@@ -100,8 +100,8 @@ namespace uk.JohnCook.dotnet.StreamController
 
         private async void Window_Closed(object sender, EventArgs e)
         {
-            AudioInterfaceCollection.Instance.DeviceCollectionEnumerated -= AudioDevicesEnumerated;
-            AudioInterfaceCollection.Instance.DefaultDeviceChange -= DefaultAudioDeviceChanged;
+            AudioInterfaceCollection.Instance.CollectionEnumerated -= AudioDevicesEnumerated;
+            AudioInterfaceCollection.Instance.DefaultDeviceChanged -= DefaultAudioDeviceChanged;
             webSocket.StateChange -= WebSocket_StateChange_ContextSwitch;
             webSocket.ErrorState -= WebSocket_Error_ContextSwitch;
             webSocket.OnObsEvent -= WebSocket_Event_ContextSwitch;
@@ -120,12 +120,9 @@ namespace uk.JohnCook.dotnet.StreamController
 
         #region Audio interfaces
 
-        private void AudioDevicesEnumerated(object sender, bool deviceEnumerationComplete)
+        private void AudioDevicesEnumerated(object sender, EventArgs e)
         {
-            if (deviceEnumerationComplete)
-            {
-                audioDevicesEnumerated.SetResult(true);
-            }
+            audioDevicesEnumerated.SetResult(true);
             taskbarRenderMenu.ItemsSource = AudioInterfaceCollection.Devices;
             taskbarCaptureMenu.ItemsSource = AudioInterfaceCollection.Devices;
         }
@@ -851,7 +848,8 @@ namespace uk.JohnCook.dotnet.StreamController
                 if (brush1 == primaryBrush)
                 {
                     NotifyIcon.Icon = Properties.Resources.icon;
-                } else if (brush1 == secondaryBrush)
+                }
+                else if (brush1 == secondaryBrush)
                 {
                     NotifyIcon.Icon = Properties.Resources.icon_secondary;
                 }

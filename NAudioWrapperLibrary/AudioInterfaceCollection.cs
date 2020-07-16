@@ -74,32 +74,29 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
                     Device = device
                 };
                 _Context.Send(
-                    x => Devices.Add(audioDevice)
-                , null);
+                    x => Devices.Add(audioDevice),
+                    null);
             }
             UpdateDefaultDevice(DataFlow.Render, _Enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console).ID);
             UpdateDefaultDevice(DataFlow.Capture, _Enumerator.GetDefaultAudioEndpoint(DataFlow.Capture, Role.Console).ID);
             DevicesAreEnumerated = true;
-            OnDeviceCollectionEnumerated(true);
+            NotifyCollectionEnumerated();
         }
 
-        void OnDeviceCollectionEnumerated(bool e)
+        public event EventHandler<DataFlow> DefaultDeviceChanged;
+        public event EventHandler CollectionEnumerated;
+
+        void NotifyDefaultDeviceChanged(DataFlow flow)
         {
             _Context.Send(
-                x => DeviceCollectionEnumerated?.Invoke(this, e)
+                x => DefaultDeviceChanged?.Invoke(this, flow)
             , null);
         }
 
-        public delegate DataFlow OnDefaultDeviceChanged();
-        public delegate bool OnDevicesEnumerated();
-
-        public event EventHandler<DataFlow> DefaultDeviceChange;
-        public event EventHandler<bool> DeviceCollectionEnumerated;
-
-        void NotifyDefaultDeviceChange(DataFlow flow)
+        void NotifyCollectionEnumerated()
         {
             _Context.Send(
-                x => DefaultDeviceChange?.Invoke(this, flow)
+                x => CollectionEnumerated?.Invoke(this, EventArgs.Empty)
             , null);
         }
 
@@ -161,12 +158,12 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
             if (flow == DataFlow.Render)
             {
                 Instance.DefaultRender = GetAudioInterfaceById(defaultDeviceId);
-                NotifyDefaultDeviceChange(flow);
+                NotifyDefaultDeviceChanged(flow);
             }
             else if (flow == DataFlow.Capture)
             {
                 Instance.DefaultCapture = GetAudioInterfaceById(defaultDeviceId);
-                NotifyDefaultDeviceChange(flow);
+                NotifyDefaultDeviceChanged(flow);
             }
         }
 

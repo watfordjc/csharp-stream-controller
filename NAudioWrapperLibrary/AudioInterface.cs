@@ -43,7 +43,7 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
 
         public AudioInterface()
         {
-            AudioInterfaceCollection.Instance.DefaultDeviceChange += Instance_DefaultDeviceChange;
+            AudioInterfaceCollection.Instance.DefaultDeviceChanged += AudioInterfaceCollection_DefaultDeviceChanged;
         }
 
 
@@ -79,7 +79,7 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
             OnPropertyChanged(null);
         }
 
-        private void Instance_DefaultDeviceChange(object sender, DataFlow dataFlow)
+        private void AudioInterfaceCollection_DefaultDeviceChanged(object sender, DataFlow dataFlow)
         {
             switch (dataFlow)
             {
