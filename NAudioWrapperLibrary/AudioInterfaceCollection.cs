@@ -22,6 +22,8 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
         private static readonly MMDeviceEnumerator _Enumerator = new MMDeviceEnumerator();
         private static AudioEndpointNotificationCallback _NotificationCallback = null;
         private static IMMNotificationClient _NotificationClient;
+        private SharedModels.DeviceApplicationPreferences deviceApplicationPreferences;
+        private SharedModels.ApplicationDevicePreferences applicationDevicePreferences;
 
         public AudioInterface DefaultRender { get; private set; }
         public AudioInterface DefaultCapture { get; private set; }
@@ -81,6 +83,124 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
             UpdateDefaultDevice(DataFlow.Capture, _Enumerator.GetDefaultAudioEndpoint(DataFlow.Capture, Role.Console).ID);
             DevicesAreEnumerated = true;
             NotifyCollectionEnumerated();
+            RestoreDeviceApplicationPreferences();
+            if (Processes.ProcessesAreEnumerated)
+            {
+                Processes_CollectionEnumerated(this, EventArgs.Empty);
+            }
+            Processes.CollectionChanged += Processes_CollectionChanged;
+        }
+
+        private void RestoreDeviceApplicationPreferences()
+        {
+            deviceApplicationPreferences = new SharedModels.DeviceApplicationPreferences
+            {
+                Devices = new List<SharedModels.DeviceApplicationPreference>()
+            };
+            applicationDevicePreferences = new SharedModels.ApplicationDevicePreferences
+            {
+                Applications = new List<SharedModels.ApplicationDevicePreference>()
+            };
+        }
+
+        private void Processes_CollectionEnumerated(object sender, EventArgs e)
+        {
+            foreach (ObservableProcess process in Processes)
+            {
+                ProcessAdded(process);
+            }
+        }
+
+        private void Processes_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                foreach (ObservableProcess process in e.NewItems)
+                {
+                    ProcessAdded(process);
+                }
+            }
+        }
+
+        private void AddDeviceApplicationPreference(AudioInterface audioInterface, ObservableProcess process)
+        {
+            SharedModels.DeviceApplicationPreference deviceApplicationPreference = deviceApplicationPreferences.Devices.FirstOrDefault(x => x.Id == audioInterface.ID);
+            if (deviceApplicationPreference == default)
+            {
+                deviceApplicationPreference = new SharedModels.DeviceApplicationPreference()
+                {
+                    Id = audioInterface.ID,
+                    Applications = new List<string>()
+                };
+                deviceApplicationPreferences.Devices.Add(deviceApplicationPreference);
+            }
+            if (!deviceApplicationPreference.Applications.Contains(process.ProcessName))
+            {
+                deviceApplicationPreference.Applications.Add(process.ProcessName);
+            }
+        }
+
+        private void AddApplicationDevicePreference(ObservableProcess process, AudioInterface audioInterface)
+        {
+            SharedModels.ApplicationDevicePreference applicationDevicePreference = applicationDevicePreferences.Applications.FirstOrDefault(x => x.Name == process.ProcessName);
+            if (applicationDevicePreference == default)
+            {
+                applicationDevicePreference = new SharedModels.ApplicationDevicePreference()
+                {
+                    Name = process.ProcessName,
+                    Devices = new SharedModels.DefaultDevicePreference()
+                };
+                applicationDevicePreferences.Applications.Add(applicationDevicePreference);
+            }
+            _ = audioInterface.DataFlow switch
+            {
+                DataFlow.Render => applicationDevicePreference.Devices.RenderDeviceId = audioInterface.ID,
+                DataFlow.Capture => applicationDevicePreference.Devices.CaptureDeviceId = audioInterface.ID,
+                _ => null
+            };
+        }
+
+        private void ProcessAdded(ObservableProcess process)
+        {
+            if (process == null) { throw new ArgumentNullException(nameof(process)); }
+
+            SharedModels.ApplicationDevicePreference applicationDevicePreference = applicationDevicePreferences.Applications.FirstOrDefault(x => x.Name == process.ProcessName);
+            if (applicationDevicePreference == null)
+            {
+                applicationDevicePreference = new SharedModels.ApplicationDevicePreference();
+            }
+            AudioInterface preferredRender = GetApplicationDevicePreference(DataFlow.Render, applicationDevicePreference, process);
+            if (preferredRender != null)
+            {
+                ChangeDefaultApplicationDevice(preferredRender, process.Id);
+            }
+            AudioInterface preferredCapture = GetApplicationDevicePreference(DataFlow.Capture, applicationDevicePreference, process);
+            if (preferredCapture != null)
+            {
+                ChangeDefaultApplicationDevice(preferredCapture, process.Id);
+            }
+        }
+
+        private AudioInterface GetApplicationDevicePreference(DataFlow dataFlow, SharedModels.ApplicationDevicePreference applicationDevicePreference, ObservableProcess process)
+        {
+            string preferredInterfaceId = dataFlow switch
+            {
+                DataFlow.Render => applicationDevicePreference?.Devices?.RenderDeviceId,
+                DataFlow.Capture => applicationDevicePreference?.Devices?.CaptureDeviceId,
+                _ => null
+            };
+            if (preferredInterfaceId != null)
+            {
+                return GetAudioInterfaceById(preferredInterfaceId);
+            }
+            AudioInterface audioInterface = GetDefaultApplicationDevice(dataFlow, process.Id);
+            if (audioInterface != null)
+            {
+                AddApplicationDevicePreference(process, audioInterface);
+                AddDeviceApplicationPreference(audioInterface, process);
+                return audioInterface;
+            }
+            return null;
         }
 
         public event EventHandler<DataFlow> DefaultDeviceChanged;
