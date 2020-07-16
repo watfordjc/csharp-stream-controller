@@ -43,6 +43,11 @@
                                         <TextBlock Text="{Binding FriendlyName}" />
                                     </DataTemplate>
                                 </ComboBox.ItemTemplate>
+                                <ComboBox.ItemContainerStyle>
+                                    <Style TargetType="ComboBoxItem">
+                                        <Setter Property="Visibility" Value="{Binding IsActive, Converter={StaticResource BoolToVisibility}, Mode=OneWay}" />
+                                    </Style>
+                                </ComboBox.ItemContainerStyle>
                             </ComboBox>
                         </StackPanel>
                         <GroupBox x:Name="current_interface" Header="Interface" Margin="8" Padding="8" DataContext="{Binding ElementName=cb_interfaces, Path=SelectedItem}">
@@ -114,36 +119,36 @@
                                 </ComboBox.ItemContainerStyle>
                             </ComboBox>
                         </StackPanel>
-                    <GroupBox x:Name="current_application" Header="Application" Margin="8" Padding="8" DataContext="{Binding ElementName=cb_applications, Path=SelectedItem}">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                            </Grid.RowDefinitions>
-                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding ProcessName}" />
-                            <TextBlock Grid.Row="1" Grid.Column="0" Text="PID:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Id}" />
-                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Main Window:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding MainWindowTitle}" />
-                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Render Device:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                            <TextBlock Grid.Row="3" Grid.Column="1" x:Name="app_render" />
-                            <TextBlock Grid.Row="4" Grid.Column="0" Text="Capture Device:" VerticalAlignment="Center" Margin="0 0 8 0" />
+                        <GroupBox x:Name="current_application" Header="Application" Margin="8" Padding="8" DataContext="{Binding ElementName=cb_applications, Path=SelectedItem}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" VerticalAlignment="Center" Margin="0 0 8 0" />
+                                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding ProcessName}" />
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="PID:" VerticalAlignment="Center" Margin="0 0 8 0" />
+                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Id}" />
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Main Window:" VerticalAlignment="Center" Margin="0 0 8 0" />
+                                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding MainWindowTitle}" />
+                                <TextBlock Grid.Row="3" Grid.Column="0" Text="Render Device:" VerticalAlignment="Center" Margin="0 0 8 0" />
+                                <TextBlock Grid.Row="3" Grid.Column="1" x:Name="app_render" />
+                                <TextBlock Grid.Row="4" Grid.Column="0" Text="Capture Device:" VerticalAlignment="Center" Margin="0 0 8 0" />
                                 <TextBlock Grid.Row="4" Grid.Column="1" x:Name="app_capture" />
                                 <Button Grid.Row="5" Grid.Column="0" Margin="0 8" Padding="4" Content="Use Interface for Console Audio" Click="BtnSetApplicationDefault_Click" MaxWidth="300" HorizontalAlignment="Left" />
                             </Grid>
                         </GroupBox>
                         <StackPanel Orientation="Horizontal" Grid.Row="5" Grid.Column="0" HorizontalAlignment="Left">
-                        <Button Margin="8 8" Padding="4" Content="Reset Custom Devices for All Apps" Click="BtnResetAllApplicationDefault_Click" />
-                        <Button Margin="8 8" Padding="4" Content="Toggle Custom Devices for All Apps" Click="BtnToggleAllApplicationDefault_Click" />
+                            <Button Margin="8 8" Padding="4" Content="Reset Custom Devices for All Apps" Click="BtnResetAllApplicationDefault_Click" />
+                            <Button Margin="8 8" Padding="4" Content="Toggle Custom Devices for All Apps" Click="BtnToggleAllApplicationDefault_Click" />
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
