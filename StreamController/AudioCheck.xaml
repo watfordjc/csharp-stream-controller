@@ -4,8 +4,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:uk.JohnCook.dotnet.StreamController"
-        xmlns:na="clr-namespace:NAudio.CoreAudioApi;assembly=NAudio"
-        xmlns:tb="http://www.hardcodet.net/taskbar"
         mc:Ignorable="d"
         FontFamily="Open Sans"
         FontSize="14"
@@ -13,66 +11,6 @@
         Closed="Window_Closed"
         Title="AudioCheck" Height="450" Width="800">
     <DockPanel>
-        <tb:TaskbarIcon
-            x:Name="NotifyIcon"
-            ToolTipText="Stream Controller"
-            Visibility="Collapsed"
-            MenuActivation="RightClick">
-            <tb:TaskbarIcon.ContextMenu>
-                <ContextMenu>
-                    <MenuItem Header="Default _Render" x:Name="taskbarRenderMenu">
-                        <MenuItem.ItemTemplate>
-                            <DataTemplate DataType="MenuItem">
-                                <TextBlock Text="{Binding FriendlyName}" />
-                            </DataTemplate>
-                        </MenuItem.ItemTemplate>
-                        <MenuItem.ItemContainerStyle>
-                            <Style TargetType="MenuItem">
-                                <EventSetter Event="Click" Handler="SystemTrayRenderDefault_Click" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsActive}" Value="False">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding DataFlow}" Value="{x:Static na:DataFlow.Capture}">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding IsDefaultRender}" Value="True">
-                                        <Setter Property="IsChecked" Value="True" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </MenuItem.ItemContainerStyle>
-                    </MenuItem>
-                    <MenuItem Header="Default _Capture" x:Name="taskbarCaptureMenu">
-                        <MenuItem.ItemTemplate>
-                            <DataTemplate DataType="MenuItem">
-                                <TextBlock Text="{Binding FriendlyName}" />
-                            </DataTemplate>
-                        </MenuItem.ItemTemplate>
-                        <MenuItem.ItemContainerStyle>
-                            <Style TargetType="MenuItem">
-                                <EventSetter Event="Click" Handler="SystemTrayCaptureDefault_Click" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsActive}" Value="False">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding DataFlow}" Value="{x:Static na:DataFlow.Render}">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding IsDefaultCapture}" Value="True">
-                                        <Setter Property="IsChecked" Value="True" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </MenuItem.ItemContainerStyle>
-                    </MenuItem>
-                    <Separator />
-                    <MenuItem Header="E_nsure Custom Audio" Click="SystemTrayToggleCustomAudio_Click" />
-                    <Separator />
-                    <MenuItem Header="E_xit" Click="SystemTrayExit_Click" />
-                </ContextMenu>
-            </tb:TaskbarIcon.ContextMenu>
-        </tb:TaskbarIcon>
         <Menu DockPanel.Dock="Top" ItemsSource="{StaticResource ResourceKey=MenuItems}" />
         <StatusBar DockPanel.Dock="Bottom" Height="auto" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" Padding="2">
             <StatusBarItem DockPanel.Dock="Right">

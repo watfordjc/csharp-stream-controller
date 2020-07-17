@@ -88,14 +88,8 @@ namespace uk.JohnCook.dotnet.StreamController
             webSocket.OnObsEvent += WebSocket_Event_ContextSwitch;
             webSocket.OnObsReply += Websocket_Reply_ContextSwitch;
             _ReconnectCountdownTimer.Elapsed += ReconnectCountdownTimer_Elapsed;
-            UpdateTrayIcon();
+            SystemTrayIcon.Instance.UpdateTrayIcon();
             await ObsWebsocketConnect().ConfigureAwait(true);
-        }
-
-        private void UpdateTrayIcon()
-        {
-            NotifyIcon.Icon = Properties.Resources.icon;
-            NotifyIcon.Visibility = Visibility.Visible;
         }
 
         private async void Window_Closed(object sender, EventArgs e)
@@ -114,7 +108,7 @@ namespace uk.JohnCook.dotnet.StreamController
             sourceTypes = null;
             obsSourceDictionary.Clear();
             obsSceneItemSceneDictionary.Clear();
-            NotifyIcon.Dispose();
+            SystemTrayIcon.Instance.NotifyIcon.Icon = Properties.Resources.icon_neutral;
         }
         #endregion
 
@@ -123,8 +117,6 @@ namespace uk.JohnCook.dotnet.StreamController
         private void AudioDevicesEnumerated(object sender, EventArgs e)
         {
             audioDevicesEnumerated.SetResult(true);
-            taskbarRenderMenu.ItemsSource = AudioInterfaceCollection.Devices;
-            taskbarCaptureMenu.ItemsSource = AudioInterfaceCollection.Devices;
         }
 
         private async void DefaultAudioDeviceChanged(object sender, DataFlow dataFlow)
@@ -223,14 +215,14 @@ namespace uk.JohnCook.dotnet.StreamController
                 connectionError = String.Empty;
                 _ReconnectCountdownTimer.Stop();
                 UpdateUIConnectStatus(String.Empty, Brushes.DarkGreen, null);
-                NotifyIcon.Icon = Properties.Resources.icon_dark_green;
+                SystemTrayIcon.Instance.NotifyIcon.Icon = Properties.Resources.icon_dark_green;
                 obsSourceDictionary.Clear();
             }
             else if (newState != WebSocketState.Connecting)
             {
                 _ReconnectCountdownTimer.Start();
                 UpdateUIConnectStatus(null, Brushes.Red, null);
-                NotifyIcon.Icon = Properties.Resources.icon_red;
+                SystemTrayIcon.Instance.NotifyIcon.Icon = Properties.Resources.icon_red;
             }
             else
             {
@@ -241,7 +233,7 @@ namespace uk.JohnCook.dotnet.StreamController
                 connectionError = String.Empty;
                 _ReconnectCountdownTimer.Stop();
                 UpdateUIConnectStatus("\u2026", Brushes.DarkGoldenrod, null);
-                NotifyIcon.Icon = Properties.Resources.dark_golden_rod;
+                SystemTrayIcon.Instance.NotifyIcon.Icon = Properties.Resources.dark_golden_rod;
             }
         }
 
@@ -847,11 +839,11 @@ namespace uk.JohnCook.dotnet.StreamController
                     null);
                 if (brush1 == primaryBrush)
                 {
-                    NotifyIcon.Icon = Properties.Resources.icon;
+                    SystemTrayIcon.Instance.NotifyIcon.Icon = Properties.Resources.icon;
                 }
                 else if (brush1 == secondaryBrush)
                 {
-                    NotifyIcon.Icon = Properties.Resources.icon_secondary;
+                    SystemTrayIcon.Instance.NotifyIcon.Icon = Properties.Resources.icon_secondary;
                 }
             }
             if (brush2 != null)
@@ -860,7 +852,7 @@ namespace uk.JohnCook.dotnet.StreamController
                 _Context.Send(
                     _ => sbCircleStatus.Fill = brush2,
                     null);
-                NotifyIcon.Icon = Properties.Resources.icon_neutral;
+                SystemTrayIcon.Instance.NotifyIcon.Icon = Properties.Resources.icon_neutral;
             }
         }
 
@@ -879,37 +871,6 @@ namespace uk.JohnCook.dotnet.StreamController
                 null);
             return Task.CompletedTask;
         }
-
-
-        #region System Tray Context Menu
-
-        private void SystemTrayRenderDefault_Click(object sender, RoutedEventArgs e)
-        {
-            AudioInterfaceCollection.ChangeDefaultDevice(((sender as MenuItem).DataContext as AudioInterface).ID);
-        }
-
-
-        private void SystemTrayCaptureDefault_Click(object sender, RoutedEventArgs e)
-        {
-            AudioInterfaceCollection.ChangeDefaultDevice(((sender as MenuItem).DataContext as AudioInterface).ID);
-        }
-
-
-        private async void SystemTrayToggleCustomAudio_Click(object sender, RoutedEventArgs e)
-        {
-            (e.OriginalSource as MenuItem).IsEnabled = false;
-            await Task.Run(
-                () => AudioInterfaceCollection.ToggleAllDefaultApplicationDevice()
-                ).ConfigureAwait(true);
-            (e.OriginalSource as MenuItem).IsEnabled = true;
-        }
-
-        private void SystemTrayExit_Click(object sender, RoutedEventArgs e)
-        {
-            App.Current.Shutdown();
-        }
-
-        #endregion
 
         #endregion
 
