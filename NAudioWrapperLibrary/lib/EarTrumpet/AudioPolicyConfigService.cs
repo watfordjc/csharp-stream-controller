@@ -6,6 +6,7 @@ using System.Diagnostics;
 using NAudio.CoreAudioApi;
 using NAudio.Utils;
 using System.Runtime.InteropServices;
+using System.Linq;
 
 namespace uk.JohnCook.dotnet.NAudioWrapperLibrary.EarTrumpet.DataModel.WindowsAudio.Internal
 {
@@ -62,8 +63,17 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary.EarTrumpet.DataModel.WindowsAu
 
             if (hr1 != HResult.S_OK || hr2 != HResult.S_OK)
             {
-                // Print error or throw exception? Print error for now.
-                Trace.WriteLine($"Error in {nameof(SetDefaultEndPoint)} for {processId}: MultimediaResult={Marshal.GetExceptionForHR(hr1)}, ConsoleResult={Marshal.GetExceptionForHR(hr2)}");
+                Exception ex1 = Marshal.GetExceptionForHR(hr1);
+                Exception ex2 = Marshal.GetExceptionForHR(hr2);
+                if (ex1.GetType() == typeof(ArgumentException) || ex2.GetType() == typeof(ArgumentException))
+                {
+                    ProcessCollection.Processes.FirstOrDefault(x => x.Id == processId).AudioDeviceTogglingNeeded = true;
+                }
+                else
+                {
+                    // Print error or throw exception? Print error for now.
+                    Trace.WriteLine($"Error in {nameof(SetDefaultEndPoint)} for {processId}: MultimediaResult={ex1}, ConsoleResult={ex2}");
+                }
             }
         }
 

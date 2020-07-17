@@ -172,15 +172,18 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
                 string preferredCaptureId = applicationDevicePreference?.Devices?.CaptureDeviceId;
                 bool windowsThinksDefault = windowsPreferredRender == null && windowsPreferredCapture == null;
                 bool noPreferences = preferredRenderId == null && preferredCaptureId == null;
+                // There is agreement that this process uses the default devices.
                 if (noPreferences && windowsThinksDefault)
                 {
                     continue;
                 }
+                // Windows doesn't think this process uses the default device and we don't have any preferences for the process.
                 if (applicationDevicePreference == default && !windowsThinksDefault)
                 {
                     ChangeDefaultApplicationDevice(windowsPreferredRender, process);
                     ChangeDefaultApplicationDevice(windowsPreferredCapture, process);
                 }
+                // Windows doesn't think this process uses the default device. We agree, but we disagree on the preferred audio device.
                 else if (!windowsThinksDefault)
                 {
                     bool changeNeeded = preferredRenderId != windowsPreferredRender.ID;
@@ -188,6 +191,26 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
                     if (changeNeeded)
                     {
                         Trace.WriteLine($"Preference conflict detected between Windows Settings and Stream Controller for process {process.ProcessName}.");
+                    }
+                    if (process.AudioDeviceTogglingNeeded)
+                    {
+                        ToggleDefaultApplicationDevice(process);
+                        process.AudioDeviceTogglingNeeded = false;
+                    }
+                }
+                // Windows thinks the process uses the default device. We disagree and are waiting for the process to make a sound.
+                else if (windowsThinksDefault)
+                {
+                    EarTrumpet.DataModel.WindowsAudio.Internal.AudioPolicyConfig audioPolicyConfig;
+                    if (preferredRenderId != null)
+                    {
+                        audioPolicyConfig = new EarTrumpet.DataModel.WindowsAudio.Internal.AudioPolicyConfig(DataFlow.Render);
+                        audioPolicyConfig.SetDefaultEndPoint(preferredRenderId, process.Id);
+                    }
+                    if (preferredCaptureId != null)
+                    {
+                        audioPolicyConfig = new EarTrumpet.DataModel.WindowsAudio.Internal.AudioPolicyConfig(DataFlow.Capture);
+                        audioPolicyConfig.SetDefaultEndPoint(preferredCaptureId, process.Id);
                     }
                 }
             }

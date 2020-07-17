@@ -14,6 +14,7 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
         public string ProcessName { get; private set; }
         public int Id { get; private set; }
         public string MainWindowTitle { get; private set; }
+        public bool AudioDeviceTogglingNeeded { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
         public void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
