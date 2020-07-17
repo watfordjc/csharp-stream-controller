@@ -496,7 +496,10 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
             void IMMNotificationClient.OnDeviceStateChanged(string deviceId, DeviceState newState)
             {
                 AudioInterface audioInterface = GetAudioInterfaceById(deviceId);
-                audioInterface.SetProperties(newState);
+                if (audioInterface != null)
+                {
+                    audioInterface.SetProperties(newState);
+                }
 
                 if (newState != DeviceState.Active) { return; }
                 SharedModels.DeviceApplicationPreference deviceApplicationPreference = Instance.deviceApplicationPreferences.Devices.FirstOrDefault(x => x.Id == deviceId);
