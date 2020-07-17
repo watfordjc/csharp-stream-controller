@@ -109,7 +109,6 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
                     processNameOccurance = 0;
                 }
                 ObservableProcess observableProcess = Processes.Where(x => x.ProcessName == ProcessNameList[i]).ToArray()[processNameOccurance];
-                Trace.WriteLine($"Moving {observableProcess.ProcessName} from position {Processes.IndexOf(observableProcess)} to {i}.");
                 Processes.Move(Processes.IndexOf(observableProcess), i);
             }
         }

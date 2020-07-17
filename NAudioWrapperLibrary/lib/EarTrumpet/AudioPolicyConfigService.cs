@@ -79,8 +79,15 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary.EarTrumpet.DataModel.WindowsAu
             }
             else
             {
-                Trace.WriteLine($"{Marshal.GetExceptionForHR(hr)}");
-                return null;
+                Exception ex = Marshal.GetExceptionForHR(hr);
+                // If a process doesn't have a persisted default audio endpoint for a DataFlow direction, an ArgumentException is raised. Ignore it.
+                if (ex.GetType() == typeof(ArgumentException)) { return null; }
+                else
+                {
+                    // Some other exception type has occurred but we don't know why.
+                    Trace.WriteLine($"{ex}");
+                    return null;
+                }
             }
         }
 

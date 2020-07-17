@@ -215,6 +215,37 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
             jsonDataDirty = true;
         }
 
+        private void RemoveOldApplicationDevicePreference(ObservableProcess process, AudioInterface audioInterface)
+        {
+            SharedModels.ApplicationDevicePreference applicationDevicePreference = applicationDevicePreferences.Applications.FirstOrDefault(x => x.Name == process.ProcessName);
+            if (applicationDevicePreference == default) { return; }
+            string previousPreferredInterface = null;
+            switch (audioInterface.DataFlow)
+            {
+                case DataFlow.Render:
+                    previousPreferredInterface = applicationDevicePreference.Devices.RenderDeviceId;
+                    applicationDevicePreference.Devices.RenderDeviceId = null;
+                    break;
+                case DataFlow.Capture:
+                    previousPreferredInterface = applicationDevicePreference.Devices.CaptureDeviceId;
+                    applicationDevicePreference.Devices.CaptureDeviceId = null;
+                    break;
+                default:
+                    return;
+            }
+            if (applicationDevicePreference.Devices.RenderDeviceId == null && applicationDevicePreference.Devices.CaptureDeviceId == null)
+            {
+                applicationDevicePreferences.Applications.Remove(applicationDevicePreference);
+            }
+            SharedModels.DeviceApplicationPreference deviceApplicationPreference = deviceApplicationPreferences.Devices.FirstOrDefault(x => x.Id == previousPreferredInterface);
+            if (deviceApplicationPreference == default) { return; }
+            deviceApplicationPreference.Applications.Remove(process.ProcessName);
+            if (deviceApplicationPreference.Applications.Count == 0)
+            {
+                deviceApplicationPreferences.Devices.Remove(deviceApplicationPreference);
+            }
+        }
+
         private void ProcessAdded(ObservableProcess process)
         {
             if (process == null) { throw new ArgumentNullException(nameof(process)); }
@@ -251,6 +282,7 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
             AudioInterface audioInterface = GetDefaultApplicationDevice(dataFlow, process);
             if (audioInterface != null)
             {
+                RemoveOldApplicationDevicePreference(process, audioInterface);
                 AddApplicationDevicePreference(process, audioInterface);
                 AddDeviceApplicationPreference(audioInterface, process);
                 return audioInterface;
@@ -296,13 +328,18 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
 
             EarTrumpet.DataModel.WindowsAudio.Internal.AudioPolicyConfig audioPolicyConfig = new EarTrumpet.DataModel.WindowsAudio.Internal.AudioPolicyConfig(audioInterface.DataFlow);
             audioPolicyConfig.SetDefaultEndPoint(audioInterface.ID, process.Id);
+            Instance.RemoveOldApplicationDevicePreference(process, audioInterface);
             Instance.AddDeviceApplicationPreference(audioInterface, process);
+            Instance.AddApplicationDevicePreference(process, audioInterface);
         }
 
         public static void ClearAllApplicationDefaultDevices(DataFlow dataFlow)
         {
             EarTrumpet.DataModel.WindowsAudio.Internal.AudioPolicyConfig audioPolicyConfig = new EarTrumpet.DataModel.WindowsAudio.Internal.AudioPolicyConfig(dataFlow);
             audioPolicyConfig.ClearDefaultEndPoints();
+            Instance.deviceApplicationPreferences.Devices.Clear();
+            Instance.applicationDevicePreferences.Applications.Clear();
+            Instance.jsonDataDirty = true;
         }
 
         public static void ToggleDefaultApplicationDevice(ObservableProcess process)
@@ -363,7 +400,6 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
             return Devices.Where(device => device.VolumeNotificationGuid == notificationId).FirstOrDefault();
         }
 
-        // TODO: Implement methods to propagate events
         private class AudioEndpointNotificationCallback : IMMNotificationClient
         {
             private readonly SynchronizationContext mContext;
@@ -399,7 +435,21 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
 
             void IMMNotificationClient.OnDeviceStateChanged(string deviceId, DeviceState newState)
             {
-                GetAudioInterfaceById(deviceId).SetProperties(newState);
+                AudioInterface audioInterface = GetAudioInterfaceById(deviceId);
+                audioInterface.SetProperties(newState);
+
+                if (newState != DeviceState.Active) { return; }
+                SharedModels.DeviceApplicationPreference deviceApplicationPreference = Instance.deviceApplicationPreferences.Devices.FirstOrDefault(x => x.Id == deviceId);
+                if (deviceApplicationPreference == default) { return; }
+
+                foreach (string applicationName in deviceApplicationPreference.Applications)
+                {
+                    ObservableProcess[] processes = ProcessCollection.Processes.Where(x => x.ProcessName == applicationName).ToArray();
+                    foreach (ObservableProcess process in processes)
+                    {
+                        ChangeDefaultApplicationDevice(audioInterface, process);
+                    }
+                }
             }
 
             void IMMNotificationClient.OnPropertyValueChanged(string pwstrDeviceId, PropertyKey key)

@@ -34,7 +34,13 @@ namespace uk.JohnCook.dotnet.StreamController
         private void PopulateApplications()
         {
             cb_applications.ItemsSource = ProcessCollection.Processes;
-            ProcessCollection.Instance.CollectionEnumerated += Processes_CollectionEnumerated;
+            if (ProcessCollection.Instance.ProcessesAreEnumerated)
+            {
+                Processes_CollectionEnumerated(this, EventArgs.Empty);
+            } else
+            {
+                ProcessCollection.Instance.CollectionEnumerated += Processes_CollectionEnumerated;
+            }
             ProcessCollection.Instance.CollectionChanged += Processes_CollectionChanged;
             cb_applications.SelectionChanged += ApplicationsComboBox_SelectionChanged;
         }
