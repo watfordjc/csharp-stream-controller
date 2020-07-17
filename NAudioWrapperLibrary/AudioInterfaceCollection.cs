@@ -1,15 +1,15 @@
 ﻿using System;
-using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
+using System.Collections.Specialized;
+using System.Configuration;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
-using System.Reflection.Metadata;
-using System.Runtime.CompilerServices;
-using System.Security.Principal;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using NAudio;
+using System.Timers;
 using NAudio.CoreAudioApi;
 using NAudio.CoreAudioApi.Interfaces;
 
@@ -22,12 +22,18 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
         private static readonly MMDeviceEnumerator _Enumerator = new MMDeviceEnumerator();
         private static AudioEndpointNotificationCallback _NotificationCallback = null;
         private static IMMNotificationClient _NotificationClient;
+        private static readonly string appdataPath = Path.GetDirectoryName(ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal).FilePath) + "\\";
+        private const string deviceApplicationPreferencesFilename = "DeviceApplicationPreferences.json";
+        private const string applicationDevicePreferencesFilename = "ApplicationDevicePreferences.json";
         private SharedModels.DeviceApplicationPreferences deviceApplicationPreferences;
         private SharedModels.ApplicationDevicePreferences applicationDevicePreferences;
+        private bool jsonDataDirty = false;
+        private static readonly System.Timers.Timer jsonSaveTimer = new System.Timers.Timer(60000);
 
+        public static AudioInterfaceCollection Instance { get { return lazySingleton.Value; } }
+        public static ObservableCollection<AudioInterface> Devices { get; } = new ObservableCollection<AudioInterface>();
         public AudioInterface DefaultRender { get; private set; }
         public AudioInterface DefaultCapture { get; private set; }
-        public static ObservableCollection<AudioInterface> Devices { get; } = new ObservableCollection<AudioInterface>();
         public bool DevicesAreEnumerated { get; private set; }
 
         private static readonly Lazy<AudioInterfaceCollection> lazySingleton =
@@ -36,7 +42,6 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
             );
         private bool disposedValue;
 
-        public static AudioInterfaceCollection Instance { get { return lazySingleton.Value; } }
 
         public static void RegisterEndpointNotificationCallback(IMMNotificationClient notificationClient)
         {
@@ -54,6 +59,9 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
         private async void Initialise()
         {
             await PopulateInterfaces().ConfigureAwait(false);
+            jsonSaveTimer.Elapsed += JsonSaveTimer_Elapsed;
+            jsonSaveTimer.Enabled = true;
+            jsonSaveTimer.Start();
         }
 
         private async Task PopulateInterfaces()
@@ -84,28 +92,73 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
             DevicesAreEnumerated = true;
             NotifyCollectionEnumerated();
             RestoreDeviceApplicationPreferences();
-            if (Processes.ProcessesAreEnumerated)
+            bool processesEnumerated = false;
+            _Context.Send(
+                x => processesEnumerated = ProcessCollection.Instance.ProcessesAreEnumerated,
+                null);
+            if (!processesEnumerated)
+            {
+                ProcessCollection.Instance.CollectionEnumerated += Processes_CollectionEnumerated;
+            }
+            else
             {
                 Processes_CollectionEnumerated(this, EventArgs.Empty);
             }
-            Processes.CollectionChanged += Processes_CollectionChanged;
+
+            ProcessCollection.Instance.CollectionChanged += Processes_CollectionChanged;
         }
 
-        private void RestoreDeviceApplicationPreferences()
+        private async void RestoreDeviceApplicationPreferences()
         {
-            deviceApplicationPreferences = new SharedModels.DeviceApplicationPreferences
+            if (!Directory.Exists(appdataPath))
             {
-                Devices = new List<SharedModels.DeviceApplicationPreference>()
-            };
-            applicationDevicePreferences = new SharedModels.ApplicationDevicePreferences
+                Directory.CreateDirectory(appdataPath);
+            }
+            if (File.Exists(appdataPath + deviceApplicationPreferencesFilename))
             {
-                Applications = new List<SharedModels.ApplicationDevicePreference>()
-            };
+                using FileStream deviceApplicationJsonFile = File.OpenRead(appdataPath + deviceApplicationPreferencesFilename);
+                deviceApplicationPreferences = await JsonSerializer.DeserializeAsync<SharedModels.DeviceApplicationPreferences>(deviceApplicationJsonFile).ConfigureAwait(true);
+            }
+            if (deviceApplicationPreferences == null)
+            {
+                deviceApplicationPreferences = new SharedModels.DeviceApplicationPreferences
+                {
+                    Devices = new List<SharedModels.DeviceApplicationPreference>()
+                };
+            }
+            if (File.Exists(appdataPath + applicationDevicePreferencesFilename))
+            {
+                using FileStream applicationDeviceJsonFile = File.OpenRead(appdataPath + applicationDevicePreferencesFilename);
+                applicationDevicePreferences = await JsonSerializer.DeserializeAsync<SharedModels.ApplicationDevicePreferences>(applicationDeviceJsonFile).ConfigureAwait(true);
+            }
+            if (applicationDevicePreferences == null)
+            {
+                applicationDevicePreferences = new SharedModels.ApplicationDevicePreferences
+                {
+                    Applications = new List<SharedModels.ApplicationDevicePreference>()
+                };
+            }
+        }
+
+        private async void JsonSaveTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            if (!jsonDataDirty) { return; }
+
+            ReadOnlyMemory<char> deviceApplicationJson = JsonSerializer.Serialize(deviceApplicationPreferences).AsMemory();
+            ReadOnlyMemory<char> applicationDeviceJson = JsonSerializer.Serialize(applicationDevicePreferences).AsMemory();
+
+            using StreamWriter deviceApplicationJsonFile = new StreamWriter(appdataPath + deviceApplicationPreferencesFilename, false);
+            using StreamWriter applicationDeviceJsonFile = new StreamWriter(appdataPath + applicationDevicePreferencesFilename, false);
+
+            await deviceApplicationJsonFile.WriteAsync(deviceApplicationJson).ConfigureAwait(false);
+            await applicationDeviceJsonFile.WriteAsync(applicationDeviceJson).ConfigureAwait(false);
+
+            jsonDataDirty = false;
         }
 
         private void Processes_CollectionEnumerated(object sender, EventArgs e)
         {
-            foreach (ObservableProcess process in Processes)
+            foreach (ObservableProcess process in ProcessCollection.Processes)
             {
                 ProcessAdded(process);
             }
@@ -138,6 +191,7 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
             {
                 deviceApplicationPreference.Applications.Add(process.ProcessName);
             }
+            jsonDataDirty = true;
         }
 
         private void AddApplicationDevicePreference(ObservableProcess process, AudioInterface audioInterface)
@@ -158,6 +212,7 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
                 DataFlow.Capture => applicationDevicePreference.Devices.CaptureDeviceId = audioInterface.ID,
                 _ => null
             };
+            jsonDataDirty = true;
         }
 
         private void ProcessAdded(ObservableProcess process)
