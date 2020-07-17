@@ -227,12 +227,12 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
             AudioInterface preferredRender = GetApplicationDevicePreference(DataFlow.Render, applicationDevicePreference, process);
             if (preferredRender != null)
             {
-                ChangeDefaultApplicationDevice(preferredRender, process.Id);
+                ChangeDefaultApplicationDevice(preferredRender, process);
             }
             AudioInterface preferredCapture = GetApplicationDevicePreference(DataFlow.Capture, applicationDevicePreference, process);
             if (preferredCapture != null)
             {
-                ChangeDefaultApplicationDevice(preferredCapture, process.Id);
+                ChangeDefaultApplicationDevice(preferredCapture, process);
             }
         }
 
@@ -248,7 +248,7 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
             {
                 return GetAudioInterfaceById(preferredInterfaceId);
             }
-            AudioInterface audioInterface = GetDefaultApplicationDevice(dataFlow, process.Id);
+            AudioInterface audioInterface = GetDefaultApplicationDevice(dataFlow, process);
             if (audioInterface != null)
             {
                 AddApplicationDevicePreference(process, audioInterface);
@@ -281,18 +281,22 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
             policyConfigClient.SetDefaultEndpoint(defaultDeviceId, Role.Console);
         }
 
-        public static AudioInterface GetDefaultApplicationDevice(DataFlow dataFlow, int processId)
+        public static AudioInterface GetDefaultApplicationDevice(DataFlow dataFlow, ObservableProcess process)
         {
+            if (process == null) { throw new ArgumentNullException(nameof(process)); }
+
             EarTrumpet.DataModel.WindowsAudio.Internal.AudioPolicyConfig audioPolicyConfig = new EarTrumpet.DataModel.WindowsAudio.Internal.AudioPolicyConfig(dataFlow);
-            return GetAudioInterfaceById(audioPolicyConfig.GetDefaultEndPoint(processId));
+            return GetAudioInterfaceById(audioPolicyConfig.GetDefaultEndPoint(process.Id));
         }
 
-        public static void ChangeDefaultApplicationDevice(AudioInterface audioInterface, int processId)
+        public static void ChangeDefaultApplicationDevice(AudioInterface audioInterface, ObservableProcess process)
         {
             if (audioInterface == null) { throw new ArgumentNullException(nameof(audioInterface)); }
+            if (process == null) { throw new ArgumentNullException(nameof(process)); }
 
             EarTrumpet.DataModel.WindowsAudio.Internal.AudioPolicyConfig audioPolicyConfig = new EarTrumpet.DataModel.WindowsAudio.Internal.AudioPolicyConfig(audioInterface.DataFlow);
-            audioPolicyConfig.SetDefaultEndPoint(audioInterface.ID, processId);
+            audioPolicyConfig.SetDefaultEndPoint(audioInterface.ID, process.Id);
+            Instance.AddDeviceApplicationPreference(audioInterface, process);
         }
 
         public static void ClearAllApplicationDefaultDevices(DataFlow dataFlow)
@@ -301,30 +305,32 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
             audioPolicyConfig.ClearDefaultEndPoints();
         }
 
-        public static void ToggleDefaultApplicationDevice(int processId)
+        public static void ToggleDefaultApplicationDevice(ObservableProcess process)
         {
-            AudioInterface renderDevice = GetDefaultApplicationDevice(DataFlow.Render, processId);
+            if (process == null) { throw new ArgumentNullException(nameof(process)); }
+
+            AudioInterface renderDevice = GetDefaultApplicationDevice(DataFlow.Render, process);
             if (renderDevice != null)
             {
-                Trace.WriteLine($"Toggling PID {processId} render device to default and back to {renderDevice.FriendlyName}.");
-                ChangeDefaultApplicationDevice(Instance.DefaultRender, processId);
-                ChangeDefaultApplicationDevice(renderDevice, processId);
+                Trace.WriteLine($"Toggling PID {process.Id} render device to default and back to {renderDevice.FriendlyName}.");
+                ChangeDefaultApplicationDevice(Instance.DefaultRender, process);
+                ChangeDefaultApplicationDevice(renderDevice, process);
             }
-            AudioInterface captureDevice = GetDefaultApplicationDevice(DataFlow.Capture, processId);
+            AudioInterface captureDevice = GetDefaultApplicationDevice(DataFlow.Capture, process);
             if (captureDevice != null)
             {
-                Trace.WriteLine($"Toggling PID {processId} capture device to default and back to {captureDevice.FriendlyName}.");
-                ChangeDefaultApplicationDevice(Instance.DefaultCapture, processId);
-                ChangeDefaultApplicationDevice(captureDevice, processId);
+                Trace.WriteLine($"Toggling PID {process.Id} capture device to default and back to {captureDevice.FriendlyName}.");
+                ChangeDefaultApplicationDevice(Instance.DefaultCapture, process);
+                ChangeDefaultApplicationDevice(captureDevice, process);
             }
         }
 
         public static void ToggleAllDefaultApplicationDevice()
         {
-            foreach (Process process in Process.GetProcesses())
+            foreach (ObservableProcess process in ProcessCollection.Processes)
             {
                 if (String.IsNullOrEmpty(process.MainWindowTitle)) { continue; }
-                ToggleDefaultApplicationDevice(process.Id);
+                ToggleDefaultApplicationDevice(process);
             }
         }
 

@@ -66,15 +66,14 @@ namespace uk.JohnCook.dotnet.StreamController
         {
             if (e.AddedItems.Count > 0)
             {
-                int processId = (e.AddedItems[0] as ObservableProcess).Id;
-                UpdateApplicationAudioDevices(processId);
+                UpdateApplicationAudioDevices(e.AddedItems[0] as ObservableProcess);
             }
         }
 
-        private void UpdateApplicationAudioDevices(int processId)
+        private void UpdateApplicationAudioDevices(ObservableProcess process)
         {
-            AudioInterface applicationRender = AudioInterfaceCollection.GetDefaultApplicationDevice(DataFlow.Render, processId);
-            AudioInterface applicationCapture = AudioInterfaceCollection.GetDefaultApplicationDevice(DataFlow.Capture, processId);
+            AudioInterface applicationRender = AudioInterfaceCollection.GetDefaultApplicationDevice(DataFlow.Render, process);
+            AudioInterface applicationCapture = AudioInterfaceCollection.GetDefaultApplicationDevice(DataFlow.Capture, process);
             app_render.Text = applicationRender?.FriendlyName ?? "Default";
             app_capture.Text = applicationCapture?.FriendlyName ?? "Default";
         }
@@ -99,17 +98,16 @@ namespace uk.JohnCook.dotnet.StreamController
 
         private void BtnSetApplicationDefault_Click(object sender, RoutedEventArgs e)
         {
-            int processId = (cb_applications.SelectedItem as ObservableProcess).Id;
+            ObservableProcess process = (cb_applications.SelectedItem as ObservableProcess);
             AudioInterface currentInterface = (cb_interfaces.SelectedItem as AudioInterface);
-            AudioInterfaceCollection.ChangeDefaultApplicationDevice(currentInterface, processId);
-            UpdateApplicationAudioDevices(processId);
+            AudioInterfaceCollection.ChangeDefaultApplicationDevice(currentInterface, process);
+            UpdateApplicationAudioDevices(process);
         }
 
         private void BtnResetAllApplicationDefault_Click(object sender, RoutedEventArgs e)
         {
-            int processId = (cb_applications.SelectedItem as ObservableProcess).Id;
             AudioInterfaceCollection.ClearAllApplicationDefaultDevices(DataFlow.All);
-            UpdateApplicationAudioDevices(processId);
+            UpdateApplicationAudioDevices(cb_applications.SelectedItem as ObservableProcess);
         }
 
         private async void BtnToggleAllApplicationDefault_Click(object sender, RoutedEventArgs e)
