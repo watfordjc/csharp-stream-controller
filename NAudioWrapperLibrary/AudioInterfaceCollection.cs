@@ -16,7 +16,7 @@ using NAudio.CoreAudioApi.Interfaces;
 namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
 {
 
-    public sealed class AudioInterfaceCollection : ObservableCollection<MMDevice>, IDisposable
+    public sealed class AudioInterfaceCollection : ObservableCollection<MMDevice>
     {
         private readonly SynchronizationContext _Context;
         private static readonly MMDeviceEnumerator _Enumerator = new MMDeviceEnumerator();
@@ -40,7 +40,6 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
             new Lazy<AudioInterfaceCollection>(
                 () => new AudioInterfaceCollection()
             );
-        private bool disposedValue;
 
 
         public static void RegisterEndpointNotificationCallback(IMMNotificationClient notificationClient)
@@ -142,7 +141,11 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
 
         private async void JsonSaveTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            if (!jsonDataDirty) { return; }
+            if (!jsonDataDirty)
+            {
+                CheckApplicationDeviceChanges();
+                return;
+            }
 
             ReadOnlyMemory<char> deviceApplicationJson = JsonSerializer.Serialize(deviceApplicationPreferences).AsMemory();
             ReadOnlyMemory<char> applicationDeviceJson = JsonSerializer.Serialize(applicationDevicePreferences).AsMemory();
@@ -154,6 +157,40 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
             await applicationDeviceJsonFile.WriteAsync(applicationDeviceJson).ConfigureAwait(false);
 
             jsonDataDirty = false;
+
+            CheckApplicationDeviceChanges();
+        }
+
+        private void CheckApplicationDeviceChanges()
+        {
+            foreach (ObservableProcess process in ProcessCollection.Processes)
+            {
+                AudioInterface windowsPreferredRender = GetDefaultApplicationDevice(DataFlow.Render, process);
+                AudioInterface windowsPreferredCapture = GetDefaultApplicationDevice(DataFlow.Capture, process);
+                SharedModels.ApplicationDevicePreference applicationDevicePreference = applicationDevicePreferences.Applications.FirstOrDefault(x => x.Name == process.ProcessName);
+                string preferredRenderId = applicationDevicePreference?.Devices?.RenderDeviceId;
+                string preferredCaptureId = applicationDevicePreference?.Devices?.CaptureDeviceId;
+                bool windowsThinksDefault = windowsPreferredRender == null && windowsPreferredCapture == null;
+                bool noPreferences = preferredRenderId == null && preferredCaptureId == null;
+                if (noPreferences && windowsThinksDefault)
+                {
+                    continue;
+                }
+                if (applicationDevicePreference == default && !windowsThinksDefault)
+                {
+                    ChangeDefaultApplicationDevice(windowsPreferredRender, process);
+                    ChangeDefaultApplicationDevice(windowsPreferredCapture, process);
+                }
+                else if (!windowsThinksDefault)
+                {
+                    bool changeNeeded = preferredRenderId != windowsPreferredRender.ID;
+                    changeNeeded = changeNeeded || preferredCaptureId != windowsPreferredCapture?.ID;
+                    if (changeNeeded)
+                    {
+                        Trace.WriteLine($"Preference conflict detected between Windows Settings and Stream Controller for process {process.ProcessName}.");
+                    }
+                }
+            }
         }
 
         private void Processes_CollectionEnumerated(object sender, EventArgs e)
@@ -456,35 +493,6 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
             {
                 GetAudioInterfaceById(pwstrDeviceId).NotifyMMAudioPropertyChanged(mContext, key);
             }
-        }
-
-        private void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    // TODO: dispose managed state (managed objects)
-                }
-
-                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
-                // TODO: set large fields to null
-                disposedValue = true;
-            }
-        }
-
-        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
-        // ~AudioInterfaces()
-        // {
-        //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        //     Dispose(disposing: false);
-        // }
-
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
         }
     }
 }
