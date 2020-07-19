@@ -21,20 +21,59 @@ Project names and purposes are subject to changes, and this README is likely to 
 ### [NAudioWrapperLibrary](NAudioWrapperLibrary)
 The purpose of this library is to interface with the Windows audio devices via the [NAudio library](https://github.com/naudio/NAudio).
 
-### [WebSocketLibrary](WebSocketLibrary)
-The purpose of this library is to provide a generic websocket client ([GenericClient](WebSocketLibrary/GenericClient.cs)) using [System.Net.WebSockets.ClientWebSocket](https://docs.microsoft.com/en-us/dotnet/api/system.net.websockets.clientwebsocket?view=netcore-3.1).
+Its short name for milestones is **NAWLib**.
+
+### [NetworkingWrapperLibrary](NetworkingWrapperLibrary)
+The purpose of this library is to interface with the Windows networking devices.
+
+Its short name for milestones is **NWLib**.
 
 ### [OBSWebSocketLibrary](OBSWebSocketLibrary)
 The purpose of this library is to provide an [obs-websocket](https://github.com/Palakis/obs-websocket) specific implementation of [WebSocketLibrary.GenericClient](WebSocketLibrary/GenericClient.cs).
 
+Its short name for milestones is **OBSWSLib**.
+
+### [Setup](Setup)
+This library is for generating installers/releases.
+
+### [SharedModels](SharedModels)
+This library is for classes that are used by other projects/libraries and will eventually be for classes that aren't dependent on other projects and are used across projects.
+
+Its short name for milestones is **SMLib**.
+
 ### [Stream Controller](Stream%20Controller)
-This is the user interface stuff, which at the moment is mostly for debugging the libraries.
+This is the user interface project. All of the windows are contained in this project and it is also the thing the Setup project creates installers from.
+
+Its short name for milestones is **SC**.
+
+### [WebSocketLibrary](WebSocketLibrary)
+The purpose of this library is to provide a generic websocket client ([GenericClient](WebSocketLibrary/GenericClient.cs)) using [System.Net.WebSockets.ClientWebSocket](https://docs.microsoft.com/en-us/dotnet/api/system.net.websockets.clientwebsocket?view=netcore-3.1).
+
+Its short name for milestones is **WSLib**.
 
 ## Branches
 ### [master](../../tree/master)
 This branch is, for the time being, the only one suitable for forking from.
 
 ### [audio-interface-db](../../tree/audio-interface-db)
-This feature branch is a fork of [master](../../tree/master). It is where I am working on some UI and audio stuff.
+This feature branch is a fork of [master](../../tree/master). It is where I was working on some UI and audio stuff.
 
-Until I get my branching and committing sorted out this branch is subject to rebasing and forced pushes.
+This branch is subject to rebasing and forced pushes, and will probably be deleted at some point given [issue #18](../../issues/18) resulted in something akin to an audio interface database.
+
+### Feature Branches
+
+Feature branches for issues follow the naming convention **feature/issue-issueNumber/projectShortname-branchNumer** where:
+  * issueNumber is the Github issue number in this repository;
+  * projectShortname is:
+    * a11y for Accessibility
+    * audio for Windows Audio
+    * net for Networking
+    * obs for OBS
+    * twitch for Twitch
+    * twitter for Twitter
+    * gui for UI
+  * branchNumber is the version number of that Repository Project's branch of the issue.
+  
+  These branches are subject to rebasing, forced pushes, cherry-picking, and abandonment.
+  
+  Feature branches get deleted after the master branch is fast-forwarded to the HEAD of the feature branch and the issue gets closed.
