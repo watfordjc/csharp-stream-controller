@@ -4,13 +4,13 @@
                     xmlns:Collections="clr-namespace:System.Collections;assembly=System.Runtime.Extensions"
                     x:Class="uk.JohnCook.dotnet.StreamController.MenuItemCollection">
     <Collections:ArrayList x:Key="MenuItems" x:Shared="false">
-        <MenuItem Header="_File">
+        <MenuItem Header="_File" IsTabStop="False">
             <MenuItem Header="E_xit" Click="MenuItemExit_Click" />
         </MenuItem>
-        <MenuItem Header="_Edit">
+        <MenuItem Header="_Edit" IsTabStop="False">
             <MenuItem Header="_Preferences" Click="MenuWindowItem_Click" x:Name="PreferencesWindow" Loaded="MenuWindowItemLoaded" />
         </MenuItem>
-        <MenuItem Header="_Window">
+        <MenuItem Header="_Window" IsTabStop="False">
             <MenuItem Header="_Audio Interfaces" Click="MenuWindowItem_Click" x:Name="MainWindow" Loaded="MenuWindowItemLoaded" />
             <MenuItem Header="Audio _Check" Click="MenuWindowItem_Click" x:Name="Audiocheck" Loaded="MenuWindowItemLoaded" />
             <MenuItem Header="_OBS" Click="MenuWindowItem_Click" x:Name="WebSocketTest" Loaded="MenuWindowItemLoaded" />

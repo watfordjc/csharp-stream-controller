@@ -10,6 +10,17 @@
         ContentRendered="Window_ContentRendered"
         Closed="Window_Closed"
         Title="AudioCheck" Height="450" Width="800">
+    <Window.Resources>
+        <Style x:Key="{x:Static SystemParameters.FocusVisualStyleKey}">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Rectangle StrokeThickness="2" Stroke="DodgerBlue" SnapsToDevicePixels="true"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
     <DockPanel>
         <Menu DockPanel.Dock="Top" ItemsSource="{StaticResource ResourceKey=MenuItems}" />
         <StatusBar DockPanel.Dock="Bottom" Height="auto" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" Padding="2">
@@ -77,6 +88,9 @@
                                         <Setter Property="FontWeight" Value="Bold" />
                                     </DataTrigger>
                                 </Style.Triggers>
+                                <Style.Setters>
+                                    <Setter Property="FocusVisualStyle" Value="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
+                                </Style.Setters>
                             </Style>
                         </ListBox.ItemContainerStyle>
                     </ListBox>

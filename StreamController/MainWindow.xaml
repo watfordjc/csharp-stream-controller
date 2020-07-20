@@ -9,6 +9,15 @@
         Title="Stream Control" Height="600" Width="960">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+        <Style x:Key="{x:Static SystemParameters.FocusVisualStyleKey}">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Rectangle StrokeThickness="2" Stroke="DodgerBlue" SnapsToDevicePixels="true"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
     <DockPanel>
         <Menu DockPanel.Dock="Top" ItemsSource="{StaticResource ResourceKey=MenuItems}" />
@@ -32,7 +41,7 @@
                     <StackPanel Orientation="Vertical">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Interface:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                            <ComboBox x:Name="cb_interfaces" IsEditable="False" Height="auto">
+                            <ComboBox x:Name="cb_interfaces" IsEditable="False" Height="auto" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
                                 <ComboBox.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <VirtualizingStackPanel />
@@ -74,7 +83,7 @@
                                 <TextBlock Grid.Row="3" Grid.Column="1" x:Name="interface_volume" Text="{Binding Volume,StringFormat={}{0}%}" Visibility="{Binding IsActive, Converter={StaticResource BoolToVisibility}}" />
                                 <TextBlock Grid.Row="4" Grid.Column="0" x:Name="interface_muted_label" Text="Muted:" VerticalAlignment="Center" Margin="0 0 8 0" Visibility="{Binding IsActive, Converter={StaticResource BoolToVisibility}}" />
                                 <TextBlock Grid.Row="4" Grid.Column="1" x:Name="interface_muted" Text="{Binding Muted}" Visibility="{Binding IsActive, Converter={StaticResource BoolToVisibility}}" />
-                                <Button Grid.Row="5" Grid.Column="0" x:Name="btnMakeDefaultRender" Margin="0 8" Padding="4" Content="Make Default" Visibility="{Binding IsActive, Converter={StaticResource BoolToVisibility}}" Click="BtnMakeDefaultRender_Click" />
+                                <Button Grid.Row="5" Grid.Column="0" x:Name="btnMakeDefaultRender" Margin="0 8" Padding="4" Content="Make Default" Visibility="{Binding IsActive, Converter={StaticResource BoolToVisibility}}" Click="BtnMakeDefaultRender_Click" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
                             </Grid>
                         </GroupBox>
                         <Grid>
@@ -94,7 +103,7 @@
                     <StackPanel Orientation="Vertical">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Application:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                            <ComboBox x:Name="cb_applications" IsEditable="False" Height="auto">
+                            <ComboBox x:Name="cb_applications" IsEditable="False" Height="auto" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
                                 <ComboBox.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <VirtualizingStackPanel />
@@ -143,12 +152,12 @@
                                 <TextBlock Grid.Row="3" Grid.Column="1" x:Name="app_render" />
                                 <TextBlock Grid.Row="4" Grid.Column="0" Text="Capture Device:" VerticalAlignment="Center" Margin="0 0 8 0" />
                                 <TextBlock Grid.Row="4" Grid.Column="1" x:Name="app_capture" />
-                                <Button Grid.Row="5" Grid.Column="0" Margin="0 8" Padding="4" Content="Use Interface for Console Audio" Click="BtnSetApplicationDefault_Click" MaxWidth="300" HorizontalAlignment="Left" />
+                                <Button Grid.Row="5" Grid.Column="0" Margin="0 8" Padding="4" Content="Use Interface for Console Audio" Click="BtnSetApplicationDefault_Click" MaxWidth="300" HorizontalAlignment="Left" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
                             </Grid>
                         </GroupBox>
                         <StackPanel Orientation="Horizontal" Grid.Row="5" Grid.Column="0" HorizontalAlignment="Left">
-                            <Button Margin="8 8" Padding="4" Content="Reset Custom Devices for All Apps" Click="BtnResetAllApplicationDefault_Click" />
-                            <Button Margin="8 8" Padding="4" Content="Toggle Custom Devices for All Apps" Click="BtnToggleAllApplicationDefault_Click" />
+                            <Button Margin="8 8" Padding="4" Content="Reset Custom Devices for All Apps" Click="BtnResetAllApplicationDefault_Click" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
+                            <Button Margin="8 8" Padding="4" Content="Toggle Custom Devices for All Apps" Click="BtnToggleAllApplicationDefault_Click" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
