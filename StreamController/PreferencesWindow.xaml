@@ -8,10 +8,22 @@
         mc:Ignorable="d"
         FontFamily="Open Sans"
         FontSize="12"
+        FocusManager.FocusedElement="{Binding ElementName=cbUriProtocol}"
         Title="Preferences" Width="560" MinWidth="560" Height="600" MinHeight="600">
     <Window.DataContext>
         <local:Preferences />
     </Window.DataContext>
+    <Window.Resources>
+        <Style x:Key="{x:Static SystemParameters.FocusVisualStyleKey}">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Rectangle StrokeThickness="2" Stroke="DodgerBlue" SnapsToDevicePixels="true"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
     <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="16 0">
         <Grid>
             <Grid.ColumnDefinitions>
@@ -44,12 +56,12 @@
                                 <RowDefinition Height="auto" />
                             </Grid.RowDefinitions>
                             <TextBlock Grid.Row="0" Grid.Column="0" x:Name="scheme_label" Text="Scheme:" Margin="8 8 2 8" VerticalAlignment="Center" />
-                            <ComboBox Grid.Row="0" Grid.Column="1" AutomationProperties.LabeledBy="{Binding ElementName=scheme_label}" Margin="2 8 8 8" Padding="6" MinWidth="50" VerticalContentAlignment="Center" x:Name="cbUriProtocol">
+                            <ComboBox Grid.Row="0" Grid.Column="1" AutomationProperties.LabeledBy="{Binding ElementName=scheme_label}" Margin="2 8 8 8" Padding="6" MinWidth="50" VerticalContentAlignment="Center" x:Name="cbUriProtocol" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
                                 <ComboBoxItem Content="ws" />
                                 <ComboBoxItem Content="wss" />
                             </ComboBox>
                             <TextBlock Grid.Column="0" Grid.Row="1" x:Name="hostname_label" Text="Hostname:" VerticalAlignment="Center" Margin="8 8 2 8" />
-                            <TextBox Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" AutomationProperties.LabeledBy="{Binding ElementName=hostname_label}" VerticalAlignment="Center"  Margin="2 8 2 8" Padding="6" MinWidth="200" x:Name="tbUriHostname">
+                            <TextBox Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" AutomationProperties.LabeledBy="{Binding ElementName=hostname_label}" VerticalAlignment="Center"  Margin="2 8 2 8" Padding="6" MinWidth="200" x:Name="tbUriHostname" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
                                 <TextBox.Text>
                                     <Binding Path="obs_uri_host" Source="{x:Static local:Preferences.Default}" Mode="TwoWay">
                                         <Binding.ValidationRules>
@@ -73,7 +85,7 @@
                                 </TextBlock.Style>
                             </TextBlock>
                             <TextBlock Grid.Row="3" Grid.Column="0" x:Name="port_label" Text="Port:" VerticalAlignment="Center" Margin="8 8 2 8" />
-                            <TextBox Grid.Row="3" Grid.Column="1" AutomationProperties.LabeledBy="{Binding ElementName=port_label}" TextAlignment="Center" VerticalAlignment="Center" MinWidth="60" Padding="6" Margin="2 8 8 8" x:Name="tbUriPort">
+                            <TextBox Grid.Row="3" Grid.Column="1" AutomationProperties.LabeledBy="{Binding ElementName=port_label}" TextAlignment="Center" VerticalAlignment="Center" MinWidth="60" Padding="6" Margin="2 8 8 8" x:Name="tbUriPort" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
                                 <TextBox.Text>
                                     <Binding Path="obs_uri_port" Source="{x:Static local:Preferences.Default}" Mode="TwoWay">
                                         <Binding.ValidationRules>
@@ -99,12 +111,12 @@
                         </Grid>
                     </GroupBox>
                     <StackPanel Orientation="Horizontal">
-                        <CheckBox Content="Use Password:" Margin="8 8 4 8" VerticalAlignment="Center" x:Name="cbUsePassword" IsChecked="{Binding Path=obs_use_password, Source={x:Static local:Preferences.Default}, Mode=OneWay}" />
-                        <PasswordBox AutomationProperties.Name="Password" MinWidth="160" PasswordChar="_" x:Name="pbPassword" Margin="0 8" Padding="6" IsEnabled="{Binding ElementName=cbUsePassword, Path=IsChecked}" />
+                        <CheckBox Content="Use Password:" Margin="8" Padding="6" VerticalContentAlignment="Center" VerticalAlignment="Center" x:Name="cbUsePassword" IsChecked="{Binding Path=obs_use_password, Source={x:Static local:Preferences.Default}, Mode=OneWay}" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
+                        <PasswordBox AutomationProperties.Name="Password" MinWidth="160" PasswordChar="_" x:Name="pbPassword" Margin="0 8" Padding="6" IsEnabled="{Binding ElementName=cbUsePassword, Path=IsChecked}" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <CheckBox Content="Connect on Launch" Margin="8" x:Name="cbConnectLaunch" IsChecked="{Binding Path=obs_connect_launch, Source={x:Static local:Preferences.Default}, Mode=TwoWay}" />
-                        <CheckBox Content="Automatically Reconnect" Margin="8" x:Name="cbAutoReconnect" IsChecked="{Binding Path=obs_auto_reconnect, Source={x:Static local:Preferences.Default}, Mode=TwoWay}" />
+                        <CheckBox Content="Connect on Launch" VerticalContentAlignment="Center" Margin="8" Padding="6" x:Name="cbConnectLaunch" IsChecked="{Binding Path=obs_connect_launch, Source={x:Static local:Preferences.Default}, Mode=TwoWay}" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
+                        <CheckBox Content="Automatically Reconnect" VerticalContentAlignment="Center" Margin="8" Padding="6" x:Name="cbAutoReconnect" IsChecked="{Binding Path=obs_auto_reconnect, Source={x:Static local:Preferences.Default}, Mode=TwoWay}" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
                     </StackPanel>
                     <GroupBox Header="Exponential Back-off" Margin="8">
                         <Grid>
@@ -120,7 +132,7 @@
                                 <RowDefinition Height="auto" />
                             </Grid.RowDefinitions>
                             <TextBlock x:Name="minBackoffLabel" Grid.Row="0" Grid.Column="0" Text="Delay between 1st and 2nd connection attempt:" Margin="2 8" VerticalAlignment="Center" />
-                            <TextBox AutomationProperties.Name="Seconds" AutomationProperties.LabeledBy="{Binding ElementName=minBackoffLabel}" Grid.Row="0" Grid.Column="1"  Margin="2 8" VerticalAlignment="Center" Width="40" Padding="6" TextAlignment="Right" x:Name="tbBackoffMin">
+                            <TextBox AutomationProperties.Name="Seconds" AutomationProperties.LabeledBy="{Binding ElementName=minBackoffLabel}" Grid.Row="0" Grid.Column="1"  Margin="2 8" VerticalAlignment="Center" Width="40" Padding="6" TextAlignment="Right" x:Name="tbBackoffMin" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
                                 <TextBox.Text>
                                     <Binding Path="obs_reconnect_min_seconds" Source="{x:Static local:Preferences.Default}" Mode="TwoWay">
                                         <Binding.ValidationRules>
@@ -145,7 +157,7 @@
                                 </TextBlock.Style>
                             </TextBlock>
                             <TextBlock x:Name="maxBackoffLabel" Grid.Row="2" Grid.Column="0" Text="Maximum delay between connection attempts:" Margin="2 8" VerticalAlignment="Center" />
-                            <TextBox AutomationProperties.Name="Minutes" AutomationProperties.LabeledBy="{Binding ElementName=maxBackoffLabel}" Grid.Row="2" Grid.Column="1" Margin="2 8" VerticalAlignment="Center" Width="40" Padding="6" TextAlignment="Right" x:Name="tbBackoffMax">
+                            <TextBox AutomationProperties.Name="Minutes" AutomationProperties.LabeledBy="{Binding ElementName=maxBackoffLabel}" Grid.Row="2" Grid.Column="1" Margin="2 8" VerticalAlignment="Center" Width="40" Padding="6" TextAlignment="Right" x:Name="tbBackoffMax" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
                                 <TextBox.Text>
                                     <Binding Path="obs_reconnect_max_minutes" Source="{x:Static local:Preferences.Default}" Mode="TwoWay">
                                         <Binding.ValidationRules>
@@ -171,12 +183,13 @@
                             </TextBlock>
                         </Grid>
                     </GroupBox>
-                    <CheckBox Content="Auto-scroll" VerticalContentAlignment="Center" Margin="8" x:Name="cbAutoscroll" IsChecked="{Binding Path=obs_autoscroll, Source={x:Static local:Preferences.Default}, Mode=TwoWay}" />
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox Content="Auto-scroll" VerticalContentAlignment="Center" Padding="6" x:Name="cbAutoscroll" IsChecked="{Binding Path=obs_autoscroll, Source={x:Static local:Preferences.Default}, Mode=TwoWay}" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
+                    </StackPanel>
                 </StackPanel>
             </GroupBox>
-
-            <StackPanel Margin="16" HorizontalAlignment="Right" Orientation="Horizontal" Grid.Row="2" Grid.Column="2" >
-                <Button Content="Save" Padding="8 2" Click="SaveButton_Click" />
+            <StackPanel Margin="0 8 0 0" HorizontalAlignment="Right" Orientation="Horizontal" Grid.Row="2" Grid.Column="2" >
+                <Button Content="Save" Padding="9 6" Click="SaveButton_Click" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
             </StackPanel>
         </Grid>
     </ScrollViewer>
