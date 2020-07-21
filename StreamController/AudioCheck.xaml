@@ -76,8 +76,7 @@
                     <ListBox ItemsSource="{Binding Sources,IsAsync=True}" x:Name="lbSourceList" Margin="0 0 0 8" ScrollViewer.HorizontalScrollBarVisibility="Disabled" AutomationProperties.LabeledBy="{Binding ElementName=label_scene_sources}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Width="auto" TextWrapping="Wrap" Text="{Binding Source.Name, StringFormat={} * {0}, IsAsync=True}">
-                                </TextBlock>
+                                <TextBlock Width="auto" TextWrapping="Wrap" Text="{Binding Source.Name, StringFormat={} * {0}, IsAsync=True}" />
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                         <ListBox.ItemContainerStyle>
@@ -90,6 +89,7 @@
                                 </Style.Triggers>
                                 <Style.Setters>
                                     <Setter Property="FocusVisualStyle" Value="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
+                                    <Setter Property="AutomationProperties.Name" Value="{Binding Source.Name}" />
                                 </Style.Setters>
                             </Style>
                         </ListBox.ItemContainerStyle>

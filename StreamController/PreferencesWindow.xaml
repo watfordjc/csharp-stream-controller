@@ -8,7 +8,7 @@
         mc:Ignorable="d"
         FontFamily="Open Sans"
         FontSize="12"
-        Title="Preferences" Width="560" MinWidth="560" Height="600" MinHeight="600">
+        Title="Preferences" Width="600" MinWidth="600" Height="600" MinHeight="600">
     <Window.DataContext>
         <local:Preferences />
     </Window.DataContext>
@@ -130,8 +130,8 @@
                                 <RowDefinition Height="auto" />
                                 <RowDefinition Height="auto" />
                             </Grid.RowDefinitions>
-                            <TextBlock x:Name="minBackoffLabel" Grid.Row="0" Grid.Column="0" Text="Delay between 1st and 2nd connection attempt:" Margin="2 8" VerticalAlignment="Center" />
-                            <TextBox AutomationProperties.Name="Seconds" AutomationProperties.LabeledBy="{Binding ElementName=minBackoffLabel}" Grid.Row="0" Grid.Column="1"  Margin="2 8" VerticalAlignment="Center" Width="40" Padding="6" TextAlignment="Right" x:Name="tbBackoffMin" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
+                            <TextBlock x:Name="minBackoffLabel" Grid.Row="0" Grid.Column="0" Text="Delay in seconds between 1st and 2nd connection attempt:" Margin="2 8" VerticalAlignment="Center" />
+                            <TextBox AutomationProperties.LabeledBy="{Binding ElementName=minBackoffLabel}" Grid.Row="0" Grid.Column="1"  Margin="2 8" VerticalAlignment="Center" Width="40" Padding="6" TextAlignment="Right" x:Name="tbBackoffMin" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
                                 <TextBox.Text>
                                     <Binding Path="obs_reconnect_min_seconds" Source="{x:Static local:Preferences.Default}" Mode="TwoWay">
                                         <Binding.ValidationRules>
@@ -155,8 +155,8 @@
                                     </Style>
                                 </TextBlock.Style>
                             </TextBlock>
-                            <TextBlock x:Name="maxBackoffLabel" Grid.Row="2" Grid.Column="0" Text="Maximum delay between connection attempts:" Margin="2 8" VerticalAlignment="Center" />
-                            <TextBox AutomationProperties.Name="Minutes" AutomationProperties.LabeledBy="{Binding ElementName=maxBackoffLabel}" Grid.Row="2" Grid.Column="1" Margin="2 8" VerticalAlignment="Center" Width="40" Padding="6" TextAlignment="Right" x:Name="tbBackoffMax" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
+                            <TextBlock x:Name="maxBackoffLabel" Grid.Row="2" Grid.Column="0" Text="Maximum delay in minutes between connection attempts:" Margin="2 8" VerticalAlignment="Center" />
+                            <TextBox AutomationProperties.LabeledBy="{Binding ElementName=maxBackoffLabel}" Grid.Row="2" Grid.Column="1" Margin="2 8" VerticalAlignment="Center" Width="40" Padding="6" TextAlignment="Right" x:Name="tbBackoffMax" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
                                 <TextBox.Text>
                                     <Binding Path="obs_reconnect_max_minutes" Source="{x:Static local:Preferences.Default}" Mode="TwoWay">
                                         <Binding.ValidationRules>

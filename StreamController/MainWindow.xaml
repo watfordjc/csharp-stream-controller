@@ -55,6 +55,7 @@
                                 <ComboBox.ItemContainerStyle>
                                     <Style TargetType="ComboBoxItem">
                                         <Setter Property="Visibility" Value="{Binding IsActive, Converter={StaticResource BoolToVisibility}, Mode=OneWay}" />
+                                        <Setter Property="AutomationProperties.Name" Value="{Binding FriendlyName}" />
                                     </Style>
                                 </ComboBox.ItemContainerStyle>
                             </ComboBox>
@@ -124,6 +125,7 @@
                                                 <Setter Property="Visibility" Value="Collapsed" />
                                             </DataTrigger>
                                         </Style.Triggers>
+                                        <Setter Property="AutomationProperties.Name" Value="{Binding ProcessName}" />
                                     </Style>
                                 </ComboBox.ItemContainerStyle>
                             </ComboBox>
