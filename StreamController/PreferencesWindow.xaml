@@ -56,26 +56,51 @@
                                 <RowDefinition Height="auto" />
                             </Grid.RowDefinitions>
                             <TextBlock Grid.Row="0" Grid.Column="0" x:Name="scheme_label" Text="Scheme:" Margin="8 8 2 8" VerticalAlignment="Center" />
-                            <ComboBox Grid.Row="0" Grid.Column="1" AutomationProperties.LabeledBy="{Binding ElementName=scheme_label}" Margin="2 8 8 8" Padding="6" MinWidth="50" VerticalContentAlignment="Center" x:Name="cbUriProtocol" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
+                            <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
+                            <ComboBox AutomationProperties.LabeledBy="{Binding ElementName=scheme_label}" Margin="2 8 8 8" Padding="6" MinWidth="50" VerticalContentAlignment="Center" x:Name="cbUriProtocol" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
                                 <ComboBoxItem Content="ws" />
                                 <ComboBoxItem Content="wss" />
+                                <ComboBox.SelectedItem>
+                                    <Binding Path="SelectedItem" Mode="OneWay" ElementName="cbUriProtocol">
+                                        <Binding.ValidationRules>
+                                            <v:ComboBoxOneItemSelected ValidatesOnTargetUpdated="True" />
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </ComboBox.SelectedItem>
                             </ComboBox>
+                                <TextBlock VerticalAlignment="Center" Margin="8 4 8 8" Foreground="Red" FontWeight="SemiBold">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ElementName=cbUriProtocol, Path=(Validation.HasError)}" Value="True">
+                                                    <Setter Property="Text" Value="{Binding ElementName=cbUriProtocol, Path=(Validation.Errors).CurrentItem.ErrorContent}" />
+                                                    <Setter Property="Focusable" Value="True" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding ElementName=cbUriProtocol, Path=(Validation.HasError)}" Value="False">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </StackPanel>
                             <TextBlock Grid.Column="0" Grid.Row="1" x:Name="hostname_label" Text="Hostname:" VerticalAlignment="Center" Margin="8 8 2 8" />
                             <TextBox Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" AutomationProperties.LabeledBy="{Binding ElementName=hostname_label}" VerticalAlignment="Center"  Margin="2 8 2 8" Padding="6" MinWidth="200" x:Name="tbUriHostname" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
                                 <TextBox.Text>
-                                    <Binding Path="obs_uri_host" Source="{x:Static local:Preferences.Default}" Mode="TwoWay">
+                                    <Binding Path="obs_uri_host" UpdateSourceTrigger="PropertyChanged" Source="{x:Static local:Preferences.Default}" Mode="TwoWay">
                                         <Binding.ValidationRules>
                                             <v:Hostname />
                                         </Binding.ValidationRules>
                                     </Binding>
                                 </TextBox.Text>
                             </TextBox>
-                            <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Margin="8 4 8 8" Foreground="Red" FontWeight="SemiBold">
+                            <TextBlock x:Name="uri_hostname_error" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Margin="8 4 8 8" Foreground="Red" FontWeight="SemiBold">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding ElementName=tbUriHostname, Path=(Validation.HasError)}" Value="True">
                                                 <Setter Property="Text" Value="{Binding ElementName=tbUriHostname, Path=(Validation.Errors).CurrentItem.ErrorContent}" />
+                                                <Setter Property="Focusable" Value="True" />
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding ElementName=tbUriHostname, Path=(Validation.HasError)}" Value="False">
                                                 <Setter Property="Visibility" Value="Collapsed" />
@@ -85,21 +110,23 @@
                                 </TextBlock.Style>
                             </TextBlock>
                             <TextBlock Grid.Row="3" Grid.Column="0" x:Name="port_label" Text="Port:" VerticalAlignment="Center" Margin="8 8 2 8" />
-                            <TextBox Grid.Row="3" Grid.Column="1" AutomationProperties.LabeledBy="{Binding ElementName=port_label}" TextAlignment="Center" VerticalAlignment="Center" MinWidth="60" Padding="6" Margin="2 8 8 8" x:Name="tbUriPort" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
+                            <StackPanel Grid.Row="3" Grid.Column="1"  Orientation="Horizontal">
+                            <TextBox AutomationProperties.LabeledBy="{Binding ElementName=port_label}" TextAlignment="Center" VerticalAlignment="Center" MinWidth="60" Padding="6" Margin="2 8 8 8" x:Name="tbUriPort" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
                                 <TextBox.Text>
-                                    <Binding Path="obs_uri_port" Source="{x:Static local:Preferences.Default}" Mode="TwoWay">
+                                    <Binding Path="obs_uri_port" UpdateSourceTrigger="PropertyChanged" Source="{x:Static local:Preferences.Default}" Mode="TwoWay">
                                         <Binding.ValidationRules>
                                             <v:PortNumber />
                                         </Binding.ValidationRules>
                                     </Binding>
                                 </TextBox.Text>
                             </TextBox>
-                            <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Margin="8 4 8 8" Foreground="Red" FontWeight="SemiBold">
+                            <TextBlock VerticalAlignment="Center" Margin="8 4 8 8" Foreground="Red" FontWeight="SemiBold">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding ElementName=tbUriPort, Path=(Validation.HasError)}" Value="True">
                                                 <Setter Property="Text" Value="{Binding ElementName=tbUriPort, Path=(Validation.Errors).CurrentItem.ErrorContent}" />
+                                                <Setter Property="Focusable" Value="True" />
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding ElementName=tbUriPort, Path=(Validation.HasError)}" Value="False">
                                                 <Setter Property="Visibility" Value="Collapsed" />
@@ -108,6 +135,7 @@
                                     </Style>
                                 </TextBlock.Style>
                             </TextBlock>
+                            </StackPanel>
                         </Grid>
                     </GroupBox>
                     <StackPanel Orientation="Horizontal">
@@ -132,9 +160,9 @@
                                 <RowDefinition Height="auto" />
                             </Grid.RowDefinitions>
                             <TextBlock x:Name="minBackoffLabel" Grid.Row="0" Grid.Column="0" Text="Delay in seconds between 1st and 2nd connection attempt:" Margin="2 8" VerticalAlignment="Center" />
-                            <TextBox AutomationProperties.LabeledBy="{Binding ElementName=minBackoffLabel}" Grid.Row="0" Grid.Column="1"  Margin="2 8" VerticalAlignment="Center" Width="40" Padding="6" TextAlignment="Right" x:Name="tbBackoffMin" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
+                            <TextBox AutomationProperties.Name="First reconnect delay in seconds" Grid.Row="0" Grid.Column="1"  Margin="2 8" VerticalAlignment="Center" Width="40" Padding="6" TextAlignment="Right" x:Name="tbBackoffMin" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
                                 <TextBox.Text>
-                                    <Binding Path="obs_reconnect_min_seconds" Source="{x:Static local:Preferences.Default}" Mode="TwoWay">
+                                    <Binding Path="obs_reconnect_min_seconds" UpdateSourceTrigger="PropertyChanged" Source="{x:Static local:Preferences.Default}" Mode="TwoWay">
                                         <Binding.ValidationRules>
                                             <v:NumberGreaterZero />
                                         </Binding.ValidationRules>
@@ -146,8 +174,9 @@
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding ElementName=tbBackoffMin, Path=(Validation.HasError)}" Value="True">
+                                            <DataTrigger Binding="{Binding ElementName=tbBackoffMin, Path=(Validation.HasError), UpdateSourceTrigger=PropertyChanged}" Value="True">
                                                 <Setter Property="Text" Value="{Binding ElementName=tbBackoffMin, Path=(Validation.Errors).CurrentItem.ErrorContent}" />
+                                                <Setter Property="Focusable" Value="True" />
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding ElementName=tbBackoffMin, Path=(Validation.HasError)}" Value="False">
                                                 <Setter Property="Visibility" Value="Collapsed" />
@@ -157,9 +186,9 @@
                                 </TextBlock.Style>
                             </TextBlock>
                             <TextBlock x:Name="maxBackoffLabel" Grid.Row="2" Grid.Column="0" Text="Maximum delay in minutes between connection attempts:" Margin="2 8" VerticalAlignment="Center" />
-                            <TextBox AutomationProperties.LabeledBy="{Binding ElementName=maxBackoffLabel}" Grid.Row="2" Grid.Column="1" Margin="2 8" VerticalAlignment="Center" Width="40" Padding="6" TextAlignment="Right" x:Name="tbBackoffMax" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
+                            <TextBox AutomationProperties.Name="Maximum reconnect delay in minutes" Grid.Row="2" Grid.Column="1" Margin="2 8" VerticalAlignment="Center" Width="40" Padding="6" TextAlignment="Right" x:Name="tbBackoffMax" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
                                 <TextBox.Text>
-                                    <Binding Path="obs_reconnect_max_minutes" Source="{x:Static local:Preferences.Default}" Mode="TwoWay">
+                                    <Binding Path="obs_reconnect_max_minutes" UpdateSourceTrigger="PropertyChanged" Source="{x:Static local:Preferences.Default}" Mode="TwoWay">
                                         <Binding.ValidationRules>
                                             <v:NumberGreaterZero />
                                         </Binding.ValidationRules>
@@ -173,6 +202,7 @@
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding ElementName=tbBackoffMax, Path=(Validation.HasError)}" Value="True">
                                                 <Setter Property="Text" Value="{Binding ElementName=tbBackoffMax, Path=(Validation.Errors).CurrentItem.ErrorContent}" />
+                                                <Setter Property="Focusable" Value="True" />
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding ElementName=tbBackoffMax, Path=(Validation.HasError)}" Value="False">
                                                 <Setter Property="Visibility" Value="Collapsed" />
