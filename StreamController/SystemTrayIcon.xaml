@@ -25,6 +25,7 @@
                         </MenuItem.ItemTemplate>
                         <MenuItem.ItemContainerStyle>
                             <Style TargetType="MenuItem">
+                                <Setter Property="AutomationProperties.Name" Value="{Binding FriendlyName}" />
                                 <EventSetter Event="Click" Handler="SystemTrayRenderDefault_Click" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding IsActive}" Value="False">
@@ -35,6 +36,7 @@
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding IsDefaultRender}" Value="True">
                                         <Setter Property="IsChecked" Value="True" />
+                                        <Setter Property="AutomationProperties.Name" Value="{Binding FriendlyName, StringFormat={}Current default render device\, {0}}" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -48,6 +50,7 @@
                         </MenuItem.ItemTemplate>
                         <MenuItem.ItemContainerStyle>
                             <Style TargetType="MenuItem">
+                                <Setter Property="AutomationProperties.Name" Value="{Binding FriendlyName}" />
                                 <EventSetter Event="Click" Handler="SystemTrayCaptureDefault_Click" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding IsActive}" Value="False">
@@ -58,6 +61,7 @@
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding IsDefaultCapture}" Value="True">
                                         <Setter Property="IsChecked" Value="True" />
+                                        <Setter Property="AutomationProperties.Name" Value="{Binding FriendlyName, StringFormat={}Current default capture device\, {0}}" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
