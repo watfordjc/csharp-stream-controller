@@ -197,7 +197,7 @@ namespace uk.JohnCook.dotnet.StreamController
             _ReconnectTimeRemaining--;
             if (_ReconnectTimeRemaining > 0)
             {
-                UpdateUIConnectStatus(TimeSpan.FromSeconds(_ReconnectTimeRemaining).ToString("c", CultureInfo.CurrentCulture), null, null);
+                UpdateUIConnectStatus("Reconnecting in " +TimeSpan.FromSeconds(_ReconnectTimeRemaining).ToString("c", CultureInfo.CurrentCulture), null, null);
             }
         }
 
@@ -212,16 +212,16 @@ namespace uk.JohnCook.dotnet.StreamController
         {
             if (newState == WebSocketState.Open)
             {
-                connectionError = String.Empty;
+                connectionError = "AOK";
                 _ReconnectCountdownTimer.Stop();
-                UpdateUIConnectStatus(String.Empty, Brushes.DarkGreen, null);
+                UpdateUIConnectStatus("Connected", Brushes.DarkGreen, null);
                 SystemTrayIcon.Instance.NotifyIcon.Icon = Properties.Resources.icon_dark_green;
                 obsSourceDictionary.Clear();
             }
             else if (newState != WebSocketState.Connecting)
             {
                 _ReconnectCountdownTimer.Start();
-                UpdateUIConnectStatus(null, Brushes.Red, null);
+                UpdateUIConnectStatus("Disconnected", Brushes.Red, null);
                 SystemTrayIcon.Instance.NotifyIcon.Icon = Properties.Resources.icon_red;
             }
             else
@@ -230,9 +230,9 @@ namespace uk.JohnCook.dotnet.StreamController
                 {
                     webSocket.PasswordPreference = Preferences.Default.obs_password;
                 }
-                connectionError = String.Empty;
+                connectionError = "Error state cleared";
                 _ReconnectCountdownTimer.Stop();
-                UpdateUIConnectStatus("\u2026", Brushes.DarkGoldenrod, null);
+                UpdateUIConnectStatus("Connecting\u2026", Brushes.DarkGoldenrod, null);
                 SystemTrayIcon.Instance.NotifyIcon.Icon = Properties.Resources.dark_golden_rod;
             }
         }
