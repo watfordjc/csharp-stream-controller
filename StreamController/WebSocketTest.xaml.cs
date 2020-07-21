@@ -288,6 +288,18 @@ namespace uk.JohnCook.dotnet.StreamController
             }
         }
 
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.F4)
+            {
+                if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)
+                    && (Keyboard.IsKeyDown(Key.LeftAlt)))
+                {
+                    App.Current.Shutdown();
+                }
+            }
+        }
+
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)

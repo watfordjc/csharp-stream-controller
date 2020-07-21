@@ -8,6 +8,7 @@
         mc:Ignorable="d"
         FontFamily="Open Sans"
         FontSize="12"
+        KeyDown="Window_KeyDown"
         Title="Preferences" Width="600" MinWidth="600" Height="600" MinHeight="600">
     <Window.DataContext>
         <local:Preferences />

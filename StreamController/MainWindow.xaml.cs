@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using NAudio.CoreAudioApi;
 using uk.JohnCook.dotnet.NAudioWrapperLibrary;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace uk.JohnCook.dotnet.StreamController
 {
@@ -125,6 +126,18 @@ namespace uk.JohnCook.dotnet.StreamController
                 () => AudioInterfaceCollection.ToggleAllDefaultApplicationDevice()
                 ).ConfigureAwait(true);
             (e.OriginalSource as Button).IsEnabled = true;
+        }
+
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.F4)
+            {
+                if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)
+                    && (Keyboard.IsKeyDown(Key.LeftAlt)))
+                {
+                    App.Current.Shutdown();
+                }
+            }
         }
     }
 }

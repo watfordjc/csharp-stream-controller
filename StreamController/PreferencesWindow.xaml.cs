@@ -87,5 +87,12 @@ namespace uk.JohnCook.dotnet.StreamController
             this.Close();
         }
 
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape)
+            {
+                this.Close();
+            }
+        }
     }
 }

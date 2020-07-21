@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:uk.JohnCook.dotnet.StreamController"
         mc:Ignorable="d"
         FontFamily="Open Sans"
+        KeyDown="Window_KeyDown"
         Title="Stream Control" Height="600" Width="960">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />

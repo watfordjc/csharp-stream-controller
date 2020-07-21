@@ -9,10 +9,15 @@ namespace uk.JohnCook.dotnet.StreamController
 {
     public partial class MenuItemCollection : ResourceDictionary, ICollection<KeyValuePair<string, object>>
     {
-        private void MenuItemExit_Click(object sender, RoutedEventArgs e)
+        private void MenuItemClose_Click(object sender, RoutedEventArgs e)
         {
             Window parent = Window.GetWindow((MenuItem)sender);
             parent.Close();
+        }
+
+        private void MenuItemExit_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
         }
 
         private void MenuWindowItem_Click(object sender, RoutedEventArgs e)

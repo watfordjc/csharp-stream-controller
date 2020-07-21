@@ -5,7 +5,8 @@
                     x:Class="uk.JohnCook.dotnet.StreamController.MenuItemCollection">
     <Collections:ArrayList x:Key="MenuItems" x:Shared="false">
         <MenuItem Header="_File" IsTabStop="False">
-            <MenuItem Header="E_xit" Click="MenuItemExit_Click" />
+            <MenuItem Header="_Close" InputGestureText="Alt+F4" AutomationProperties.AcceleratorKey="Alt+F4" Click="MenuItemClose_Click" />
+            <MenuItem Header="E_xit" InputGestureText="Ctrl+Alt+F4" AutomationProperties.AcceleratorKey="Ctrl+Alt+F4" Click="MenuItemExit_Click" />
         </MenuItem>
         <MenuItem Header="_Edit" IsTabStop="False">
             <MenuItem Header="_Preferences" Click="MenuWindowItem_Click" x:Name="PreferencesWindow" Loaded="MenuWindowItemLoaded" />
