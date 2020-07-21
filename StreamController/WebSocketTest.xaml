@@ -9,8 +9,19 @@
         Closed="Window_Closed"
         Title="WebSocketTest" Height="450" Width="800"
         FontFamily="Open Sans" FontSize="14">
+    <Window.Resources>
+        <Style TargetType="Control" x:Key="{x:Static SystemParameters.FocusVisualStyleKey}">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Rectangle StrokeThickness="2" Stroke="RoyalBlue" StrokeDashArray="5 3" SnapsToDevicePixels="true"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
     <DockPanel>
-        <Menu DockPanel.Dock="Top" ItemsSource="{StaticResource ResourceKey=MenuItems}" />
+        <Menu DockPanel.Dock="Top" ItemsSource="{StaticResource ResourceKey=MenuItems}" AutomationProperties.Name="Application" />
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="16" />
@@ -26,16 +37,18 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="16" />
             </Grid.RowDefinitions>
-            <Button Width="auto" Height="auto" Grid.Column="1" Grid.Row="1" x:Name="btnTest" Margin="8" Padding="3 0" Click="ButtonTest_Click">
-                <TextBlock Text="Test" />
-            </Button>
-            <Button Width="auto" Height="auto" Grid.Column="1" Grid.Row="2" x:Name="btnClose" Margin="8" Padding="3 0" Click="ButtonClose_Click">
-                <TextBlock Text="Close" />
-            </Button>
-            <TextBlock x:Name="txtStatus" Grid.Column="2" Grid.Row="1" Margin="8"  />
-            <CheckBox x:Name="cbAutoScroll" Content="Auto Scroll" Grid.Column="3" Grid.Row="1" Margin="8" VerticalContentAlignment="Center" HorizontalAlignment="Right" Checked="AutoScroll_Checked" Unchecked="AutoScroll_Unchecked" />
-            <ScrollViewer Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="2" Grid.RowSpan="2" Margin="8" x:Name="svScroll" ScrollViewer.ScrollChanged="TxtOutput_ScrollChanged" >
-                <TextBox x:Name="txtOutput" IsReadOnly="True" IsUndoEnabled="False" />
+            <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="1">
+                <Button Width="auto" Height="auto"  x:Name="btnTest" Margin="8" Click="ButtonTest_Click" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
+                    <TextBlock Padding="6 2" Text="Connect" />
+                </Button>
+                <Button Width="auto" Height="auto" x:Name="btnClose" Margin="8" Click="ButtonClose_Click" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
+                <TextBlock Padding="6 2" Text="Disconnect" />
+                </Button>
+                <TextBlock VerticalAlignment="Center" x:Name="txtStatus" Margin="8"  />
+            </StackPanel>
+            <CheckBox x:Name="cbAutoScroll" Content="Auto Scroll" Grid.Column="3" Grid.Row="1" Margin="8" VerticalContentAlignment="Center" HorizontalAlignment="Right" Checked="AutoScroll_Checked" Unchecked="AutoScroll_Unchecked" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
+            <ScrollViewer Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" Grid.RowSpan="2" Margin="8" x:Name="svScroll" ScrollViewer.ScrollChanged="TxtOutput_ScrollChanged" AutomationProperties.Name="Received Data">
+                <TextBox x:Name="txtOutput" IsReadOnly="True" IsUndoEnabled="False" AutomationProperties.Name="Data" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
             </ScrollViewer>
         </Grid>
 

@@ -8,17 +8,16 @@
         mc:Ignorable="d"
         FontFamily="Open Sans"
         FontSize="12"
-        FocusManager.FocusedElement="{Binding ElementName=cbUriProtocol}"
         Title="Preferences" Width="560" MinWidth="560" Height="600" MinHeight="600">
     <Window.DataContext>
         <local:Preferences />
     </Window.DataContext>
     <Window.Resources>
-        <Style x:Key="{x:Static SystemParameters.FocusVisualStyleKey}">
+        <Style TargetType="Control" x:Key="{x:Static SystemParameters.FocusVisualStyleKey}">
             <Setter Property="Control.Template">
                 <Setter.Value>
                     <ControlTemplate>
-                        <Rectangle StrokeThickness="2" Stroke="DodgerBlue" SnapsToDevicePixels="true"/>
+                        <Rectangle StrokeThickness="2" Stroke="RoyalBlue" StrokeDashArray="5 3" SnapsToDevicePixels="true"/>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -184,7 +183,7 @@
                         </Grid>
                     </GroupBox>
                     <StackPanel Orientation="Horizontal">
-                        <CheckBox Content="Auto-scroll" VerticalContentAlignment="Center" Padding="6" x:Name="cbAutoscroll" IsChecked="{Binding Path=obs_autoscroll, Source={x:Static local:Preferences.Default}, Mode=TwoWay}" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
+                        <CheckBox Content="Auto-scroll" VerticalContentAlignment="Center" Padding="6" Margin="8" x:Name="cbAutoscroll" IsChecked="{Binding Path=obs_autoscroll, Source={x:Static local:Preferences.Default}, Mode=TwoWay}" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
                     </StackPanel>
                 </StackPanel>
             </GroupBox>

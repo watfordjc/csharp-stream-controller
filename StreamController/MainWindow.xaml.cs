@@ -37,7 +37,8 @@ namespace uk.JohnCook.dotnet.StreamController
             if (ProcessCollection.Instance.ProcessesAreEnumerated)
             {
                 Processes_CollectionEnumerated(this, EventArgs.Empty);
-            } else
+            }
+            else
             {
                 ProcessCollection.Instance.CollectionEnumerated += Processes_CollectionEnumerated;
             }
@@ -54,7 +55,8 @@ namespace uk.JohnCook.dotnet.StreamController
         private void Processes_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             ObservableProcess currentProcess = cb_applications.SelectedItem as ObservableProcess;
-            if (e.OldItems == null) {
+            if (e.OldItems == null)
+            {
                 return;
             }
             if (currentProcess == null && e.Action == NotifyCollectionChangedAction.Move)

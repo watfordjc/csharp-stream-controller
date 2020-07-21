@@ -9,18 +9,18 @@
         Title="Stream Control" Height="600" Width="960">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
-        <Style x:Key="{x:Static SystemParameters.FocusVisualStyleKey}">
+        <Style TargetType="{x:Type Control}" x:Key="{x:Static SystemParameters.FocusVisualStyleKey}">
             <Setter Property="Control.Template">
                 <Setter.Value>
                     <ControlTemplate>
-                        <Rectangle StrokeThickness="2" Stroke="DodgerBlue" SnapsToDevicePixels="true"/>
+                        <Rectangle StrokeThickness="2" Stroke="RoyalBlue" StrokeDashArray="5 3" SnapsToDevicePixels="true"/>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
     </Window.Resources>
     <DockPanel>
-        <Menu DockPanel.Dock="Top" ItemsSource="{StaticResource ResourceKey=MenuItems}" />
+        <Menu DockPanel.Dock="Top" ItemsSource="{StaticResource ResourceKey=MenuItems}" AutomationProperties.Name="Application" />
         <StackPanel Orientation="Vertical">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -40,8 +40,8 @@
                 <GroupBox x:Name="audio_interfaces" Header="Audio Interfaces" Grid.Column="1" Grid.Row="1" Margin="0,0,8,8" Padding="8" Grid.ColumnSpan="2">
                     <StackPanel Orientation="Vertical">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Interface:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                            <ComboBox x:Name="cb_interfaces" IsEditable="False" Height="auto" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
+                            <TextBlock x:Name="label_interface" Text="Interface:" VerticalAlignment="Center" Margin="0 0 8 0" />
+                            <ComboBox x:Name="cb_interfaces" IsEditable="False" Height="auto" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" AutomationProperties.LabeledBy="{Binding ElementName=label_interface}">
                                 <ComboBox.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <VirtualizingStackPanel />
@@ -102,8 +102,8 @@
                 <GroupBox x:Name="applications" Header="Applications" Grid.Column="3" Grid.Row="1" Margin="0,0,8,8" Padding="8" Grid.ColumnSpan="2">
                     <StackPanel Orientation="Vertical">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Application:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                            <ComboBox x:Name="cb_applications" IsEditable="False" Height="auto" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
+                            <TextBlock x:Name="label_application" Text="Application:" VerticalAlignment="Center" Margin="0 0 8 0" />
+                            <ComboBox x:Name="cb_applications" IsEditable="False" Height="auto" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" AutomationProperties.LabeledBy="{Binding ElementName=label_application}">
                                 <ComboBox.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <VirtualizingStackPanel />
