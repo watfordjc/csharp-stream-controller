@@ -57,7 +57,7 @@
                             </Grid.RowDefinitions>
                             <TextBlock Grid.Row="0" Grid.Column="0" x:Name="scheme_label" Text="Scheme:" Margin="8 8 2 8" VerticalAlignment="Center" />
                             <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
-                            <ComboBox AutomationProperties.LabeledBy="{Binding ElementName=scheme_label}" Margin="2 8 8 8" Padding="6" MinWidth="50" VerticalContentAlignment="Center" x:Name="cbUriProtocol" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
+                            <ComboBox SelectedIndex="0" AutomationProperties.LabeledBy="{Binding ElementName=scheme_label}" Margin="2 8 8 8" Padding="6" MinWidth="50" VerticalContentAlignment="Center" x:Name="cbUriProtocol" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
                                 <ComboBoxItem Content="ws" />
                                 <ComboBoxItem Content="wss" />
                                 <ComboBox.SelectedItem>
