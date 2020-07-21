@@ -32,6 +32,7 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
 
         public static AudioInterfaceCollection Instance { get { return lazySingleton.Value; } }
         public static ObservableCollection<AudioInterface> Devices { get; } = new ObservableCollection<AudioInterface>();
+        public static ObservableCollection<AudioInterface> ActiveDevices { get; } = new ObservableCollection<AudioInterface>();
         public AudioInterface DefaultRender { get; private set; }
         public AudioInterface DefaultCapture { get; private set; }
         public bool DevicesAreEnumerated { get; private set; }
@@ -85,6 +86,12 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
                 _Context.Send(
                     x => Devices.Add(audioDevice),
                     null);
+                if (audioDevice.IsActive)
+                {
+                    _Context.Send(
+                        x => ActiveDevices.Add(audioDevice),
+                        null);
+                }
             }
             UpdateDefaultDevice(DataFlow.Render, _Enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console).ID);
             UpdateDefaultDevice(DataFlow.Capture, _Enumerator.GetDefaultAudioEndpoint(DataFlow.Capture, Role.Console).ID);
@@ -484,13 +491,26 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
                 mContext.Send(
                     x => Devices.Add(device)
                 , null);
+                if (device.IsActive)
+                {
+                    mContext.Send(
+                        x => ActiveDevices.Add(device),
+                        null);
+                }
             }
 
             void IMMNotificationClient.OnDeviceRemoved(string deviceId)
             {
+                AudioInterface audioInterface = GetAudioInterfaceById(deviceId);
                 mContext.Send(
                     x => Devices.Remove(GetAudioInterfaceById(deviceId))
                 , null);
+                if (audioInterface.IsActive)
+                {
+                    mContext.Send(
+                        x => ActiveDevices.Remove(audioInterface),
+                        null);
+                }
             }
 
             void IMMNotificationClient.OnDeviceStateChanged(string deviceId, DeviceState newState)
@@ -501,7 +521,20 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
                     audioInterface.SetProperties(newState);
                 }
 
-                if (newState != DeviceState.Active) { return; }
+                if (newState != DeviceState.Active) {
+                    if (ActiveDevices.Contains(audioInterface))
+                    {
+                        mContext.Send(
+                            x => ActiveDevices.Remove(audioInterface),
+                            null);
+                    }
+                    return; 
+                }
+
+                mContext.Send(
+                    x => ActiveDevices.Add(audioInterface),
+                    null);
+
                 SharedModels.DeviceApplicationPreference deviceApplicationPreference = Instance.deviceApplicationPreferences.Devices.FirstOrDefault(x => x.Id == deviceId);
                 if (deviceApplicationPreference == default) { return; }
 

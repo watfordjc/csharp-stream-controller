@@ -28,9 +28,6 @@
                                 <Setter Property="AutomationProperties.Name" Value="{Binding FriendlyName}" />
                                 <EventSetter Event="Click" Handler="SystemTrayRenderDefault_Click" />
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsActive}" Value="False">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
                                     <DataTrigger Binding="{Binding DataFlow}" Value="{x:Static na:DataFlow.Capture}">
                                         <Setter Property="Visibility" Value="Collapsed" />
                                     </DataTrigger>
@@ -53,9 +50,6 @@
                                 <Setter Property="AutomationProperties.Name" Value="{Binding FriendlyName}" />
                                 <EventSetter Event="Click" Handler="SystemTrayCaptureDefault_Click" />
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsActive}" Value="False">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
                                     <DataTrigger Binding="{Binding DataFlow}" Value="{x:Static na:DataFlow.Render}">
                                         <Setter Property="Visibility" Value="Collapsed" />
                                     </DataTrigger>

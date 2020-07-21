@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -41,8 +42,8 @@ namespace uk.JohnCook.dotnet.StreamController
 
         private void Devices_CollectionEnumerated(object sender, EventArgs e)
         {
-            taskbarRenderMenu.ItemsSource = AudioInterfaceCollection.Devices;
-            taskbarCaptureMenu.ItemsSource = AudioInterfaceCollection.Devices;
+            taskbarRenderMenu.ItemsSource = AudioInterfaceCollection.ActiveDevices;
+            taskbarCaptureMenu.ItemsSource = AudioInterfaceCollection.ActiveDevices;
         }
 
         public void UpdateTrayIcon()

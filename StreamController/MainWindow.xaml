@@ -55,7 +55,6 @@
                                 </ComboBox.ItemTemplate>
                                 <ComboBox.ItemContainerStyle>
                                     <Style TargetType="ComboBoxItem">
-                                        <Setter Property="Visibility" Value="{Binding IsActive, Converter={StaticResource BoolToVisibility}, Mode=OneWay}" />
                                         <Setter Property="AutomationProperties.Name" Value="{Binding FriendlyName}" />
                                     </Style>
                                 </ComboBox.ItemContainerStyle>

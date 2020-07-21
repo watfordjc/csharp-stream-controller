@@ -26,7 +26,7 @@ namespace uk.JohnCook.dotnet.StreamController
 
         private void PopulateAudioInterfaces()
         {
-            cb_interfaces.ItemsSource = AudioInterfaceCollection.Devices;
+            cb_interfaces.ItemsSource = AudioInterfaceCollection.ActiveDevices;
             AudioInterfaceCollection.Instance.DefaultDeviceChanged += OnDefaultDeviceChanged;
             if (AudioInterfaceCollection.Instance.DefaultRender != null) { OnDefaultDeviceChanged(this, DataFlow.Render); }
             if (AudioInterfaceCollection.Instance.DefaultCapture != null) { OnDefaultDeviceChanged(this, DataFlow.Capture); }
