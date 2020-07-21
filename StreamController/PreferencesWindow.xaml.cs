@@ -94,5 +94,12 @@ namespace uk.JohnCook.dotnet.StreamController
                 this.Close();
             }
         }
+
+        private void ValidationErrorTextBlock_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            System.Windows.Automation.Peers.AutomationPeer peer = System.Windows.Automation.Peers.UIElementAutomationPeer.FromElement(sender as TextBlock);
+            if (peer == null) { return; }
+            peer.RaiseAutomationEvent(System.Windows.Automation.Peers.AutomationEvents.LiveRegionChanged);
+        }
     }
 }

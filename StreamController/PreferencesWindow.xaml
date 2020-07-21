@@ -68,7 +68,7 @@
                                     </Binding>
                                 </ComboBox.SelectedItem>
                             </ComboBox>
-                                <TextBlock VerticalAlignment="Center" Margin="8 4 8 8" Foreground="Red" FontWeight="SemiBold">
+                                <TextBlock VerticalAlignment="Center" Margin="8 4 8 8" Foreground="Red" FontWeight="SemiBold" AutomationProperties.LiveSetting="Polite" IsVisibleChanged="ValidationErrorTextBlock_IsVisibleChanged">
                                     <TextBlock.Style>
                                         <Style TargetType="TextBlock">
                                             <Style.Triggers>
@@ -94,7 +94,7 @@
                                     </Binding>
                                 </TextBox.Text>
                             </TextBox>
-                            <TextBlock x:Name="uri_hostname_error" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Margin="8 4 8 8" Foreground="Red" FontWeight="SemiBold">
+                            <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Margin="8 4 8 8" Foreground="Red" FontWeight="SemiBold" AutomationProperties.LiveSetting="Polite" IsVisibleChanged="ValidationErrorTextBlock_IsVisibleChanged">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
                                         <Style.Triggers>
@@ -120,7 +120,7 @@
                                     </Binding>
                                 </TextBox.Text>
                             </TextBox>
-                            <TextBlock VerticalAlignment="Center" Margin="8 4 8 8" Foreground="Red" FontWeight="SemiBold">
+                                <TextBlock VerticalAlignment="Center" Margin="8 4 8 8" Foreground="Red" FontWeight="SemiBold" AutomationProperties.LiveSetting="Polite" IsVisibleChanged="ValidationErrorTextBlock_IsVisibleChanged">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
                                         <Style.Triggers>
@@ -170,7 +170,7 @@
                                 </TextBox.Text>
                             </TextBox>
                             <TextBlock Grid.Row="0" Grid.Column="2" Text="seconds" Margin="2 8" VerticalAlignment="Center" />
-                            <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" TextAlignment="Right" Margin="8 4 8 8" Foreground="Red" FontWeight="SemiBold">
+                            <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" TextAlignment="Right" Margin="8 4 8 8" Foreground="Red" FontWeight="SemiBold" AutomationProperties.LiveSetting="Polite" IsVisibleChanged="ValidationErrorTextBlock_IsVisibleChanged">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
                                         <Style.Triggers>
@@ -196,7 +196,7 @@
                                 </TextBox.Text>
                             </TextBox>
                             <TextBlock Grid.Row="2" Grid.Column="2" Text="minutes" Margin="2 8" VerticalAlignment="Center" />
-                            <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" TextAlignment="Right" Margin="8 4 8 8" Foreground="Red" FontWeight="SemiBold">
+                            <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" TextAlignment="Right" Margin="8 4 8 8" Foreground="Red" FontWeight="SemiBold" AutomationProperties.LiveSetting="Polite" IsVisibleChanged="ValidationErrorTextBlock_IsVisibleChanged">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
                                         <Style.Triggers>
