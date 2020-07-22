@@ -23,7 +23,7 @@
         </Style>
     </Window.Resources>
     <DockPanel>
-        <Menu DockPanel.Dock="Top" ItemsSource="{StaticResource ResourceKey=MenuItems}" AutomationProperties.Name="Application" />
+        <Menu DockPanel.Dock="Top" ItemsSource="{StaticResource ResourceKey=MenuItems}" AutomationProperties.Name="Application" KeyboardNavigation.TabNavigation="None" />
         <StatusBar DockPanel.Dock="Bottom" Height="auto" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" Padding="2">
             <StatusBarItem DockPanel.Dock="Right">
                 <Ellipse HorizontalAlignment="Right" Width="16" Height="16" Fill="Gray" x:Name="sbCircleStatus" AutomationProperties.Name="Connection Status Indicator" />

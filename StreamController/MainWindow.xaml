@@ -21,7 +21,7 @@
         </Style>
     </Window.Resources>
     <DockPanel>
-        <Menu DockPanel.Dock="Top" ItemsSource="{StaticResource ResourceKey=MenuItems}" AutomationProperties.Name="Application" />
+        <Menu DockPanel.Dock="Top" ItemsSource="{StaticResource ResourceKey=MenuItems}" AutomationProperties.Name="Application" KeyboardNavigation.TabNavigation="None" />
         <StackPanel Orientation="Vertical">
             <Grid>
                 <Grid.ColumnDefinitions>
