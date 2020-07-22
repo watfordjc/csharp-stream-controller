@@ -99,11 +99,14 @@
                                     <DataTrigger Binding="{Binding Source.Dependencies.DependencyProblem, IsAsync=True}" Value="True">
                                         <Setter Property="Foreground" Value="Red" />
                                         <Setter Property="FontWeight" Value="Bold" />
+                                        <Setter Property="AutomationProperties.Name" Value="{Binding Source.Name, StringFormat={}Dependency problem for {0}}" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Source.Dependencies.DependencyProblem, IsAsync=True}" Value="False">
+                                        <Setter Property="AutomationProperties.Name" Value="{Binding Source.Name}" />
                                     </DataTrigger>
                                 </Style.Triggers>
                                 <Style.Setters>
                                     <Setter Property="FocusVisualStyle" Value="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
-                                    <Setter Property="AutomationProperties.Name" Value="{Binding Source.Name}" />
                                 </Style.Setters>
                             </Style>
                         </ListBox.ItemContainerStyle>
