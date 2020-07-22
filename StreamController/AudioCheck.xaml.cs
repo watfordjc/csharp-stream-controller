@@ -29,6 +29,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Automation.Peers;
 
 namespace uk.JohnCook.dotnet.StreamController
 {
@@ -41,6 +42,7 @@ namespace uk.JohnCook.dotnet.StreamController
         private readonly ObsWsClient webSocket;
         private readonly TaskCompletionSource<bool> audioDevicesEnumerated = new TaskCompletionSource<bool>();
         private string connectionError = String.Empty;
+        private string extendedConnectionError = String.Empty;
         private WaveOutEvent silentAudioEvent = null;
         private static readonly Brush primaryBrush = new SolidColorBrush(Color.FromArgb(0xFF, 0xE2, 0xC1, 0xEA));
         private static readonly Brush secondaryBrush = new SolidColorBrush(Color.FromArgb(0xFF, 0xC5, 0xC0, 0xEB));
@@ -75,7 +77,7 @@ namespace uk.JohnCook.dotnet.StreamController
         private async void Window_ContentRendered(object sender, EventArgs e)
         {
             pulseCancellationToken = new CancellationTokenSource();
-            UpdateUIConnectStatus(null, null, null);
+            UpdateUIConnectStatus(null, null, null, false);
             AudioInterfaceCollection.Instance.CollectionEnumerated += AudioDevicesEnumerated;
             if (AudioInterfaceCollection.Instance.DevicesAreEnumerated)
             {
@@ -197,7 +199,7 @@ namespace uk.JohnCook.dotnet.StreamController
             _ReconnectTimeRemaining--;
             if (_ReconnectTimeRemaining > 0)
             {
-                UpdateUIConnectStatus("Reconnecting in " +TimeSpan.FromSeconds(_ReconnectTimeRemaining).ToString("c", CultureInfo.CurrentCulture), null, null);
+                UpdateUIConnectStatus("Reconnecting in " + TimeSpan.FromSeconds(_ReconnectTimeRemaining).ToString("c", CultureInfo.CurrentCulture), null, null, false);
             }
         }
 
@@ -213,15 +215,16 @@ namespace uk.JohnCook.dotnet.StreamController
             if (newState == WebSocketState.Open)
             {
                 connectionError = "AOK";
+                extendedConnectionError = String.Empty;
                 _ReconnectCountdownTimer.Stop();
-                UpdateUIConnectStatus("Connected", Brushes.DarkGreen, null);
+                UpdateUIConnectStatus("Connected", Brushes.DarkGreen, null, true);
                 SystemTrayIcon.Instance.NotifyIcon.Icon = Properties.Resources.icon_dark_green;
                 obsSourceDictionary.Clear();
             }
             else if (newState != WebSocketState.Connecting)
             {
                 _ReconnectCountdownTimer.Start();
-                UpdateUIConnectStatus("Disconnected", Brushes.Red, null);
+                UpdateUIConnectStatus(null, Brushes.Red, null, false);
                 SystemTrayIcon.Instance.NotifyIcon.Icon = Properties.Resources.icon_red;
             }
             else
@@ -231,8 +234,9 @@ namespace uk.JohnCook.dotnet.StreamController
                     webSocket.PasswordPreference = Preferences.Default.obs_password;
                 }
                 connectionError = "Error state cleared";
+                extendedConnectionError = String.Empty;
                 _ReconnectCountdownTimer.Stop();
-                UpdateUIConnectStatus("Connecting\u2026", Brushes.DarkGoldenrod, null);
+                UpdateUIConnectStatus("Connecting\u2026", Brushes.DarkGoldenrod, null, true);
                 SystemTrayIcon.Instance.NotifyIcon.Icon = Properties.Resources.dark_golden_rod;
             }
         }
@@ -248,12 +252,18 @@ namespace uk.JohnCook.dotnet.StreamController
         {
             if (e.ReconnectDelay > 0)
             {
-                UpdateUIConnectStatus(TimeSpan.FromSeconds(e.ReconnectDelay).ToString("c", CultureInfo.CurrentCulture), null, null);
+                UpdateUIConnectStatus("Reconnecting in " + TimeSpan.FromSeconds(e.ReconnectDelay).ToString("c", CultureInfo.CurrentCulture), null, null, true);
                 _ReconnectTimeRemaining = e.ReconnectDelay;
+            }
+            else if (!webSocket.AutoReconnect)
+            {
+                UpdateUIConnectStatus("Disconnected", Brushes.Red, null, true);
             }
             if (e.Error != null)
             {
-                connectionError = $"{e.Error.Message}\n{e.Error.InnerException?.Message}";
+                connectionError = $"{e.Error.Message}";
+                extendedConnectionError = $"{e.Error.InnerException?.Message}";
+                TextBlock_AnnounceChanged(tbStatus);
             }
         }
 
@@ -538,11 +548,12 @@ namespace uk.JohnCook.dotnet.StreamController
                 UpdateUIConnectStatus(
                     null,
                     messageObject.Pulse ? primaryBrush : secondaryBrush,
-                    Brushes.Gray);
+                    Brushes.Gray,
+                    false);
             }
             catch (TaskCanceledException)
             {
-                UpdateUIConnectStatus(null, Brushes.Gray, null);
+                UpdateUIConnectStatus(null, Brushes.Gray, null, false);
             }
         }
 
@@ -814,17 +825,29 @@ namespace uk.JohnCook.dotnet.StreamController
 
         #region User Interface
 
-        private void UpdateUIConnectStatus(string countdownText, Brush brush1, Brush brush2)
+        private void UpdateUIConnectStatus(string countdownText, Brush brush1, Brush brush2, bool announceChange)
         {
-            _ = Task.Run(
-                () => UpdateConnectStatus(countdownText, brush1, brush2)
+            Task.Run(
+                () => UpdateConnectStatus(countdownText, brush1, brush2, announceChange)
                 );
         }
 
-        private async Task UpdateConnectStatus(string countdownText, Brush brush1, Brush brush2)
+        private void TextBlock_AnnounceChanged(object sender)
+        {
+            AutomationPeer peer = UIElementAutomationPeer.FromElement(sender as UIElement);
+            if (peer == null) { return; }
+            _Context.Send(
+                x => peer.RaiseAutomationEvent(AutomationEvents.LiveRegionChanged),
+                null);
+        }
+
+        private async Task UpdateConnectStatus(string countdownText, Brush brush1, Brush brush2, bool announceChange)
         {
             _Context.Send(
                 _ => tbStatus.Text = connectionError,
+                null);
+            _Context.Send(
+                _ => tbStatusExtended.Text = extendedConnectionError,
                 null);
             if (countdownText != null)
             {
@@ -845,6 +868,12 @@ namespace uk.JohnCook.dotnet.StreamController
                 {
                     SystemTrayIcon.Instance.NotifyIcon.Icon = Properties.Resources.icon_secondary;
                 }
+            }
+            if (announceChange)
+            {
+                _Context.Send(
+                    x => TextBlock_AnnounceChanged(tbReconnectCountdown),
+                    null);
             }
             if (brush2 != null)
             {
@@ -882,6 +911,17 @@ namespace uk.JohnCook.dotnet.StreamController
                     && (Keyboard.IsKeyDown(Key.LeftAlt)))
                 {
                     App.Current.Shutdown();
+                }
+            }
+            if (e.Key == Key.F12)
+            {
+                if (!string.IsNullOrEmpty(extendedConnectionError))
+                {
+                    TextBlock_AnnounceChanged(tbStatusExtended);
+                }
+                else
+                {
+                    TextBlock_AnnounceChanged(tbStatus);
                 }
             }
         }

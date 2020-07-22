@@ -29,7 +29,7 @@
                 <Ellipse HorizontalAlignment="Right" Width="16" Height="16" Fill="Gray" x:Name="sbCircleStatus" AutomationProperties.Name="Connection Status Indicator" />
             </StatusBarItem>
             <StatusBarItem DockPanel.Dock="Right">
-                <TextBlock x:Name="tbReconnectCountdown" MinWidth="10" TextAlignment="Right" AutomationProperties.Name="Connection Status" />
+                <TextBlock x:Name="tbReconnectCountdown" MinWidth="10" TextAlignment="Right" AutomationProperties.Name="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text, StringFormat={}{0}}" AutomationProperties.LiveSetting="Assertive" />
             </StatusBarItem>
             <StatusBarItem DockPanel.Dock="Right" VerticalContentAlignment="Stretch">
                 <Rectangle Width="1" Fill="Gray" />
@@ -41,7 +41,20 @@
                 <Rectangle Width="1" Fill="Gray" />
             </StatusBarItem>
             <StatusBarItem DockPanel.Dock="Right" Margin="4 0">
-                <TextBlock x:Name="tbStatus" HorizontalAlignment="Stretch" AutomationProperties.Name="Error messages" AutomationProperties.IsOffscreenBehavior="Offscreen" />
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+                    <TextBlock x:Name="tbStatus" AutomationProperties.Name="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text, StringFormat={}{0}}" AutomationProperties.LiveSetting="Polite" AutomationProperties.IsOffscreenBehavior="Offscreen" />
+                    <TextBlock x:Name="tbStatusExtended" AutomationProperties.Name="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text, StringFormat={}Error Details: {0}.}" AutomationProperties.AcceleratorKey="F12" AutomationProperties.LiveSetting="Polite">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text}" Value="">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </StackPanel>
             </StatusBarItem>
         </StatusBar>
         <Grid>
