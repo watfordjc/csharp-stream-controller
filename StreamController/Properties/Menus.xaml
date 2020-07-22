@@ -6,7 +6,7 @@
     <Collections:ArrayList x:Key="MenuItems" x:Shared="false">
         <MenuItem Header="_File">
             <MenuItem Header="_Close" InputGestureText="Alt+F4" AutomationProperties.AcceleratorKey="Alt+F4" Click="MenuItemClose_Click" />
-            <MenuItem Header="E_xit" InputGestureText="Ctrl+Alt+F4" AutomationProperties.AcceleratorKey="Ctrl+Alt+F4" Click="MenuItemExit_Click" />
+            <MenuItem Header="E_xit" InputGestureText="Shift+Alt+F4" AutomationProperties.AcceleratorKey="Shift+Alt+F4" Click="MenuItemExit_Click" />
         </MenuItem>
         <MenuItem Header="_Edit">
             <MenuItem Header="_Preferences" Click="MenuWindowItem_Click" x:Name="PreferencesWindow" Loaded="MenuWindowItemLoaded" />

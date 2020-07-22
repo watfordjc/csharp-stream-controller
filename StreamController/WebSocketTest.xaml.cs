@@ -292,8 +292,8 @@ namespace uk.JohnCook.dotnet.StreamController
         {
             if (e.Key == Key.F4)
             {
-                if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)
-                    && (Keyboard.IsKeyDown(Key.LeftAlt)))
+                if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)
+                    && (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)))
                 {
                     App.Current.Shutdown();
                 }
