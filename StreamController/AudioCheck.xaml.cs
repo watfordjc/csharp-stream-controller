@@ -91,6 +91,7 @@ namespace uk.JohnCook.dotnet.StreamController
             webSocket.OnObsReply += Websocket_Reply_ContextSwitch;
             _ReconnectCountdownTimer.Elapsed += ReconnectCountdownTimer_Elapsed;
             SystemTrayIcon.Instance.UpdateTrayIcon();
+            cbScenes.ItemsSource = sceneList;
             await ObsWebsocketConnect().ConfigureAwait(true);
         }
 
@@ -890,6 +891,10 @@ namespace uk.JohnCook.dotnet.StreamController
             _Context.Send(
                 x => DataContext = currentScene,
                 null);
+            _Context.Send(
+                x => cbScenes.SelectedItem = currentScene,
+                null);
+            TextBlock_AnnounceChanged(current_scene);
             return Task.CompletedTask;
         }
 
@@ -898,6 +903,7 @@ namespace uk.JohnCook.dotnet.StreamController
             _Context.Send(
                 x => tbTransitioning.Text = transitionMessage,
                 null);
+            TextBlock_AnnounceChanged(tbTransitioning);
             return Task.CompletedTask;
         }
 
@@ -924,6 +930,17 @@ namespace uk.JohnCook.dotnet.StreamController
                     TextBlock_AnnounceChanged(tbStatus);
                 }
             }
+        }
+
+
+        private async void CbScenes_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count == 0) { return; }
+            ObsScene selectedScene = (e.AddedItems[0] as ObsScene);
+            if (selectedScene == e.AddedItems) { return; }
+            SetCurrentSceneRequest request = ObsWsRequest.GetInstanceOfType(ObsRequestType.SetCurrentScene) as SetCurrentSceneRequest;
+            request.SceneName = selectedScene.Name;
+            await webSocket.ObsSend(request).ConfigureAwait(true);
         }
 
         #region dispose

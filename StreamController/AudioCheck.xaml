@@ -74,11 +74,43 @@
                 <RowDefinition Height="16" />
             </Grid.RowDefinitions>
             <StackPanel Orientation="Vertical" Grid.Row="1" Grid.Column="1" Margin="8 0" VerticalAlignment="Top" Grid.ColumnSpan="2">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock x:Name="label_current_scene" Text="Current Scene:" FontWeight="SemiBold" TextAlignment="Left" Margin="0 0 2 8" />
-                    <TextBlock x:Name="current_scene" Text="{Binding Name, TargetNullValue='None', FallbackValue='None', IsAsync=True}" Margin="2 0 0 8" TextWrapping="Wrap" />
+                <StackPanel Orientation="Horizontal" Margin="0 0 0 8">
+                    <TextBlock x:Name="label_available_scenes" Text="Available Scenes:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0 0 2 8" />
+                    <ComboBox Name="cbScenes" Margin="2 0 0 8" SelectionChanged="CbScenes_SelectionChanged" AutomationProperties.LabeledBy="{Binding ElementName=label_available_scenes}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                        <ComboBox.ItemContainerStyle>
+                            <Style>
+                                <Setter Property="AutomationProperties.Name" Value="{Binding Name}" />
+                            </Style>
+                        </ComboBox.ItemContainerStyle>
+                    </ComboBox>
                 </StackPanel>
-                <TextBlock x:Name="tbTransitioning" Margin="0 0 0 8" TextWrapping="Wrap" />
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock x:Name="label_current_scene" Text="Current Scene:" VerticalAlignment="Center" FontWeight="SemiBold" TextAlignment="Left" Margin="0 0 2 8" />
+                    <TextBlock x:Name="current_scene" Margin="2 0 0 8" TextWrapping="Wrap" Text="{Binding Name, TargetNullValue='None', FallbackValue='None', IsAsync=True}"
+                               AutomationProperties.LiveSetting="Polite"
+                               AutomationProperties.Name="{Binding Name, TargetNullValue='None', FallbackValue='None', IsAsync=True, StringFormat={}Current scene: {0}}"
+                               />
+                </StackPanel>
+                <TextBlock x:Name="tbTransitioning" Margin="0 0 0 8" TextWrapping="Wrap">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text}" Value="">
+                                    <Setter Property="AutomationProperties.LiveSetting" Value="Off" />
+                                    <Setter Property="Visibility" Value="Hidden" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                            <Setter Property="AutomationProperties.LiveSetting" Value="Polite" />
+                            <Setter Property="AutomationProperties.Name" Value="Switching scenes" />
+                            <Setter Property="Visibility" Value="Visible" />
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
             </StackPanel>
             <Grid Grid.Row="1" Grid.Column="3" Grid.RowSpan="4">
                 <Grid.RowDefinitions>
