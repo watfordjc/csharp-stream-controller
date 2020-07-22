@@ -182,14 +182,6 @@ namespace uk.JohnCook.dotnet.StreamController
             webSocket.DisconnectAsync(true).ConfigureAwait(true);
         }
 
-        private async void ButtonTest_Click(object sender, RoutedEventArgs e)
-        {
-            btnTest.IsEnabled = false;
-            webSocket.AutoReconnect = Preferences.Default.obs_auto_reconnect;
-            await webSocket.AutoReconnectConnectAsync().ConfigureAwait(true);
-            e.Handled = true;
-        }
-
         private void WebSocket_StateChange_ContextSwitch(object sender, WebSocketState e)
         {
             _Context.Send(
@@ -262,10 +254,28 @@ namespace uk.JohnCook.dotnet.StreamController
             }
         }
 
-        private async void ButtonClose_Click(object sender, RoutedEventArgs e)
+        private async Task Connect()
+        {
+            btnTest.IsEnabled = false;
+            webSocket.AutoReconnect = Preferences.Default.obs_auto_reconnect;
+            await webSocket.AutoReconnectConnectAsync().ConfigureAwait(true);
+        }
+
+        private async Task Disconnect()
         {
             webSocket.AutoReconnect = false;
             await webSocket.DisconnectAsync(true).ConfigureAwait(true);
+        }
+
+        private async void ButtonTest_Click(object sender, RoutedEventArgs e)
+        {
+            await Connect().ConfigureAwait(true);
+            e.Handled = true;
+        }
+
+        private async void ButtonClose_Click(object sender, RoutedEventArgs e)
+        {
+            await Disconnect().ConfigureAwait(true);
             e.Handled = true;
         }
 
@@ -288,7 +298,7 @@ namespace uk.JohnCook.dotnet.StreamController
             }
         }
 
-        private void Window_KeyDown(object sender, KeyEventArgs e)
+        private async void Window_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.F4)
             {
@@ -297,6 +307,18 @@ namespace uk.JohnCook.dotnet.StreamController
                 {
                     App.Current.Shutdown();
                 }
+            }
+            else if (e.Key == Key.R
+                && (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)))
+            {
+                await Connect().ConfigureAwait(true);
+                e.Handled = true;
+            }
+            else if (e.Key == Key.D
+                && (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)))
+            {
+                await Disconnect().ConfigureAwait(true);
+                e.Handled = true;
             }
         }
 

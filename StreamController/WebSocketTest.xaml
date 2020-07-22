@@ -39,18 +39,20 @@
                 <RowDefinition Height="16" />
             </Grid.RowDefinitions>
             <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="1">
-                <Button Width="auto" Height="auto"  x:Name="btnTest" Margin="8" Click="ButtonTest_Click" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
+                <Button Width="auto" Height="auto"  x:Name="btnTest" Margin="8" Click="ButtonTest_Click" AutomationProperties.AcceleratorKey="Ctrl+R" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
                     <TextBlock Padding="6 2" Text="Connect" />
                 </Button>
-                <Button Width="auto" Height="auto" x:Name="btnClose" Margin="8" Click="ButtonClose_Click" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
+                <Button Width="auto" Height="auto" x:Name="btnClose" Margin="8" Click="ButtonClose_Click" AutomationProperties.AcceleratorKey="Ctrl+D" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
                 <TextBlock Padding="6 2" Text="Disconnect" />
                 </Button>
                 <TextBlock VerticalAlignment="Center" x:Name="txtStatus" Margin="8"  />
             </StackPanel>
-            <CheckBox x:Name="cbAutoScroll" Content="Auto Scroll" Grid.Column="3" Grid.Row="1" Margin="8" VerticalContentAlignment="Center" HorizontalAlignment="Right" Checked="AutoScroll_Checked" Unchecked="AutoScroll_Unchecked" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
-            <ScrollViewer Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" Grid.RowSpan="2" Margin="8" x:Name="svScroll" ScrollViewer.ScrollChanged="TxtOutput_ScrollChanged" AutomationProperties.Name="Received Data">
+            <CheckBox x:Name="cbAutoScroll" Content="_Auto Scroll" Grid.Column="3" Grid.Row="1" Margin="8" VerticalContentAlignment="Center" HorizontalAlignment="Right" Checked="AutoScroll_Checked" Unchecked="AutoScroll_Unchecked" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
+            <GroupBox x:Name="gb_data" Header="_Received Data" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" Grid.RowSpan="2">
+            <ScrollViewer x:Name="svScroll" ScrollViewer.ScrollChanged="TxtOutput_ScrollChanged" AutomationProperties.LabeledBy="{Binding ElementName=gb_data}">
                 <TextBox x:Name="txtOutput" IsReadOnly="True" IsUndoEnabled="False" AutomationProperties.Name="Data" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
             </ScrollViewer>
+            </GroupBox>
         </Grid>
 
     </DockPanel>

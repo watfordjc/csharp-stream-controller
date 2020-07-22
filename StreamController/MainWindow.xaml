@@ -41,7 +41,7 @@
                 <GroupBox x:Name="audio_interfaces" Header="Audio Interfaces" Grid.Column="1" Grid.Row="1" Margin="0,0,8,8" Padding="8" Grid.ColumnSpan="2">
                     <StackPanel Orientation="Vertical">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock x:Name="label_interface" Text="Interface:" VerticalAlignment="Center" Margin="0 0 8 0" />
+                            <Label x:Name="label_interface" Content="I_nterface:" Target="{Binding ElementName=cb_interfaces}" VerticalAlignment="Center" Margin="0 0 8 0" />
                             <ComboBox x:Name="cb_interfaces" IsEditable="False" Height="auto" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" AutomationProperties.LabeledBy="{Binding ElementName=label_interface}">
                                 <ComboBox.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -103,7 +103,7 @@
                 <GroupBox x:Name="applications" Header="Applications" Grid.Column="3" Grid.Row="1" Margin="0,0,8,8" Padding="8" Grid.ColumnSpan="2">
                     <StackPanel Orientation="Vertical">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock x:Name="label_application" Text="Application:" VerticalAlignment="Center" Margin="0 0 8 0" />
+                            <Label x:Name="label_application" Content="_Application:" Target="{Binding ElementName=cb_applications}" VerticalAlignment="Center" Margin="0 0 8 0" />
                             <ComboBox x:Name="cb_applications" IsEditable="False" Height="auto" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" AutomationProperties.LabeledBy="{Binding ElementName=label_application}">
                                 <ComboBox.ItemsPanel>
                                     <ItemsPanelTemplate>
