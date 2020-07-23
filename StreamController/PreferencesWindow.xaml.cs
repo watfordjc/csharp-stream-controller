@@ -49,10 +49,22 @@ namespace uk.JohnCook.dotnet.StreamController
         /// <summary>
         /// Save user preferences.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        /// <returns>True if saved, false if validation error.</returns>
+        private bool Save()
         {
+            save_button.IsEnabled = false;
+            if (!WindowUtilityLibrary.DependencyObjectIsValid(this))
+            {
+                save_validation_error.Visibility = Visibility.Visible;
+                NotifyTextBlockChanged(save_validation_error);
+                save_button.IsEnabled = true;
+                return false;
+            }
+            else
+            {
+                save_validation_error.Visibility = Visibility.Hidden;
+            }
+
             ResourceManager rm = new ResourceManager("uk.JohnCook.dotnet.StreamController.Properties.Resources", typeof(PreferencesWindow).Assembly);
 
             Preferences.Default.obs_uri_scheme = cbUriProtocol.Text;
@@ -60,11 +72,11 @@ namespace uk.JohnCook.dotnet.StreamController
             {
                 if (!Preferences.Default.obs_use_password)
                 {
-                    _ = MessageBox.Show(rm.GetString("new_password_placeholder_error", CultureInfo.CurrentUICulture), rm.GetString("title_new_password_error", CultureInfo.CurrentUICulture) , MessageBoxButton.OK);
-                    e.Handled = true;
-                    return;
+                    _ = MessageBox.Show(rm.GetString("new_password_placeholder_error", CultureInfo.CurrentUICulture), rm.GetString("title_new_password_error", CultureInfo.CurrentUICulture), MessageBoxButton.OK);
+                    return false;
                 }
-            } else if (cbUsePassword.IsChecked.Value)
+            }
+            else if (cbUsePassword.IsChecked.Value)
             {
                 SharedModels.SecurePreferences securePreferences = new SharedModels.SecurePreferences();
                 char[] password = pbPassword.Password.ToArray();
@@ -76,30 +88,65 @@ namespace uk.JohnCook.dotnet.StreamController
                 Preferences.Default.obs_use_password = true;
 
                 _ = MessageBox.Show(rm.GetString("new_password_set_message", CultureInfo.CurrentUICulture), rm.GetString("title_new_password_saved", CultureInfo.CurrentUICulture), MessageBoxButton.OK);
-            } else
+            }
+            else
             {
                 Preferences.Default.obs_use_password = false;
                 Preferences.Default.obs_password = String.Empty;
             }
             Preferences.Default.Save();
             // TODO: Update existing ObsWsClient.AutoReconnect if necessary
-            e.Handled = true;
-            this.Close();
+            return true;
         }
 
-        private void Window_KeyDown(object sender, KeyEventArgs e)
+        /// <summary>
+        /// Save preferences by clicking the Save button.
+        /// </summary>
+        /// <param name="sender">A button.</param>
+        /// <param name="e">Associated button click state information and event data.</param>
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            if (e.Key == Key.Escape)
+            bool saved = Save();
+            e.Handled = true;
+            if (saved)
             {
                 this.Close();
             }
         }
 
-        private void ValidationErrorTextBlock_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private void Window_KeyDown(object sender, KeyEventArgs e)
         {
-            System.Windows.Automation.Peers.AutomationPeer peer = System.Windows.Automation.Peers.UIElementAutomationPeer.FromElement(sender as TextBlock);
+            // Close preferences window using Escape key.
+            if (e.Key == Key.Escape)
+            {
+                this.Close();
+            }
+            // Save preferences using Ctrl+S.
+            else if (e.Key == Key.S
+                && (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)))
+            {
+                save_button.Focus();
+                if (Save())
+                {
+                    this.Close();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Raise a UI Automation event for a TextBlock.
+        /// </summary>
+        /// <param name="textBlock">The TextBlock that has changed content.</param>
+        private static void NotifyTextBlockChanged(TextBlock textBlock)
+        {
+            System.Windows.Automation.Peers.AutomationPeer peer = System.Windows.Automation.Peers.UIElementAutomationPeer.FromElement(textBlock);
             if (peer == null) { return; }
             peer.RaiseAutomationEvent(System.Windows.Automation.Peers.AutomationEvents.LiveRegionChanged);
+        }
+
+        private void ValidationErrorTextBlock_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            NotifyTextBlockChanged(sender as TextBlock);
         }
     }
 }

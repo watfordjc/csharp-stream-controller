@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Security.Principal;
 using System.Text;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace uk.JohnCook.dotnet.StreamController
 {
@@ -26,6 +27,9 @@ namespace uk.JohnCook.dotnet.StreamController
             Audiocheck = 3
         }
 
+        /// <summary>
+        /// Type to WindowType dictionary.
+        /// </summary>
         private static readonly Dictionary<Type, WindowType> enumTypeDictionary = new Dictionary<Type, WindowType>()
         {
             { typeof(MainWindow), WindowType.MainWindow },
@@ -87,10 +91,44 @@ namespace uk.JohnCook.dotnet.StreamController
             };
         }
 
+        /// <summary>
+        /// Gets the WindowType of a (Window) Type.
+        /// </summary>
+        /// <param name="window">The Type of a Window instance.</param>
+        /// <returns>The WindowType for that window.</returns>
         public static WindowType GetWindowTypeEnum(Type window)
         {
             Debug.Assert(enumTypeDictionary.ContainsKey(window), "Unrecognised window Type.");
             return enumTypeDictionary.GetValueOrDefault(window);
+        }
+
+        /// <summary>
+        /// Recursively check a DependencyObject for validation errors.
+        /// </summary>
+        /// <param name="dependencyObject">The DependencyObject to check for validation errors.</param>
+        /// <returns>True if no validation errors, otherwise false.</returns>
+        public static bool DependencyObjectIsValid(DependencyObject dependencyObject)
+        {
+            // Check if this DependencyObject has Validation errors.
+            if (Validation.GetHasError(dependencyObject))
+            {
+                return false;
+            }
+            // Enumerate children. LogicalTreeHelper.GetChildren() returns Object[], not DependencyObject[].
+            foreach (Object childObject in LogicalTreeHelper.GetChildren(dependencyObject))
+            {
+                // Panel objects contain controls. Control objects can be changed by user.
+                if (!(childObject is Panel) && !(childObject is Control))
+                {
+                    continue;
+                }
+                // Panel and Control are types of DependencyObject and may contain DependencyObject children.
+                else if (!DependencyObjectIsValid(childObject as DependencyObject))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }

@@ -57,17 +57,17 @@
                             </Grid.RowDefinitions>
                             <Label Grid.Row="0" Grid.Column="0" x:Name="scheme_label" Content="_Scheme:" Target="{Binding ElementName=cbUriProtocol}" Margin="8 8 2 8" VerticalAlignment="Center" />
                             <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
-                            <ComboBox SelectedIndex="0" AutomationProperties.LabeledBy="{Binding ElementName=scheme_label}" Margin="2 8 8 8" Padding="6" MinWidth="50" VerticalContentAlignment="Center" x:Name="cbUriProtocol" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
-                                <ComboBoxItem Content="ws" />
-                                <ComboBoxItem Content="wss" />
-                                <ComboBox.SelectedItem>
-                                    <Binding Path="SelectedItem" Mode="OneWay" ElementName="cbUriProtocol">
-                                        <Binding.ValidationRules>
-                                            <v:ComboBoxOneItemSelected ValidatesOnTargetUpdated="True" />
-                                        </Binding.ValidationRules>
-                                    </Binding>
-                                </ComboBox.SelectedItem>
-                            </ComboBox>
+                                <ComboBox SelectedIndex="0" AutomationProperties.LabeledBy="{Binding ElementName=scheme_label}" Margin="2 8 8 8" Padding="6" MinWidth="50" VerticalContentAlignment="Center" x:Name="cbUriProtocol" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
+                                    <ComboBoxItem Content="ws" />
+                                    <ComboBoxItem Content="wss" />
+                                    <ComboBox.SelectedItem>
+                                        <Binding Path="SelectedItem" Mode="OneWay" ElementName="cbUriProtocol">
+                                            <Binding.ValidationRules>
+                                                <v:ComboBoxOneItemSelected ValidatesOnTargetUpdated="True" />
+                                            </Binding.ValidationRules>
+                                        </Binding>
+                                    </ComboBox.SelectedItem>
+                                </ComboBox>
                                 <TextBlock VerticalAlignment="Center" Margin="8 4 8 8" Foreground="Red" FontWeight="SemiBold" AutomationProperties.LiveSetting="Polite" IsVisibleChanged="ValidationErrorTextBlock_IsVisibleChanged">
                                     <TextBlock.Style>
                                         <Style TargetType="TextBlock">
@@ -111,30 +111,30 @@
                             </TextBlock>
                             <Label Grid.Row="3" Grid.Column="0" x:Name="port_label" Content="_Port:" Target="{Binding ElementName=tbUriPort}" VerticalAlignment="Center" Margin="8 8 2 8" />
                             <StackPanel Grid.Row="3" Grid.Column="1"  Orientation="Horizontal">
-                            <TextBox AutomationProperties.LabeledBy="{Binding ElementName=port_label}" TextAlignment="Center" VerticalAlignment="Center" MinWidth="60" Padding="6" Margin="2 8 8 8" x:Name="tbUriPort" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
-                                <TextBox.Text>
-                                    <Binding Path="obs_uri_port" UpdateSourceTrigger="PropertyChanged" Source="{x:Static local:Preferences.Default}" Mode="TwoWay">
-                                        <Binding.ValidationRules>
-                                            <v:PortNumber />
-                                        </Binding.ValidationRules>
-                                    </Binding>
-                                </TextBox.Text>
-                            </TextBox>
+                                <TextBox AutomationProperties.LabeledBy="{Binding ElementName=port_label}" TextAlignment="Center" VerticalAlignment="Center" MinWidth="60" Padding="6" Margin="2 8 8 8" x:Name="tbUriPort" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
+                                    <TextBox.Text>
+                                        <Binding Path="obs_uri_port" UpdateSourceTrigger="PropertyChanged" Source="{x:Static local:Preferences.Default}" Mode="TwoWay">
+                                            <Binding.ValidationRules>
+                                                <v:PortNumber />
+                                            </Binding.ValidationRules>
+                                        </Binding>
+                                    </TextBox.Text>
+                                </TextBox>
                                 <TextBlock VerticalAlignment="Center" Margin="8 4 8 8" Foreground="Red" FontWeight="SemiBold" AutomationProperties.LiveSetting="Polite" IsVisibleChanged="ValidationErrorTextBlock_IsVisibleChanged">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding ElementName=tbUriPort, Path=(Validation.HasError)}" Value="True">
-                                                <Setter Property="Text" Value="{Binding ElementName=tbUriPort, Path=(Validation.Errors).CurrentItem.ErrorContent}" />
-                                                <Setter Property="Focusable" Value="True" />
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding ElementName=tbUriPort, Path=(Validation.HasError)}" Value="False">
-                                                <Setter Property="Visibility" Value="Collapsed" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ElementName=tbUriPort, Path=(Validation.HasError)}" Value="True">
+                                                    <Setter Property="Text" Value="{Binding ElementName=tbUriPort, Path=(Validation.Errors).CurrentItem.ErrorContent}" />
+                                                    <Setter Property="Focusable" Value="True" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding ElementName=tbUriPort, Path=(Validation.HasError)}" Value="False">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
                             </StackPanel>
                         </Grid>
                     </GroupBox>
@@ -219,7 +219,8 @@
                 </StackPanel>
             </GroupBox>
             <StackPanel Margin="0 8 0 0" HorizontalAlignment="Right" Orientation="Horizontal" Grid.Row="2" Grid.Column="2" >
-                <Button Content="Save" Padding="9 6" Click="SaveButton_Click" AutomationProperties.AcceleratorKey="Ctrl+s" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
+                <TextBlock Margin="16 0" FontWeight="SemiBold" Foreground="Red" VerticalAlignment="Center" HorizontalAlignment="Right" Grid.Row="0" Grid.Column="1" x:Name="save_validation_error" AutomationProperties.LiveSetting="Polite" Text="The last save attempt failed as there were errors above." Visibility="Hidden" />
+                <Button x:Name="save_button" Content="Save" Padding="9 6" Click="SaveButton_Click" AutomationProperties.AcceleratorKey="Ctrl+s" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
             </StackPanel>
         </Grid>
     </ScrollViewer>
