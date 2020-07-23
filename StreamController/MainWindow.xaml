@@ -6,8 +6,9 @@
         xmlns:local="clr-namespace:uk.JohnCook.dotnet.StreamController"
         mc:Ignorable="d"
         FontFamily="Open Sans"
+        FontSize="12"
         KeyDown="Window_KeyDown"
-        Title="Stream Control" Height="600" Width="960">
+        Title="Stream Control" Height="640" Width="1024">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
         <Style TargetType="{x:Type Control}" x:Key="{x:Static SystemParameters.FocusVisualStyleKey}">
@@ -19,6 +20,10 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style TargetType="{x:Type Label}" x:Key="property_label_style" BasedOn="{StaticResource {x:Type Label}}">
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Padding" Value="4 2" />
+        </Style>
     </Window.Resources>
     <DockPanel>
         <Menu DockPanel.Dock="Top" ItemsSource="{StaticResource ResourceKey=MenuItems}" AutomationProperties.Name="Application" KeyboardNavigation.TabNavigation="None" />
@@ -28,17 +33,17 @@
                     <ColumnDefinition Width="20" />
                     <ColumnDefinition Width="auto" MinWidth="400" />
                     <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="auto" MinWidth="350" />
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="auto" />
-                    <ColumnDefinition Width="20" />
+                    <ColumnDefinition Width="auto" MinWidth="20" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="20" />
                     <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
+                    <RowDefinition MaxHeight="0" />
                     <RowDefinition Height="20" />
                 </Grid.RowDefinitions>
-                <GroupBox x:Name="audio_interfaces" Header="Audio Interfaces" Grid.Column="1" Grid.Row="1" Margin="0,0,8,8" Padding="8" Grid.ColumnSpan="2">
+                <GroupBox x:Name="audio_interfaces" Header="Audio Interfaces" Grid.Column="1" Grid.Row="1" Margin="0 0 8 0" Padding="8" Grid.ColumnSpan="2" Grid.RowSpan="2">
                     <StackPanel Orientation="Vertical">
                         <StackPanel Orientation="Horizontal">
                             <Label x:Name="label_interface" Content="I_nterface:" Target="{Binding ElementName=cb_interfaces}" VerticalAlignment="Center" Margin="0 0 8 0" />
@@ -60,7 +65,7 @@
                                 </ComboBox.ItemContainerStyle>
                             </ComboBox>
                         </StackPanel>
-                        <GroupBox x:Name="current_interface" Header="Interface" Margin="8" Padding="8" DataContext="{Binding ElementName=cb_interfaces, Path=SelectedItem}">
+                        <GroupBox x:Name="current_interface" Header="Selected Interface" Margin="8" Padding="8" DataContext="{Binding ElementName=cb_interfaces, Path=SelectedItem}">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="auto" />
@@ -74,33 +79,74 @@
                                     <RowDefinition />
                                     <RowDefinition />
                                 </Grid.RowDefinitions>
-                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                                <TextBlock Grid.Row="0" Grid.Column="1" x:Name="interface_name" Text="{Binding FriendlyName}" />
-                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Type:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                                <TextBlock Grid.Row="1" Grid.Column="1" x:Name="interface_type" Text="{Binding DataFlow}" />
-                                <TextBlock Grid.Row="2" Grid.Column="0" Text="State:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                                <TextBlock Grid.Row="2" Grid.Column="1" x:Name="interface_state" Text="{Binding State}" />
-                                <TextBlock Grid.Row="3" Grid.Column="0" x:Name="interface_volume_label" Text="Volume:" VerticalAlignment="Center" Margin="0 0 8 0" Visibility="{Binding IsActive, Converter={StaticResource BoolToVisibility}}" />
-                                <TextBlock Grid.Row="3" Grid.Column="1" x:Name="interface_volume" Text="{Binding Volume,StringFormat={}{0}%}" Visibility="{Binding IsActive, Converter={StaticResource BoolToVisibility}}" />
-                                <TextBlock Grid.Row="4" Grid.Column="0" x:Name="interface_muted_label" Text="Muted:" VerticalAlignment="Center" Margin="0 0 8 0" Visibility="{Binding IsActive, Converter={StaticResource BoolToVisibility}}" />
-                                <TextBlock Grid.Row="4" Grid.Column="1" x:Name="interface_muted" Text="{Binding Muted}" Visibility="{Binding IsActive, Converter={StaticResource BoolToVisibility}}" />
-                                <Button Grid.Row="5" Grid.Column="0" x:Name="btnMakeDefaultRender" Margin="0 8" Padding="4" Content="Make Default" Visibility="{Binding IsActive, Converter={StaticResource BoolToVisibility}}" Click="BtnMakeDefaultRender_Click" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
+                                <Label Grid.Row="0" Grid.Column="0" x:Name="label_interface_name" Content="Name:" Style="{DynamicResource property_label_style}" />
+                                <TextBlock Grid.Row="0" Grid.Column="1" x:Name="interface_name" Text="{Binding FriendlyName}" VerticalAlignment="Center" />
+                                <Label Grid.Row="1" Grid.Column="0" x:Name="label_interface_type" Content="Type:" Style="{DynamicResource property_label_style}" />
+                                <TextBlock Grid.Row="1" Grid.Column="1" x:Name="interface_type" Text="{Binding DataFlow, Mode=OneWay}" VerticalAlignment="Center" />
+                                <Label Grid.Row="2" Grid.Column="0" x:Name="label_interface_state" Content="State:" Style="{DynamicResource property_label_style}" />
+                                <TextBlock Grid.Row="2" Grid.Column="1" x:Name="interface_state" Text="{Binding State, Mode=OneWay}" VerticalAlignment="Center" />
+                                <Label Grid.Row="3" Grid.Column="0" x:Name="label_interface_volume" Content="Volume:" Style="{DynamicResource property_label_style}" Visibility="{Binding IsActive, Converter={StaticResource BoolToVisibility}}" />
+                                <TextBlock Grid.Row="3" Grid.Column="1" x:Name="interface_volume" VerticalAlignment="Center" Text="{Binding Volume,StringFormat={}{0}%}" Visibility="{Binding IsActive, Converter={StaticResource BoolToVisibility}}" />
+                                <Label Grid.Row="4" Grid.Column="0" x:Name="label_interface_muted" Content="Muted:" Style="{DynamicResource property_label_style}" Visibility="{Binding IsActive, Converter={StaticResource BoolToVisibility}}" />
+                                <TextBlock Grid.Row="4" Grid.Column="1" x:Name="interface_muted" VerticalAlignment="Center" Text="{Binding Muted}" Visibility="{Binding IsActive, Converter={StaticResource BoolToVisibility}}" />
+                                <StackPanel Margin="4 8 4 4" HorizontalAlignment="Left" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal">
+                                    <Button x:Name="btnMakeDefaultRender" Padding="4" Content="Make Default" Visibility="{Binding IsActive, Converter={StaticResource BoolToVisibility}}" Click="BtnMakeDefaultRender_Click" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
+                                </StackPanel>
                             </Grid>
                         </GroupBox>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="auto" />
-                                <ColumnDefinition Width="auto" />
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                            </Grid.RowDefinitions>
-                        </Grid>
+                        <GroupBox x:Name="group_default_render" Header="Default Render Interface" Margin="4 4" Padding="8" >
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto" />
+                                    <ColumnDefinition Width="auto" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                </Grid.RowDefinitions>
+                                <Label Grid.Row="0" Grid.Column="0" Content="Name:" Style="{DynamicResource property_label_style}" />
+                                <TextBlock Grid.Row="0" Grid.Column="1" x:Name="render_interface_name" VerticalAlignment="Center" Text="{Binding FriendlyName}" />
+                                <Label Grid.Row="1" Grid.Column="0" Content="Type:" Style="{DynamicResource property_label_style}" />
+                                <TextBlock Grid.Row="1" Grid.Column="1" x:Name="render_interface_type" VerticalAlignment="Center" Text="{Binding DataFlow}" />
+                                <Label Grid.Row="2" Grid.Column="0" Content="State:" Style="{DynamicResource property_label_style}" />
+                                <TextBlock Grid.Row="2" Grid.Column="1" x:Name="render_interface_state" VerticalAlignment="Center" Text="{Binding State}" />
+                                <Label Grid.Row="3" Grid.Column="0" Content="Volume:" Style="{DynamicResource property_label_style}" />
+                                <TextBlock Grid.Row="3" Grid.Column="1" x:Name="render_interface_volume" VerticalAlignment="Center" Text="{Binding Volume,StringFormat={}{0}%}" />
+                                <Label Grid.Row="4" Grid.Column="0" Content="Muted:" Style="{DynamicResource property_label_style}" />
+                                <TextBlock Grid.Row="4" Grid.Column="1" x:Name="render_interface_muted" VerticalAlignment="Center" Text="{Binding Muted}" />
+                            </Grid>
+                        </GroupBox>
+                        <GroupBox x:Name="group_default_capture" Header="Default Capture Interface" Margin="4 4" Padding="8" Grid.ColumnSpan="2">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto" />
+                                    <ColumnDefinition Width="auto" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                </Grid.RowDefinitions>
+                                <Label Grid.Row="0" Grid.Column="0" Content="Name:" Style="{DynamicResource property_label_style}" />
+                                <TextBlock Grid.Row="0" Grid.Column="1" x:Name="capture_interface_name" VerticalAlignment="Center" Text="{Binding FriendlyName}" />
+                                <Label Grid.Row="1" Grid.Column="0" Content="Type:" Style="{DynamicResource property_label_style}" />
+                                <TextBlock Grid.Row="1" Grid.Column="1" x:Name="capture_interface_type" VerticalAlignment="Center" Text="{Binding DataFlow}" />
+                                <Label Grid.Row="2" Grid.Column="0" Content="State:" Style="{DynamicResource property_label_style}" />
+                                <TextBlock Grid.Row="2" Grid.Column="1" x:Name="capture_interface_state" VerticalAlignment="Center" Text="{Binding State}" />
+                                <Label Grid.Row="3" Grid.Column="0" Content="Volume:" Style="{DynamicResource property_label_style}" />
+                                <TextBlock Grid.Row="3" Grid.Column="1" x:Name="capture_interface_volume" VerticalAlignment="Center" Text="{Binding Volume,StringFormat={}{0}%}" />
+                                <Label Grid.Row="4" Grid.Column="0" Content="Muted:" Style="{DynamicResource property_label_style}" />
+                                <TextBlock Grid.Row="4" Grid.Column="1" x:Name="capture_interface_muted" VerticalAlignment="Center" Text="{Binding Muted}" />
+                            </Grid>
+                        </GroupBox>
                     </StackPanel>
                 </GroupBox>
-                <GroupBox x:Name="applications" Header="Applications" Grid.Column="3" Grid.Row="1" Margin="0,0,8,8" Padding="8" Grid.ColumnSpan="2">
+                <GroupBox x:Name="applications" Header="Applications" Grid.Column="3" Grid.Row="1" Margin="0 0 8 0" Padding="8" Grid.ColumnSpan="2" Grid.RowSpan="1">
                     <StackPanel Orientation="Vertical">
                         <StackPanel Orientation="Horizontal">
                             <Label x:Name="label_application" Content="_Application:" Target="{Binding ElementName=cb_applications}" VerticalAlignment="Center" Margin="0 0 8 0" />
@@ -130,7 +176,7 @@
                                 </ComboBox.ItemContainerStyle>
                             </ComboBox>
                         </StackPanel>
-                        <GroupBox x:Name="current_application" Header="Application" Margin="8" Padding="8" DataContext="{Binding ElementName=cb_applications, Path=SelectedItem}">
+                        <GroupBox x:Name="current_application" Header="Selected Application" Margin="8" Padding="8" DataContext="{Binding ElementName=cb_applications, Path=SelectedItem}">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="auto" />
@@ -144,74 +190,30 @@
                                     <RowDefinition />
                                     <RowDefinition />
                                 </Grid.RowDefinitions>
-                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding ProcessName}" />
-                                <TextBlock Grid.Row="1" Grid.Column="0" Text="PID:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Id}" />
-                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Main Window:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding MainWindowTitle}" />
-                                <TextBlock Grid.Row="3" Grid.Column="0" Text="Render Device:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                                <TextBlock Grid.Row="3" Grid.Column="1" x:Name="app_render" />
-                                <TextBlock Grid.Row="4" Grid.Column="0" Text="Capture Device:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                                <TextBlock Grid.Row="4" Grid.Column="1" x:Name="app_capture" />
-                                <Button Grid.Row="5" Grid.Column="0" Margin="0 8" Padding="4" Content="Use Interface for Console Audio" Click="BtnSetApplicationDefault_Click" MaxWidth="300" HorizontalAlignment="Left" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
+                                <Label Grid.Row="0" Grid.Column="0" Content="Name:" Style="{DynamicResource property_label_style}" />
+                                <TextBlock Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Text="{Binding ProcessName}" />
+                                <Label Grid.Row="1" Grid.Column="0" Content="PID:" Style="{DynamicResource property_label_style}" />
+                                <TextBlock Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Text="{Binding Id}" />
+                                <Label Grid.Row="2" Grid.Column="0" Content="Main Window:" Style="{DynamicResource property_label_style}" />
+                                <TextBlock Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Text="{Binding MainWindowTitle}" />
+                                <Label Grid.Row="3" Grid.Column="0" Content="Render Device:" Style="{DynamicResource property_label_style}" />
+                                <TextBlock Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" x:Name="app_render" />
+                                <Label Grid.Row="4" Grid.Column="0" Content="Capture Device:" Style="{DynamicResource property_label_style}" />
+                                <TextBlock Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" x:Name="app_capture" />
+                                <StackPanel Margin="4 8 4 4" HorizontalAlignment="Left" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal">
+                                    <Button Padding="4" Content="Use Selected Audio Interface" Click="BtnSetApplicationDefault_Click" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
+                                </StackPanel>
                             </Grid>
                         </GroupBox>
-                        <StackPanel Orientation="Horizontal" Grid.Row="5" Grid.Column="0" HorizontalAlignment="Left">
-                            <Button Margin="8 8" Padding="4" Content="Reset Custom Devices for All Apps" Click="BtnResetAllApplicationDefault_Click" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
-                            <Button Margin="8 8" Padding="4" Content="Toggle Custom Devices for All Apps" Click="BtnToggleAllApplicationDefault_Click" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
-                        </StackPanel>
+                        <GroupBox Header="Custom Audio Interfaces" Margin="8" Padding="8">
+                            <StackPanel Orientation="Horizontal">
+                            <StackPanel Orientation="Vertical">
+                                <Button Margin="8" Padding="4" Content="Reset for All Applications" Click="BtnResetAllApplicationDefault_Click" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
+                                <Button Margin="8" Padding="4" Content="Toggle for All Applications" Click="BtnToggleAllApplicationDefault_Click" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
+                            </StackPanel>
+                            </StackPanel>
+                        </GroupBox>
                     </StackPanel>
-                </GroupBox>
-                <GroupBox x:Name="group_default_render" Header="Default Render Interface" Grid.Column="1" Grid.Row="2" Margin="0,8,8,8" Padding="8" Grid.ColumnSpan="2">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="auto" />
-                            <ColumnDefinition Width="auto" />
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="auto" />
-                            <RowDefinition Height="auto" />
-                            <RowDefinition Height="auto" />
-                            <RowDefinition Height="auto" />
-                            <RowDefinition Height="auto" />
-                        </Grid.RowDefinitions>
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                        <TextBlock Grid.Row="0" Grid.Column="1" x:Name="render_interface_name" Text="{Binding FriendlyName}" />
-                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Type:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                        <TextBlock Grid.Row="1" Grid.Column="1" x:Name="render_interface_type" Text="{Binding DataFlow}" />
-                        <TextBlock Grid.Row="2" Grid.Column="0" Text="State:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                        <TextBlock Grid.Row="2" Grid.Column="1" x:Name="render_interface_state" Text="{Binding State}" />
-                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Volume:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                        <TextBlock Grid.Row="3" Grid.Column="1" x:Name="render_interface_volume" Text="{Binding Volume,StringFormat={}{0}%}" />
-                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Muted:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                        <TextBlock Grid.Row="4" Grid.Column="1" x:Name="render_interface_muted" Text="{Binding Muted}" />
-                    </Grid>
-                </GroupBox>
-                <GroupBox x:Name="group_default_capture" Header="Default Capture Interface" Grid.Column="3" Grid.Row="2" Margin="8" Padding="8" Grid.ColumnSpan="2">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="auto" />
-                            <ColumnDefinition Width="auto" />
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="auto" />
-                            <RowDefinition Height="auto" />
-                            <RowDefinition Height="auto" />
-                            <RowDefinition Height="auto" />
-                            <RowDefinition Height="auto" />
-                        </Grid.RowDefinitions>
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                        <TextBlock Grid.Row="0" Grid.Column="1" x:Name="capture_interface_name" Text="{Binding FriendlyName}" />
-                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Type:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                        <TextBlock Grid.Row="1" Grid.Column="1" x:Name="capture_interface_type" Text="{Binding DataFlow}" />
-                        <TextBlock Grid.Row="2" Grid.Column="0" Text="State:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                        <TextBlock Grid.Row="2" Grid.Column="1" x:Name="capture_interface_state" Text="{Binding State}" />
-                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Volume:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                        <TextBlock Grid.Row="3" Grid.Column="1" x:Name="capture_interface_volume" Text="{Binding Volume,StringFormat={}{0}%}" />
-                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Muted:" VerticalAlignment="Center" Margin="0 0 8 0" />
-                        <TextBlock Grid.Row="4" Grid.Column="1" x:Name="capture_interface_muted" Text="{Binding Muted}" />
-                    </Grid>
                 </GroupBox>
             </Grid>
         </StackPanel>
