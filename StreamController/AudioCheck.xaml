@@ -85,7 +85,6 @@
                         <ComboBox.ItemContainerStyle>
                             <Style TargetType="ComboBoxItem">
                                 <Setter Property="AutomationProperties.Name" Value="{Binding Name}" />
-                                <Setter Property="FocusVisualStyle" Value="{x:Static SystemParameters.FocusVisualStyleKey}" />
                             </Style>
                         </ComboBox.ItemContainerStyle>
                     </ComboBox>
