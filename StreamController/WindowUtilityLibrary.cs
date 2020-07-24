@@ -171,8 +171,13 @@ namespace uk.JohnCook.dotnet.StreamController
         /// Get the current user's preferred accent colour.
         /// </summary>
         /// <returns>Brush for user's preferred accent colour.</returns>
-        public static Brush AccentColor()
+        public static Brush WindowAccentColor()
         {
+            // In High Contrast mode, accents should disappear.
+            if (SystemParameters.HighContrast)
+            {
+                return SystemColors.WindowBrush;
+            }
             //  -> Choose your accent colour -> (Recent|Windows|Custom) colour(s)
             return SystemParameters.WindowGlassBrush;
         }
