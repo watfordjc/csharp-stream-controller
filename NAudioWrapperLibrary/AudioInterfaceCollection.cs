@@ -316,6 +316,9 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
         private void ProcessAdded(ObservableProcess process)
         {
             if (process == null) { throw new ArgumentNullException(nameof(process)); }
+            while (applicationDevicePreferences == null) {
+                Task.Delay(250);
+            }
 
             SharedModels.ApplicationDevicePreference applicationDevicePreference = applicationDevicePreferences.Applications.FirstOrDefault(x => x.Name == process.ProcessName);
             if (applicationDevicePreference == null)
