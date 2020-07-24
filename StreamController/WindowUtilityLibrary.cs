@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualBasic;
+using Microsoft.Win32;
 using System;
 using System.CodeDom;
 using System.Collections.Generic;
@@ -10,6 +11,8 @@ using System.Security.Principal;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
+using Windows.UI.ViewManagement;
 
 namespace uk.JohnCook.dotnet.StreamController
 {
@@ -18,7 +21,9 @@ namespace uk.JohnCook.dotnet.StreamController
     /// </summary>
     static class WindowUtilityLibrary
     {
-        /* Constants for Types of windows in the application. */
+        /// <summary>
+        /// Constants for Types of windows in the application.
+        /// </summary>
         public enum WindowType
         {
             MainWindow = 0,
@@ -100,6 +105,76 @@ namespace uk.JohnCook.dotnet.StreamController
         {
             Debug.Assert(enumTypeDictionary.ContainsKey(window), "Unrecognised window Type.");
             return enumTypeDictionary.GetValueOrDefault(window);
+        }
+
+        /// <summary>
+        /// Constants for Window theme categorisation.
+        /// </summary>
+        public enum WindowsTheme
+        {
+            Default = 0,
+            Light = 1,
+            Dark = 2,
+            HighContrast = 3
+        }
+
+        /// <summary>
+        /// Get the theme category for the current Windows Settings personalisation preferences.
+        /// </summary>
+        /// <param name="ApplicationTheme">Windows 10 Personalisation - true for default app mode, false for default Windows mode.</param>
+        /// <returns>The current theme category.</returns>
+        public static WindowsTheme CurrentWindowsTheme(bool applicationTheme)
+        {
+            // High Contrast is enabled
+            if (SystemParameters.HighContrast)
+            {
+                return WindowsTheme.HighContrast;
+            }
+            // Windows Settings -> Personalisation -> Colours
+            // -> Default Windows Mode; Default is Dark
+            else if (!applicationTheme)
+            {
+                return Registry.GetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize", "SystemUsesLightTheme", -1) switch
+                {
+                    0 => WindowsTheme.Dark,
+                    1 => WindowsTheme.Light,
+                    _ => WindowsTheme.Default
+                };
+            }
+            // -> Default App Mode; Default is Light
+            else if (applicationTheme)
+            {
+                return Registry.GetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize", "AppsUseLightTheme", -1) switch
+                {
+                    0 => WindowsTheme.Dark,
+                    1 => WindowsTheme.Light,
+                    _ => WindowsTheme.Default
+                };
+            }
+            else
+            {
+                return WindowsTheme.Default;
+            }
+        }
+
+        /// <summary>
+        /// Get the default theme category for Default Windows Mode or Default App Mode
+        /// </summary>
+        /// <param name="applicationTheme">Windows 10 Personalisation - true for default app mode, false for default Windows mode.</param>
+        /// <returns>The default theme category for the specified mode.</returns>
+        public static WindowsTheme DefaultTheme(bool applicationTheme)
+        {
+            return applicationTheme ? WindowsTheme.Light : WindowsTheme.Dark;
+        }
+
+        /// <summary>
+        /// Get the current user's preferred accent colour.
+        /// </summary>
+        /// <returns>Brush for user's preferred accent colour.</returns>
+        public static Brush AccentColor()
+        {
+            //  -> Choose your accent colour -> (Recent|Windows|Custom) colour(s)
+            return SystemParameters.WindowGlassBrush;
         }
 
         /// <summary>
