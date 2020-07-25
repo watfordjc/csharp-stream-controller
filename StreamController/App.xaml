@@ -4,6 +4,11 @@
              xmlns:local="clr-namespace:uk.JohnCook.dotnet.StreamController"
              StartupUri="AudioCheck.xaml">
     <Application.Resources>
-        <ResourceDictionary Source="Properties\Menus.xaml" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Properties\Templates\ContextMenuTemplate.xaml" />
+                <ResourceDictionary Source="Properties\Menus.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>
