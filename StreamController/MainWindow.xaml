@@ -98,7 +98,7 @@
                                     <Label Grid.Row="4" Grid.Column="0" x:Name="label_interface_muted" Content="Muted:" Style="{DynamicResource property_label_style}" Visibility="{Binding IsActive, Converter={StaticResource BoolToVisibility}}" />
                                     <TextBlock Grid.Row="4" Grid.Column="1" x:Name="interface_muted" VerticalAlignment="Center" Text="{Binding Muted}" Visibility="{Binding IsActive, Converter={StaticResource BoolToVisibility}}" />
                                     <StackPanel Margin="4 8 4 4" HorizontalAlignment="Left" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal">
-                                        <Button x:Name="btnMakeDefaultRender" Padding="4" Content="Make Default" Visibility="{Binding IsActive, Converter={StaticResource BoolToVisibility}}" Click="BtnMakeDefaultRender_Click" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
+                                        <Button x:Name="btnMakeDefaultRender" Padding="4" Content="Make Default" Visibility="{Binding IsActive, Converter={StaticResource BoolToVisibility}}" Click="BtnMakeDefaultRender_Click" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" AutomationProperties.AcceleratorKey="Ctrl+m" />
                                     </StackPanel>
                                 </Grid>
                             </GroupBox>
@@ -209,15 +209,15 @@
                                     <Label Grid.Row="4" Grid.Column="0" Content="Capture Device:" Style="{DynamicResource property_label_style}" />
                                     <TextBlock Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" x:Name="app_capture" />
                                     <StackPanel Margin="4 8 4 4" HorizontalAlignment="Left" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal">
-                                        <Button Padding="4" Content="Use Selected Audio Interface" Click="BtnSetApplicationDefault_Click" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
+                                        <Button Padding="4" Content="Use Selected Audio Interface" Click="BtnSetApplicationDefault_Click" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" AutomationProperties.AcceleratorKey="Ctrl+u" />
                                     </StackPanel>
                                 </Grid>
                             </GroupBox>
                             <GroupBox Header="Custom Audio Interfaces" Margin="8" Padding="8">
                                 <StackPanel Orientation="Horizontal">
                                     <StackPanel Orientation="Vertical">
-                                        <Button Margin="8" Padding="4" Content="Reset for All Applications" Click="BtnResetAllApplicationDefault_Click" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
-                                        <Button Margin="8" Padding="4" Content="Toggle for All Applications" Click="BtnToggleAllApplicationDefault_Click" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
+                                        <Button Margin="8" Padding="4" Content="Reset for All Applications" Click="BtnResetAllApplicationDefault_Click" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" AutomationProperties.AcceleratorKey="Ctrl+F5" />
+                                        <Button Margin="8" Padding="4" Content="Toggle for All Applications" Click="BtnToggleAllApplicationDefault_Click" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" AutomationProperties.AcceleratorKey="Ctrl+t" />
                                     </StackPanel>
                                 </StackPanel>
                             </GroupBox>

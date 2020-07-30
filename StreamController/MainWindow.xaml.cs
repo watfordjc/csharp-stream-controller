@@ -101,12 +101,12 @@ namespace uk.JohnCook.dotnet.StreamController
             }
         }
 
-        private void BtnMakeDefaultRender_Click(object sender, RoutedEventArgs e)
+        private void MakeInterfaceDefaultRenderDevice()
         {
             AudioInterfaceCollection.ChangeDefaultDevice((cb_interfaces.SelectedItem as AudioInterface).ID);
         }
 
-        private void BtnSetApplicationDefault_Click(object sender, RoutedEventArgs e)
+        private void SetApplicationDefaultDevice()
         {
             ObservableProcess process = (cb_applications.SelectedItem as ObservableProcess);
             AudioInterface currentInterface = (cb_interfaces.SelectedItem as AudioInterface);
@@ -114,22 +114,42 @@ namespace uk.JohnCook.dotnet.StreamController
             UpdateApplicationAudioDevices(process);
         }
 
-        private void BtnResetAllApplicationDefault_Click(object sender, RoutedEventArgs e)
+        private void ResetCustomAudioDevices()
         {
             AudioInterfaceCollection.ClearAllApplicationDefaultDevices(DataFlow.All);
             UpdateApplicationAudioDevices(cb_applications.SelectedItem as ObservableProcess);
         }
 
-        private async void BtnToggleAllApplicationDefault_Click(object sender, RoutedEventArgs e)
+        private static async Task ToggleAllCustomAudioDevices()
         {
-            (e.OriginalSource as Button).IsEnabled = false;
             await Task.Run(
                 () => AudioInterfaceCollection.ToggleAllDefaultApplicationDevice()
                 ).ConfigureAwait(true);
+        }
+
+        private void BtnMakeDefaultRender_Click(object sender, RoutedEventArgs e)
+        {
+            MakeInterfaceDefaultRenderDevice();
+        }
+
+        private void BtnSetApplicationDefault_Click(object sender, RoutedEventArgs e)
+        {
+            SetApplicationDefaultDevice();
+        }
+
+        private void BtnResetAllApplicationDefault_Click(object sender, RoutedEventArgs e)
+        {
+            ResetCustomAudioDevices();
+        }
+
+        private async void BtnToggleAllApplicationDefault_Click(object sender, RoutedEventArgs e)
+        {
+            (e.OriginalSource as Button).IsEnabled = false;
+            await ToggleAllCustomAudioDevices().ConfigureAwait(true);
             (e.OriginalSource as Button).IsEnabled = true;
         }
 
-        private void Window_KeyDown(object sender, KeyEventArgs e)
+        private async void Window_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.F4)
             {
@@ -137,6 +157,34 @@ namespace uk.JohnCook.dotnet.StreamController
                     && (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)))
                 {
                     App.Current.Shutdown();
+                }
+            }
+            else if (e.Key == Key.F5)
+            {
+                if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+                {
+                    ResetCustomAudioDevices();
+                }
+            }
+            else if (e.Key == Key.M)
+            {
+                if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+                {
+                    MakeInterfaceDefaultRenderDevice();
+                }
+            }
+            else if (e.Key == Key.T)
+            {
+                if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+                {
+                    await ToggleAllCustomAudioDevices().ConfigureAwait(true);
+                }
+            }
+            else if (e.Key == Key.U)
+            {
+                if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+                {
+                    SetApplicationDefaultDevice();
                 }
             }
         }
