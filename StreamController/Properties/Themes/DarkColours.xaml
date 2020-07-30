@@ -1,0 +1,34 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:uk.JohnCook.dotnet.StreamController.Properties">
+
+    <SolidColorBrush x:Key="Menu.Static.Background" Color="#FF434343" />
+    <SolidColorBrush x:Key="Menu.Static.Border" Color="#FF999999" />
+    <SolidColorBrush x:Key="Menu.Static.Foreground" Color="LightGray" />
+
+    <SolidColorBrush x:Key="Menu.Static.Separator" Color="#FFD7D7D7" />
+
+    <SolidColorBrush x:Key="Menu.Disabled.Background" Color="#3DDADADA" />
+    <SolidColorBrush x:Key="Menu.Disabled.Border" Color="#FFDADADA" />
+    <SolidColorBrush x:Key="Menu.Disabled.Foreground" Color="#FF707070" />
+
+    <SolidColorBrush x:Key="MenuItem.Selected.Background" Color="#FF434343" />
+    <SolidColorBrush x:Key="MenuItem.Selected.Border" Color="LightGoldenrodYellow" />
+    <SolidColorBrush x:Key="MenuItem.Selected.Foreground" Color="White" />
+
+    <SolidColorBrush x:Key="MenuItem.Highlight.Background" Color="#FF606060" />
+    <SolidColorBrush x:Key="MenuItem.Highlight.Border" Color="LightGoldenrodYellow" />
+    <SolidColorBrush x:Key="MenuItem.Highlight.Foreground" Color="White" />
+
+    <SolidColorBrush x:Key="MenuItem.Highlight.Disabled.Background" Color="#0A000000" />
+    <SolidColorBrush x:Key="MenuItem.Highlight.Disabled.Border" Color="#21000000" />
+
+    <SolidColorBrush x:Key="ContextMenu.Static.Background" Color="#FF434343" />
+    <SolidColorBrush x:Key="ContextMenu.Static.BorderBrush" Color="#FF959595" />
+    <SolidColorBrush x:Key="ContextMenu.Static.Foreground" Color="{DynamicResource {DynamicResource Menu.Static.Foreground}}" />
+    <SolidColorBrush x:Key="ContextMenu.Static.Rectangle1" Color="#FF444444" />
+    <SolidColorBrush x:Key="ContextMenu.Static.Rectangle2" Color="#FF3F3F3F" />
+    <SolidColorBrush x:Key="ContextMenu.Static.Rectangle3" Color="#FF434343" />
+
+</ResourceDictionary>
+    
