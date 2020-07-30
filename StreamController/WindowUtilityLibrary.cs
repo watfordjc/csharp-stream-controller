@@ -212,7 +212,7 @@ namespace uk.JohnCook.dotnet.StreamController
             return true;
         }
 
-        public static Collection<ResourceDictionary> GetStyledResourceDictionary(WindowsTheme windowsTheme)
+        public static ResourceDictionary GetStyledResourceDictionary(WindowsTheme windowsTheme)
         {
             ResourceDictionary windowDictionary = new ResourceDictionary();
 
@@ -234,7 +234,7 @@ namespace uk.JohnCook.dotnet.StreamController
                 }
             });
 
-            return windowDictionary.MergedDictionaries;
+            return windowDictionary;
         }
     }
 }

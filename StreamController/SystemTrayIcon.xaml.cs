@@ -12,36 +12,46 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using uk.JohnCook.dotnet.NAudioWrapperLibrary;
+using uk.JohnCook.dotnet.StreamController.Controls;
 
 namespace uk.JohnCook.dotnet.StreamController
 {
     /// <summary>
     /// Interaction logic for SystemTrayIcon.xaml
     /// </summary>
-    public partial class SystemTrayIcon : Window, IDisposable
+    public partial class SystemTrayIcon : StyledWindow, IDisposable
     {
         private bool disposedValue;
         public static SystemTrayIcon Instance { get { return lazySingleton.Value; } }
 
-        private static readonly Lazy<SystemTrayIcon> lazySingleton =
+        private static Lazy<SystemTrayIcon> lazySingleton =
         new Lazy<SystemTrayIcon>(
-            () => new SystemTrayIcon()
+            () => new SystemTrayIcon(false)
         );
 
-        public SystemTrayIcon()
+        public SystemTrayIcon(bool applicationWindow) : base(applicationWindow)
         {
-            WindowUtilityLibrary.WindowsTheme applicableTheme = WindowUtilityLibrary.CurrentWindowsTheme(false);
-            if (applicableTheme == WindowUtilityLibrary.WindowsTheme.Default)
-            {
-                applicableTheme = WindowUtilityLibrary.DefaultTheme(false);
-            }
-            foreach (ResourceDictionary dictionary in WindowUtilityLibrary.GetStyledResourceDictionary(applicableTheme))
-            {
-                Resources.MergedDictionaries.Add(dictionary);
-            }
             InitializeComponent();
+            ThemeChanged += SystemTrayIcon_ThemeChanged;
             AudioInterfaceCollection.Instance.CollectionEnumerated += Devices_CollectionEnumerated;
             NotifyIcon.TrayMouseDoubleClick += NotifyIcon_TrayMouseDoubleClick;
+        }
+
+        private void SystemTrayIcon_ThemeChanged(object sender, EventArgs e)
+        {
+            SystemTrayIcon oldWindow = Instance;
+            oldWindow.NotifyIcon.Visibility = Visibility.Hidden;
+            oldWindow.Close();
+
+            lazySingleton = new Lazy<SystemTrayIcon>(
+                () => new SystemTrayIcon(false)
+            );
+            Instance.UpdateTrayIcon();
+            if (AudioInterfaceCollection.Instance.DevicesAreEnumerated)
+            {
+                Instance.Devices_CollectionEnumerated(this, EventArgs.Empty);
+            }
+            oldWindow.Dispose();
         }
 
         private void NotifyIcon_TrayMouseDoubleClick(object sender, RoutedEventArgs e)
