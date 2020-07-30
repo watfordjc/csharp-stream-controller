@@ -3,6 +3,7 @@ using Microsoft.Win32;
 using System;
 using System.CodeDom;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -19,7 +20,7 @@ namespace uk.JohnCook.dotnet.StreamController
     /// <summary>
     /// A utility library for Window objects within the Application.
     /// </summary>
-    static class WindowUtilityLibrary
+    public static class WindowUtilityLibrary
     {
         /// <summary>
         /// Constants for Types of windows in the application.
@@ -209,6 +210,31 @@ namespace uk.JohnCook.dotnet.StreamController
                 }
             }
             return true;
+        }
+
+        public static Collection<ResourceDictionary> GetStyledResourceDictionary(WindowsTheme windowsTheme)
+        {
+            ResourceDictionary windowDictionary = new ResourceDictionary();
+
+            windowDictionary.MergedDictionaries.Add(new ResourceDictionary()
+            {
+                Source = windowsTheme switch
+                {
+                    WindowsTheme.Dark => new Uri(@"Properties/Themes/DarkColours.xaml", UriKind.Relative),
+                    _ => new Uri(@"Properties/Themes/LightColours.xaml", UriKind.Relative)
+                }
+            });
+
+            windowDictionary.MergedDictionaries.Add(new ResourceDictionary()
+            {
+                Source = windowsTheme switch
+                {
+                    WindowsTheme.Dark => new Uri(@"Properties/Themes/DarkTheme.xaml", UriKind.Relative),
+                    _ => new Uri(@"Properties/Themes/LightTheme.xaml", UriKind.Relative)
+                }
+            });
+
+            return windowDictionary.MergedDictionaries;
         }
     }
 }
