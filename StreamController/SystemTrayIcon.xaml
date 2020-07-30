@@ -18,7 +18,7 @@
             Visibility="Collapsed"
             MenuActivation="RightClick">
             <tb:TaskbarIcon.ContextMenu>
-                <ContextMenu x:Name="contextMenu" Opened="contextMenu_Opened" Style="{StaticResource ContextMenuStyle}">
+                <ContextMenu x:Name="contextMenu" Style="{StaticResource ContextMenuStyle}">
                     <MenuItem Header="Default _Render" x:Name="taskbarRenderMenu" Padding="2 7" Style="{StaticResource MenuItemStyle}">
                         <MenuItem.ItemTemplate>
                             <DataTemplate DataType="MenuItem">
