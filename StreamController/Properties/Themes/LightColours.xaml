@@ -24,4 +24,13 @@
     <SolidColorBrush x:Key="MenuItem.Highlight.Disabled.Background" Color="#0A000000" />
     <SolidColorBrush x:Key="MenuItem.Highlight.Disabled.Border" Color="#21000000" />
 
+    <!-- Context Menu -->
+
+    <SolidColorBrush x:Key="ContextMenu.Static.Background" Color="#FFF5F5F5" />
+    <SolidColorBrush x:Key="ContextMenu.Static.BorderBrush" Color="#FF959595" />
+    <SolidColorBrush x:Key="ContextMenu.Static.Foreground" Color="{DynamicResource {x:Static SystemColors.MenuTextColorKey}}" />
+    <SolidColorBrush x:Key="ContextMenu.Static.Rectangle1" Color="#F1F1F1" />
+    <SolidColorBrush x:Key="ContextMenu.Static.Rectangle2" Color="#E2E3E3" />
+    <SolidColorBrush x:Key="ContextMenu.Static.Rectangle3" Color="White" />
+
 </ResourceDictionary>

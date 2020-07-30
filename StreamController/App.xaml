@@ -6,7 +6,6 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Properties\Templates\ContextMenuTemplate.xaml" />
                 <ResourceDictionary Source="Properties\Menus.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
