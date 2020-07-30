@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
@@ -40,6 +41,8 @@ namespace uk.JohnCook.dotnet.StreamController.Controls
             CurrentTheme = GetApplicableTheme();
             CreateResourceDictionary();
             SystemEvents.UserPreferenceChanged += SystemEvents_UserPreferenceChanged;
+            FontSize = ((Int32)App.Current.Resources["DpiX"]) / 96.0 * SystemFonts.MessageFontSize;
+            FontFamily = SystemFonts.MessageFontFamily;
         }
 
         /// <summary>
@@ -48,6 +51,12 @@ namespace uk.JohnCook.dotnet.StreamController.Controls
         static StyledWindow()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(StyledWindow), new FrameworkPropertyMetadata(typeof(StyledWindow)));
+
+            PropertyInfo dpiXProperty = typeof(SystemParameters).GetProperty("DpiX", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            PropertyInfo dpiYProperty = typeof(SystemParameters).GetProperty("Dpi", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            App.Current.Resources["DpiX"] = dpiXProperty.GetValue(null, null);
+            App.Current.Resources["DpiY"] = dpiYProperty.GetValue(null, null);
         }
 
         /// <summary>

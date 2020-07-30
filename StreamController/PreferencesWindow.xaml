@@ -7,10 +7,9 @@
         xmlns:controls="clr-namespace:uk.JohnCook.dotnet.StreamController.Controls"
         xmlns:v="clr-namespace:uk.JohnCook.dotnet.StreamController.ValidationRules"
         mc:Ignorable="d"
-        FontFamily="Open Sans"
-        FontSize="12"
         KeyDown="Window_KeyDown"
-        Title="Preferences" Width="600" MinWidth="600" Height="600" MinHeight="600">
+        SizeToContent="WidthAndHeight"
+        Title="Preferences" MinWidth="600" MinHeight="600">
     <Window.DataContext>
         <local:Preferences />
     </Window.DataContext>
@@ -47,9 +46,9 @@
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="16" />
             </Grid.RowDefinitions>
-            <GroupBox Header="OBS-websocket" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Padding="8">
+            <GroupBox Header="OBS-websocket" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Padding="4">
                 <StackPanel Orientation="Vertical">
-                    <GroupBox Header="Server URI" Margin="8" Padding="8">
+                    <GroupBox Header="Server URI" Margin="4" Padding="4">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="auto" />
@@ -63,9 +62,9 @@
                                 <RowDefinition Height="auto" />
                                 <RowDefinition Height="auto" />
                             </Grid.RowDefinitions>
-                            <Label Grid.Row="0" Grid.Column="0" x:Name="scheme_label" Content="_Scheme:" Target="{Binding ElementName=cbUriProtocol}" Margin="8 8 2 8" VerticalAlignment="Center" />
+                            <Label Grid.Row="0" Grid.Column="0" x:Name="scheme_label" Content="_Scheme:" Target="{Binding ElementName=cbUriProtocol}" Margin="8 4 2 4" VerticalAlignment="Center" />
                             <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
-                                <ComboBox SelectedIndex="0" AutomationProperties.LabeledBy="{Binding ElementName=scheme_label}" Margin="2 8 8 8" Padding="6" MinWidth="50" VerticalContentAlignment="Center" x:Name="cbUriProtocol" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
+                                <ComboBox SelectedIndex="0" AutomationProperties.LabeledBy="{Binding ElementName=scheme_label}" Margin="2 4 8 4" Padding="5" MinWidth="50" VerticalContentAlignment="Center" x:Name="cbUriProtocol" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
                                     <ComboBoxItem Content="ws" />
                                     <ComboBoxItem Content="wss" />
                                     <ComboBox.SelectedItem>
@@ -76,7 +75,7 @@
                                         </Binding>
                                     </ComboBox.SelectedItem>
                                 </ComboBox>
-                                <TextBlock VerticalAlignment="Center" Margin="8 4 8 8" Foreground="Red" FontWeight="SemiBold" AutomationProperties.LiveSetting="Polite" IsVisibleChanged="ValidationErrorTextBlock_IsVisibleChanged">
+                                <TextBlock VerticalAlignment="Center" Margin="8 4 8 4" Foreground="Red" FontWeight="SemiBold" AutomationProperties.LiveSetting="Polite" IsVisibleChanged="ValidationErrorTextBlock_IsVisibleChanged">
                                     <TextBlock.Style>
                                         <Style TargetType="TextBlock">
                                             <Style.Triggers>
@@ -92,8 +91,8 @@
                                     </TextBlock.Style>
                                 </TextBlock>
                             </StackPanel>
-                            <Label Grid.Column="0" Grid.Row="1" x:Name="hostname_label" Content="_Hostname:" Target="{Binding ElementName=tbUriHostname}" VerticalAlignment="Center" Margin="8 8 2 8" />
-                            <TextBox Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" AutomationProperties.LabeledBy="{Binding ElementName=hostname_label}" VerticalAlignment="Center"  Margin="2 8 2 8" Padding="6" MinWidth="200" x:Name="tbUriHostname" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
+                            <Label Grid.Column="0" Grid.Row="1" x:Name="hostname_label" Content="_Hostname:" Target="{Binding ElementName=tbUriHostname}" VerticalAlignment="Center" Margin="8 4 2 4" />
+                            <TextBox Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" AutomationProperties.LabeledBy="{Binding ElementName=hostname_label}" VerticalAlignment="Center"  Margin="2 4 2 4" Padding="5" MinWidth="200" x:Name="tbUriHostname" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
                                 <TextBox.Text>
                                     <Binding Path="obs_uri_host" UpdateSourceTrigger="PropertyChanged" Source="{x:Static local:Preferences.Default}" Mode="TwoWay">
                                         <Binding.ValidationRules>
@@ -102,7 +101,7 @@
                                     </Binding>
                                 </TextBox.Text>
                             </TextBox>
-                            <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Margin="8 4 8 8" Foreground="Red" FontWeight="SemiBold" AutomationProperties.LiveSetting="Polite" IsVisibleChanged="ValidationErrorTextBlock_IsVisibleChanged">
+                            <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Margin="8 4 4 4" Foreground="Red" FontWeight="SemiBold" AutomationProperties.LiveSetting="Polite" IsVisibleChanged="ValidationErrorTextBlock_IsVisibleChanged">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
                                         <Style.Triggers>
@@ -117,9 +116,9 @@
                                     </Style>
                                 </TextBlock.Style>
                             </TextBlock>
-                            <Label Grid.Row="3" Grid.Column="0" x:Name="port_label" Content="_Port:" Target="{Binding ElementName=tbUriPort}" VerticalAlignment="Center" Margin="8 8 2 8" />
+                            <Label Grid.Row="3" Grid.Column="0" x:Name="port_label" Content="_Port:" Target="{Binding ElementName=tbUriPort}" VerticalAlignment="Center" Margin="8 4 2 4" />
                             <StackPanel Grid.Row="3" Grid.Column="1"  Orientation="Horizontal">
-                                <TextBox AutomationProperties.LabeledBy="{Binding ElementName=port_label}" TextAlignment="Center" VerticalAlignment="Center" MinWidth="60" Padding="6" Margin="2 8 8 8" x:Name="tbUriPort" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
+                                <TextBox AutomationProperties.LabeledBy="{Binding ElementName=port_label}" TextAlignment="Center" VerticalAlignment="Center" MinWidth="60" Padding="5" Margin="2 4 8 4" x:Name="tbUriPort" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
                                     <TextBox.Text>
                                         <Binding Path="obs_uri_port" UpdateSourceTrigger="PropertyChanged" Source="{x:Static local:Preferences.Default}" Mode="TwoWay">
                                             <Binding.ValidationRules>
@@ -128,7 +127,7 @@
                                         </Binding>
                                     </TextBox.Text>
                                 </TextBox>
-                                <TextBlock VerticalAlignment="Center" Margin="8 4 8 8" Foreground="Red" FontWeight="SemiBold" AutomationProperties.LiveSetting="Polite" IsVisibleChanged="ValidationErrorTextBlock_IsVisibleChanged">
+                                <TextBlock VerticalAlignment="Center" Margin="4 4 8 4" Foreground="Red" FontWeight="SemiBold" AutomationProperties.LiveSetting="Polite" IsVisibleChanged="ValidationErrorTextBlock_IsVisibleChanged">
                                     <TextBlock.Style>
                                         <Style TargetType="TextBlock">
                                             <Style.Triggers>
@@ -147,14 +146,14 @@
                         </Grid>
                     </GroupBox>
                     <StackPanel Orientation="Horizontal">
-                        <CheckBox Content="_Use Password:" Margin="8" Padding="6" VerticalContentAlignment="Center" VerticalAlignment="Center" x:Name="cbUsePassword" IsChecked="{Binding Path=obs_use_password, Source={x:Static local:Preferences.Default}, Mode=OneWay}" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
-                        <PasswordBox AutomationProperties.Name="Password" MinWidth="160" PasswordChar="_" x:Name="pbPassword" Margin="0 8" Padding="6" IsEnabled="{Binding ElementName=cbUsePassword, Path=IsChecked}" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
+                        <CheckBox Content="_Use Password:" Margin="8 6" Padding="5" VerticalContentAlignment="Center" VerticalAlignment="Center" x:Name="cbUsePassword" IsChecked="{Binding Path=obs_use_password, Source={x:Static local:Preferences.Default}, Mode=OneWay}" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
+                        <PasswordBox AutomationProperties.Name="Password" MinWidth="160" PasswordChar="_" x:Name="pbPassword" Margin="0 6" Padding="5" IsEnabled="{Binding ElementName=cbUsePassword, Path=IsChecked}" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <CheckBox Content="_Connect on Launch" VerticalContentAlignment="Center" Margin="8" Padding="6" x:Name="cbConnectLaunch" IsChecked="{Binding Path=obs_connect_launch, Source={x:Static local:Preferences.Default}, Mode=TwoWay}" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
-                        <CheckBox Content="Automatically _Reconnect" VerticalContentAlignment="Center" Margin="8" Padding="6" x:Name="cbAutoReconnect" IsChecked="{Binding Path=obs_auto_reconnect, Source={x:Static local:Preferences.Default}, Mode=TwoWay}" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
+                        <CheckBox Content="_Connect on Launch" VerticalContentAlignment="Center" Margin="8 6" Padding="5" x:Name="cbConnectLaunch" IsChecked="{Binding Path=obs_connect_launch, Source={x:Static local:Preferences.Default}, Mode=TwoWay}" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
+                        <CheckBox Content="Automatically _Reconnect" VerticalContentAlignment="Center" Margin="8 6" Padding="5" x:Name="cbAutoReconnect" IsChecked="{Binding Path=obs_auto_reconnect, Source={x:Static local:Preferences.Default}, Mode=TwoWay}" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
                     </StackPanel>
-                    <GroupBox Header="Exponential Back-off" Margin="8">
+                    <GroupBox Header="Exponential Back-off" Margin="8 4">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
@@ -167,8 +166,8 @@
                                 <RowDefinition Height="auto" />
                                 <RowDefinition Height="auto" />
                             </Grid.RowDefinitions>
-                            <Label x:Name="minBackoffLabel" Grid.Row="0" Grid.Column="0" Content="_Delay in seconds between 1st and 2nd connection attempt:" Target="{Binding ElementName=tbBackoffMin}" Margin="2 8" VerticalAlignment="Center" />
-                            <TextBox AutomationProperties.Name="First reconnect delay in seconds" Grid.Row="0" Grid.Column="1"  Margin="2 8" VerticalAlignment="Center" Width="40" Padding="6" TextAlignment="Right" x:Name="tbBackoffMin" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
+                            <Label x:Name="minBackoffLabel" Grid.Row="0" Grid.Column="0" Content="_Delay in seconds between 1st and 2nd connection attempt:" Target="{Binding ElementName=tbBackoffMin}" Margin="2 4" VerticalAlignment="Center" />
+                            <TextBox AutomationProperties.Name="First reconnect delay in seconds" Grid.Row="0" Grid.Column="1"  Margin="2 4" VerticalAlignment="Center" Width="40" Padding="5" TextAlignment="Right" x:Name="tbBackoffMin" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
                                 <TextBox.Text>
                                     <Binding Path="obs_reconnect_min_seconds" UpdateSourceTrigger="PropertyChanged" Source="{x:Static local:Preferences.Default}" Mode="TwoWay">
                                         <Binding.ValidationRules>
@@ -177,8 +176,8 @@
                                     </Binding>
                                 </TextBox.Text>
                             </TextBox>
-                            <TextBlock Grid.Row="0" Grid.Column="2" Text="seconds" Margin="2 8" VerticalAlignment="Center" />
-                            <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" TextAlignment="Right" Margin="8 4 8 8" Foreground="Red" FontWeight="SemiBold" AutomationProperties.LiveSetting="Polite" IsVisibleChanged="ValidationErrorTextBlock_IsVisibleChanged">
+                            <TextBlock Grid.Row="0" Grid.Column="2" Text="seconds" Margin="2 4" VerticalAlignment="Center" />
+                            <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" TextAlignment="Right" Margin="8 2 8 4" Foreground="Red" FontWeight="SemiBold" AutomationProperties.LiveSetting="Polite" IsVisibleChanged="ValidationErrorTextBlock_IsVisibleChanged">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
                                         <Style.Triggers>
@@ -193,8 +192,8 @@
                                     </Style>
                                 </TextBlock.Style>
                             </TextBlock>
-                            <Label x:Name="maxBackoffLabel" Grid.Row="2" Grid.Column="0" Content="_Maximum delay in minutes between connection attempts:" Target="{Binding ElementName=tbBackoffMax}" Margin="2 8" VerticalAlignment="Center" />
-                            <TextBox AutomationProperties.Name="Maximum reconnect delay in minutes" Grid.Row="2" Grid.Column="1" Margin="2 8" VerticalAlignment="Center" Width="40" Padding="6" TextAlignment="Right" x:Name="tbBackoffMax" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
+                            <Label x:Name="maxBackoffLabel" Grid.Row="2" Grid.Column="0" Content="_Maximum delay in minutes between connection attempts:" Target="{Binding ElementName=tbBackoffMax}" Margin="2 4" VerticalAlignment="Center" />
+                            <TextBox AutomationProperties.Name="Maximum reconnect delay in minutes" Grid.Row="2" Grid.Column="1" Margin="2 4" VerticalAlignment="Center" Width="40" Padding="5" TextAlignment="Right" x:Name="tbBackoffMax" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
                                 <TextBox.Text>
                                     <Binding Path="obs_reconnect_max_minutes" UpdateSourceTrigger="PropertyChanged" Source="{x:Static local:Preferences.Default}" Mode="TwoWay">
                                         <Binding.ValidationRules>
@@ -203,8 +202,8 @@
                                     </Binding>
                                 </TextBox.Text>
                             </TextBox>
-                            <TextBlock Grid.Row="2" Grid.Column="2" Text="minutes" Margin="2 8" VerticalAlignment="Center" />
-                            <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" TextAlignment="Right" Margin="8 4 8 8" Foreground="Red" FontWeight="SemiBold" AutomationProperties.LiveSetting="Polite" IsVisibleChanged="ValidationErrorTextBlock_IsVisibleChanged">
+                            <TextBlock Grid.Row="2" Grid.Column="2" Text="minutes" Margin="2 4" VerticalAlignment="Center" />
+                            <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" TextAlignment="Right" Margin="8 2 8 4" Foreground="Red" FontWeight="SemiBold" AutomationProperties.LiveSetting="Polite" IsVisibleChanged="ValidationErrorTextBlock_IsVisibleChanged">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
                                         <Style.Triggers>
@@ -222,13 +221,13 @@
                         </Grid>
                     </GroupBox>
                     <StackPanel Orientation="Horizontal">
-                        <CheckBox Content="_Auto-scroll" VerticalContentAlignment="Center" Padding="6" Margin="8" x:Name="cbAutoscroll" IsChecked="{Binding Path=obs_autoscroll, Source={x:Static local:Preferences.Default}, Mode=TwoWay}" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
+                        <CheckBox Content="_Auto-scroll" VerticalContentAlignment="Center" Padding="6" Margin="8 6" x:Name="cbAutoscroll" IsChecked="{Binding Path=obs_autoscroll, Source={x:Static local:Preferences.Default}, Mode=TwoWay}" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
                     </StackPanel>
                 </StackPanel>
             </GroupBox>
-            <StackPanel Margin="0 8 0 0" HorizontalAlignment="Right" Orientation="Horizontal" Grid.Row="2" Grid.Column="2" >
+            <StackPanel Margin="0 12 0 0" HorizontalAlignment="Right" Orientation="Horizontal" Grid.Row="2" Grid.Column="2" >
                 <TextBlock Margin="16 0" FontWeight="SemiBold" Foreground="Red" VerticalAlignment="Center" HorizontalAlignment="Right" Grid.Row="0" Grid.Column="1" x:Name="save_validation_error" AutomationProperties.LiveSetting="Polite" Text="The last save attempt failed as there were errors above." Visibility="Hidden" />
-                <Button x:Name="save_button" Content="Save" Padding="9 6" Click="SaveButton_Click" AutomationProperties.AcceleratorKey="Ctrl+s" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
+                <Button x:Name="save_button" Content="Save" Padding="7 4" Click="SaveButton_Click" AutomationProperties.AcceleratorKey="Ctrl+s" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
             </StackPanel>
         </Grid>
     </ScrollViewer>

@@ -6,12 +6,11 @@
         xmlns:local="clr-namespace:uk.JohnCook.dotnet.StreamController"
         xmlns:controls="clr-namespace:uk.JohnCook.dotnet.StreamController.Controls"
         mc:Ignorable="d"
-        FontFamily="Open Sans"
-        FontSize="14"
         ContentRendered="Window_ContentRendered"
         Closed="Window_Closed"
         KeyDown="Window_KeyDown"
-        Title="AudioCheck" Height="450" Width="800">
+        SizeToContent="WidthAndHeight"
+        Title="AudioCheck" MinHeight="450" MinWidth="800">
     <Window.Resources>
         <Style x:Key="{x:Static SystemParameters.FocusVisualStyleKey}" BasedOn="{StaticResource ResourceKey={x:Static SystemParameters.FocusVisualStyleKey}}">
             <Style.Triggers>

@@ -9,8 +9,6 @@
         xmlns:controls="clr-namespace:uk.JohnCook.dotnet.StreamController.Controls"
         mc:Ignorable="d"
         Visibility="Collapsed"
-        FontFamily="Open Sans"
-        FontSize="12"
         Title="SystemTrayIcon" Height="450" Width="800">
     <Grid>
         <tb:TaskbarIcon
