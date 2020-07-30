@@ -64,6 +64,8 @@
     <Resource Include="Properties\Themes\DarkTheme.xaml" />
     <Resource Include="Properties\Themes\LightColours.xaml" />
     <Resource Include="Properties\Themes\LightTheme.xaml" />
+    <Resource Include="Properties\Themes\HighContrastColours.xaml" />
+    <Resource Include="Properties\Themes\HighContrastTheme.xaml" />
     <Resource Include="Properties\Templates\ContextMenuTemplate.xaml" />
     <Resource Include="Properties\Templates\MenuItemTemplate.xaml" />
   </ItemGroup>

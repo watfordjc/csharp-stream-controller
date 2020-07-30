@@ -220,6 +220,7 @@ namespace uk.JohnCook.dotnet.StreamController
             {
                 Source = windowsTheme switch
                 {
+                    WindowsTheme.HighContrast => new Uri(@"Properties/Themes/HighContrastColours.xaml", UriKind.Relative),
                     WindowsTheme.Dark => new Uri(@"Properties/Themes/DarkColours.xaml", UriKind.Relative),
                     _ => new Uri(@"Properties/Themes/LightColours.xaml", UriKind.Relative)
                 }
@@ -229,6 +230,7 @@ namespace uk.JohnCook.dotnet.StreamController
             {
                 Source = windowsTheme switch
                 {
+                    WindowsTheme.HighContrast => new Uri(@"Properties/Themes/HighContrastTheme.xaml", UriKind.Relative),
                     WindowsTheme.Dark => new Uri(@"Properties/Themes/DarkTheme.xaml", UriKind.Relative),
                     _ => new Uri(@"Properties/Themes/LightTheme.xaml", UriKind.Relative)
                 }

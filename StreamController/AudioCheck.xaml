@@ -12,21 +12,28 @@
         KeyDown="Window_KeyDown"
         Title="AudioCheck" Height="450" Width="800">
     <Window.Resources>
-        <Style x:Key="{x:Static SystemParameters.FocusVisualStyleKey}">
-            <Setter Property="Control.Template">
-                <Setter.Value>
-                    <ControlTemplate>
-                        <Rectangle StrokeThickness="2" Stroke="RoyalBlue" StrokeDashArray="5 3" SnapsToDevicePixels="true"/>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
+        <Style x:Key="{x:Static SystemParameters.FocusVisualStyleKey}" BasedOn="{StaticResource ResourceKey={x:Static SystemParameters.FocusVisualStyleKey}}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Source={x:Static SystemParameters.HighContrast}}" Value="False">
+                    <Setter Property="Control.Template">
+                        <Setter.Value>
+                            <ControlTemplate>
+                                <Rectangle StrokeThickness="2"
+                                           Stroke="RoyalBlue"
+                                           StrokeDashArray="5 3"
+                                           SnapsToDevicePixels="true" />
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+            </Style.Triggers>
         </Style>
     </Window.Resources>
     <DockPanel>
         <Menu DockPanel.Dock="Top" ItemsSource="{StaticResource ResourceKey=MenuItems}" AutomationProperties.Name="Application" KeyboardNavigation.TabNavigation="None" />
-        <StatusBar DockPanel.Dock="Bottom" Height="auto" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" Padding="2">
+        <StatusBar DockPanel.Dock="Bottom" Height="auto" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" Padding="2" Foreground="{DynamicResource {x:Static SystemColors.MenuTextBrushKey}}">
             <StatusBarItem DockPanel.Dock="Right">
-                <Ellipse HorizontalAlignment="Right" Width="16" Height="16" Fill="Gray" x:Name="sbCircleStatus" AutomationProperties.Name="Connection Status Indicator" />
+                <Ellipse HorizontalAlignment="Right" Width="16" Height="16" Fill="{DynamicResource {x:Static SystemColors.WindowFrameBrushKey}}" x:Name="sbCircleStatus" AutomationProperties.Name="Connection Status Indicator" />
             </StatusBarItem>
             <StatusBarItem DockPanel.Dock="Right">
                 <TextBlock x:Name="tbReconnectCountdown" MinWidth="10" TextAlignment="Right" AutomationProperties.Name="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text, StringFormat={}{0}}" AutomationProperties.LiveSetting="Assertive" />
@@ -38,7 +45,7 @@
                 <TextBlock DataContext="AudioInterfaceCollection.Instance.Devices" Text="{Binding Count, StringFormat={}{0} audio devices, Mode=OneWay, IsAsync=True, FallbackValue='Parsing audio devices&#x2026;'}" MinWidth="10" TextAlignment="Right" />
             </StatusBarItem>
             <StatusBarItem DockPanel.Dock="Right" VerticalContentAlignment="Stretch">
-                <Rectangle Width="1" Fill="Gray" />
+                <Rectangle Width="1" Fill="{DynamicResource {x:Static SystemColors.WindowFrameBrushKey}}" />
             </StatusBarItem>
             <StatusBarItem DockPanel.Dock="Right" Margin="4 0">
                 <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
@@ -128,11 +135,23 @@
                         <ListBox.ItemContainerStyle>
                             <Style TargetType="ListBoxItem">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Source.Dependencies.DependencyProblem, IsAsync=True}" Value="True">
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding Source.Dependencies.DependencyProblem, IsAsync=True}" Value="True" />
+                                            <Condition Binding="{Binding Source={x:Static SystemParameters.HighContrast}}" Value="False" />
+                                        </MultiDataTrigger.Conditions>
                                         <Setter Property="Foreground" Value="Red" />
                                         <Setter Property="FontWeight" Value="Bold" />
                                         <Setter Property="AutomationProperties.Name" Value="{Binding Source.Name, StringFormat={}Dependency problem for {0}}" />
-                                    </DataTrigger>
+                                    </MultiDataTrigger>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding Source.Dependencies.DependencyProblem, IsAsync=True}" Value="True" />
+                                            <Condition Binding="{Binding Source={x:Static SystemParameters.HighContrast}}" Value="True" />
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                                        <Setter Property="AutomationProperties.Name" Value="{Binding Source.Name, StringFormat={}Dependency problem for {0}}" />
+                                    </MultiDataTrigger>
                                     <DataTrigger Binding="{Binding Source.Dependencies.DependencyProblem, IsAsync=True}" Value="False">
                                         <Setter Property="AutomationProperties.Name" Value="{Binding Source.Name}" />
                                     </DataTrigger>

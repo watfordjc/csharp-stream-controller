@@ -14,14 +14,21 @@
         <local:Preferences />
     </Window.DataContext>
     <Window.Resources>
-        <Style TargetType="Control" x:Key="{x:Static SystemParameters.FocusVisualStyleKey}">
-            <Setter Property="Control.Template">
-                <Setter.Value>
-                    <ControlTemplate>
-                        <Rectangle StrokeThickness="2" Stroke="RoyalBlue" StrokeDashArray="5 3" SnapsToDevicePixels="true"/>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
+        <Style x:Key="{x:Static SystemParameters.FocusVisualStyleKey}" BasedOn="{StaticResource ResourceKey={x:Static SystemParameters.FocusVisualStyleKey}}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Source={x:Static SystemParameters.HighContrast}}" Value="False">
+                    <Setter Property="Control.Template">
+                        <Setter.Value>
+                            <ControlTemplate>
+                                <Rectangle StrokeThickness="2"
+                                           Stroke="RoyalBlue"
+                                           StrokeDashArray="5 3"
+                                           SnapsToDevicePixels="true" />
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+            </Style.Triggers>
         </Style>
     </Window.Resources>
     <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="16 0">
