@@ -31,5 +31,9 @@
     <SolidColorBrush x:Key="ContextMenu.Static.Rectangle1" Color="{DynamicResource {x:Static SystemColors.MenuColorKey}}" />
     <SolidColorBrush x:Key="ContextMenu.Static.Rectangle2" Color="{DynamicResource {x:Static SystemColors.MenuColorKey}}" />
     <SolidColorBrush x:Key="ContextMenu.Static.Rectangle3" Color="{DynamicResource {x:Static SystemColors.MenuColorKey}}" />
+
+    <!-- Preferences Window -->
+
+    <SolidColorBrush x:Key="Text.Static.Error" Color="{DynamicResource {x:Static SystemColors.MenuTextColorKey}}" />
     
 </ResourceDictionary>

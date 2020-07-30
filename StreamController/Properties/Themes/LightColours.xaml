@@ -34,5 +34,9 @@
     <SolidColorBrush x:Key="ContextMenu.Static.Rectangle2" Color="#E2E3E3" />
     <SolidColorBrush x:Key="ContextMenu.Static.Rectangle3" Color="White" />
     
+    <!-- Preferences Window -->
+
+    <SolidColorBrush x:Key="Text.Static.Error" Color="Red" />
+
 </ResourceDictionary>
     
