@@ -123,7 +123,14 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
             if (File.Exists(appdataPath + deviceApplicationPreferencesFilename))
             {
                 using FileStream deviceApplicationJsonFile = File.OpenRead(appdataPath + deviceApplicationPreferencesFilename);
-                deviceApplicationPreferences = await JsonSerializer.DeserializeAsync<SharedModels.DeviceApplicationPreferences>(deviceApplicationJsonFile).ConfigureAwait(true);
+                try
+                {
+                    deviceApplicationPreferences = await JsonSerializer.DeserializeAsync<SharedModels.DeviceApplicationPreferences>(deviceApplicationJsonFile).ConfigureAwait(true);
+                }
+                catch (JsonException e)
+                {
+                    Trace.WriteLine($"JSON Error: {e.Message} - {e.InnerException.Message}");
+                }
             }
             if (deviceApplicationPreferences == null)
             {
@@ -135,7 +142,14 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
             if (File.Exists(appdataPath + applicationDevicePreferencesFilename))
             {
                 using FileStream applicationDeviceJsonFile = File.OpenRead(appdataPath + applicationDevicePreferencesFilename);
-                applicationDevicePreferences = await JsonSerializer.DeserializeAsync<SharedModels.ApplicationDevicePreferences>(applicationDeviceJsonFile).ConfigureAwait(true);
+                try
+                {
+                    applicationDevicePreferences = await JsonSerializer.DeserializeAsync<SharedModels.ApplicationDevicePreferences>(applicationDeviceJsonFile).ConfigureAwait(true);
+                }
+                catch (JsonException e)
+                {
+                    Trace.WriteLine($"JSON Error: {e.Message} - {e.InnerException.Message}");
+                }
             }
             if (applicationDevicePreferences == null)
             {
