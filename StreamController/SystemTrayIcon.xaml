@@ -8,6 +8,8 @@
         xmlns:tb="http://www.hardcodet.net/taskbar"
         mc:Ignorable="d"
         Visibility="Collapsed"
+        FontFamily="Open Sans"
+        FontSize="12"
         Title="SystemTrayIcon" Height="450" Width="800">
     <Grid>
         <tb:TaskbarIcon
@@ -16,15 +18,15 @@
             Visibility="Collapsed"
             MenuActivation="RightClick">
             <tb:TaskbarIcon.ContextMenu>
-                <ContextMenu Template="{StaticResource ResourceKey=ContextMenuTemplate}">
-                    <MenuItem Header="Default _Render" x:Name="taskbarRenderMenu">
+                <ContextMenu x:Name="contextMenu" Opened="contextMenu_Opened" Style="{StaticResource ContextMenuStyle}">
+                    <MenuItem Header="Default _Render" x:Name="taskbarRenderMenu" Padding="2 7" Style="{StaticResource MenuItemStyle}">
                         <MenuItem.ItemTemplate>
                             <DataTemplate DataType="MenuItem">
                                 <TextBlock Text="{Binding FriendlyName}" />
                             </DataTemplate>
                         </MenuItem.ItemTemplate>
                         <MenuItem.ItemContainerStyle>
-                            <Style TargetType="MenuItem">
+                            <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource MenuItemStyle}">
                                 <Setter Property="AutomationProperties.Name" Value="{Binding FriendlyName}" />
                                 <EventSetter Event="Click" Handler="SystemTrayRenderDefault_Click" />
                                 <Style.Triggers>
@@ -39,14 +41,14 @@
                             </Style>
                         </MenuItem.ItemContainerStyle>
                     </MenuItem>
-                    <MenuItem Header="Default _Capture" x:Name="taskbarCaptureMenu">
+                    <MenuItem Header="Default _Capture" x:Name="taskbarCaptureMenu" Padding="2 7" Style="{StaticResource MenuItemStyle}">
                         <MenuItem.ItemTemplate>
                             <DataTemplate DataType="MenuItem">
                                 <TextBlock Text="{Binding FriendlyName}" />
                             </DataTemplate>
                         </MenuItem.ItemTemplate>
                         <MenuItem.ItemContainerStyle>
-                            <Style TargetType="MenuItem">
+                            <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource MenuItemStyle}">
                                 <Setter Property="AutomationProperties.Name" Value="{Binding FriendlyName}" />
                                 <EventSetter Event="Click" Handler="SystemTrayCaptureDefault_Click" />
                                 <Style.Triggers>
@@ -61,10 +63,10 @@
                             </Style>
                         </MenuItem.ItemContainerStyle>
                     </MenuItem>
-                    <Separator />
-                    <MenuItem Header="E_nsure Custom Audio" Click="SystemTrayToggleCustomAudio_Click" />
-                    <Separator />
-                    <MenuItem Header="E_xit" Click="SystemTrayExit_Click" />
+                    <Separator Margin="3 0" />
+                    <MenuItem Header="E_nsure Custom Audio" Click="SystemTrayToggleCustomAudio_Click" Padding="2 6" Style="{StaticResource MenuItemStyle}" />
+                    <Separator Margin="3 0" />
+                    <MenuItem Header="E_xit" Click="SystemTrayExit_Click" Padding="2 6" Style="{StaticResource MenuItemStyle}" />
                 </ContextMenu>
             </tb:TaskbarIcon.ContextMenu>
         </tb:TaskbarIcon>

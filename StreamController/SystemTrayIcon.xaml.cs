@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -29,6 +30,15 @@ namespace uk.JohnCook.dotnet.StreamController
 
         public SystemTrayIcon()
         {
+            WindowUtilityLibrary.WindowsTheme applicableTheme = WindowUtilityLibrary.CurrentWindowsTheme(false);
+            if (applicableTheme == WindowUtilityLibrary.WindowsTheme.Default)
+            {
+                applicableTheme = WindowUtilityLibrary.DefaultTheme(false);
+            }
+            foreach (ResourceDictionary dictionary in WindowUtilityLibrary.GetStyledResourceDictionary(applicableTheme))
+            {
+                Resources.MergedDictionaries.Add(dictionary);
+            }
             InitializeComponent();
             AudioInterfaceCollection.Instance.CollectionEnumerated += Devices_CollectionEnumerated;
             NotifyIcon.TrayMouseDoubleClick += NotifyIcon_TrayMouseDoubleClick;
