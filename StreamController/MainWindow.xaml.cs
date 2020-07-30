@@ -10,6 +10,7 @@ using uk.JohnCook.dotnet.NAudioWrapperLibrary;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using uk.JohnCook.dotnet.StreamController.Controls;
+using System.Windows.Automation.Peers;
 
 namespace uk.JohnCook.dotnet.StreamController
 {
@@ -88,12 +89,30 @@ namespace uk.JohnCook.dotnet.StreamController
             app_capture.Text = applicationCapture?.FriendlyName ?? "Default";
         }
 
+        private void NotifyLiveRegionChanged(DataGrid sender)
+        {
+
+            AutomationPeer peer = UIElementAutomationPeer.FromElement(sender as UIElement);
+
+            if (peer == null) { return; }
+            Dispatcher.Invoke(
+                () => peer.RaiseAutomationEvent(AutomationEvents.LiveRegionChanged)
+                );
+        }
+
+
+
         private void OnDefaultDeviceChanged(object sender, DataFlow flow)
         {
             if (flow == DataFlow.Render)
             {
                 cb_interfaces.SelectedItem = AudioInterfaceCollection.Instance.DefaultRender;
-                group_default_render.DataContext = AudioInterfaceCollection.Instance.DefaultRender;
+                group_default_render.Items.Clear();
+                int newRow = group_default_render.Items.Add(AudioInterfaceCollection.Instance.DefaultRender);
+                if (newRow != -1)
+                {
+                    NotifyLiveRegionChanged(group_default_render);
+                }
             }
             else if (flow == DataFlow.Capture)
             {

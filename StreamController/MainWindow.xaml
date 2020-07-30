@@ -102,30 +102,66 @@
                                     </StackPanel>
                                 </Grid>
                             </GroupBox>
-                            <GroupBox x:Name="group_default_render" Header="Default Render Interface" Margin="4 4" Padding="8" >
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="auto" />
-                                        <ColumnDefinition Width="auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="auto" />
-                                        <RowDefinition Height="auto" />
-                                        <RowDefinition Height="auto" />
-                                        <RowDefinition Height="auto" />
-                                        <RowDefinition Height="auto" />
-                                    </Grid.RowDefinitions>
-                                    <Label Grid.Row="0" Grid.Column="0" Content="Name:" Style="{DynamicResource property_label_style}" />
-                                    <TextBlock Grid.Row="0" Grid.Column="1" x:Name="render_interface_name" VerticalAlignment="Center" Text="{Binding FriendlyName}" />
-                                    <Label Grid.Row="1" Grid.Column="0" Content="Type:" Style="{DynamicResource property_label_style}" />
-                                    <TextBlock Grid.Row="1" Grid.Column="1" x:Name="render_interface_type" VerticalAlignment="Center" Text="{Binding DataFlow}" />
-                                    <Label Grid.Row="2" Grid.Column="0" Content="State:" Style="{DynamicResource property_label_style}" />
-                                    <TextBlock Grid.Row="2" Grid.Column="1" x:Name="render_interface_state" VerticalAlignment="Center" Text="{Binding State}" />
-                                    <Label Grid.Row="3" Grid.Column="0" Content="Volume:" Style="{DynamicResource property_label_style}" />
-                                    <TextBlock Grid.Row="3" Grid.Column="1" x:Name="render_interface_volume" VerticalAlignment="Center" Text="{Binding Volume,StringFormat={}{0}%}" />
-                                    <Label Grid.Row="4" Grid.Column="0" Content="Muted:" Style="{DynamicResource property_label_style}" />
-                                    <TextBlock Grid.Row="4" Grid.Column="1" x:Name="render_interface_muted" VerticalAlignment="Center" Text="{Binding Muted}" />
-                                </Grid>
+                            <GroupBox  Header="Default Render Interface" Margin="4 4" Padding="8" >
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                                <DataGrid AutomationProperties.LiveSetting="Polite" x:Name="group_default_render" CanUserAddRows="False" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserResizeRows="False"
+                                          HeadersVisibility="Column" VerticalAlignment="Top" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" GridLinesVisibility="None" ColumnWidth="auto" AreRowDetailsFrozen="True" FlowDirection="RightToLeft">
+                                        <DataGrid.LayoutTransform>
+                                            <TransformGroup>
+                                                <RotateTransform Angle="90"/>
+                                                <MatrixTransform Matrix="-1,0,0,-1,0,0"/>
+                                            </TransformGroup>
+                                        </DataGrid.LayoutTransform>
+                                        <DataGrid.ColumnHeaderStyle>
+                                        <Style TargetType="{x:Type DataGridColumnHeader}">
+                                                <Setter Property="LayoutTransform">
+                                                    <Setter.Value>
+                                                        <TransformGroup>
+                                                            <RotateTransform Angle="-90" />
+                                                        </TransformGroup>
+                                                    </Setter.Value>
+                                                </Setter>
+                                                <Setter Property="Padding" Value="10 0" />
+                                                <Setter Property="Background" Value="Transparent" />
+                                                <Setter Property="FlowDirection" Value="LeftToRight" />
+                                                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                                <Setter Property="VerticalAlignment" Value="Stretch" />
+                                                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                            </Style>
+                                    </DataGrid.ColumnHeaderStyle>
+                                    <DataGrid.CellStyle>
+                                            <Style TargetType="{x:Type DataGridCell}">
+                                                <Setter Property="LayoutTransform">
+                                                    <Setter.Value>
+                                                        <TransformGroup>
+                                                            <RotateTransform Angle="-90" />
+                                                        </TransformGroup>
+                                                    </Setter.Value>
+                                                </Setter>
+                                                <Setter Property="BorderThickness" Value="5 5" />
+                                                <Setter Property="FlowDirection" Value="LeftToRight" />
+                                                <Setter Property="VerticalContentAlignment" Value="Center" />
+                                                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                            </Style>
+                                        </DataGrid.CellStyle>
+                                        <DataGrid.RowStyle>
+                                            <Style TargetType="{x:Type DataGridRow}">
+                                                <Setter Property="Height" Value="auto" />
+                                                <Setter Property="VerticalAlignment" Value="Stretch" />
+                                                <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                                                <Setter Property="FlowDirection" Value="RightToLeft" />
+                                                <Setter Property="AutomationProperties.Name" Value="{Binding FriendlyName}" />
+                                            </Style>
+                                    </DataGrid.RowStyle>
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Name" CanUserSort="False" IsReadOnly="True" Binding="{Binding FriendlyName}" />
+                                            <DataGridTextColumn Header="State" CanUserSort="False" IsReadOnly="True" Binding="{Binding State}" />
+                                            <DataGridTextColumn Header="Type" CanUserSort="False" IsReadOnly="True" Binding="{Binding DataFlow}" />
+                                            <DataGridTextColumn Header="Volume" CanUserSort="False" IsReadOnly="True" Binding="{Binding Volume, StringFormat={}{0}%}" />
+                                            <DataGridTextColumn Header="Muted" CanUserSort="False" IsReadOnly="True" Binding="{Binding Muted}" />
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                </ScrollViewer>
                             </GroupBox>
                             <GroupBox x:Name="group_default_capture" Header="Default Capture Interface" Margin="4 4" Padding="8" Grid.ColumnSpan="2">
                                 <Grid>
