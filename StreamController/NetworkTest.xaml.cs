@@ -10,13 +10,14 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using uk.JohnCook.dotnet.NetworkingWrapperLibrary;
+using uk.JohnCook.dotnet.StreamController.Controls;
 
 namespace uk.JohnCook.dotnet.StreamController
 {
     /// <summary>
     /// Interaction logic for NetworkTest.xaml
     /// </summary>
-    public partial class NetworkTest : Window
+    public partial class NetworkTest : StyledWindow
     {
         public NetworkTest()
         {

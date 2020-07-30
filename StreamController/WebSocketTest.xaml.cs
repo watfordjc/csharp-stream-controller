@@ -31,6 +31,7 @@ using uk.JohnCook.dotnet.OBSWebSocketLibrary;
 using uk.JohnCook.dotnet.OBSWebSocketLibrary.Data;
 using uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsEvents;
 using uk.JohnCook.dotnet.OBSWebSocketLibrary.TypeDefs;
+using uk.JohnCook.dotnet.StreamController.Controls;
 using uk.JohnCook.dotnet.WebSocketLibrary;
 
 namespace uk.JohnCook.dotnet.StreamController
@@ -38,7 +39,7 @@ namespace uk.JohnCook.dotnet.StreamController
     /// <summary>
     /// Interaction logic for WebSocketTest.xaml
     /// </summary>
-    public partial class WebSocketTest : Window, IDisposable
+    public partial class WebSocketTest : StyledWindow, IDisposable
     {
         private readonly ObsWsClient webSocket;
         private bool autoscroll = false;

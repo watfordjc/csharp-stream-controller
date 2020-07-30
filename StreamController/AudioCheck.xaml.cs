@@ -30,13 +30,14 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Automation.Peers;
+using uk.JohnCook.dotnet.StreamController.Controls;
 
 namespace uk.JohnCook.dotnet.StreamController
 {
     /// <summary>
     /// Interaction logic for AudioCheck.xaml
     /// </summary>
-    public partial class AudioCheck : Window, IDisposable
+    public partial class AudioCheck : StyledWindow, IDisposable
     {
         private readonly SynchronizationContext _Context;
         private readonly ObsWsClient webSocket;

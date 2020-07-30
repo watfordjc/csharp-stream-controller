@@ -1,9 +1,10 @@
-﻿<Window x:Class="uk.JohnCook.dotnet.StreamController.WebSocketTest"
+﻿<controls:StyledWindow x:Class="uk.JohnCook.dotnet.StreamController.WebSocketTest"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:uk.JohnCook.dotnet.StreamController"
+        xmlns:controls="clr-namespace:uk.JohnCook.dotnet.StreamController.Controls"
         mc:Ignorable="d"
         ContentRendered="Window_ContentRendered"
         Closed="Window_Closed"
@@ -63,4 +64,4 @@
         </Grid>
 
     </DockPanel>
-</Window>
+</controls:StyledWindow>

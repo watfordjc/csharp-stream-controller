@@ -14,13 +14,14 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using uk.JohnCook.dotnet.StreamController.Controls;
 
 namespace uk.JohnCook.dotnet.StreamController
 {
     /// <summary>
     /// Interaction logic for PreferencesWindow.xaml
     /// </summary>
-    public partial class PreferencesWindow : Window
+    public partial class PreferencesWindow : StyledWindow
     {
         private const string PASSWORD_PLACEHOLDER = "{20E90077-AE25-42AA-B8A9-08C56F788542}";
 

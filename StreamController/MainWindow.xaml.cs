@@ -9,13 +9,14 @@ using NAudio.CoreAudioApi;
 using uk.JohnCook.dotnet.NAudioWrapperLibrary;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using uk.JohnCook.dotnet.StreamController.Controls;
 
 namespace uk.JohnCook.dotnet.StreamController
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : StyledWindow
     {
         public MainWindow()
         {
