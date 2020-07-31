@@ -47,13 +47,17 @@
     <Property Id="ARPCOMMENTS">!(loc.Comments)</Property>
 
     <!-- Custom dialog background image 493x312 -->
-    <!--
-    <WixVariable Id="WixUIDialogBmp" Value="$(var.ProjectDir)Assets\Background.bmp" />
-    -->
+
+    <WixVariable Id="WixUIDialogBmp" Value="$(var.ProjectDir)Assets\DialogBackground.png" />
+
     <!-- Custom installer banner image 493x58 -->
-    <!--
-    <WixVariable Id="WixUIBannerBmp" Value="$(var.ProjectDir)Assets\Banner.bmp" />
-    -->
+
+    <WixVariable Id="WixUIBannerBmp" Value="$(var.ProjectDir)Assets\DialogBanner.png" />
+    
+    <!-- License file in RTF format - update if ../LICENSE changes -->
+
+    <WixVariable Id="WixUILicenseRtf" Value="$(var.ProjectDir)Assets\LICENSE.rtf" />
+
     <!-- Definitions of things to be installed. -->
     <Feature Id="ProductFeature"
              Title="StreamController"
@@ -61,6 +65,12 @@
       <ComponentGroupRef Id="ProductComponents" />
       <ComponentGroupRef Id="PublishedComponents" />
     </Feature>
+
+    <!-- Option to launch application once installed. -->
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch Stream Controller" />
+    <!-- Value from ComponentsGenerated.wxs for .exe must be updated if it changes! -->
+    <Property Id="WixShellExecTarget" Value="[#fil8C7E37F1FFA1717D823A404C654087F2]" />
+    <CustomAction Id="LaunchApplication" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
 
     <!-- Installer UI -->
     <UI Id="UserInterface">
@@ -76,14 +86,18 @@
 
       <Property Id="WixUI_Ico_Info" Value="icon.ico" />
 
+      <DialogRef Id="LicenseAgreementDlg" />
       <DialogRef Id="ProgressDlg" />
       <DialogRef Id="ErrorDlg" />
       <DialogRef Id="FilesInUse" />
       <DialogRef Id="FatalError" />
       <DialogRef Id="UserExit" />
 
+      <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg" Order="2"></Publish>
+      <Publish Dialog="LicenseAgreementDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" Order="3"></Publish>
+      <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="EndDialog" Value="Return" Order="3"></Publish>
+      <Publish Dialog="ExitDialog" Control="Finish" Event="DoAction" Value="LaunchApplication" Order="998">WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed</Publish>
       <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
-      <Publish Dialog="WelcomeDlg" Control="Next" Event="EndDialog" Value="Return" Order="2"></Publish>
     </UI>
 
   </Product>
