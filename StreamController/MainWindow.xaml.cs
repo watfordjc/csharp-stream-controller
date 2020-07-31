@@ -19,6 +19,7 @@ namespace uk.JohnCook.dotnet.StreamController
     /// </summary>
     public partial class MainWindow : StyledWindow
     {
+        private ObservableProcess currentSelectedProcess;
         public MainWindow()
         {
             InitializeComponent();
@@ -70,13 +71,12 @@ namespace uk.JohnCook.dotnet.StreamController
             {
                 return;
             }
-            if (currentProcess == null && e.Action == NotifyCollectionChangedAction.Move)
+            if (currentProcess == null && e.Action == NotifyCollectionChangedAction.Move && currentSelectedProcess != null)
             {
-                currentProcess = e.NewItems[0] as ObservableProcess;
+                currentProcess = currentSelectedProcess;
                 cb_applications.SelectedItem = currentProcess;
-                AnnounceVisualElementChanged(cb_applications);
             }
-            if (currentProcess == null || (e.OldItems.Contains(currentProcess) && e.Action == NotifyCollectionChangedAction.Remove))
+            if (currentSelectedProcess == null || (e.OldItems.Contains(currentProcess) && e.Action == NotifyCollectionChangedAction.Remove))
             {
                 cb_applications.SelectedItem = ProcessCollection.Processes.FirstOrDefault(x => x.Id == Process.GetCurrentProcess().Id);
                 AnnounceVisualElementChanged(cb_applications);
@@ -87,7 +87,8 @@ namespace uk.JohnCook.dotnet.StreamController
         {
             if (e.AddedItems.Count > 0)
             {
-                UpdateApplicationAudioDevices(e.AddedItems[0] as ObservableProcess, false);
+                currentSelectedProcess = e.AddedItems[0] as ObservableProcess;
+                UpdateApplicationAudioDevices(currentSelectedProcess, false);
                 AnnounceVisualElementChanged(current_application);
             }
         }
