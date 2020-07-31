@@ -10,6 +10,7 @@ using uk.JohnCook.dotnet.NAudioWrapperLibrary;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using uk.JohnCook.dotnet.StreamController.Controls;
+using System.Windows.Automation.Peers;
 
 namespace uk.JohnCook.dotnet.StreamController
 {
@@ -48,6 +49,14 @@ namespace uk.JohnCook.dotnet.StreamController
             cb_applications.SelectionChanged += ApplicationsComboBox_SelectionChanged;
         }
 
+        private void Interfaces_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count > 0)
+            {
+                AnnounceVisualElementChanged(current_interface);
+            }
+        }
+
         private void Processes_CollectionEnumerated(object sender, EventArgs e)
         {
             int currentProcessId = Process.GetCurrentProcess().Id;
@@ -65,10 +74,12 @@ namespace uk.JohnCook.dotnet.StreamController
             {
                 currentProcess = e.NewItems[0] as ObservableProcess;
                 cb_applications.SelectedItem = currentProcess;
+                AnnounceVisualElementChanged(cb_applications);
             }
             if (currentProcess == null || (e.OldItems.Contains(currentProcess) && e.Action == NotifyCollectionChangedAction.Remove))
             {
                 cb_applications.SelectedItem = ProcessCollection.Processes.FirstOrDefault(x => x.Id == Process.GetCurrentProcess().Id);
+                AnnounceVisualElementChanged(cb_applications);
             }
         }
 
@@ -76,16 +87,28 @@ namespace uk.JohnCook.dotnet.StreamController
         {
             if (e.AddedItems.Count > 0)
             {
-                UpdateApplicationAudioDevices(e.AddedItems[0] as ObservableProcess);
+                UpdateApplicationAudioDevices(e.AddedItems[0] as ObservableProcess, false);
+                AnnounceVisualElementChanged(current_application);
             }
         }
 
-        private void UpdateApplicationAudioDevices(ObservableProcess process)
+        private void UpdateApplicationAudioDevices(ObservableProcess process, bool announceChanges)
         {
             AudioInterface applicationRender = AudioInterfaceCollection.GetDefaultApplicationDevice(DataFlow.Render, process);
             AudioInterface applicationCapture = AudioInterfaceCollection.GetDefaultApplicationDevice(DataFlow.Capture, process);
+            string previousAppRenderText = app_render.Text;
             app_render.Text = applicationRender?.FriendlyName ?? "Default";
+            if (announceChanges && app_render.Text != previousAppRenderText)
+            {
+                AnnounceVisualElementChanged(app_render);
+            }
+            string previousAppCaptureText = app_capture.Text;
             app_capture.Text = applicationCapture?.FriendlyName ?? "Default";
+            if (announceChanges && app_capture.Text != previousAppCaptureText)
+            {
+                AnnounceVisualElementChanged(app_capture);
+            }
+
         }
 
         private void OnDefaultDeviceChanged(object sender, DataFlow flow)
@@ -94,10 +117,12 @@ namespace uk.JohnCook.dotnet.StreamController
             {
                 cb_interfaces.SelectedItem = AudioInterfaceCollection.Instance.DefaultRender;
                 group_default_render.DataContext = AudioInterfaceCollection.Instance.DefaultRender;
+                AnnounceVisualElementChanged(group_default_render);
             }
             else if (flow == DataFlow.Capture)
             {
                 group_default_capture.DataContext = AudioInterfaceCollection.Instance.DefaultCapture;
+                AnnounceVisualElementChanged(group_default_capture);
             }
         }
 
@@ -111,13 +136,22 @@ namespace uk.JohnCook.dotnet.StreamController
             ObservableProcess process = (cb_applications.SelectedItem as ObservableProcess);
             AudioInterface currentInterface = (cb_interfaces.SelectedItem as AudioInterface);
             AudioInterfaceCollection.ChangeDefaultApplicationDevice(currentInterface, process);
-            UpdateApplicationAudioDevices(process);
+            UpdateApplicationAudioDevices(process, true);
         }
 
         private void ResetCustomAudioDevices()
         {
             AudioInterfaceCollection.ClearAllApplicationDefaultDevices(DataFlow.All);
-            UpdateApplicationAudioDevices(cb_applications.SelectedItem as ObservableProcess);
+            UpdateApplicationAudioDevices(cb_applications.SelectedItem as ObservableProcess, true);
+        }
+
+        private void AnnounceVisualElementChanged(object sender)
+        {
+            AutomationPeer peer = UIElementAutomationPeer.FromElement(sender as UIElement);
+            if (peer == null) { return; }
+            Dispatcher.Invoke(
+                () => peer.RaiseAutomationEvent(AutomationEvents.LiveRegionChanged)
+                );
         }
 
         private static async Task ToggleAllCustomAudioDevices()
