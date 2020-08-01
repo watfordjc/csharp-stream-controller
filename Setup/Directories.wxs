@@ -14,11 +14,19 @@
     <Directory Id="TARGETDIR" Name="SourceDir">
 
       <!-- \Program Files\ or \Program Files (x86)\ -->
-      <Directory Id="ProgramFiles6432Folder">
+      <?if $(var.Platform) = x64 ?>
+      <Directory Id="ProgramFiles64Folder">
         <Directory Id="ProgramCreatorFolder" Name="!(loc.ProgramCreatorCompany)">
           <Directory Id="INSTALLFOLDER" Name="!(loc.ProgramInstallationDirectory)" />
         </Directory>
       </Directory>
+      <?elseif $(var.Platform)= x86 ?>
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="ProgramCreatorFolder" Name="!(loc.ProgramCreatorCompany)">
+          <Directory Id="INSTALLFOLDER" Name="!(loc.ProgramInstallationDirectory)" />
+        </Directory>
+      </Directory>
+      <?endif?>
 
       <!-- Start Menu shortcut folders -->
       <Directory Id="ProgramMenuFolder">

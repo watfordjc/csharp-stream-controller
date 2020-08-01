@@ -11,62 +11,24 @@
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <OutputPath>bin\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
-    <DefineConstants>Debug</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <OutputPath>bin\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
-    <DefineConstants>Debug</DefineConstants>
-    <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
-    <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
-    <SuppressIces>
-    </SuppressIces>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
-    <DefineConstants>Debug</DefineConstants>
-    <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
-    <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
-    <DefineConstants>Debug</DefineConstants>
-    <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
-    <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
-    <DefineConstants>Debug</DefineConstants>
-    <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
-    <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
-    <DefineConstants>Debug</DefineConstants>
-    <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
-    <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
-  </PropertyGroup>
+<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+<OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
+<IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
+<DefineConstants>Debug</DefineConstants>
+</PropertyGroup>
+<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+<OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
+<IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
+</PropertyGroup>
+<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+<OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
+<IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
+<DefineConstants>Debug</DefineConstants>
+</PropertyGroup>
+<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+<OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
+<IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
+</PropertyGroup>
   <ItemGroup>
     <Compile Include="ComponentsGenerated.wxs" />
     <Compile Include="Directories.wxs" />
@@ -108,17 +70,56 @@
 	To modify your build process, add your task inside one of the targets below and uncomment it.
 	Other similar extension points exist, see Wix.targets.
 	-->
+
   <Target Name="BeforeBuild">
-    <Exec Command="rd /s /q &quot;..\StreamController\bin\$(Configuration)\netcoreapp3.1\win-$(Platform)&quot; " />
+    <CreateProperty Value="..\StreamController\bin\$(Configuration)\netcoreapp3.1\win-$(Platform)">
+      <Output TaskParameter="Value" PropertyName="PublishPath"/>
+    </CreateProperty>
+    <CreateProperty Value="C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\signtool.exe">
+      <Output TaskParameter="Value" PropertyName="SignToolPath" />
+    </CreateProperty>
+    <CreateProperty Value="http://timestamp.digicert.com">
+      <Output TaskParameter="Value" PropertyName="TimestampServiceURL" />
+    </CreateProperty>
+    <CreateProperty Value="sha256">
+      <Output TaskParameter="Value" PropertyName="TimestampServiceDigestAlgo"/>
+    </CreateProperty>
+    <CreateProperty Value="John Cook">
+      <Output TaskParameter="Value" PropertyName="SignerCN"/>
+    </CreateProperty>
+
+    <!-- Delete previous build folder -->
+    <Exec Command="rd /s /q &quot;$(PublishPath)&quot; " />
+    <!-- Publish application for HeatDirectory step -->
     <Exec Command="dotnet publish &quot;..\StreamController\StreamController.csproj&quot; -c $(Configuration) -r win-$(Platform) --no-self-contained" />
-    <GetAssemblyIdentity AssemblyFiles="..\StreamController\bin\$(Configuration)\netcoreapp3.1\win-$(Platform)\StreamController.dll">
+    <!-- Sign application exe and dll -->
+    <Exec Command="&quot;$(SignToolPath)&quot; sign /tr $(TimestampServiceURL) /td $(TimestampServiceDigestAlgo) /fd $(TimestampServiceDigestAlgo) /n &quot;$(SignerCN)&quot; &quot;$(PublishPath)\publish\StreamController.dll&quot;" />
+    <Exec Command="&quot;$(SignToolPath)&quot; sign /tr $(TimestampServiceURL) /td $(TimestampServiceDigestAlgo) /fd $(TimestampServiceDigestAlgo) /n &quot;$(SignerCN)&quot; &quot;$(PublishPath)\publish\StreamController.exe&quot;" />
+    <!-- Create variables for file name and installation path -->
+    <GetAssemblyIdentity AssemblyFiles="$(PublishPath)\StreamController.dll">
       <Output TaskParameter="Assemblies" ItemName="AssemblyVersion" />
     </GetAssemblyIdentity>
+    <CreateProperty Value="StreamController_$(OutputName)_win-$(Platform)_%(AssemblyVersion.Version)">
+      <Output TaskParameter="Value" PropertyName="TargetName" />
+    </CreateProperty>
+    <CreateProperty Value="$(TargetName)$(TargetExt)">
+      <Output TaskParameter="Value" PropertyName="TargetFileName" />
+    </CreateProperty>
+    <CreateProperty Value="$(TargetDir)$(TargetFileName)">
+      <Output TaskParameter="Value" PropertyName="TargetPath" />
+    </CreateProperty>
+    <!-- Constants for command line -->
     <PropertyGroup>
-      <DefineConstants>BuildVersion=%(AssemblyVersion.Version);BasePath=..\StreamController\bin\$(Configuration)\netcoreapp3.1\win-$(Platform)\publish</DefineConstants>
+      <DefineConstants>BuildVersion=%(AssemblyVersion.Version);BasePath=$(PublishPath)\publish</DefineConstants>
     </PropertyGroup>
-    <HeatDirectory OutputFile="ComponentsGenerated.wxs" DirectoryRefId="INSTALLFOLDER" ComponentGroupName="PublishedComponents" SuppressCom="true" Directory="..\StreamController\bin\$(Configuration)\netcoreapp3.1\win-$(Platform)\publish" SuppressFragments="true" SuppressRegistry="true" SuppressRootDirectory="true" AutoGenerateGuids="false" GenerateGuidsNow="true" ToolPath="$(WixToolPath)" PreprocessorVariable="var.BasePath" />
+    <!-- Create ComponentsGenerated.wxs-->
+    <HeatDirectory OutputFile="ComponentsGenerated.wxs" DirectoryRefId="INSTALLFOLDER" ComponentGroupName="PublishedComponents" SuppressCom="true" Directory="$(PublishPath)\publish" SuppressFragments="true" SuppressRegistry="true" SuppressRootDirectory="true" AutoGenerateGuids="false" GenerateGuidsNow="true" ToolPath="$(WixToolPath)" PreprocessorVariable="var.BasePath" />
   </Target>
   <Target Name="AfterBuild">
+    <!-- Sign MSI Installer -->
+    <Exec Command="&quot;$(SignToolPath)&quot; sign /tr $(TimestampServiceURL) /td $(TimestampServiceDigestAlgo) /fd $(TimestampServiceDigestAlgo) /n &quot;$(SignerCN)&quot; &quot;$(TargetPath)&quot;" />
   </Target>
+  <PropertyGroup>
+    <PostBuildEvent />
+  </PropertyGroup>
 </Project>

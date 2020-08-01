@@ -8,6 +8,7 @@
     <Authors>John Cook</Authors>
     <Copyright>Copyright © John Cook 2020</Copyright>
     <Platforms>AnyCPU;x64;x86</Platforms>
+    <RuntimeIdentifiers>win-x64;win-x86</RuntimeIdentifiers>
     <RootNamespace>uk.JohnCook.dotnet.OBSWebSocketLibrary</RootNamespace>
     <NeutralLanguage>en-GB</NeutralLanguage>
   </PropertyGroup>
@@ -21,7 +22,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NAudioWrapperLibrary\NAudioWrapperLibrary.csproj" />
-    <ProjectReference Include="..\SharedModels\SharedModels.csproj" />
     <ProjectReference Include="..\WebSocketLibrary\WebSocketLibrary.csproj" />
   </ItemGroup>
 
@@ -39,5 +39,9 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="if &quot;$(ConfigurationName)&quot; == &quot;Release&quot; (&#xD;&#xA;&quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\signtool.exe&quot; sign /tr http://timestamp.digicert.com /td sha256 /fd sha256 /n  &quot;$(Company)&quot; &quot;$(TargetDir)$(TargetFileName)&quot;&#xD;&#xA;)" />
+  </Target>
 
 </Project>

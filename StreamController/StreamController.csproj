@@ -11,6 +11,7 @@
     <Authors>John Cook</Authors>
     <Copyright>Copyright © John Cook 2020</Copyright>
     <Platforms>AnyCPU;x64;x86</Platforms>
+    <RuntimeIdentifiers>win-x64;win-x86</RuntimeIdentifiers>
     <ApplicationIcon>icon-neutral.ico</ApplicationIcon>
   </PropertyGroup>
 
@@ -26,10 +27,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NAudioWrapperLibrary\NAudioWrapperLibrary.csproj" />
     <ProjectReference Include="..\NetworkingWrapperLibrary\NetworkingWrapperLibrary.csproj" />
     <ProjectReference Include="..\OBSWebSocketLibrary\OBSWebSocketLibrary.csproj" />
-    <ProjectReference Include="..\SharedModels\SharedModels.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -76,4 +75,8 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="if &quot;$(ConfigurationName)&quot; == &quot;Release&quot; (&#xD;&#xA;&quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\signtool.exe&quot; sign /tr http://timestamp.digicert.com /td sha256 /fd sha256 /n  &quot;$(Company)&quot;  &quot;$(TargetDir)$(TargetName).dll&quot;&#xD;&#xA;&quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\signtool.exe&quot; sign /tr http://timestamp.digicert.com /td sha256 /fd sha256 /n  &quot;$(Company)&quot;  &quot;$(TargetDir)$(TargetName).exe&quot;&#xD;&#xA;)" />
+  </Target>
 </Project>
