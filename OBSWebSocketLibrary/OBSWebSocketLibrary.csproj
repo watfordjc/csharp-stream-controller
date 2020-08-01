@@ -2,15 +2,21 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <AssemblyVersion>0.1.0.0</AssemblyVersion>
-    <FileVersion>0.1.0.0</FileVersion>
-    <Version>0.1.0</Version>
+    <AssemblyVersion>0.2.0.0</AssemblyVersion>
+    <FileVersion>0.2.0.0</FileVersion>
+    <Version>0.2.0</Version>
     <Authors>John Cook</Authors>
     <Copyright>Copyright © John Cook 2020</Copyright>
     <Platforms>AnyCPU;x64;x86</Platforms>
     <RuntimeIdentifiers>win-x64;win-x86</RuntimeIdentifiers>
     <RootNamespace>uk.JohnCook.dotnet.OBSWebSocketLibrary</RootNamespace>
     <NeutralLanguage>en-GB</NeutralLanguage>
+    <Description>The purpose of this library is to provide an obs-websocket specific implementation of WebSocketLibrary.GenericClient.</Description>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageReleaseNotes>Version bump of OBSWebSocketLibrary. Nowhere near stable yet - minor version changes almost certainly have breaking changes.</PackageReleaseNotes>
+    <RepositoryUrl>https://github.com/watfordjc/csharp-stream-controller</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/watfordjc/csharp-stream-controller</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
@@ -38,6 +44,13 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

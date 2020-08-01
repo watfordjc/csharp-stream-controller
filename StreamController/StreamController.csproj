@@ -5,7 +5,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>uk.JohnCook.dotnet.StreamController</RootNamespace>
     <UseWPF>true</UseWPF>
-    <Version>0.0.3</Version>
+    <Version>0.0.4</Version>
     <NeutralLanguage>en-GB</NeutralLanguage>
     <StartupObject>StreamController.App</StartupObject>
     <Authors>John Cook</Authors>
@@ -13,6 +13,12 @@
     <Platforms>AnyCPU;x64;x86</Platforms>
     <RuntimeIdentifiers>win-x64;win-x86</RuntimeIdentifiers>
     <ApplicationIcon>icon-neutral.ico</ApplicationIcon>
+    <Description>A work-in-progress stream control application that acts as a helper connectivity hub for video streaming.</Description>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageReleaseNotes>First planned release of StreamController.</PackageReleaseNotes>
+    <RepositoryUrl>https://github.com/watfordjc/csharp-stream-controller</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/watfordjc/csharp-stream-controller</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
@@ -51,6 +57,10 @@
     <None Update="Preferences.settings">
       <Generator>PublicSettingsSingleFileGenerator</Generator>
       <LastGenOutput>Preferences.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
     </None>
   </ItemGroup>
 

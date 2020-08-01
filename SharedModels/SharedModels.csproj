@@ -3,14 +3,20 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <Authors>John Cook</Authors>
-    <Version>0.1.0</Version>
-    <AssemblyVersion>0.1.0.0</AssemblyVersion>
-    <FileVersion>0.1.0.0</FileVersion>
+    <Version>0.2.0</Version>
+    <AssemblyVersion>0.2.0.0</AssemblyVersion>
+    <FileVersion>0.2.0.0</FileVersion>
     <Copyright>Copyright © John Cook 2020</Copyright>
     <Platforms>AnyCPU;x64;x86</Platforms>
     <RuntimeIdentifiers>win-x64;win-x86</RuntimeIdentifiers>
     <RootNamespace>uk.JohnCook.dotnet.SharedModels</RootNamespace>
     <NeutralLanguage>en-GB</NeutralLanguage>
+    <Description>This library is for classes that are used by other projects/libraries and will eventually be for classes that aren't dependent on other projects and are used across projects.</Description>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageReleaseNotes>Version bump of SharedModels. Minor version changes may have breaking changes.</PackageReleaseNotes>
+    <RepositoryUrl>https://github.com/watfordjc/csharp-stream-controller</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/watfordjc/csharp-stream-controller</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,6 +25,13 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="NAudio" Version="1.10.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

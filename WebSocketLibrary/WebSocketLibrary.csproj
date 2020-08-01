@@ -2,15 +2,21 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <Authors>John Cook</Authors>
-    <AssemblyVersion>0.1.0.0</AssemblyVersion>
-    <FileVersion>0.1.0.0</FileVersion>
+    <AssemblyVersion>0.2.0.0</AssemblyVersion>
+    <FileVersion>0.2.0.0</FileVersion>
     <Copyright>Copyright © John Cook 2020</Copyright>
     <Platforms>AnyCPU;x64;x86</Platforms>
     <RuntimeIdentifiers>win-x64;win-x86</RuntimeIdentifiers>
     <RootNamespace>uk.JohnCook.dotnet.WebSocketLibrary</RootNamespace>
     <NeutralLanguage>en-GB</NeutralLanguage>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <Description>The purpose of this library is to provide a generic websocket client (GenericClient) using System.Net.WebSockets.ClientWebSocket.</Description>
+    <PackageReleaseNotes>Version bump of WebSocketLibrary. Nowhere near stable yet - minor version changes almost certainly have breaking changes.</PackageReleaseNotes>
+    <RepositoryUrl>https://github.com/watfordjc/csharp-stream-controller</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/watfordjc/csharp-stream-controller</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,6 +24,13 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

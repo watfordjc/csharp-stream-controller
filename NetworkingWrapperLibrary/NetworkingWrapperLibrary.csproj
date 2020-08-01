@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <PackageLicenseFile>license.md</PackageLicenseFile>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <Platforms>AnyCPU;x64;x86</Platforms>
     <RuntimeIdentifiers>win-x64;win-x86</RuntimeIdentifiers>
     <RootNamespace>uk.JohnCook.dotnet.NetworkingWrapperLibrary</RootNamespace>
@@ -10,6 +10,11 @@
     <Authors>John Cook</Authors>
     <Copyright>Copyright © John Cook 2020</Copyright>
     <NeutralLanguage>en-GB</NeutralLanguage>
+    <Description>The purpose of this library is to interface with the Windows networking devices.</Description>
+    <PackageReleaseNotes>Version bump of NetworkingWrapperLibrary. Nowhere near stable yet - minor version changes almost certainly have breaking changes.</PackageReleaseNotes>
+    <RepositoryUrl>https://github.com/watfordjc/csharp-stream-controller</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/watfordjc/csharp-stream-controller</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,7 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="NetworkHelper\license.md">
+    <None Include="..\LICENSE">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
