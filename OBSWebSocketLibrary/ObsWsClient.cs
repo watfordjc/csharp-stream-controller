@@ -363,11 +363,15 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary
             else if (obsReply.Status == "error")
             {
                 ObsError replyModel = (ObsError)await JsonSerializer.DeserializeAsync(message, typeof(ObsError)).ConfigureAwait(false);
+                if (obsReply.RequestType == ObsRequestType.Authenticate && !CanSend)
+                {
+                    AutoReconnect = false;
+                }
                 WsClientErrorMessage errorMessage = new WsClientErrorMessage()
                 {
                     Error = new Exception(
-                        $"The {obsReply.RequestMetadata.OriginalRequestType} request {obsReply.MessageId} was responded to by a status of {obsReply.Status}.",
-                        new Exception(replyModel.Error)
+                        replyModel.Error,
+                        new Exception($"The {obsReply.RequestMetadata.OriginalRequestType} request {obsReply.MessageId} was responded to by a status of {obsReply.Status}.")
                         ),
                     ReconnectDelay = -1
                 };
