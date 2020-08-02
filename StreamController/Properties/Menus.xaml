@@ -11,6 +11,12 @@
         <MenuItem Header="_Edit">
             <MenuItem Header="_Preferences" Click="MenuWindowItem_Click" x:Name="PreferencesWindow" Loaded="MenuWindowItemLoaded" />
         </MenuItem>
+        <MenuItem Header="_Connection" Loaded="ConnectItemLoaded">
+            <MenuItem Header="_Reconnect" Command="{x:Static local:MenuItemCollection.routedConnectionMenuCommand}" x:Name="Reconnect" />
+            <MenuItem Header="_Disconnect" Command="{x:Static local:MenuItemCollection.routedConnectionMenuCommand}" x:Name="Disconnect" />
+            <Separator />
+            <MenuItem Header="_Auto-Reconnect" Click="ConnectItem_Click" x:Name="AutoReconnect" IsChecked="{Binding Source={x:Static local:Preferences.Default}, Path=obs_auto_reconnect, Mode=OneWay}" />
+        </MenuItem>
         <MenuItem Header="_Window">
             <MenuItem Header="_Audio Interfaces" Click="MenuWindowItem_Click" x:Name="MainWindow" Loaded="MenuWindowItemLoaded" />
             <MenuItem Header="Audio _Check" Click="MenuWindowItem_Click" x:Name="Audiocheck" Loaded="MenuWindowItemLoaded" />

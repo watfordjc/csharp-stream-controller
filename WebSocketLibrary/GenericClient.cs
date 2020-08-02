@@ -398,7 +398,7 @@ namespace uk.JohnCook.dotnet.WebSocketLibrary
             {
                 if (disposing)
                 {
-                    connectionCancellation.Dispose();
+                    connectionCancellation?.Dispose();
                     sendAsyncSemaphore.Dispose();
                     receiveAsyncSemaphore.Dispose();
                     ArrayPool<byte>.Shared.Return(receiveBuffer.Array);

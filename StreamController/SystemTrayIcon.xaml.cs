@@ -67,8 +67,12 @@ namespace uk.JohnCook.dotnet.StreamController
 
         public void UpdateTrayIcon()
         {
-            NotifyIcon.Icon = Properties.Resources.icon;
-            NotifyIcon.Visibility = Visibility.Visible;
+            Dispatcher.Invoke(
+                () => NotifyIcon.Icon = Properties.Resources.icon
+                );
+            Dispatcher.Invoke(
+                () => NotifyIcon.Visibility = Visibility.Visible
+                );
         }
 
         #region System Tray Context Menu

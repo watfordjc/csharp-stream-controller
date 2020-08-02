@@ -30,7 +30,11 @@
         </Style>
     </Window.Resources>
     <DockPanel>
-        <Menu DockPanel.Dock="Top" ItemsSource="{StaticResource ResourceKey=MenuItems}" AutomationProperties.Name="Application" KeyboardNavigation.TabNavigation="None" />
+        <Menu DataContext="{StaticResource MenuItems}" DockPanel.Dock="Top" x:Name="menuBar"  ItemsSource="{StaticResource ResourceKey=MenuItems}" AutomationProperties.Name="Application" KeyboardNavigation.TabNavigation="None">
+            <Menu.CommandBindings>
+                <CommandBinding Command="{x:Static local:MenuItemCollection.routedConnectionMenuCommand}" CanExecute="Menu_CanExecute" Executed="Menu_Execute" />
+            </Menu.CommandBindings>
+        </Menu>
         <StatusBar DockPanel.Dock="Bottom" Height="auto" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" Padding="2" Foreground="{DynamicResource {x:Static SystemColors.MenuTextBrushKey}}">
             <StatusBarItem DockPanel.Dock="Right">
                 <Ellipse HorizontalAlignment="Right" Width="16" Height="16" Fill="{DynamicResource {x:Static SystemColors.WindowFrameBrushKey}}" x:Name="sbCircleStatus" AutomationProperties.Name="Connection Status Indicator" />

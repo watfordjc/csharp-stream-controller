@@ -280,7 +280,20 @@ namespace uk.JohnCook.dotnet.StreamController
                 UpdateUIConnectStatus(null, Brushes.Red, null, false);
                 SystemTrayIcon.Instance.NotifyIcon.Icon = Properties.Resources.icon_red;
             }
-            else
+            else if (newState == WebSocketState.Closed)
+            {
+                UpdateUIConnectStatus("Disconnected", Brushes.Red, null, true);
+                connectionError = "Successfully disconnected.";
+                CreateWebsocketClient();
+            }
+            else if (newState == WebSocketState.None && webSocket.AutoReconnect)
+            {
+                if (!_ReconnectCountdownTimer.Enabled)
+                {
+                    _ReconnectCountdownTimer.Start();
+                }
+            }
+            else if (newState == WebSocketState.Connecting)
             {
                 if (webSocket.PasswordPreference != Preferences.Default.obs_password)
                 {
@@ -1038,5 +1051,41 @@ namespace uk.JohnCook.dotnet.StreamController
             GC.SuppressFinalize(this);
         }
         #endregion
+
+        private void Menu_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            switch ((e.OriginalSource as MenuItem).Name)
+            {
+                case "Reconnect":
+                    e.CanExecute = webSocket.State != WebSocketState.Connecting;
+                    break;
+                case "Disconnect":
+                    e.CanExecute = webSocket.State == WebSocketState.Open;
+                    break;
+                default:
+                    return;
+            }
+        }
+
+        private async void Menu_Execute(object sender, ExecutedRoutedEventArgs e)
+        {
+            switch ((e.OriginalSource as MenuItem).Name)
+            {
+                case "Reconnect":
+                    if (webSocket.State == WebSocketState.Open)
+                    {
+                        await webSocket.DisconnectAsync(true).ConfigureAwait(true);
+                    }
+                    await ObsWebsocketConnect().ConfigureAwait(true);
+                    break;
+                case "Disconnect":
+                    webSocket.AutoReconnect = false;
+                    await webSocket.DisconnectAsync(true).ConfigureAwait(true);
+                    break;
+                default:
+                    return;
+            }
+
+        }
     }
 }

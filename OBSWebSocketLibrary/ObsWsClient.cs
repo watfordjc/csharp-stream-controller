@@ -37,11 +37,12 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary
         private readonly Dictionary<Guid, ObsRequestMetadata> sentMessageGuids = new Dictionary<Guid, ObsRequestMetadata>();
         public string PasswordPreference { get; set; }
         public bool CanSend { get; private set; }
+        public WebSocketState State { get; private set; }
 
         public ObsWsClient(Uri url) : base(url)
         {
             context = SynchronizationContext.Current;
-            StateChange += WebSocket_Connected;
+            StateChange += WebSocket_StateChange;
             OnObsEvent += FurtherProcessObsEvent;
         }
 
@@ -71,8 +72,9 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary
             return sentMessageGuids.ContainsKey(messageId);
         }
 
-        private async void WebSocket_Connected(object sender, WebSocketState state)
+        private async void WebSocket_StateChange(object sender, WebSocketState state)
         {
+            State = state;
             if (state != WebSocketState.Open)
             {
                 ReceiveTextMessage -= WebSocket_NewTextMessage;

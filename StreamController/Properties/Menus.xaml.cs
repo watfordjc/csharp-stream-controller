@@ -4,11 +4,14 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace uk.JohnCook.dotnet.StreamController
 {
     public partial class MenuItemCollection : ResourceDictionary, ICollection<KeyValuePair<string, object>>
     {
+        public static readonly RoutedUICommand routedConnectionMenuCommand = new RoutedUICommand("ConnectionMenuItemCommand", "ConnectionMenuItemCommand", typeof(MenuItemCollection));
+
         private void MenuItemClose_Click(object sender, RoutedEventArgs e)
         {
             Window parent = Window.GetWindow((MenuItem)sender);
@@ -30,12 +33,38 @@ namespace uk.JohnCook.dotnet.StreamController
         {
             if (sender == null) { throw new ArgumentNullException(nameof(sender)); }
 
-            WindowUtilityLibrary.WindowType clickedWindowType = (WindowUtilityLibrary.WindowType)Enum.Parse(typeof(WindowUtilityLibrary.WindowType), ((MenuItem)sender).Name);
+            WindowUtilityLibrary.WindowType clickedWindowType = (WindowUtilityLibrary.WindowType)Enum.Parse(typeof(WindowUtilityLibrary.WindowType), (sender as MenuItem).Name);
             Window parent = Window.GetWindow((MenuItem)sender);
             WindowUtilityLibrary.WindowType windowType = WindowUtilityLibrary.GetWindowTypeEnum(parent.GetType());
             if (clickedWindowType == windowType)
             {
-                ((MenuItem)sender).IsEnabled = false;
+                (sender as MenuItem).IsEnabled = false;
+            }
+        }
+
+        private void ConnectItem_Click(object sender, RoutedEventArgs e)
+        {
+            switch ((sender as MenuItem).Name)
+            {
+                case "AutoReconnect":
+                    Preferences.Default.obs_auto_reconnect = !(sender as MenuItem).IsChecked;
+                    Preferences.Default.Save();
+                    e.Handled = true;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void ConnectItemLoaded(object sender, RoutedEventArgs e)
+        {
+            if (sender == null) { throw new ArgumentNullException(nameof(sender)); }
+
+            Window parent = Window.GetWindow((MenuItem)sender);
+            WindowUtilityLibrary.WindowType windowType = WindowUtilityLibrary.GetWindowTypeEnum(parent.GetType());
+            if (windowType != WindowUtilityLibrary.WindowType.Audiocheck)
+            {
+                (sender as MenuItem).Visibility = Visibility.Collapsed;
             }
         }
 
@@ -57,10 +86,12 @@ namespace uk.JohnCook.dotnet.StreamController
 
         public bool Remove(KeyValuePair<string, object> item)
         {
-            if (Contains(item.Key)) {
+            if (Contains(item.Key))
+            {
                 Remove(item.Key);
                 return true;
-            } else
+            }
+            else
             {
                 return false;
             }
