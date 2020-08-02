@@ -14,6 +14,7 @@ The main purpose of the solution in this repository is to create a connectivity 
 * Twitter
 * Twitch
 * An Android app (via websockets)
+* A smartwatch app for live heart rate and stress level (how: TBD)
 
 ## Solution Projects
 Project names and purposes are subject to changes, and this README is likely to lag such changes.
@@ -54,11 +55,6 @@ Its short name for milestones is **WSLib**.
 ## Branches
 ### [master](../../tree/master)
 This branch is, for the time being, the only one suitable for forking from.
-
-### [audio-interface-db](../../tree/audio-interface-db)
-This feature branch is a fork of [master](../../tree/master). It is where I was working on some UI and audio stuff.
-
-This branch is subject to rebasing and forced pushes, and will probably be deleted at some point given [issue #18](../../issues/18) resulted in something akin to an audio interface database.
 
 ### Feature Branches
 
