@@ -315,7 +315,14 @@ namespace uk.JohnCook.dotnet.WebSocketLibrary
                 {
                     receivedMessage.Message.Dispose();
                     receivedMessage.Message = null;
-                    OnStateChange(_Client.State);
+                    if (_Client != null)
+                    {
+                        OnStateChange(_Client.State);
+                    }
+                    else
+                    {
+                        OnStateChange(WebSocketState.None);
+                    }
                     OnErrorState(e, -1);
                     break;
                 }

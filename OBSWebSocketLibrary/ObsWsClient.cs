@@ -29,6 +29,7 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary
     /// </summary>
     public class ObsWsClient : GenericClient
     {
+        bool _disposed = false;
         private readonly ResourceManager rm = new ResourceManager("uk.JohnCook.dotnet.OBSWebSocketLibrary.Properties.Resources", typeof(ObsWsClient).Assembly);
         private readonly SynchronizationContext context;
         public bool AutoReconnect { get; set; }
@@ -304,6 +305,7 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary
                             AuthenticateRequest authRequest = new AuthenticateRequest();
                             if (PasswordPreference == null || PasswordPreference.Length == 0)
                             {
+                                AutoReconnect = false;
                                 OnErrorState(new Exception(rm.GetString("auth_required_no_password", CultureInfo.CurrentUICulture)), -1);
                                 break;
                             }
@@ -401,6 +403,31 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary
                     break;
             }
             NewObsEvent(obsEvent);
+        }
+
+        ~ObsWsClient() => Dispose(false);
+
+        // Protected implementation of Dispose pattern.
+        protected override void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            if (disposing)
+            {
+                // TODO: dispose managed state (managed objects).
+                heartBeatCheck.Stop();
+                heartBeatCheck.Dispose();
+            }
+
+            // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+            // TODO: set large fields to null.
+            _disposed = true;
+
+            // Call the base class implementation.
+            base.Dispose(disposing);
         }
     }
 }
