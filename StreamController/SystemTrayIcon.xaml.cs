@@ -37,21 +37,26 @@ namespace uk.JohnCook.dotnet.StreamController
             NotifyIcon.TrayMouseDoubleClick += NotifyIcon_TrayMouseDoubleClick;
         }
 
-        private void SystemTrayIcon_ThemeChanged(object sender, EventArgs e)
+        private void SystemTrayIcon_ThemeChanged(object sender, WindowUtilityLibrary.WindowsTheme oldTheme)
         {
+            if (Instance.CurrentTheme == oldTheme)
+            {
+                return;
+            }
             SystemTrayIcon oldWindow = Instance;
+            oldWindow.NotifyIcon.ContextMenu.IsOpen = false;
             oldWindow.NotifyIcon.Visibility = Visibility.Hidden;
             oldWindow.Close();
 
             lazySingleton = new Lazy<SystemTrayIcon>(
                 () => new SystemTrayIcon(false)
             );
-            Instance.UpdateTrayIcon();
             if (AudioInterfaceCollection.Instance.DevicesAreEnumerated)
             {
                 Instance.Devices_CollectionEnumerated(this, EventArgs.Empty);
             }
             oldWindow.Dispose();
+            Instance.UpdateTrayIcon();
         }
 
         private void NotifyIcon_TrayMouseDoubleClick(object sender, RoutedEventArgs e)
@@ -65,11 +70,12 @@ namespace uk.JohnCook.dotnet.StreamController
             taskbarCaptureMenu.ItemsSource = AudioInterfaceCollection.ActiveDevices;
         }
 
-        public void UpdateTrayIcon()
+        public async void UpdateTrayIcon()
         {
             Dispatcher.Invoke(
                 () => NotifyIcon.Icon = Properties.Resources.icon
                 );
+            await Task.Delay(1500).ConfigureAwait(true);
             Dispatcher.Invoke(
                 () => NotifyIcon.Visibility = Visibility.Visible
                 );

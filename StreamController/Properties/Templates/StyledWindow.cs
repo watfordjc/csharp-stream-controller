@@ -39,7 +39,7 @@ namespace uk.JohnCook.dotnet.StreamController.Controls
         {
             IsApplicationWindow = applicationWindow;
             CurrentTheme = GetApplicableTheme();
-            CreateResourceDictionary();
+            CreateResourceDictionary(CurrentTheme);
             SystemEvents.UserPreferenceChanged += SystemEvents_UserPreferenceChanged;
             FontSize = ((Int32)App.Current.Resources["DpiX"]) / 96.0 * SystemFonts.MessageFontSize;
             FontFamily = SystemFonts.MessageFontFamily;
@@ -76,18 +76,17 @@ namespace uk.JohnCook.dotnet.StreamController.Controls
         /// <summary>
         /// EventHandler for notifying of theme changes.
         /// </summary>
-        public event EventHandler ThemeChanged;
+        public event EventHandler<WindowUtilityLibrary.WindowsTheme> ThemeChanged;
 
         /// <summary>
         /// Create a resource dictionary based on app/Windows type.
         /// </summary>
-        private void CreateResourceDictionary()
+        private void CreateResourceDictionary(WindowUtilityLibrary.WindowsTheme theme)
         {
-            foreach (ResourceDictionary dictionary in WindowUtilityLibrary.GetStyledResourceDictionary(CurrentTheme).MergedDictionaries)
+            foreach (ResourceDictionary dictionary in WindowUtilityLibrary.GetStyledResourceDictionary(theme).MergedDictionaries)
             {
                 Resources.MergedDictionaries.Add(dictionary);
             }
-            ThemeChanged?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>
@@ -99,14 +98,14 @@ namespace uk.JohnCook.dotnet.StreamController.Controls
         {
             if (e.Category != UserPreferenceCategory.General) { return; }
 
+            WindowUtilityLibrary.WindowsTheme oldTheme = CurrentTheme;
             WindowUtilityLibrary.WindowsTheme newTheme = GetApplicableTheme();
-            if (newTheme == CurrentTheme) { return; }
+            if (newTheme == oldTheme) { return; }
 
             Resources.MergedDictionaries.Clear();
-
+            CreateResourceDictionary(newTheme);
             CurrentTheme = newTheme;
-
-            CreateResourceDictionary();
+            ThemeChanged?.Invoke(this, oldTheme);
         }
     }
 }
