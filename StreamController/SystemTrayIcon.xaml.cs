@@ -19,7 +19,7 @@ namespace uk.JohnCook.dotnet.StreamController
     /// <summary>
     /// Interaction logic for SystemTrayIcon.xaml
     /// </summary>
-    public partial class SystemTrayIcon : StyledWindow, IDisposable
+    public partial class SystemTrayIcon : StyledWindow
     {
         private bool disposedValue;
         public static SystemTrayIcon Instance { get { return lazySingleton.Value; } }
@@ -55,8 +55,8 @@ namespace uk.JohnCook.dotnet.StreamController
             {
                 Instance.Devices_CollectionEnumerated(this, EventArgs.Empty);
             }
-            oldWindow.Dispose();
-            Instance.UpdateTrayIcon();
+            UpdateTrayIcon();
+            oldWindow.Dispose(true);
         }
 
         private void NotifyIcon_TrayMouseDoubleClick(object sender, RoutedEventArgs e)
@@ -70,15 +70,19 @@ namespace uk.JohnCook.dotnet.StreamController
             taskbarCaptureMenu.ItemsSource = AudioInterfaceCollection.ActiveDevices;
         }
 
-        public async void UpdateTrayIcon()
+        public static async void UpdateTrayIcon()
         {
-            Dispatcher.Invoke(
-                () => NotifyIcon.Icon = Properties.Resources.icon
-                );
-            await Task.Delay(1500).ConfigureAwait(true);
-            Dispatcher.Invoke(
-                () => NotifyIcon.Visibility = Visibility.Visible
-                );
+            try
+            {
+                Instance.NotifyIcon.Icon = Properties.Resources.icon;
+                await Task.Delay(1500).ConfigureAwait(true);
+                Instance.NotifyIcon.Visibility = Visibility.Visible;
+            }
+            catch (NullReferenceException)
+            {
+                return;
+            }
+
         }
 
         #region System Tray Context Menu
@@ -114,35 +118,24 @@ namespace uk.JohnCook.dotnet.StreamController
 
         #region dispose
 
-        protected virtual void Dispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
             if (!disposedValue)
             {
                 if (disposing)
                 {
                     // TODO: dispose managed state (managed objects)
+                    ThemeChanged -= SystemTrayIcon_ThemeChanged;
+                    AudioInterfaceCollection.Instance.CollectionEnumerated -= Devices_CollectionEnumerated;
+                    NotifyIcon.TrayMouseDoubleClick -= NotifyIcon_TrayMouseDoubleClick;
                     NotifyIcon.Dispose();
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override finalizer
                 // TODO: set large fields to null
-                NotifyIcon = null;
                 disposedValue = true;
             }
-        }
-
-        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
-        ~SystemTrayIcon()
-        {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: false);
-        }
-
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
+            base.Dispose(disposing);
         }
 
         #endregion

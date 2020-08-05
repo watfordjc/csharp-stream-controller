@@ -39,7 +39,7 @@ namespace uk.JohnCook.dotnet.StreamController
     /// <summary>
     /// Interaction logic for WebSocketTest.xaml
     /// </summary>
-    public partial class WebSocketTest : StyledWindow, IDisposable
+    public partial class WebSocketTest : StyledWindow
     {
         private readonly ObsWsClient webSocket;
         private bool autoscroll = false;
@@ -323,33 +323,21 @@ namespace uk.JohnCook.dotnet.StreamController
             }
         }
 
-        protected virtual void Dispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (disposedValue)
             {
-                if (disposing)
-                {
-                    webSocket.Dispose();
-                }
-
-                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
-                // TODO: set large fields to null
-                disposedValue = true;
+                return;
             }
-        }
+            if (disposing)
+            {
+                webSocket.Dispose();
+            }
 
-        // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
-        ~WebSocketTest()
-        {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: false);
-        }
-
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
+            // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+            // TODO: set large fields to null
+            disposedValue = true;
+            base.Dispose(disposing);
         }
     }
 }

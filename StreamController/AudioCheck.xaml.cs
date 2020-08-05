@@ -37,7 +37,7 @@ namespace uk.JohnCook.dotnet.StreamController
     /// <summary>
     /// Interaction logic for AudioCheck.xaml
     /// </summary>
-    public partial class AudioCheck : StyledWindow, IDisposable
+    public partial class AudioCheck : StyledWindow
     {
         private readonly SynchronizationContext _Context;
         private ObsWsClient webSocket;
@@ -80,7 +80,7 @@ namespace uk.JohnCook.dotnet.StreamController
             Preferences.Default.PropertyChanged += Default_PropertyChanged;
             _ReconnectCountdownTimer.Elapsed += ReconnectCountdownTimer_Elapsed;
             _PreferencesApplied.Elapsed += PreferencesApplied_Elapsed;
-            SystemTrayIcon.Instance.UpdateTrayIcon();
+            SystemTrayIcon.UpdateTrayIcon();
             cbScenes.ItemsSource = sceneList;
             webSocket.AutoReconnect = Preferences.Default.obs_auto_reconnect;
             await ObsWebsocketConnect().ConfigureAwait(true);
@@ -138,7 +138,7 @@ namespace uk.JohnCook.dotnet.StreamController
                 webSocket.Dispose();
             }
             CreateWebsocketClient();
-            SystemTrayIcon.Instance.UpdateTrayIcon();
+            SystemTrayIcon.UpdateTrayIcon();
             webSocket.AutoReconnect = Preferences.Default.obs_auto_reconnect;
             if (webSocket.AutoReconnect)
             {
@@ -1017,39 +1017,28 @@ namespace uk.JohnCook.dotnet.StreamController
         }
 
         #region dispose
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    _ReconnectCountdownTimer.Dispose();
-                    _PreferencesApplied.Dispose();
-                    pulseCancellationToken.Dispose();
-                }
 
-                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
-                // TODO: set large fields to null
+        protected override void Dispose(bool disposing)
+        {
+            if (disposedValue)
+            {
+                return;
+            }
+
+            if (disposing)
+            {
+                _ReconnectCountdownTimer.Dispose();
+                _PreferencesApplied.Dispose();
+                pulseCancellationToken.Dispose();
                 silentAudioEvent?.Stop();
                 silentAudioEvent?.Dispose();
                 webSocket.Dispose();
-                disposedValue = true;
             }
+
+            disposedValue = true;
+            base.Dispose(disposing);
         }
 
-        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
-        ~AudioCheck()
-        {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: false);
-        }
-
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-        }
         #endregion
 
         private void Menu_CanExecute(object sender, CanExecuteRoutedEventArgs e)

@@ -29,7 +29,7 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary
     /// </summary>
     public class ObsWsClient : GenericClient
     {
-        bool _disposed = false;
+        private bool disposedValue;
         private readonly ResourceManager rm = new ResourceManager("uk.JohnCook.dotnet.OBSWebSocketLibrary.Properties.Resources", typeof(ObsWsClient).Assembly);
         private readonly SynchronizationContext context;
         public bool AutoReconnect { get; set; }
@@ -407,28 +407,25 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary
             NewObsEvent(obsEvent);
         }
 
-        ~ObsWsClient() => Dispose(false);
-
-        // Protected implementation of Dispose pattern.
         protected override void Dispose(bool disposing)
         {
-            if (_disposed)
+            if (disposedValue)
             {
                 return;
             }
 
             if (disposing)
             {
-                // TODO: dispose managed state (managed objects).
+                // TODO: dispose managed state (managed objects)
+                StateChange -= WebSocket_StateChange;
+                OnObsEvent -= FurtherProcessObsEvent;
                 heartBeatCheck.Stop();
                 heartBeatCheck.Dispose();
             }
 
-            // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
-            // TODO: set large fields to null.
-            _disposed = true;
-
-            // Call the base class implementation.
+            // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+            // TODO: set large fields to null
+            disposedValue = true;
             base.Dispose(disposing);
         }
     }

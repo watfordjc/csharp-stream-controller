@@ -20,8 +20,10 @@ namespace uk.JohnCook.dotnet.StreamController.Controls
     /// <summary>
     /// A Window that follows system preferences for themes.
     /// </summary>
-    public abstract class StyledWindow : Window
+    public abstract class StyledWindow : Window, IDisposable
     {
+        private bool disposedValue;
+
         /// <summary>
         /// The theme currently in use.
         /// </summary>
@@ -106,6 +108,36 @@ namespace uk.JohnCook.dotnet.StreamController.Controls
             CreateResourceDictionary(newTheme);
             CurrentTheme = newTheme;
             ThemeChanged?.Invoke(this, oldTheme);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects)
+                    SystemEvents.UserPreferenceChanged -= SystemEvents_UserPreferenceChanged;
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                // TODO: set large fields to null
+                disposedValue = true;
+            }
+        }
+
+        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+        // ~StyledWindow()
+        // {
+        //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        //     Dispose(disposing: false);
+        // }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }
