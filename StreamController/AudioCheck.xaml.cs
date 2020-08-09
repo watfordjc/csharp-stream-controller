@@ -47,7 +47,7 @@ namespace uk.JohnCook.dotnet.StreamController
         private WaveOutEvent silentAudioEvent = null;
         private static readonly Brush primaryBrush = new SolidColorBrush(Color.FromArgb(0xFF, 0xE2, 0xC1, 0xEA));
         private static readonly Brush secondaryBrush = new SolidColorBrush(Color.FromArgb(0xFF, 0xC5, 0xC0, 0xEB));
-        private CancellationTokenSource pulseCancellationToken;
+        private readonly SemaphoreSlim iconSemaphore = new SemaphoreSlim(1);
         private readonly System.Timers.Timer _ReconnectCountdownTimer = new System.Timers.Timer(1000);
         private readonly System.Timers.Timer _PreferencesApplied = new System.Timers.Timer(500);
         private int _ReconnectTimeRemaining;
@@ -69,7 +69,6 @@ namespace uk.JohnCook.dotnet.StreamController
 
         private async void Window_ContentRendered(object sender, EventArgs e)
         {
-            pulseCancellationToken = new CancellationTokenSource();
             UpdateUIConnectStatus(null, null, null, false);
             AudioInterfaceCollection.Instance.CollectionEnumerated += AudioDevicesEnumerated;
             if (AudioInterfaceCollection.Instance.DevicesAreEnumerated)
@@ -271,14 +270,12 @@ namespace uk.JohnCook.dotnet.StreamController
                 extendedConnectionError = String.Empty;
                 _ReconnectCountdownTimer.Stop();
                 UpdateUIConnectStatus("Connected", Brushes.DarkGreen, null, true);
-                SystemTrayIcon.Instance.NotifyIcon.Icon = Properties.Resources.icon_dark_green;
                 obsSourceDictionary.Clear();
             }
             else if (newState != WebSocketState.Connecting && webSocket.AutoReconnect == true)
             {
                 _ReconnectCountdownTimer.Start();
                 UpdateUIConnectStatus(null, Brushes.Red, null, false);
-                SystemTrayIcon.Instance.NotifyIcon.Icon = Properties.Resources.icon_red;
             }
             else if (newState == WebSocketState.Closed)
             {
@@ -303,7 +300,6 @@ namespace uk.JohnCook.dotnet.StreamController
                 extendedConnectionError = String.Empty;
                 _ReconnectCountdownTimer.Stop();
                 UpdateUIConnectStatus("Connecting\u2026", Brushes.DarkGoldenrod, null, true);
-                SystemTrayIcon.Instance.NotifyIcon.Icon = Properties.Resources.dark_golden_rod;
             }
         }
 
@@ -612,23 +608,11 @@ namespace uk.JohnCook.dotnet.StreamController
 
         private void Heartbeat_Event(HeartbeatObsEvent messageObject)
         {
-            if (!pulseCancellationToken.IsCancellationRequested)
-            {
-                pulseCancellationToken.Cancel();
-            }
-            pulseCancellationToken = new CancellationTokenSource();
-            try
-            {
                 UpdateUIConnectStatus(
                     null,
                     messageObject.Pulse ? primaryBrush : secondaryBrush,
                     Brushes.Gray,
                     false);
-            }
-            catch (TaskCanceledException)
-            {
-                UpdateUIConnectStatus(null, Brushes.Gray, null, false);
-            }
         }
 
         private void SwitchScenes_Event(SwitchScenesObsEvent messageObject)
@@ -929,34 +913,75 @@ namespace uk.JohnCook.dotnet.StreamController
                     _ => tbReconnectCountdown.Text = countdownText,
                     null);
             }
-            if (brush1 != null)
-            {
-                _Context.Send(
-                    _ => sbCircleStatus.Fill = brush1,
-                    null);
-                if (brush1 == primaryBrush)
-                {
-                    SystemTrayIcon.Instance.NotifyIcon.Icon = Properties.Resources.icon;
-                }
-                else if (brush1 == secondaryBrush)
-                {
-                    SystemTrayIcon.Instance.NotifyIcon.Icon = Properties.Resources.icon_secondary;
-                }
-            }
             if (announceChange)
             {
                 _Context.Send(
                     x => TextBlock_AnnounceChanged(tbReconnectCountdown),
                     null);
             }
+            await ChangeIconColor(announceChange, brush1, brush2).ConfigureAwait(false);
+        }
+
+        private async Task ChangeIconColor(bool highPriority, Brush brush1, Brush brush2)
+        {
+            // System tray icon must be visible at this point for its icon to change, with some high priority exceptions (disconnected).
+            bool taskbarIconVisible = SystemTrayIcon.Instance.NotifyIcon.Visibility == Visibility.Visible;
+            // Low priority changes are out of date after 250ms.
+            bool haveSemaphore = await iconSemaphore.WaitAsync(250).ConfigureAwait(true);
+
+            if (!haveSemaphore && !highPriority)
+            {
+                return;
+            }
+            else if (!haveSemaphore && highPriority)
+            {
+                // High priority changes can wait forever.
+                await iconSemaphore.WaitAsync(-1).ConfigureAwait(true);
+            }
+
+            // Set the first (colour change) brush to the status bar and system tray.
+            if (brush1 != null)
+            {
+                _Context.Send(
+                    _ => sbCircleStatus.Fill = brush1,
+                    null);
+                if (brush1 == primaryBrush && taskbarIconVisible)
+                {
+                    SystemTrayIcon.Instance.NotifyIcon.Icon = Properties.Resources.icon;
+                }
+                else if (brush1 == secondaryBrush && taskbarIconVisible)
+                {
+                    SystemTrayIcon.Instance.NotifyIcon.Icon = Properties.Resources.icon_secondary;
+                }
+                else if (brush1 == Brushes.DarkGoldenrod && taskbarIconVisible)
+                {
+                    SystemTrayIcon.Instance.NotifyIcon.Icon = Properties.Resources.icon_dark_golden_rod;
+                }
+                else if (brush1 == Brushes.Red)
+                {
+                    SystemTrayIcon.Instance.NotifyIcon.Icon = Properties.Resources.icon_red;
+                }
+                else if (brush1 == Brushes.DarkGreen && taskbarIconVisible)
+                {
+                    SystemTrayIcon.Instance.NotifyIcon.Icon = Properties.Resources.icon_dark_green;
+                }
+            }
+
+            // Set the second (return colour) brush to the status bar after 250ms and return system tray to neutral icon.
             if (brush2 != null)
             {
-                await Task.Delay(250, pulseCancellationToken.Token).ConfigureAwait(false);
+                await Task.Delay(250).ConfigureAwait(true);
                 _Context.Send(
                     _ => sbCircleStatus.Fill = brush2,
                     null);
                 SystemTrayIcon.Instance.NotifyIcon.Icon = Properties.Resources.icon_neutral;
             }
+            // If there is no return colour, prevent the colour changing for one second.
+            else
+            {
+                await Task.Delay(1000).ConfigureAwait(true);
+            }
+            iconSemaphore.Release();
         }
 
         private Task UpdateSceneInformation()
@@ -1029,7 +1054,7 @@ namespace uk.JohnCook.dotnet.StreamController
             {
                 _ReconnectCountdownTimer.Dispose();
                 _PreferencesApplied.Dispose();
-                pulseCancellationToken.Dispose();
+                iconSemaphore.Dispose();
                 silentAudioEvent?.Stop();
                 silentAudioEvent?.Dispose();
                 webSocket.Dispose();

@@ -63,9 +63,9 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon dark_golden_rod {
+        internal static System.Drawing.Icon icon {
             get {
-                object obj = ResourceManager.GetObject("dark_golden_rod", resourceCulture);
+                object obj = ResourceManager.GetObject("icon", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
@@ -73,9 +73,9 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon icon {
+        internal static System.Drawing.Icon icon_dark_golden_rod {
             get {
-                object obj = ResourceManager.GetObject("icon", resourceCulture);
+                object obj = ResourceManager.GetObject("icon_dark_golden_rod", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
