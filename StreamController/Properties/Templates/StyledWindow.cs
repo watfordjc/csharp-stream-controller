@@ -45,6 +45,7 @@ namespace uk.JohnCook.dotnet.StreamController.Controls
             SystemEvents.UserPreferenceChanged += SystemEvents_UserPreferenceChanged;
             FontSize = ((Int32)App.Current.Resources["DpiX"]) / 96.0 * SystemFonts.MessageFontSize;
             FontFamily = SystemFonts.MessageFontFamily;
+            this.Closed += StyledWindow_Closed;
         }
 
         /// <summary>
@@ -59,6 +60,14 @@ namespace uk.JohnCook.dotnet.StreamController.Controls
 
             App.Current.Resources["DpiX"] = dpiXProperty.GetValue(null, null);
             App.Current.Resources["DpiY"] = dpiYProperty.GetValue(null, null);
+        }
+
+        /// <summary>
+        /// Show tray icon on window close
+        /// </summary>
+        private void StyledWindow_Closed(object sender, EventArgs e)
+        {
+            SystemTrayIcon.UpdateTrayIcon();
         }
 
         /// <summary>

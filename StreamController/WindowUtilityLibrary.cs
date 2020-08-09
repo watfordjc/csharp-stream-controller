@@ -30,7 +30,8 @@ namespace uk.JohnCook.dotnet.StreamController
             MainWindow = 0,
             PreferencesWindow = 1,
             WebSocketTest = 2,
-            Audiocheck = 3
+            Audiocheck = 3,
+            SystemTrayIcon = 4
         }
 
         /// <summary>
@@ -41,7 +42,8 @@ namespace uk.JohnCook.dotnet.StreamController
             { typeof(MainWindow), WindowType.MainWindow },
             { typeof(PreferencesWindow), WindowType.PreferencesWindow },
             { typeof(WebSocketTest), WindowType.WebSocketTest },
-            { typeof(AudioCheck), WindowType.Audiocheck }
+            { typeof(AudioCheck), WindowType.Audiocheck },
+            { typeof(SystemTrayIcon), WindowType.SystemTrayIcon }
         };
 
         /// <summary>
