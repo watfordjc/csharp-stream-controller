@@ -7,7 +7,7 @@
     <UseWPF>true</UseWPF>
     <Version>0.0.4</Version>
     <NeutralLanguage>en-GB</NeutralLanguage>
-    <StartupObject>StreamController.App</StartupObject>
+    <StartupObject>uk.JohnCook.dotnet.StreamController.Program</StartupObject>
     <Authors>John Cook</Authors>
     <Copyright>Copyright © John Cook 2020</Copyright>
     <Platforms>AnyCPU;x64;x86</Platforms>
