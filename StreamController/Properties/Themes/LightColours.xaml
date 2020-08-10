@@ -34,6 +34,13 @@
     <SolidColorBrush x:Key="ContextMenu.Static.Rectangle2" Color="#E2E3E3" />
     <SolidColorBrush x:Key="ContextMenu.Static.Rectangle3" Color="White" />
     
+    <!-- Text Boxes -->
+
+    <SolidColorBrush x:Key="TextBox.Static.Background" Color="#FFFFFFFF" />
+    <SolidColorBrush x:Key="TextBox.Static.Border" Color="#FFABAdB3" />
+    <SolidColorBrush x:Key="TextBox.MouseOver.Border" Color="#FF7EB4EA" />
+    <SolidColorBrush x:Key="TextBox.Focus.Border" Color="#FF569DE5" />
+
     <!-- Preferences Window -->
 
     <SolidColorBrush x:Key="Text.Static.Error" Color="Red" />
