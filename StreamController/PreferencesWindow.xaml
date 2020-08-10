@@ -144,7 +144,7 @@
                     </GroupBox>
                     <StackPanel Orientation="Horizontal">
                         <CheckBox Content="_Use Password:" Margin="8 6" Padding="5" VerticalContentAlignment="Center" VerticalAlignment="Center" x:Name="cbUsePassword" IsChecked="{Binding Path=obs_use_password, Source={x:Static local:Preferences.Default}, Mode=OneWay}" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
-                        <PasswordBox AutomationProperties.Name="Password" MinWidth="160" PasswordChar="_" x:Name="pbPassword" Margin="0 6" Padding="5" IsEnabled="{Binding ElementName=cbUsePassword, Path=IsChecked}" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
+                        <PasswordBox AutomationProperties.Name="Password" MinWidth="160" Style="{DynamicResource PasswordBoxStyle}" PasswordChar="_" x:Name="pbPassword" Margin="0 6" Padding="5" IsEnabled="{Binding ElementName=cbUsePassword, Path=IsChecked}" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <CheckBox Content="_Connect on Launch" VerticalContentAlignment="Center" Margin="8 6" Padding="5" x:Name="cbConnectLaunch" IsChecked="{Binding Path=obs_connect_launch, Source={x:Static local:Preferences.Default}}" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
