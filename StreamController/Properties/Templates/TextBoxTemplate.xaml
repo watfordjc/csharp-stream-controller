@@ -84,11 +84,11 @@
     <!--=================================================================
         PasswordBox
     ==================================================================-->
-    <Style x:Key="{x:Type PasswordBox}"
+    <Style x:Key="StyledPasswordBox"
            TargetType="{x:Type PasswordBox}">
         <Setter Property="PasswordChar" Value="●"/>
         <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"/>
-        <Setter Property="BorderBrush" Value="{StaticResource TextBox.Static.Border}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource TextBox.Static.Border}"/>
         <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="KeyboardNavigation.TabNavigation" Value="None"/>
@@ -105,6 +105,12 @@
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}"
                         SnapsToDevicePixels="True">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="ValidationStates">
+                                <VisualState x:Name="InvalidFocused" />
+                                <VisualState x:Name="InvalidUnfocused" />
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
                         <ScrollViewer x:Name="PART_ContentHost" 
                             Focusable="false" 
                             HorizontalScrollBarVisibility="Hidden" 
@@ -115,24 +121,35 @@
                             <Setter TargetName="border" Property="Opacity" Value="0.56"/>
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="true">
-                            <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource TextBox.MouseOver.Border}" />
+                            <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource TextBox.MouseOver.Border}" />
                         </Trigger>
-                        <Trigger Property="IsKeyboardFocused" Value="true">
-                            <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource TextBox.Focus.Border}" />
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsKeyboardFocused" Value="true" />
+                                <Condition Property="Validation.HasError" Value="false" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource TextBox.Focus.Border}" />
+                        </MultiTrigger>
+                        <Trigger Property="Validation.HasError" Value="true">
+                            <Trigger.Setters>
+                                <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource Text.Static.Error}" />
+                                <Setter TargetName="border" Property="BorderThickness" Value="2" />
+                                <Setter TargetName="border" Property="Margin" Value="-1" />
+                            </Trigger.Setters>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Path=(framework:FrameworkAppContextSwitches.UseAdornerForTextboxSelectionRendering)}" Value="false">
+            <!--<DataTrigger Binding="{Binding Path=(framework:FrameworkAppContextSwitches.UseAdornerForTextboxSelectionRendering)}" Value="false">-->
                 <!-- DDVSO:405199
                      Ensure that the proper text selection colors are used per theme if non-adorner selection is enabled -->
-                <Setter Property="SelectionBrush"
+                <!--<Setter Property="SelectionBrush"
                     Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
                 <Setter Property="SelectionTextBrush"
-                    Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}" />
-            </DataTrigger>
+                    Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}" />-->
+            <!--</DataTrigger>-->
             <MultiTrigger>
                 <MultiTrigger.Conditions>
                     <Condition Property="IsInactiveSelectionHighlightEnabled" Value="true" />
@@ -143,4 +160,5 @@
             </MultiTrigger>
         </Style.Triggers>
     </Style>
+
 </ResourceDictionary>

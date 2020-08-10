@@ -27,4 +27,10 @@
         </Style.Resources>
     </Style>
 
+    <Style x:Key="PasswordBoxStyle" TargetType="{x:Type PasswordBox}" BasedOn="{StaticResource StyledPasswordBox}">
+        <Style.Resources>
+            <ResourceDictionary Source="LightColours.xaml" />
+        </Style.Resources>
+    </Style>
+
 </ResourceDictionary>
