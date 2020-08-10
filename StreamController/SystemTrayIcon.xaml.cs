@@ -74,9 +74,14 @@ namespace uk.JohnCook.dotnet.StreamController
         {
             try
             {
-                Instance.NotifyIcon.Icon = Properties.Resources.icon;
+                Instance.Dispatcher.Invoke(
+                    () => Instance.NotifyIcon.Icon = Properties.Resources.icon
+                    );
                 await Task.Delay(1500).ConfigureAwait(true);
-                Instance.NotifyIcon.Visibility = Visibility.Visible;
+                Instance.Dispatcher.Invoke(
+                    () => Instance.NotifyIcon.Visibility = Visibility.Visible
+                    );
+
             }
             catch (NullReferenceException)
             {
