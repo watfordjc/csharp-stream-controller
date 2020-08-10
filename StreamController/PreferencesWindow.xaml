@@ -15,20 +15,17 @@
     </Window.DataContext>
     <Window.Resources>
         <Style x:Key="{x:Static SystemParameters.FocusVisualStyleKey}" BasedOn="{StaticResource ResourceKey={x:Static SystemParameters.FocusVisualStyleKey}}">
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding Source={x:Static SystemParameters.HighContrast}}" Value="False">
-                    <Setter Property="Control.Template">
-                        <Setter.Value>
-                            <ControlTemplate>
-                                <Rectangle StrokeThickness="2"
-                                           Stroke="RoyalBlue"
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Rectangle Margin="-4"
+                                           StrokeThickness="2"
+                                           Stroke="{DynamicResource TextBox.Focus.Border}"
                                            StrokeDashArray="5 3"
                                            SnapsToDevicePixels="true" />
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </DataTrigger>
-            </Style.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
     </Window.Resources>
     <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="16 0">
@@ -92,7 +89,7 @@
                                 </TextBlock>
                             </StackPanel>
                             <Label Grid.Column="0" Grid.Row="1" x:Name="hostname_label" Content="_Hostname:" Target="{Binding ElementName=tbUriHostname}" VerticalAlignment="Center" Margin="8 4 2 4" />
-                            <TextBox Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" AutomationProperties.LabeledBy="{Binding ElementName=hostname_label}" VerticalAlignment="Center"  Margin="2 4 2 4" Padding="5" MinWidth="200" x:Name="tbUriHostname" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
+                            <TextBox Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" Style="{DynamicResource TextBoxStyle}" AutomationProperties.LabeledBy="{Binding ElementName=hostname_label}" VerticalAlignment="Center"  Margin="2 4 2 4" Padding="5" MinWidth="200" x:Name="tbUriHostname" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
                                 <TextBox.Text>
                                     <Binding Path="obs_uri_host" UpdateSourceTrigger="PropertyChanged" Source="{x:Static local:Preferences.Default}" Mode="TwoWay">
                                         <Binding.ValidationRules>
@@ -118,7 +115,7 @@
                             </TextBlock>
                             <Label Grid.Row="3" Grid.Column="0" x:Name="port_label" Content="_Port:" Target="{Binding ElementName=tbUriPort}" VerticalAlignment="Center" Margin="8 4 2 4" />
                             <StackPanel Grid.Row="3" Grid.Column="1"  Orientation="Horizontal">
-                                <TextBox AutomationProperties.LabeledBy="{Binding ElementName=port_label}" TextAlignment="Center" VerticalAlignment="Center" MinWidth="60" Padding="5" Margin="2 4 8 4" x:Name="tbUriPort" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
+                                <TextBox AutomationProperties.LabeledBy="{Binding ElementName=port_label}" Style="{DynamicResource TextBoxStyle}" TextAlignment="Center" VerticalAlignment="Center" MinWidth="60" Padding="5" Margin="2 4 8 4" x:Name="tbUriPort" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
                                     <TextBox.Text>
                                         <Binding Path="obs_uri_port" UpdateSourceTrigger="PropertyChanged" Source="{x:Static local:Preferences.Default}" Mode="TwoWay">
                                             <Binding.ValidationRules>
@@ -150,8 +147,8 @@
                         <PasswordBox AutomationProperties.Name="Password" MinWidth="160" PasswordChar="_" x:Name="pbPassword" Margin="0 6" Padding="5" IsEnabled="{Binding ElementName=cbUsePassword, Path=IsChecked}" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <CheckBox Content="_Connect on Launch" VerticalContentAlignment="Center" Margin="8 6" Padding="5" x:Name="cbConnectLaunch" IsChecked="{Binding Path=obs_connect_launch, Source={x:Static local:Preferences.Default}, Mode=TwoWay}" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
-                        <CheckBox Content="Automatically _Reconnect" VerticalContentAlignment="Center" Margin="8 6" Padding="5" x:Name="cbAutoReconnect" IsChecked="{Binding Path=obs_auto_reconnect, Source={x:Static local:Preferences.Default}, Mode=TwoWay}" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
+                        <CheckBox Content="_Connect on Launch" VerticalContentAlignment="Center" Margin="8 6" Padding="5" x:Name="cbConnectLaunch" IsChecked="{Binding Path=obs_connect_launch, Source={x:Static local:Preferences.Default}}" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
+                        <CheckBox Content="Automatically _Reconnect" VerticalContentAlignment="Center" Margin="8 6" Padding="5" x:Name="cbAutoReconnect" IsChecked="{Binding Path=obs_auto_reconnect, Source={x:Static local:Preferences.Default}}" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
                     </StackPanel>
                     <GroupBox Header="Exponential Back-off" Margin="8 4">
                         <Grid>
@@ -167,7 +164,7 @@
                                 <RowDefinition Height="auto" />
                             </Grid.RowDefinitions>
                             <Label x:Name="minBackoffLabel" Grid.Row="0" Grid.Column="0" Content="_Delay in seconds between 1st and 2nd connection attempt:" Target="{Binding ElementName=tbBackoffMin}" Margin="2 4" VerticalAlignment="Center" />
-                            <TextBox AutomationProperties.Name="First reconnect delay in seconds" Grid.Row="0" Grid.Column="1"  Margin="2 4" VerticalAlignment="Center" Width="40" Padding="5" TextAlignment="Right" x:Name="tbBackoffMin" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
+                            <TextBox AutomationProperties.Name="First reconnect delay in seconds" Grid.Row="0" Grid.Column="1" Margin="2 4" Style="{DynamicResource TextBoxStyle}" VerticalAlignment="Center" Width="40" Padding="5" TextAlignment="Right" x:Name="tbBackoffMin" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
                                 <TextBox.Text>
                                     <Binding Path="obs_reconnect_min_seconds" UpdateSourceTrigger="PropertyChanged" Source="{x:Static local:Preferences.Default}" Mode="TwoWay">
                                         <Binding.ValidationRules>
@@ -193,7 +190,7 @@
                                 </TextBlock.Style>
                             </TextBlock>
                             <Label x:Name="maxBackoffLabel" Grid.Row="2" Grid.Column="0" Content="_Maximum delay in minutes between connection attempts:" Target="{Binding ElementName=tbBackoffMax}" Margin="2 4" VerticalAlignment="Center" />
-                            <TextBox AutomationProperties.Name="Maximum reconnect delay in minutes" Grid.Row="2" Grid.Column="1" Margin="2 4" VerticalAlignment="Center" Width="40" Padding="5" TextAlignment="Right" x:Name="tbBackoffMax" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
+                            <TextBox AutomationProperties.Name="Maximum reconnect delay in minutes" Grid.Row="2" Grid.Column="1" Margin="2 4" Style="{DynamicResource TextBoxStyle}" VerticalAlignment="Center" Width="40" Padding="5" TextAlignment="Right" x:Name="tbBackoffMax" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
                                 <TextBox.Text>
                                     <Binding Path="obs_reconnect_max_minutes" UpdateSourceTrigger="PropertyChanged" Source="{x:Static local:Preferences.Default}" Mode="TwoWay">
                                         <Binding.ValidationRules>
