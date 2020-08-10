@@ -4,6 +4,7 @@
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="DarkColours.xaml" />
+        <ResourceDictionary Source="..\Templates\TextBoxTemplate.xaml" />
         <ResourceDictionary Source="..\Templates\ContextMenuTemplate.xaml" />
         <ResourceDictionary Source="..\Templates\MenuItemTemplate.xaml" />
     </ResourceDictionary.MergedDictionaries>
@@ -19,5 +20,11 @@
             <ResourceDictionary Source="DarkColours.xaml" />
         </Style.Resources>
     </Style>
-    
+
+    <Style x:Key="TextBoxStyle" TargetType="{x:Type TextBox}" BasedOn="{StaticResource StyledTextBox}">
+        <Style.Resources>
+            <ResourceDictionary Source="DarkColours.xaml" />
+        </Style.Resources>
+    </Style>
+
 </ResourceDictionary>
