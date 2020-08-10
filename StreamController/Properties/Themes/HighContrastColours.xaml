@@ -32,6 +32,13 @@
     <SolidColorBrush x:Key="ContextMenu.Static.Rectangle2" Color="{DynamicResource {x:Static SystemColors.MenuColorKey}}" />
     <SolidColorBrush x:Key="ContextMenu.Static.Rectangle3" Color="{DynamicResource {x:Static SystemColors.MenuColorKey}}" />
 
+    <!-- Text Boxes -->
+
+    <SolidColorBrush x:Key="TextBox.Static.Background" Color="{DynamicResource {x:Static SystemColors.WindowColorKey}}" />
+    <SolidColorBrush x:Key="TextBox.Static.Border" Color="{DynamicResource {x:Static SystemColors.WindowFrameColorKey}}" />
+    <SolidColorBrush x:Key="TextBox.MouseOver.Border" Color="{DynamicResource {x:Static SystemColors.HighlightColorKey}}" />
+    <SolidColorBrush x:Key="TextBox.Focus.Border" Color="{DynamicResource {x:Static SystemColors.ActiveBorderColorKey}}" />
+
     <!-- Preferences Window -->
 
     <SolidColorBrush x:Key="Text.Static.Error" Color="{DynamicResource {x:Static SystemColors.MenuTextColorKey}}" />
