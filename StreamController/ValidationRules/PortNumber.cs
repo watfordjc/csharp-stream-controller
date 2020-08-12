@@ -20,7 +20,7 @@ namespace uk.JohnCook.dotnet.StreamController.ValidationRules
                 number > IPEndPoint.MaxPort
                 )
             {
-                return new ValidationResult(false, "Please enter a valid port number.");
+                return new ValidationResult(false, Properties.Resources.validation_error_PortNumber);
             }
             return ValidationResult.ValidResult;
         }

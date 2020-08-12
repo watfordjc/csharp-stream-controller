@@ -17,7 +17,7 @@ namespace uk.JohnCook.dotnet.StreamController.ValidationRules
                 Uri.CheckHostName((string)value) == UriHostNameType.Unknown
                 )
             {
-                return new ValidationResult(false, "Please enter a valid hostname or IP address.");
+                return new ValidationResult(false, Properties.Resources.validation_error_Hostname);
             }
             return ValidationResult.ValidResult;
         }

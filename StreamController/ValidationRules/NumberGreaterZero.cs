@@ -19,7 +19,7 @@ namespace uk.JohnCook.dotnet.StreamController.ValidationRules
                 number > int.MaxValue
                 )
             {
-                return new ValidationResult(false, "Please enter a number greater than zero.");
+                return new ValidationResult(false, Properties.Resources.validation_error_NumberGreaterZero);
             }
             return ValidationResult.ValidResult;
         }

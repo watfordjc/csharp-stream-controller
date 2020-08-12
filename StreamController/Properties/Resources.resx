@@ -121,12 +121,16 @@
     <value>Stream Controller</value>
     <comment>Friendly application name</comment>
   </data>
+  <data name="application_name_obs-websocket" xml:space="preserve">
+    <value>OBS-websocket</value>
+    <comment>The application name for obs-websocket.</comment>
+  </data>
   <data name="button_connect" xml:space="preserve">
     <value>Connect</value>
     <comment>Button text - Connect</comment>
   </data>
   <data name="button_connect_accelerator" xml:space="preserve">
-    <value>Ctrl+R</value>
+    <value>Ctrl+r</value>
     <comment>Accelerator key for Connect and Reconnect buttons</comment>
   </data>
   <data name="button_disconnect" xml:space="preserve">
@@ -134,12 +138,20 @@
     <comment>Button text - Disconnect</comment>
   </data>
   <data name="button_disconnect_accelerator" xml:space="preserve">
-    <value>Ctrl+D</value>
+    <value>Ctrl+d</value>
     <comment>Accelerator key for Disconnect buttons</comment>
   </data>
   <data name="button_reconnect" xml:space="preserve">
     <value>Reconnect</value>
     <comment>Button text - Reconnect</comment>
+  </data>
+  <data name="button_save" xml:space="preserve">
+    <value>Save</value>
+    <comment>Button text - Save</comment>
+  </data>
+  <data name="button_save_accelerator" xml:space="preserve">
+    <value>Ctrl+s</value>
+    <comment>Accelerator key for Save buttons</comment>
   </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
@@ -228,6 +240,14 @@
     <value>The next time you open Preferences the password box will contain placeholder text.</value>
     <comment>Dialog box text - password will be replaced with placeholder text when preferences window is next opened.</comment>
   </data>
+  <data name="text_minutes" xml:space="preserve">
+    <value>minutes</value>
+    <comment>Text - minutes</comment>
+  </data>
+  <data name="text_seconds" xml:space="preserve">
+    <value>seconds</value>
+    <comment>Text - seconds</comment>
+  </data>
   <data name="title_new_password_error" xml:space="preserve">
     <value>New Password Error</value>
     <comment>Dialog box title - New Password Error</comment>
@@ -260,6 +280,26 @@
     <value>E_nsure Custom Audio</value>
     <comment>Tray icon -&gt; right-click -&gt; Ensure Custom Audio</comment>
   </data>
+  <data name="validation_error_ComboBoxOneItemSelected" xml:space="preserve">
+    <value>Please select an item.</value>
+    <comment>Validation error - no combo box items selected</comment>
+  </data>
+  <data name="validation_error_Hostname" xml:space="preserve">
+    <value>Please enter a valid hostname or IP address.</value>
+    <comment>Validation error - invalid hostname or IP address</comment>
+  </data>
+  <data name="validation_error_NumberGreaterZero" xml:space="preserve">
+    <value>Please enter a number greater than zero.</value>
+    <comment>Validation error - number less than or equal to zero</comment>
+  </data>
+  <data name="validation_error_PortNumber" xml:space="preserve">
+    <value>Please enter a valid port number.</value>
+    <comment>Validation error - invalid port number</comment>
+  </data>
+  <data name="validation_error_window_preferences_save" xml:space="preserve">
+    <value>The last save attempt failed as there were errors above.</value>
+    <comment>Validation error - Save, form has errors</comment>
+  </data>
   <data name="window_audio-check_title" xml:space="preserve">
     <value>AudioCheck</value>
     <comment>Title Bar for AudioCheck.xaml</comment>
@@ -284,9 +324,65 @@
     <value>WebSocketTest</value>
     <comment>Title Bar for WebSocketText.xaml</comment>
   </data>
+  <data name="window_preferences_auto-scroll" xml:space="preserve">
+    <value>_Auto-scroll</value>
+    <comment>Text for (Preferences.xaml -&gt; OBS-websocket -&gt; Auto-scroll)</comment>
+  </data>
+  <data name="window_preferences_automatic-reconnect" xml:space="preserve">
+    <value>Automatically _Reconnect</value>
+    <comment>Text for (Preferences.xaml -&gt; OBS-websocket -&gt; Automatically Reconnect checkbox)</comment>
+  </data>
+  <data name="window_preferences_backoff_max_automation-name" xml:space="preserve">
+    <value>Maximum reconnect delay in minutes</value>
+    <comment>Automation name for (Preferences.xaml -&gt; Exponential Back-off -&gt; Maximum)</comment>
+  </data>
+  <data name="window_preferences_backoff_max_label" xml:space="preserve">
+    <value>_Maximum delay in minutes between connection attempts:</value>
+    <comment>Text for (Preferences.xaml -&gt; Exponential Back-off -&gt; Maximum)</comment>
+  </data>
+  <data name="window_preferences_backoff_min_automation-name" xml:space="preserve">
+    <value>First reconnect delay in seconds</value>
+    <comment>Automation name for (Preferences.xaml -&gt; Exponential Back-off -&gt; Minimum)</comment>
+  </data>
+  <data name="window_preferences_backoff_min_label" xml:space="preserve">
+    <value>_Delay in seconds between 1st and 2nd connection attempt:</value>
+    <comment>Text for (Preferences.xaml -&gt; Exponential Back-off -&gt; Minimum)</comment>
+  </data>
+  <data name="window_preferences_connect-on-launch" xml:space="preserve">
+    <value>_Connect on Launch</value>
+    <comment>Text for (Preferences.xaml -&gt; OBS-websocket -&gt; Connect on Launch checkbox)</comment>
+  </data>
+  <data name="window_preferences_groupbox_backoff" xml:space="preserve">
+    <value>Exponential Back-off</value>
+    <comment>Text for (Preferences.xaml -&gt; Exponential Back-off)</comment>
+  </data>
+  <data name="window_preferences_groupbox_server-uri_label" xml:space="preserve">
+    <value>Server URI</value>
+    <comment>Text for (Preferences.xaml -&gt; OBS-websocket -&gt; Server URI)</comment>
+  </data>
+  <data name="window_preferences_hostname_label" xml:space="preserve">
+    <value>_Hostname:</value>
+    <comment>Text for (Preferences.xaml -&gt; Server URI -&gt; Hostname)</comment>
+  </data>
+  <data name="window_preferences_password_automation-name" xml:space="preserve">
+    <value>Password</value>
+    <comment>Automation name for (Preferences.xaml -&gt; Server URI -&gt; Password)</comment>
+  </data>
+  <data name="window_preferences_port_label" xml:space="preserve">
+    <value>_Port:</value>
+    <comment>Text for (Preferences.xaml -&gt; Server URI -&gt; Port)</comment>
+  </data>
+  <data name="window_preferences_scheme_label" xml:space="preserve">
+    <value>_Scheme:</value>
+    <comment>Text for (Preferences.xaml -&gt; Server URI -&gt; Scheme)</comment>
+  </data>
   <data name="window_preferences_title" xml:space="preserve">
     <value>Preferences</value>
     <comment>Title Bar for Preferences.xaml</comment>
+  </data>
+  <data name="window_preferences_use-password_label" xml:space="preserve">
+    <value>_Use Password:</value>
+    <comment>Text for (Preferences.xaml -&gt; Server URI -&gt; Use Password)</comment>
   </data>
   <data name="window_system-tray-icon_title" xml:space="preserve">
     <value>SystemTrayIcon</value>

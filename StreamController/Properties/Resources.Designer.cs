@@ -70,6 +70,15 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to OBS-websocket.
+        /// </summary>
+        public static string application_name_obs_websocket {
+            get {
+                return ResourceManager.GetString("application_name_obs-websocket", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Connect.
         /// </summary>
         public static string button_connect {
@@ -79,7 +88,7 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Ctrl+R.
+        ///   Looks up a localized string similar to Ctrl+r.
         /// </summary>
         public static string button_connect_accelerator {
             get {
@@ -97,7 +106,7 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Ctrl+D.
+        ///   Looks up a localized string similar to Ctrl+d.
         /// </summary>
         public static string button_disconnect_accelerator {
             get {
@@ -111,6 +120,24 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         public static string button_reconnect {
             get {
                 return ResourceManager.GetString("button_reconnect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save.
+        /// </summary>
+        public static string button_save {
+            get {
+                return ResourceManager.GetString("button_save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ctrl+s.
+        /// </summary>
+        public static string button_save_accelerator {
+            get {
+                return ResourceManager.GetString("button_save_accelerator", resourceCulture);
             }
         }
         
@@ -328,6 +355,24 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to minutes.
+        /// </summary>
+        public static string text_minutes {
+            get {
+                return ResourceManager.GetString("text_minutes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to seconds.
+        /// </summary>
+        public static string text_seconds {
+            get {
+                return ResourceManager.GetString("text_seconds", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to New Password Error.
         /// </summary>
         public static string title_new_password_error {
@@ -400,6 +445,51 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Please select an item..
+        /// </summary>
+        public static string validation_error_ComboBoxOneItemSelected {
+            get {
+                return ResourceManager.GetString("validation_error_ComboBoxOneItemSelected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please enter a valid hostname or IP address..
+        /// </summary>
+        public static string validation_error_Hostname {
+            get {
+                return ResourceManager.GetString("validation_error_Hostname", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please enter a number greater than zero..
+        /// </summary>
+        public static string validation_error_NumberGreaterZero {
+            get {
+                return ResourceManager.GetString("validation_error_NumberGreaterZero", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please enter a valid port number..
+        /// </summary>
+        public static string validation_error_PortNumber {
+            get {
+                return ResourceManager.GetString("validation_error_PortNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The last save attempt failed as there were errors above..
+        /// </summary>
+        public static string validation_error_window_preferences_save {
+            get {
+                return ResourceManager.GetString("validation_error_window_preferences_save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to AudioCheck.
         /// </summary>
         public static string window_audio_check_title {
@@ -454,11 +544,137 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to _Auto-scroll.
+        /// </summary>
+        public static string window_preferences_auto_scroll {
+            get {
+                return ResourceManager.GetString("window_preferences_auto-scroll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Automatically _Reconnect.
+        /// </summary>
+        public static string window_preferences_automatic_reconnect {
+            get {
+                return ResourceManager.GetString("window_preferences_automatic-reconnect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Maximum reconnect delay in minutes.
+        /// </summary>
+        public static string window_preferences_backoff_max_automation_name {
+            get {
+                return ResourceManager.GetString("window_preferences_backoff_max_automation-name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Maximum delay in minutes between connection attempts:.
+        /// </summary>
+        public static string window_preferences_backoff_max_label {
+            get {
+                return ResourceManager.GetString("window_preferences_backoff_max_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to First reconnect delay in seconds.
+        /// </summary>
+        public static string window_preferences_backoff_min_automation_name {
+            get {
+                return ResourceManager.GetString("window_preferences_backoff_min_automation-name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Delay in seconds between 1st and 2nd connection attempt:.
+        /// </summary>
+        public static string window_preferences_backoff_min_label {
+            get {
+                return ResourceManager.GetString("window_preferences_backoff_min_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Connect on Launch.
+        /// </summary>
+        public static string window_preferences_connect_on_launch {
+            get {
+                return ResourceManager.GetString("window_preferences_connect-on-launch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Exponential Back-off.
+        /// </summary>
+        public static string window_preferences_groupbox_backoff {
+            get {
+                return ResourceManager.GetString("window_preferences_groupbox_backoff", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Server URI.
+        /// </summary>
+        public static string window_preferences_groupbox_server_uri_label {
+            get {
+                return ResourceManager.GetString("window_preferences_groupbox_server-uri_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Hostname:.
+        /// </summary>
+        public static string window_preferences_hostname_label {
+            get {
+                return ResourceManager.GetString("window_preferences_hostname_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Password.
+        /// </summary>
+        public static string window_preferences_password_automation_name {
+            get {
+                return ResourceManager.GetString("window_preferences_password_automation-name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Port:.
+        /// </summary>
+        public static string window_preferences_port_label {
+            get {
+                return ResourceManager.GetString("window_preferences_port_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Scheme:.
+        /// </summary>
+        public static string window_preferences_scheme_label {
+            get {
+                return ResourceManager.GetString("window_preferences_scheme_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Preferences.
         /// </summary>
         public static string window_preferences_title {
             get {
                 return ResourceManager.GetString("window_preferences_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Use Password:.
+        /// </summary>
+        public static string window_preferences_use_password_label {
+            get {
+                return ResourceManager.GetString("window_preferences_use-password_label", resourceCulture);
             }
         }
         
