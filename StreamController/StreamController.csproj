@@ -6,7 +6,6 @@
     <RootNamespace>uk.JohnCook.dotnet.StreamController</RootNamespace>
     <UseWPF>true</UseWPF>
     <Version>0.0.4</Version>
-    <NeutralLanguage>en-GB</NeutralLanguage>
     <StartupObject>uk.JohnCook.dotnet.StreamController.Program</StartupObject>
     <Authors>John Cook</Authors>
     <Copyright>Copyright © John Cook 2020</Copyright>
@@ -85,7 +84,7 @@
 
   <ItemGroup>
     <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>

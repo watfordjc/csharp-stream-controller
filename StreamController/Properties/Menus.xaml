@@ -2,25 +2,52 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:uk.JohnCook.dotnet.StreamController"
                     xmlns:Collections="clr-namespace:System.Collections;assembly=System.Runtime.Extensions"
+                    xmlns:props="clr-namespace:uk.JohnCook.dotnet.StreamController.Properties"
                     x:Class="uk.JohnCook.dotnet.StreamController.MenuItemCollection">
     <Collections:ArrayList x:Key="MenuItems" x:Shared="false">
-        <MenuItem Header="_File">
-            <MenuItem Header="_Close" InputGestureText="Alt+F4" AutomationProperties.AcceleratorKey="Alt+F4" Click="MenuItemClose_Click" />
-            <MenuItem Header="E_xit" InputGestureText="Shift+Alt+F4" AutomationProperties.AcceleratorKey="Shift+Alt+F4" Click="MenuItemExit_Click" />
+        <MenuItem Header="{x:Static props:Resources.menu_file}">
+            <MenuItem Header="{x:Static props:Resources.menu_file_close}"
+                      InputGestureText="{x:Static props:Resources.menu_file_close_accelerator}"
+                      AutomationProperties.AcceleratorKey="{x:Static props:Resources.menu_file_close_accelerator}"
+                      Click="MenuItemClose_Click" />
+            <MenuItem Header="{x:Static props:Resources.menu_file_exit}"
+                      InputGestureText="{x:Static props:Resources.menu_file_exit_accelerator}"
+                      AutomationProperties.AcceleratorKey="{x:Static props:Resources.menu_file_exit_accelerator}"
+                      Click="MenuItemExit_Click" />
         </MenuItem>
-        <MenuItem Header="_Edit">
-            <MenuItem Header="_Preferences" Click="MenuWindowItem_Click" x:Name="PreferencesWindow" Loaded="MenuWindowItemLoaded" />
+        <MenuItem Header="{x:Static props:Resources.menu_edit}">
+            <MenuItem Header="{x:Static props:Resources.menu_edit_preferences}"
+                      Click="MenuWindowItem_Click"
+                      x:Name="PreferencesWindow"
+                      Loaded="MenuWindowItemLoaded" />
         </MenuItem>
-        <MenuItem Header="_Connection" Loaded="ConnectItemLoaded">
-            <MenuItem Header="_Reconnect" Command="{x:Static local:MenuItemCollection.routedConnectionMenuCommand}" x:Name="Reconnect" />
-            <MenuItem Header="_Disconnect" Command="{x:Static local:MenuItemCollection.routedConnectionMenuCommand}" x:Name="Disconnect" />
+        <MenuItem Header="{x:Static props:Resources.menu_connection}"
+                  Loaded="ConnectItemLoaded">
+            <MenuItem Header="{x:Static props:Resources.menu_connection_reconnect}"
+                      Command="{x:Static local:MenuItemCollection.routedConnectionMenuCommand}"
+                      x:Name="Reconnect" />
+            <MenuItem Header="{x:Static props:Resources.menu_connection_disconnect}"
+                      Command="{x:Static local:MenuItemCollection.routedConnectionMenuCommand}"
+                      x:Name="Disconnect" />
             <Separator />
-            <MenuItem Header="_Auto-Reconnect" Click="ConnectItem_Click" x:Name="AutoReconnect" IsChecked="{Binding Source={x:Static local:Preferences.Default}, Path=obs_auto_reconnect, Mode=OneWay}" />
+            <MenuItem Header="{x:Static props:Resources.menu_connection_auto_reconnect}"
+                      Click="ConnectItem_Click"
+                      x:Name="AutoReconnect"
+                      IsChecked="{Binding Source={x:Static local:Preferences.Default}, Path=obs_auto_reconnect, Mode=OneWay}" />
         </MenuItem>
-        <MenuItem Header="_Window">
-            <MenuItem Header="_Audio Interfaces" Click="MenuWindowItem_Click" x:Name="MainWindow" Loaded="MenuWindowItemLoaded" />
-            <MenuItem Header="Audio _Check" Click="MenuWindowItem_Click" x:Name="Audiocheck" Loaded="MenuWindowItemLoaded" />
-            <MenuItem Header="_OBS" Click="MenuWindowItem_Click" x:Name="WebSocketTest" Loaded="MenuWindowItemLoaded" />
+        <MenuItem Header="{x:Static props:Resources.menu_window}">
+            <MenuItem Header="{x:Static props:Resources.menu_window_audio_interfaces}"
+                      Click="MenuWindowItem_Click"
+                      x:Name="MainWindow"
+                      Loaded="MenuWindowItemLoaded" />
+            <MenuItem Header="{x:Static props:Resources.menu_window_audio_check}"
+                      Click="MenuWindowItem_Click"
+                      x:Name="Audiocheck"
+                      Loaded="MenuWindowItemLoaded" />
+            <MenuItem Header="{x:Static props:Resources.menu_window_obs}"
+                      Click="MenuWindowItem_Click"
+                      x:Name="WebSocketTest"
+                      Loaded="MenuWindowItemLoaded" />
         </MenuItem>
     </Collections:ArrayList>
 </ResourceDictionary>

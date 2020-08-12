@@ -1,3 +1,4 @@
+using System.Resources;
 using System.Runtime.InteropServices;
 
 [assembly: System.Windows.ThemeInfo(System.Windows.ResourceDictionaryLocation.None, System.Windows.ResourceDictionaryLocation.SourceAssembly)]
@@ -17,3 +18,5 @@ using System.Runtime.InteropServices;
 // The following GUID is for the ID of the typelib if this project is exposed to COM.
 
 [assembly: Guid("3b07bbe0-779b-4d2d-bb52-e1783714e399")]
+
+[assembly: NeutralResourcesLanguage(cultureName: "en-GB", location: UltimateResourceFallbackLocation.MainAssembly)]

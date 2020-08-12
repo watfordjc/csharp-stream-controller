@@ -5,12 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:uk.JohnCook.dotnet.StreamController"
         xmlns:controls="clr-namespace:uk.JohnCook.dotnet.StreamController.Controls"
+        xmlns:props="clr-namespace:uk.JohnCook.dotnet.StreamController.Properties"
         mc:Ignorable="d"
         ContentRendered="Window_ContentRendered"
         Closed="Window_Closed"
         KeyDown="Window_KeyDown"
         SizeToContent="WidthAndHeight"
-        Title="AudioCheck" MinHeight="450" MinWidth="800">
+        Title="{x:Static props:Resources.window_audio_check_title}"
+        MinHeight="450" MinWidth="800">
     <Window.Resources>
         <Style x:Key="{x:Static SystemParameters.FocusVisualStyleKey}" BasedOn="{StaticResource ResourceKey={x:Static SystemParameters.FocusVisualStyleKey}}">
             <Style.Triggers>
@@ -43,7 +45,7 @@
                 <TextBlock x:Name="tbReconnectCountdown" MinWidth="10" TextAlignment="Right" AutomationProperties.Name="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text, StringFormat={}{0}}" AutomationProperties.LiveSetting="Assertive" />
             </StatusBarItem>
             <StatusBarItem DockPanel.Dock="Right" VerticalContentAlignment="Stretch">
-                <Rectangle Width="1" Fill="Gray" />
+                <Rectangle Width="1" Fill="{DynamicResource {x:Static SystemColors.WindowFrameBrushKey}}" />
             </StatusBarItem>
             <StatusBarItem DockPanel.Dock="Right">
                 <TextBlock DataContext="AudioInterfaceCollection.Instance.Devices" Text="{Binding Count, StringFormat={}{0} audio devices, Mode=OneWay, IsAsync=True, FallbackValue='Parsing audio devices&#x2026;'}" MinWidth="10" TextAlignment="Right" />
@@ -144,7 +146,7 @@
                                             <Condition Binding="{Binding Source.Dependencies.DependencyProblem, IsAsync=True}" Value="True" />
                                             <Condition Binding="{Binding Source={x:Static SystemParameters.HighContrast}}" Value="False" />
                                         </MultiDataTrigger.Conditions>
-                                        <Setter Property="Foreground" Value="Red" />
+                                        <Setter Property="Foreground" Value="{DynamicResource Text.Static.Error}" />
                                         <Setter Property="FontWeight" Value="Bold" />
                                         <Setter Property="AutomationProperties.Name" Value="{Binding Source.Name, StringFormat={}Dependency problem for {0}}" />
                                     </MultiDataTrigger>

@@ -5,11 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:uk.JohnCook.dotnet.StreamController"
         xmlns:controls="clr-namespace:uk.JohnCook.dotnet.StreamController.Controls"
+        xmlns:props="clr-namespace:uk.JohnCook.dotnet.StreamController.Properties"
         mc:Ignorable="d"
         ContentRendered="Window_ContentRendered"
         Closed="Window_Closed"
         KeyDown="Window_KeyDown"
-        Title="WebSocketTest" MinHeight="450" MinWidth="800">
+        Title="{x:Static props:Resources.window_obs_title}"
+        MinHeight="450" MinWidth="800">
     <Window.Resources>
         <Style x:Key="{x:Static SystemParameters.FocusVisualStyleKey}" BasedOn="{StaticResource ResourceKey={x:Static SystemParameters.FocusVisualStyleKey}}">
             <Style.Triggers>

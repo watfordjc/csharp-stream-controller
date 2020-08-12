@@ -7,9 +7,11 @@
         xmlns:na="clr-namespace:NAudio.CoreAudioApi;assembly=NAudio"
         xmlns:tb="http://www.hardcodet.net/taskbar"
         xmlns:controls="clr-namespace:uk.JohnCook.dotnet.StreamController.Controls"
+        xmlns:props="clr-namespace:uk.JohnCook.dotnet.StreamController.Properties"
         mc:Ignorable="d"
         Visibility="Collapsed"
-        Title="SystemTrayIcon" Height="450" Width="800">
+        Title="{x:Static props:Resources.window_system_tray_icon_title}"
+        Height="450" Width="800">
     <Grid>
         <tb:TaskbarIcon
             x:Name="NotifyIcon"

@@ -136,16 +136,104 @@
   <data name="icon_secondary" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\icon-secondary.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="menu_connection" xml:space="preserve">
+    <value>_Connection</value>
+    <comment>Menu Bar -&gt; Connection</comment>
+  </data>
+  <data name="menu_connection_auto-reconnect" xml:space="preserve">
+    <value>_Auto-Reconnect</value>
+    <comment>Menu Bar -&gt; Connection -&gt; Auto-Reconnect</comment>
+  </data>
+  <data name="menu_connection_disconnect" xml:space="preserve">
+    <value>_Disconnect</value>
+    <comment>Menu Bar -&gt; Connection -&gt; Disconnect</comment>
+  </data>
+  <data name="menu_connection_reconnect" xml:space="preserve">
+    <value>_Reconnect</value>
+    <comment>Menu Bar -&gt; Connection -&gt; Reconnect</comment>
+  </data>
+  <data name="menu_edit" xml:space="preserve">
+    <value>_Edit</value>
+    <comment>Menu Bar -&gt; Edit</comment>
+  </data>
+  <data name="menu_edit_preferences" xml:space="preserve">
+    <value>_Preferences</value>
+    <comment>Menu Bar -&gt; Edit -&gt; Preferences</comment>
+  </data>
+  <data name="menu_file" xml:space="preserve">
+    <value>_File</value>
+    <comment>Menu Bar -&gt; File</comment>
+  </data>
+  <data name="menu_file_close" xml:space="preserve">
+    <value>_Close</value>
+    <comment>Menu Bar -&gt; File -&gt; Close (closes window)</comment>
+  </data>
+  <data name="menu_file_close_accelerator" xml:space="preserve">
+    <value>Alt+F4</value>
+    <comment>Accelerator Key for (Menu Bar -&gt; File -&gt; Close)</comment>
+  </data>
+  <data name="menu_file_exit" xml:space="preserve">
+    <value>E_xit</value>
+    <comment>Menu Bar -&gt; File -&gt; Exit (exits application)</comment>
+  </data>
+  <data name="menu_file_exit_accelerator" xml:space="preserve">
+    <value>Shift+Alt+F4</value>
+    <comment>Accelerator Key for (Menu Bar -&gt; File -&gt; Exit)</comment>
+  </data>
+  <data name="menu_window" xml:space="preserve">
+    <value>_Window</value>
+    <comment>Menu Bar -&gt; Window</comment>
+  </data>
+  <data name="menu_window_audio-check" xml:space="preserve">
+    <value>Audio _Check</value>
+    <comment>Menu Bar -&gt; Window -&gt; Audio-Check</comment>
+  </data>
+  <data name="menu_window_audio-interfaces" xml:space="preserve">
+    <value>_Audio Interfaces</value>
+    <comment>Menu Bar -&gt; Window -&gt; Audio Interfaces</comment>
+  </data>
+  <data name="menu_window_obs" xml:space="preserve">
+    <value>_OBS</value>
+    <comment>Menu Bar -&gt; Window -&gt; OBS</comment>
+  </data>
   <data name="new_password_placeholder_error" xml:space="preserve">
     <value>Use Password is enabled but the password box still contains placeholder text.</value>
+    <comment>Dialog box text - use password checked, password not set</comment>
   </data>
   <data name="new_password_set_message" xml:space="preserve">
     <value>The next time you open Preferences the password box will contain placeholder text.</value>
+    <comment>Dialog box text - password will be replaced with placeholder text when preferences window is next opened.</comment>
   </data>
   <data name="title_new_password_error" xml:space="preserve">
     <value>New Password Error</value>
+    <comment>Dialog box title - New Password Error</comment>
   </data>
   <data name="title_new_password_saved" xml:space="preserve">
     <value>obs-websocket Password Configured</value>
+    <comment>Dialog box title - obs-websocket Password configured</comment>
+  </data>
+  <data name="window_audio-check_title" xml:space="preserve">
+    <value>AudioCheck</value>
+    <comment>Title Bar for AudioCheck.xaml</comment>
+  </data>
+  <data name="window_audio-interfaces_title" xml:space="preserve">
+    <value>Stream Control</value>
+    <comment>Title Bar for MainWindow.xaml</comment>
+  </data>
+  <data name="window_network-test_title" xml:space="preserve">
+    <value>NetworkTest</value>
+    <comment>Title Bar for NetworkTest.xaml</comment>
+  </data>
+  <data name="window_obs_title" xml:space="preserve">
+    <value>WebSocketTest</value>
+    <comment>Title Bar for WebSocketText.xaml</comment>
+  </data>
+  <data name="window_preferences_title" xml:space="preserve">
+    <value>Preferences</value>
+    <comment>Title Bar for Preferences.xaml</comment>
+  </data>
+  <data name="window_system-tray-icon_title" xml:space="preserve">
+    <value>SystemTrayIcon</value>
+    <comment>Title Bar for SystemTrayIcon.xaml (window is never visible)</comment>
   </data>
 </root>

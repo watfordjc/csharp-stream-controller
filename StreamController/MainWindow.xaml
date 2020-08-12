@@ -5,10 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:uk.JohnCook.dotnet.StreamController"
         xmlns:controls="clr-namespace:uk.JohnCook.dotnet.StreamController.Controls"
+        xmlns:props="clr-namespace:uk.JohnCook.dotnet.StreamController.Properties"
         mc:Ignorable="d"
         KeyDown="Window_KeyDown"
         SizeToContent="WidthAndHeight"
-        Title="Stream Control" MinHeight="640" MinWidth="800">
+        Title="{x:Static props:Resources.window_audio_interfaces_title}"
+        MinHeight="640" MinWidth="800">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
         <Style x:Key="{x:Static SystemParameters.FocusVisualStyleKey}" BasedOn="{StaticResource ResourceKey={x:Static SystemParameters.FocusVisualStyleKey}}">

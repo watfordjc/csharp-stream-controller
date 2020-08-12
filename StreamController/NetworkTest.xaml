@@ -6,8 +6,10 @@
         xmlns:local="clr-namespace:uk.JohnCook.dotnet.StreamController"
         xmlns:controls="clr-namespace:uk.JohnCook.dotnet.StreamController.Controls"
         xmlns:connectivityLevel="clr-namespace:uk.JohnCook.dotnet.NetworkingWrapperLibrary;assembly=NetworkingWrapperLibrary"
+        xmlns:props="clr-namespace:uk.JohnCook.dotnet.StreamController.Properties"
         mc:Ignorable="d"
-        Title="NetworkTest" MinHeight="450" MinWidth="800">
+        Title="{x:Static props:Resources.window_network_test_title}"
+        MinHeight="450" MinWidth="800">
     <Grid Margin="16">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />

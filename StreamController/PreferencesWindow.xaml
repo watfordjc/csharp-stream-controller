@@ -6,10 +6,12 @@
         xmlns:local="clr-namespace:uk.JohnCook.dotnet.StreamController"
         xmlns:controls="clr-namespace:uk.JohnCook.dotnet.StreamController.Controls"
         xmlns:v="clr-namespace:uk.JohnCook.dotnet.StreamController.ValidationRules"
+        xmlns:props="clr-namespace:uk.JohnCook.dotnet.StreamController.Properties"
         mc:Ignorable="d"
         KeyDown="Window_KeyDown"
         SizeToContent="WidthAndHeight"
-        Title="Preferences" MinWidth="600" MinHeight="600">
+        Title="{x:Static props:Resources.window_preferences_title}"
+        MinWidth="600" MinHeight="600">
     <Window.DataContext>
         <local:Preferences />
     </Window.DataContext>

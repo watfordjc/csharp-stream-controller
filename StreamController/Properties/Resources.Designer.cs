@@ -22,7 +22,7 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("uk.JohnCook.dotnet.StreamController.Properties.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon icon {
+        public static System.Drawing.Icon icon {
             get {
                 object obj = ResourceManager.GetObject("icon", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
@@ -73,7 +73,7 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon icon_dark_golden_rod {
+        public static System.Drawing.Icon icon_dark_golden_rod {
             get {
                 object obj = ResourceManager.GetObject("icon_dark_golden_rod", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
@@ -83,7 +83,7 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon icon_dark_green {
+        public static System.Drawing.Icon icon_dark_green {
             get {
                 object obj = ResourceManager.GetObject("icon_dark_green", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
@@ -93,7 +93,7 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon icon_neutral {
+        public static System.Drawing.Icon icon_neutral {
             get {
                 object obj = ResourceManager.GetObject("icon_neutral", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
@@ -103,7 +103,7 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon icon_red {
+        public static System.Drawing.Icon icon_red {
             get {
                 object obj = ResourceManager.GetObject("icon_red", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
@@ -113,7 +113,7 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon icon_secondary {
+        public static System.Drawing.Icon icon_secondary {
             get {
                 object obj = ResourceManager.GetObject("icon_secondary", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
@@ -121,9 +121,144 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to _Connection.
+        /// </summary>
+        public static string menu_connection {
+            get {
+                return ResourceManager.GetString("menu_connection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Auto-Reconnect.
+        /// </summary>
+        public static string menu_connection_auto_reconnect {
+            get {
+                return ResourceManager.GetString("menu_connection_auto-reconnect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Disconnect.
+        /// </summary>
+        public static string menu_connection_disconnect {
+            get {
+                return ResourceManager.GetString("menu_connection_disconnect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Reconnect.
+        /// </summary>
+        public static string menu_connection_reconnect {
+            get {
+                return ResourceManager.GetString("menu_connection_reconnect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Edit.
+        /// </summary>
+        public static string menu_edit {
+            get {
+                return ResourceManager.GetString("menu_edit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Preferences.
+        /// </summary>
+        public static string menu_edit_preferences {
+            get {
+                return ResourceManager.GetString("menu_edit_preferences", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _File.
+        /// </summary>
+        public static string menu_file {
+            get {
+                return ResourceManager.GetString("menu_file", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Close.
+        /// </summary>
+        public static string menu_file_close {
+            get {
+                return ResourceManager.GetString("menu_file_close", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Alt+F4.
+        /// </summary>
+        public static string menu_file_close_accelerator {
+            get {
+                return ResourceManager.GetString("menu_file_close_accelerator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to E_xit.
+        /// </summary>
+        public static string menu_file_exit {
+            get {
+                return ResourceManager.GetString("menu_file_exit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shift+Alt+F4.
+        /// </summary>
+        public static string menu_file_exit_accelerator {
+            get {
+                return ResourceManager.GetString("menu_file_exit_accelerator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Window.
+        /// </summary>
+        public static string menu_window {
+            get {
+                return ResourceManager.GetString("menu_window", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Audio _Check.
+        /// </summary>
+        public static string menu_window_audio_check {
+            get {
+                return ResourceManager.GetString("menu_window_audio-check", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Audio Interfaces.
+        /// </summary>
+        public static string menu_window_audio_interfaces {
+            get {
+                return ResourceManager.GetString("menu_window_audio-interfaces", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _OBS.
+        /// </summary>
+        public static string menu_window_obs {
+            get {
+                return ResourceManager.GetString("menu_window_obs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Use Password is enabled but the password box still contains placeholder text..
         /// </summary>
-        internal static string new_password_placeholder_error {
+        public static string new_password_placeholder_error {
             get {
                 return ResourceManager.GetString("new_password_placeholder_error", resourceCulture);
             }
@@ -132,7 +267,7 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         /// <summary>
         ///   Looks up a localized string similar to The next time you open Preferences the password box will contain placeholder text..
         /// </summary>
-        internal static string new_password_set_message {
+        public static string new_password_set_message {
             get {
                 return ResourceManager.GetString("new_password_set_message", resourceCulture);
             }
@@ -141,7 +276,7 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         /// <summary>
         ///   Looks up a localized string similar to New Password Error.
         /// </summary>
-        internal static string title_new_password_error {
+        public static string title_new_password_error {
             get {
                 return ResourceManager.GetString("title_new_password_error", resourceCulture);
             }
@@ -150,9 +285,63 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         /// <summary>
         ///   Looks up a localized string similar to obs-websocket Password Configured.
         /// </summary>
-        internal static string title_new_password_saved {
+        public static string title_new_password_saved {
             get {
                 return ResourceManager.GetString("title_new_password_saved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to AudioCheck.
+        /// </summary>
+        public static string window_audio_check_title {
+            get {
+                return ResourceManager.GetString("window_audio-check_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stream Control.
+        /// </summary>
+        public static string window_audio_interfaces_title {
+            get {
+                return ResourceManager.GetString("window_audio-interfaces_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NetworkTest.
+        /// </summary>
+        public static string window_network_test_title {
+            get {
+                return ResourceManager.GetString("window_network-test_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to WebSocketTest.
+        /// </summary>
+        public static string window_obs_title {
+            get {
+                return ResourceManager.GetString("window_obs_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Preferences.
+        /// </summary>
+        public static string window_preferences_title {
+            get {
+                return ResourceManager.GetString("window_preferences_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SystemTrayIcon.
+        /// </summary>
+        public static string window_system_tray_icon_title {
+            get {
+                return ResourceManager.GetString("window_system-tray-icon_title", resourceCulture);
             }
         }
     }
