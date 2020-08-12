@@ -98,13 +98,13 @@ namespace uk.JohnCook.dotnet.StreamController
             AudioInterface applicationRender = AudioInterfaceCollection.GetDefaultApplicationDevice(DataFlow.Render, process);
             AudioInterface applicationCapture = AudioInterfaceCollection.GetDefaultApplicationDevice(DataFlow.Capture, process);
             string previousAppRenderText = app_render.Text;
-            app_render.Text = applicationRender?.FriendlyName ?? "Default";
+            app_render.Text = applicationRender?.FriendlyName ?? Properties.Resources.text_default;
             if (announceChanges && app_render.Text != previousAppRenderText)
             {
                 AnnounceVisualElementChanged(app_render);
             }
             string previousAppCaptureText = app_capture.Text;
-            app_capture.Text = applicationCapture?.FriendlyName ?? "Default";
+            app_capture.Text = applicationCapture?.FriendlyName ?? Properties.Resources.text_default;
             if (announceChanges && app_capture.Text != previousAppCaptureText)
             {
                 AnnounceVisualElementChanged(app_capture);

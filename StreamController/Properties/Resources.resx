@@ -141,9 +141,25 @@
     <value>Ctrl+d</value>
     <comment>Accelerator key for Disconnect buttons</comment>
   </data>
+  <data name="button_make-default" xml:space="preserve">
+    <value>Make Default</value>
+    <comment>Button text - Make Default</comment>
+  </data>
+  <data name="button_make-default_accelerator" xml:space="preserve">
+    <value>Ctrl+m</value>
+    <comment>Accelerator key for Make Default buttons</comment>
+  </data>
   <data name="button_reconnect" xml:space="preserve">
     <value>Reconnect</value>
     <comment>Button text - Reconnect</comment>
+  </data>
+  <data name="button_reset-all-apps" xml:space="preserve">
+    <value>Reset for All Applications</value>
+    <comment>Button text - Reset for All Applications</comment>
+  </data>
+  <data name="button_reset-all-apps_accelerator" xml:space="preserve">
+    <value>Ctrl+f5</value>
+    <comment>Accelerator key for Reset for All Applications buttons</comment>
   </data>
   <data name="button_save" xml:space="preserve">
     <value>Save</value>
@@ -152,6 +168,22 @@
   <data name="button_save_accelerator" xml:space="preserve">
     <value>Ctrl+s</value>
     <comment>Accelerator key for Save buttons</comment>
+  </data>
+  <data name="button_toggle-all-apps" xml:space="preserve">
+    <value>Toggle for All Applications</value>
+    <comment>Button text - Toggle for All Applications</comment>
+  </data>
+  <data name="button_toggle-all-apps_accelerator" xml:space="preserve">
+    <value>Ctrl+t</value>
+    <comment>Accelerator key for Toggle for All Applications buttons</comment>
+  </data>
+  <data name="button_use-selected-audio-interface" xml:space="preserve">
+    <value>Use Selected Audio Interface</value>
+    <comment>Button text - Use Selected Audio Interface</comment>
+  </data>
+  <data name="button_use-selected-audio-interface_accelerator" xml:space="preserve">
+    <value>Ctrl+u</value>
+    <comment>Accelerator key for Use Selected Audio Interface buttons</comment>
   </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
@@ -240,6 +272,10 @@
     <value>The next time you open Preferences the password box will contain placeholder text.</value>
     <comment>Dialog box text - password will be replaced with placeholder text when preferences window is next opened.</comment>
   </data>
+  <data name="text_default" xml:space="preserve">
+    <value>Default</value>
+    <comment>Text - Default</comment>
+  </data>
   <data name="text_minutes" xml:space="preserve">
     <value>minutes</value>
     <comment>Text - minutes</comment>
@@ -307,6 +343,82 @@
   <data name="window_audio-interfaces_title" xml:space="preserve">
     <value>Stream Control</value>
     <comment>Title Bar for MainWindow.xaml</comment>
+  </data>
+  <data name="window_main-window_applications_combobox_label" xml:space="preserve">
+    <value>_Application:</value>
+    <comment>Text for (MainWindow.xaml -&gt; Applications -&gt; Application)</comment>
+  </data>
+  <data name="window_main-window_application_capture" xml:space="preserve">
+    <value>Capture Device:</value>
+    <comment>Text for (MainWindow.xaml -&gt; Application -&gt; Capture Device)</comment>
+  </data>
+  <data name="window_main-window_application_main-window_label" xml:space="preserve">
+    <value>Main Window:</value>
+    <comment>Text for (MainWindow.xaml -&gt; Application -&gt; Main Window)</comment>
+  </data>
+  <data name="window_main-window_application_name_label" xml:space="preserve">
+    <value>Name:</value>
+    <comment>Text for (MainWindow.xaml -&gt; Application -&gt; Name)</comment>
+  </data>
+  <data name="window_main-window_application_pid_label" xml:space="preserve">
+    <value>PID:</value>
+    <comment>Text for (MainWindow.xaml -&gt; Application -&gt; PID)</comment>
+  </data>
+  <data name="window_main-window_application_render" xml:space="preserve">
+    <value>Render Device:</value>
+    <comment>Text for (MainWindow.xaml -&gt; Application -&gt; Render Device)</comment>
+  </data>
+  <data name="window_main-window_groupbox_applications" xml:space="preserve">
+    <value>Applications</value>
+    <comment>Text for (MainWindow.xaml -&gt; Applications)</comment>
+  </data>
+  <data name="window_main-window_groupbox_custom-interfaces" xml:space="preserve">
+    <value>Custom Audio Interfaces</value>
+    <comment>Text for (MainWindow.xaml -&gt; Custom Audio Interfaces)</comment>
+  </data>
+  <data name="window_main-window_groupbox_default-capture" xml:space="preserve">
+    <value>Default Capture Interface</value>
+    <comment>Text for (MainWindow.xaml -&gt; Default Capture Interface)</comment>
+  </data>
+  <data name="window_main-window_groupbox_default-render" xml:space="preserve">
+    <value>Default Render Interface</value>
+    <comment>Text for (MainWindow.xaml -&gt; Default Render Interface)</comment>
+  </data>
+  <data name="window_main-window_groupbox_interfaces" xml:space="preserve">
+    <value>Audio Interfaces</value>
+    <comment>Text for (MainWindow.xaml -&gt; Audio Interfaces)</comment>
+  </data>
+  <data name="window_main-window_groupbox_selected-application" xml:space="preserve">
+    <value>Selected Application</value>
+    <comment>Text for (MainWindow.xaml -&gt; Selected Application)</comment>
+  </data>
+  <data name="window_main-window_groupbox_selected-interface" xml:space="preserve">
+    <value>Selected Interface</value>
+    <comment>Text for (MainWindow.xaml -&gt; Selected Interface)</comment>
+  </data>
+  <data name="window_main-window_interfaces_combobox_label" xml:space="preserve">
+    <value>I_nterface:</value>
+    <comment>Text for (MainWindow.xaml -&gt; Audio Interfaces -&gt; Interface)</comment>
+  </data>
+  <data name="window_main-window_interface_muted_label" xml:space="preserve">
+    <value>Muted:</value>
+    <comment>Text for (MainWindow.xaml -&gt; Interface -&gt; Muted)</comment>
+  </data>
+  <data name="window_main-window_interface_name_label" xml:space="preserve">
+    <value>Name:</value>
+    <comment>Text for (MainWindow.xaml -&gt; Interface -&gt; Name)</comment>
+  </data>
+  <data name="window_main-window_interface_state_label" xml:space="preserve">
+    <value>State:</value>
+    <comment>Text for (MainWindow.xaml -&gt; Interface -&gt; State)</comment>
+  </data>
+  <data name="window_main-window_interface_type_label" xml:space="preserve">
+    <value>Type:</value>
+    <comment>Text for (MainWindow.xaml -&gt; Interface -&gt; Type)</comment>
+  </data>
+  <data name="window_main-window_interface_volume_label" xml:space="preserve">
+    <value>Volume:</value>
+    <comment>Text for (MainWindow.xaml -&gt; Interface -&gt; Volume)</comment>
   </data>
   <data name="window_network-test_connection-type_label" xml:space="preserve">
     <value>Connection Type:</value>

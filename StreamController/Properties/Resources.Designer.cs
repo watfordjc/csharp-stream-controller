@@ -115,11 +115,47 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Make Default.
+        /// </summary>
+        public static string button_make_default {
+            get {
+                return ResourceManager.GetString("button_make-default", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ctrl+m.
+        /// </summary>
+        public static string button_make_default_accelerator {
+            get {
+                return ResourceManager.GetString("button_make-default_accelerator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Reconnect.
         /// </summary>
         public static string button_reconnect {
             get {
                 return ResourceManager.GetString("button_reconnect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reset for All Applications.
+        /// </summary>
+        public static string button_reset_all_apps {
+            get {
+                return ResourceManager.GetString("button_reset-all-apps", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ctrl+f5.
+        /// </summary>
+        public static string button_reset_all_apps_accelerator {
+            get {
+                return ResourceManager.GetString("button_reset-all-apps_accelerator", resourceCulture);
             }
         }
         
@@ -138,6 +174,42 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         public static string button_save_accelerator {
             get {
                 return ResourceManager.GetString("button_save_accelerator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Toggle for All Applications.
+        /// </summary>
+        public static string button_toggle_all_apps {
+            get {
+                return ResourceManager.GetString("button_toggle-all-apps", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ctrl+t.
+        /// </summary>
+        public static string button_toggle_all_apps_accelerator {
+            get {
+                return ResourceManager.GetString("button_toggle-all-apps_accelerator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use Selected Audio Interface.
+        /// </summary>
+        public static string button_use_selected_audio_interface {
+            get {
+                return ResourceManager.GetString("button_use-selected-audio-interface", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ctrl+u.
+        /// </summary>
+        public static string button_use_selected_audio_interface_accelerator {
+            get {
+                return ResourceManager.GetString("button_use-selected-audio-interface_accelerator", resourceCulture);
             }
         }
         
@@ -355,6 +427,15 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Default.
+        /// </summary>
+        public static string text_default {
+            get {
+                return ResourceManager.GetString("text_default", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to minutes.
         /// </summary>
         public static string text_minutes {
@@ -504,6 +585,177 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         public static string window_audio_interfaces_title {
             get {
                 return ResourceManager.GetString("window_audio-interfaces_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Capture Device:.
+        /// </summary>
+        public static string window_main_window_application_capture {
+            get {
+                return ResourceManager.GetString("window_main-window_application_capture", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Main Window:.
+        /// </summary>
+        public static string window_main_window_application_main_window_label {
+            get {
+                return ResourceManager.GetString("window_main-window_application_main-window_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name:.
+        /// </summary>
+        public static string window_main_window_application_name_label {
+            get {
+                return ResourceManager.GetString("window_main-window_application_name_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PID:.
+        /// </summary>
+        public static string window_main_window_application_pid_label {
+            get {
+                return ResourceManager.GetString("window_main-window_application_pid_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Render Device:.
+        /// </summary>
+        public static string window_main_window_application_render {
+            get {
+                return ResourceManager.GetString("window_main-window_application_render", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Application:.
+        /// </summary>
+        public static string window_main_window_applications_combobox_label {
+            get {
+                return ResourceManager.GetString("window_main-window_applications_combobox_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Applications.
+        /// </summary>
+        public static string window_main_window_groupbox_applications {
+            get {
+                return ResourceManager.GetString("window_main-window_groupbox_applications", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Custom Audio Interfaces.
+        /// </summary>
+        public static string window_main_window_groupbox_custom_interfaces {
+            get {
+                return ResourceManager.GetString("window_main-window_groupbox_custom-interfaces", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Default Capture Interface.
+        /// </summary>
+        public static string window_main_window_groupbox_default_capture {
+            get {
+                return ResourceManager.GetString("window_main-window_groupbox_default-capture", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Default Render Interface.
+        /// </summary>
+        public static string window_main_window_groupbox_default_render {
+            get {
+                return ResourceManager.GetString("window_main-window_groupbox_default-render", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Audio Interfaces.
+        /// </summary>
+        public static string window_main_window_groupbox_interfaces {
+            get {
+                return ResourceManager.GetString("window_main-window_groupbox_interfaces", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Selected Application.
+        /// </summary>
+        public static string window_main_window_groupbox_selected_application {
+            get {
+                return ResourceManager.GetString("window_main-window_groupbox_selected-application", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Selected Interface.
+        /// </summary>
+        public static string window_main_window_groupbox_selected_interface {
+            get {
+                return ResourceManager.GetString("window_main-window_groupbox_selected-interface", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Muted:.
+        /// </summary>
+        public static string window_main_window_interface_muted_label {
+            get {
+                return ResourceManager.GetString("window_main-window_interface_muted_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name:.
+        /// </summary>
+        public static string window_main_window_interface_name_label {
+            get {
+                return ResourceManager.GetString("window_main-window_interface_name_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to State:.
+        /// </summary>
+        public static string window_main_window_interface_state_label {
+            get {
+                return ResourceManager.GetString("window_main-window_interface_state_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Type:.
+        /// </summary>
+        public static string window_main_window_interface_type_label {
+            get {
+                return ResourceManager.GetString("window_main-window_interface_type_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Volume:.
+        /// </summary>
+        public static string window_main_window_interface_volume_label {
+            get {
+                return ResourceManager.GetString("window_main-window_interface_volume_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I_nterface:.
+        /// </summary>
+        public static string window_main_window_interfaces_combobox_label {
+            get {
+                return ResourceManager.GetString("window_main-window_interfaces_combobox_label", resourceCulture);
             }
         }
         
