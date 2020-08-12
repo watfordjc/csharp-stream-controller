@@ -251,7 +251,7 @@ namespace uk.JohnCook.dotnet.StreamController
             _ReconnectTimeRemaining--;
             if (_ReconnectTimeRemaining > 0)
             {
-                UpdateUIConnectStatus("Reconnecting in " + TimeSpan.FromSeconds(_ReconnectTimeRemaining).ToString("c", CultureInfo.CurrentCulture), null, null, false);
+                UpdateUIConnectStatus(String.Format(CultureInfo.CurrentCulture, Properties.Resources.window_audio_check_reconnect_delay_format, TimeSpan.FromSeconds(_ReconnectTimeRemaining).ToString("c", CultureInfo.CurrentCulture)), null, null, false);
             }
         }
 
@@ -266,10 +266,10 @@ namespace uk.JohnCook.dotnet.StreamController
         {
             if (newState == WebSocketState.Open)
             {
-                connectionError = "AOK";
+                connectionError = Properties.Resources.text_aok;
                 extendedConnectionError = String.Empty;
                 _ReconnectCountdownTimer.Stop();
-                UpdateUIConnectStatus("Connected", Brushes.DarkGreen, null, true);
+                UpdateUIConnectStatus(Properties.Resources.text_connected, Brushes.DarkGreen, null, true);
                 obsSourceDictionary.Clear();
             }
             else if (newState != WebSocketState.Connecting && webSocket.AutoReconnect == true)
@@ -279,8 +279,8 @@ namespace uk.JohnCook.dotnet.StreamController
             }
             else if (newState == WebSocketState.Closed)
             {
-                UpdateUIConnectStatus("Disconnected", Brushes.Red, null, true);
-                connectionError = "Successfully disconnected.";
+                UpdateUIConnectStatus(Properties.Resources.text_disconnected, Brushes.Red, null, true);
+                connectionError = Properties.Resources.window_audio_check_successfully_disconnected;
                 CreateWebsocketClient();
             }
             else if (newState == WebSocketState.None && webSocket.AutoReconnect)
@@ -296,10 +296,10 @@ namespace uk.JohnCook.dotnet.StreamController
                 {
                     webSocket.PasswordPreference = Preferences.Default.obs_password;
                 }
-                connectionError = "Error state cleared";
+                connectionError = Properties.Resources.window_audio_check_error_state_cleared;
                 extendedConnectionError = String.Empty;
                 _ReconnectCountdownTimer.Stop();
-                UpdateUIConnectStatus("Connecting\u2026", Brushes.DarkGoldenrod, null, true);
+                UpdateUIConnectStatus(Properties.Resources.window_audio_check_connecting, Brushes.DarkGoldenrod, null, true);
             }
         }
 
@@ -317,7 +317,7 @@ namespace uk.JohnCook.dotnet.StreamController
                 _ReconnectTimeRemaining = e.ReconnectDelay;
                 if (webSocket.AutoReconnect && e.Error != null)
                 {
-                    UpdateUIConnectStatus("Reconnecting in " + TimeSpan.FromSeconds(e.ReconnectDelay).ToString("c", CultureInfo.CurrentCulture), null, null, true);
+                    UpdateUIConnectStatus(String.Format(CultureInfo.CurrentCulture, Properties.Resources.window_audio_check_reconnect_delay_format, TimeSpan.FromSeconds(e.ReconnectDelay).ToString("c", CultureInfo.CurrentCulture)), null, null, true);
                 }
             }
             else
@@ -332,7 +332,7 @@ namespace uk.JohnCook.dotnet.StreamController
                 TextBlock_AnnounceChanged(tbStatus);
                 if (!webSocket.AutoReconnect)
                 {
-                    UpdateUIConnectStatus("Disconnected", Brushes.Red, null, true);
+                    UpdateUIConnectStatus(Properties.Resources.text_disconnected, Brushes.Red, null, true);
                 }
             }
         }
@@ -358,7 +358,7 @@ namespace uk.JohnCook.dotnet.StreamController
                     break;
                 case ObsEventType.TransitionBegin:
                     string nextScene = ((TransitionBeginObsEvent)eventObject.MessageObject).ToScene;
-                    await UpdateTransitionMessage($"\u27a1\ufe0f {nextScene}\u2026").ConfigureAwait(true);
+                    await UpdateTransitionMessage(String.Format(CultureInfo.CurrentCulture, Properties.Resources.window_audio_check_transition_format, nextScene)).ConfigureAwait(true);
                     break;
                 case ObsEventType.TransitionEnd:
                 case ObsEventType.TransitionVideoEnd:
@@ -1068,38 +1068,41 @@ namespace uk.JohnCook.dotnet.StreamController
 
         private void Menu_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            switch ((e.OriginalSource as MenuItem).Name)
+            string menuItemName = (e.OriginalSource as MenuItem).Name;
+            if (menuItemName == Properties.Resources.menu_connection_reconnect)
             {
-                case "Reconnect":
-                    e.CanExecute = webSocket.State != WebSocketState.Connecting;
-                    break;
-                case "Disconnect":
-                    e.CanExecute = webSocket.State == WebSocketState.Open;
-                    break;
-                default:
-                    return;
+                e.CanExecute = webSocket.State != WebSocketState.Connecting;
+            }
+            else if (menuItemName == Properties.Resources.menu_connection_disconnect)
+            {
+                e.CanExecute = webSocket.State == WebSocketState.Open;
+            }
+            else
+            {
+                return;
             }
         }
 
         private async void Menu_Execute(object sender, ExecutedRoutedEventArgs e)
         {
-            switch ((e.OriginalSource as MenuItem).Name)
+            string menuItemName = (e.OriginalSource as MenuItem).Name;
+            if (menuItemName == Properties.Resources.menu_connection_reconnect)
             {
-                case "Reconnect":
-                    if (webSocket.State == WebSocketState.Open)
-                    {
-                        await webSocket.DisconnectAsync(true).ConfigureAwait(true);
-                    }
-                    await ObsWebsocketConnect().ConfigureAwait(true);
-                    break;
-                case "Disconnect":
-                    webSocket.AutoReconnect = false;
+                if (webSocket.State == WebSocketState.Open)
+                {
                     await webSocket.DisconnectAsync(true).ConfigureAwait(true);
-                    break;
-                default:
-                    return;
+                }
+                await ObsWebsocketConnect().ConfigureAwait(true);
             }
-
+            else if (menuItemName == Properties.Resources.menu_connection_disconnect)
+            {
+                webSocket.AutoReconnect = false;
+                await webSocket.DisconnectAsync(true).ConfigureAwait(true);
+            }
+            else
+            {
+                return;
+            }
         }
     }
 }

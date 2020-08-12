@@ -248,6 +248,9 @@
     <value>Shift+Alt+F4</value>
     <comment>Accelerator Key for (Menu Bar -&gt; File -&gt; Exit)</comment>
   </data>
+  <data name="menu_main_automation-name" xml:space="preserve">
+    <value>Application</value>
+  </data>
   <data name="menu_window" xml:space="preserve">
     <value>_Window</value>
     <comment>Menu Bar -&gt; Window</comment>
@@ -272,9 +275,19 @@
     <value>The next time you open Preferences the password box will contain placeholder text.</value>
     <comment>Dialog box text - password will be replaced with placeholder text when preferences window is next opened.</comment>
   </data>
+  <data name="text_aok" xml:space="preserve">
+    <value>AOK</value>
+  </data>
+  <data name="text_connected" xml:space="preserve">
+    <value>Connected</value>
+  </data>
   <data name="text_default" xml:space="preserve">
     <value>Default</value>
     <comment>Text - Default</comment>
+  </data>
+  <data name="text_disconnected" xml:space="preserve">
+    <value>Disconnected</value>
+    <comment>Text - Disconnected</comment>
   </data>
   <data name="text_minutes" xml:space="preserve">
     <value>minutes</value>
@@ -336,9 +349,57 @@
     <value>The last save attempt failed as there were errors above.</value>
     <comment>Validation error - Save, form has errors</comment>
   </data>
+  <data name="window_audio-check_available-scenes_label" xml:space="preserve">
+    <value>_Available Scenes:</value>
+  </data>
+  <data name="window_audio-check_connecting" xml:space="preserve">
+    <value>Connecting…</value>
+  </data>
+  <data name="window_audio-check_current-scene_automation-name_format" xml:space="preserve">
+    <value>Current scene: {0}</value>
+  </data>
+  <data name="window_audio-check_current-scene_label" xml:space="preserve">
+    <value>Current Scene:</value>
+  </data>
+  <data name="window_audio-check_error-state-cleared" xml:space="preserve">
+    <value>Error state cleared</value>
+  </data>
+  <data name="window_audio-check_reconnect-delay_format" xml:space="preserve">
+    <value>Reconnecting in {0}</value>
+  </data>
+  <data name="window_audio-check_scene-sources_label" xml:space="preserve">
+    <value>_Scene Sources:</value>
+  </data>
+  <data name="window_audio-check_source_dependency-problem_automation-name_format" xml:space="preserve">
+    <value>Dependency problem for {0}</value>
+  </data>
+  <data name="window_audio-check_source_format" xml:space="preserve">
+    <value>* {0}</value>
+  </data>
+  <data name="window_audio-check_status_audio-devices_fallback" xml:space="preserve">
+    <value>Parsing audio devices…</value>
+  </data>
+  <data name="window_audio-check_status_audio-devices_format" xml:space="preserve">
+    <value>{0} audio devices</value>
+  </data>
+  <data name="window_audio-check_status_error-details_automation-name_format" xml:space="preserve">
+    <value>Error Details: {0}.</value>
+  </data>
+  <data name="window_audio-check_status_icon_automation-name" xml:space="preserve">
+    <value>Connection Status Indicator</value>
+  </data>
+  <data name="window_audio-check_successfully-disconnected" xml:space="preserve">
+    <value>Successfully disconnected.</value>
+  </data>
   <data name="window_audio-check_title" xml:space="preserve">
     <value>AudioCheck</value>
     <comment>Title Bar for AudioCheck.xaml</comment>
+  </data>
+  <data name="window_audio-check_transition_automation-name" xml:space="preserve">
+    <value>Switching scenes</value>
+  </data>
+  <data name="window_audio-check_transition_format" xml:space="preserve">
+    <value>➡️ {0}…</value>
   </data>
   <data name="window_audio-interfaces_title" xml:space="preserve">
     <value>Stream Control</value>

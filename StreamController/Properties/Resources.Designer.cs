@@ -373,6 +373,15 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Application.
+        /// </summary>
+        public static string menu_main_automation_name {
+            get {
+                return ResourceManager.GetString("menu_main_automation-name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to _Window.
         /// </summary>
         public static string menu_window {
@@ -427,11 +436,38 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to AOK.
+        /// </summary>
+        public static string text_aok {
+            get {
+                return ResourceManager.GetString("text_aok", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Connected.
+        /// </summary>
+        public static string text_connected {
+            get {
+                return ResourceManager.GetString("text_connected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Default.
         /// </summary>
         public static string text_default {
             get {
                 return ResourceManager.GetString("text_default", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Disconnected.
+        /// </summary>
+        public static string text_disconnected {
+            get {
+                return ResourceManager.GetString("text_disconnected", resourceCulture);
             }
         }
         
@@ -571,11 +607,155 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to _Available Scenes:.
+        /// </summary>
+        public static string window_audio_check_available_scenes_label {
+            get {
+                return ResourceManager.GetString("window_audio-check_available-scenes_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Connecting….
+        /// </summary>
+        public static string window_audio_check_connecting {
+            get {
+                return ResourceManager.GetString("window_audio-check_connecting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Current scene: {0}.
+        /// </summary>
+        public static string window_audio_check_current_scene_automation_name_format {
+            get {
+                return ResourceManager.GetString("window_audio-check_current-scene_automation-name_format", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Current Scene:.
+        /// </summary>
+        public static string window_audio_check_current_scene_label {
+            get {
+                return ResourceManager.GetString("window_audio-check_current-scene_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error state cleared.
+        /// </summary>
+        public static string window_audio_check_error_state_cleared {
+            get {
+                return ResourceManager.GetString("window_audio-check_error-state-cleared", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reconnecting in {0}.
+        /// </summary>
+        public static string window_audio_check_reconnect_delay_format {
+            get {
+                return ResourceManager.GetString("window_audio-check_reconnect-delay_format", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Scene Sources:.
+        /// </summary>
+        public static string window_audio_check_scene_sources_label {
+            get {
+                return ResourceManager.GetString("window_audio-check_scene-sources_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dependency problem for {0}.
+        /// </summary>
+        public static string window_audio_check_source_dependency_problem_automation_name_format {
+            get {
+                return ResourceManager.GetString("window_audio-check_source_dependency-problem_automation-name_format", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to * {0}.
+        /// </summary>
+        public static string window_audio_check_source_format {
+            get {
+                return ResourceManager.GetString("window_audio-check_source_format", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Parsing audio devices….
+        /// </summary>
+        public static string window_audio_check_status_audio_devices_fallback {
+            get {
+                return ResourceManager.GetString("window_audio-check_status_audio-devices_fallback", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} audio devices.
+        /// </summary>
+        public static string window_audio_check_status_audio_devices_format {
+            get {
+                return ResourceManager.GetString("window_audio-check_status_audio-devices_format", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error Details: {0}..
+        /// </summary>
+        public static string window_audio_check_status_error_details_automation_name_format {
+            get {
+                return ResourceManager.GetString("window_audio-check_status_error-details_automation-name_format", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Connection Status Indicator.
+        /// </summary>
+        public static string window_audio_check_status_icon_automation_name {
+            get {
+                return ResourceManager.GetString("window_audio-check_status_icon_automation-name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Successfully disconnected..
+        /// </summary>
+        public static string window_audio_check_successfully_disconnected {
+            get {
+                return ResourceManager.GetString("window_audio-check_successfully-disconnected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to AudioCheck.
         /// </summary>
         public static string window_audio_check_title {
             get {
                 return ResourceManager.GetString("window_audio-check_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Switching scenes.
+        /// </summary>
+        public static string window_audio_check_transition_automation_name {
+            get {
+                return ResourceManager.GetString("window_audio-check_transition_automation-name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ➡️ {0}….
+        /// </summary>
+        public static string window_audio_check_transition_format {
+            get {
+                return ResourceManager.GetString("window_audio-check_transition_format", resourceCulture);
             }
         }
         

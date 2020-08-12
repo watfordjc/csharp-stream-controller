@@ -1,22 +1,25 @@
 ﻿<controls:StyledWindow x:Class="uk.JohnCook.dotnet.StreamController.AudioCheck"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:uk.JohnCook.dotnet.StreamController"
-        xmlns:controls="clr-namespace:uk.JohnCook.dotnet.StreamController.Controls"
-        xmlns:props="clr-namespace:uk.JohnCook.dotnet.StreamController.Properties"
-        mc:Ignorable="d"
-        ContentRendered="Window_ContentRendered"
-        Closed="Window_Closed"
-        KeyDown="Window_KeyDown"
-        SizeToContent="WidthAndHeight"
-        Title="{x:Static props:Resources.window_audio_check_title}"
-        MinHeight="450" MinWidth="800">
+                       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                       xmlns:local="clr-namespace:uk.JohnCook.dotnet.StreamController"
+                       xmlns:controls="clr-namespace:uk.JohnCook.dotnet.StreamController.Controls"
+                       xmlns:props="clr-namespace:uk.JohnCook.dotnet.StreamController.Properties"
+                       mc:Ignorable="d"
+                       ContentRendered="Window_ContentRendered"
+                       Closed="Window_Closed"
+                       KeyDown="Window_KeyDown"
+                       SizeToContent="WidthAndHeight"
+                       Title="{x:Static props:Resources.window_audio_check_title}"
+                       MinHeight="450"
+                       MinWidth="800">
     <Window.Resources>
-        <Style x:Key="{x:Static SystemParameters.FocusVisualStyleKey}" BasedOn="{StaticResource ResourceKey={x:Static SystemParameters.FocusVisualStyleKey}}">
+        <Style x:Key="{x:Static SystemParameters.FocusVisualStyleKey}"
+               BasedOn="{StaticResource ResourceKey={x:Static SystemParameters.FocusVisualStyleKey}}">
             <Style.Triggers>
-                <DataTrigger Binding="{Binding Source={x:Static SystemParameters.HighContrast}}" Value="False">
+                <DataTrigger Binding="{Binding Source={x:Static SystemParameters.HighContrast}}"
+                             Value="False">
                     <Setter Property="Control.Template">
                         <Setter.Value>
                             <ControlTemplate>
@@ -32,36 +35,74 @@
         </Style>
     </Window.Resources>
     <DockPanel>
-        <Menu DataContext="{StaticResource MenuItems}" DockPanel.Dock="Top" x:Name="menuBar"  ItemsSource="{StaticResource ResourceKey=MenuItems}" AutomationProperties.Name="Application" KeyboardNavigation.TabNavigation="None">
+        <Menu DataContext="{StaticResource MenuItems}"
+              DockPanel.Dock="Top"
+              x:Name="menuBar"
+              ItemsSource="{StaticResource ResourceKey=MenuItems}"
+              AutomationProperties.Name="{x:Static props:Resources.menu_main_automation_name}"
+              KeyboardNavigation.TabNavigation="None">
             <Menu.CommandBindings>
-                <CommandBinding Command="{x:Static local:MenuItemCollection.routedConnectionMenuCommand}" CanExecute="Menu_CanExecute" Executed="Menu_Execute" />
+                <CommandBinding Command="{x:Static local:MenuItemCollection.routedConnectionMenuCommand}"
+                                CanExecute="Menu_CanExecute"
+                                Executed="Menu_Execute" />
             </Menu.CommandBindings>
         </Menu>
-        <StatusBar DockPanel.Dock="Bottom" Height="auto" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" Padding="2" Foreground="{DynamicResource {x:Static SystemColors.MenuTextBrushKey}}">
+        <StatusBar DockPanel.Dock="Bottom"
+                   Height="auto"
+                   HorizontalAlignment="Stretch"
+                   HorizontalContentAlignment="Right"
+                   Padding="2"
+                   Foreground="{DynamicResource {x:Static SystemColors.MenuTextBrushKey}}">
             <StatusBarItem DockPanel.Dock="Right">
-                <Ellipse HorizontalAlignment="Right" Width="16" Height="16" Fill="{DynamicResource {x:Static SystemColors.WindowFrameBrushKey}}" x:Name="sbCircleStatus" AutomationProperties.Name="Connection Status Indicator" />
+                <Ellipse HorizontalAlignment="Right"
+                         Width="16"
+                         Height="16"
+                         Fill="{DynamicResource {x:Static SystemColors.WindowFrameBrushKey}}"
+                         x:Name="sbCircleStatus"
+                         AutomationProperties.Name="{x:Static props:Resources.window_audio_check_status_icon_automation_name}" />
             </StatusBarItem>
             <StatusBarItem DockPanel.Dock="Right">
-                <TextBlock x:Name="tbReconnectCountdown" MinWidth="10" TextAlignment="Right" AutomationProperties.Name="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text, StringFormat={}{0}}" AutomationProperties.LiveSetting="Assertive" />
+                <TextBlock x:Name="tbReconnectCountdown"
+                           MinWidth="10"
+                           TextAlignment="Right"
+                           AutomationProperties.Name="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text, StringFormat={}{0}}"
+                           AutomationProperties.LiveSetting="Assertive" />
             </StatusBarItem>
-            <StatusBarItem DockPanel.Dock="Right" VerticalContentAlignment="Stretch">
-                <Rectangle Width="1" Fill="{DynamicResource {x:Static SystemColors.WindowFrameBrushKey}}" />
+            <StatusBarItem DockPanel.Dock="Right"
+                           VerticalContentAlignment="Stretch">
+                <Rectangle Width="1"
+                           Fill="{DynamicResource {x:Static SystemColors.WindowFrameBrushKey}}" />
             </StatusBarItem>
             <StatusBarItem DockPanel.Dock="Right">
-                <TextBlock DataContext="AudioInterfaceCollection.Instance.Devices" Text="{Binding Count, StringFormat={}{0} audio devices, Mode=OneWay, IsAsync=True, FallbackValue='Parsing audio devices&#x2026;'}" MinWidth="10" TextAlignment="Right" />
+                <TextBlock DataContext="AudioInterfaceCollection.Instance.Devices"
+                           Text="{Binding Count, StringFormat={x:Static props:Resources.window_audio_check_status_audio_devices_format}, Mode=OneWay, IsAsync=True, FallbackValue={x:Static props:Resources.window_audio_check_status_audio_devices_fallback}}"
+                           MinWidth="10"
+                           TextAlignment="Right" />
             </StatusBarItem>
-            <StatusBarItem DockPanel.Dock="Right" VerticalContentAlignment="Stretch">
-                <Rectangle Width="1" Fill="{DynamicResource {x:Static SystemColors.WindowFrameBrushKey}}" />
+            <StatusBarItem DockPanel.Dock="Right"
+                           VerticalContentAlignment="Stretch">
+                <Rectangle Width="1"
+                           Fill="{DynamicResource {x:Static SystemColors.WindowFrameBrushKey}}" />
             </StatusBarItem>
-            <StatusBarItem DockPanel.Dock="Right" Margin="4 0">
-                <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
-                    <TextBlock x:Name="tbStatus" AutomationProperties.Name="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text, StringFormat={}{0}}" AutomationProperties.LiveSetting="Polite" AutomationProperties.IsOffscreenBehavior="Offscreen" />
-                    <TextBlock x:Name="tbStatusExtended" AutomationProperties.Name="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text, StringFormat={}Error Details: {0}.}" AutomationProperties.AcceleratorKey="F12" AutomationProperties.LiveSetting="Polite">
+            <StatusBarItem DockPanel.Dock="Right"
+                           Margin="4 0">
+                <StackPanel Orientation="Vertical"
+                            HorizontalAlignment="Stretch">
+                    <TextBlock x:Name="tbStatus"
+                               AutomationProperties.Name="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text, StringFormat={}{0}}"
+                               AutomationProperties.LiveSetting="Polite"
+                               AutomationProperties.IsOffscreenBehavior="Offscreen" />
+                    <TextBlock x:Name="tbStatusExtended"
+                               AutomationProperties.Name="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text, StringFormat={x:Static props:Resources.window_audio_check_status_error_details_automation_name_format}}"
+                               AutomationProperties.AcceleratorKey="F12"
+                               AutomationProperties.LiveSetting="Polite">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text}" Value="">
-                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text}"
+                                                 Value="">
+                                        <Setter Property="Visibility"
+                                                Value="Collapsed" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -86,10 +127,25 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="16" />
             </Grid.RowDefinitions>
-            <StackPanel Orientation="Vertical" Grid.Row="1" Grid.Column="1" Margin="8 0" VerticalAlignment="Top" Grid.ColumnSpan="2">
-                <StackPanel Orientation="Horizontal" Margin="0 0 0 8">
-                    <Label x:Name="label_available_scenes" Content="_Available Scenes:" Target="{Binding ElementName=cbScenes}" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0 0 2 8" />
-                    <ComboBox Name="cbScenes" Margin="2 0 0 8" SelectionChanged="CbScenes_SelectionChanged" AutomationProperties.LabeledBy="{Binding ElementName=label_available_scenes}" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
+            <StackPanel Orientation="Vertical"
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Margin="8 0"
+                        VerticalAlignment="Top"
+                        Grid.ColumnSpan="2">
+                <StackPanel Orientation="Horizontal"
+                            Margin="0 0 0 8">
+                    <Label x:Name="label_available_scenes"
+                           Content="{x:Static props:Resources.window_audio_check_available_scenes_label}"
+                           Target="{Binding ElementName=cbScenes}"
+                           VerticalAlignment="Center"
+                           FontWeight="SemiBold"
+                           Margin="0 0 2 8" />
+                    <ComboBox Name="cbScenes"
+                              Margin="2 0 0 8"
+                              SelectionChanged="CbScenes_SelectionChanged"
+                              AutomationProperties.LabeledBy="{Binding ElementName=label_available_scenes}"
+                              FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Name}" />
@@ -97,45 +153,77 @@
                         </ComboBox.ItemTemplate>
                         <ComboBox.ItemContainerStyle>
                             <Style TargetType="ComboBoxItem">
-                                <Setter Property="AutomationProperties.Name" Value="{Binding Name}" />
+                                <Setter Property="AutomationProperties.Name"
+                                        Value="{Binding Name}" />
                             </Style>
                         </ComboBox.ItemContainerStyle>
                     </ComboBox>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <Label x:Name="label_current_scene" Content="Current Scene:" VerticalAlignment="Center" FontWeight="SemiBold" HorizontalAlignment="Left" Margin="0 0 2 8" />
-                    <TextBlock x:Name="current_scene" Margin="2 0 0 8" TextWrapping="Wrap" VerticalAlignment="Center" Text="{Binding Name, TargetNullValue='None', FallbackValue='None', IsAsync=True}"
+                    <Label x:Name="label_current_scene"
+                           Content="{x:Static props:Resources.window_audio_check_current_scene_label}"
+                           VerticalAlignment="Center"
+                           FontWeight="SemiBold"
+                           HorizontalAlignment="Left"
+                           Margin="0 0 2 8" />
+                    <TextBlock x:Name="current_scene"
+                               Margin="2 0 0 8"
+                               TextWrapping="Wrap"
+                               VerticalAlignment="Center"
+                               Text="{Binding Name, TargetNullValue='None', FallbackValue='None', IsAsync=True}"
                                AutomationProperties.LiveSetting="Polite"
-                               AutomationProperties.Name="{Binding Name, TargetNullValue='None', FallbackValue='None', IsAsync=True, StringFormat={}Current scene: {0}}"
-                               />
+                               AutomationProperties.Name="{Binding Name, TargetNullValue='None', FallbackValue='None', IsAsync=True, StringFormat={x:Static props:Resources.window_audio_check_current_scene_automation_name_format}}" />
                 </StackPanel>
-                <TextBlock x:Name="tbTransitioning" Margin="0 0 0 8" TextWrapping="Wrap">
+                <TextBlock x:Name="tbTransitioning"
+                           Margin="0 0 0 8"
+                           TextWrapping="Wrap">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text}" Value="">
-                                    <Setter Property="AutomationProperties.LiveSetting" Value="Off" />
-                                    <Setter Property="Visibility" Value="Hidden" />
+                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text}"
+                                             Value="">
+                                    <Setter Property="AutomationProperties.LiveSetting"
+                                            Value="Off" />
+                                    <Setter Property="Visibility"
+                                            Value="Hidden" />
                                 </DataTrigger>
                             </Style.Triggers>
-                            <Setter Property="AutomationProperties.LiveSetting" Value="Polite" />
-                            <Setter Property="AutomationProperties.Name" Value="Switching scenes" />
-                            <Setter Property="Visibility" Value="Visible" />
+                            <Setter Property="AutomationProperties.LiveSetting"
+                                    Value="Polite" />
+                            <Setter Property="AutomationProperties.Name"
+                                    Value="{x:Static props:Resources.window_audio_check_transition_automation_name}" />
+                            <Setter Property="Visibility"
+                                    Value="Visible" />
                         </Style>
                     </TextBlock.Style>
                 </TextBlock>
             </StackPanel>
-            <Grid Grid.Row="1" Grid.Column="3" Grid.RowSpan="4">
+            <Grid Grid.Row="1"
+                  Grid.Column="3"
+                  Grid.RowSpan="4">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <Label x:Name="label_scene_sources" Grid.Row="0" Content="_Scene Sources:" Target="{Binding ElementName=lbSourceList}" FontWeight="SemiBold" HorizontalAlignment="Left" Margin="0 0 2 8" />
-                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                    <ListBox ItemsSource="{Binding Sources,IsAsync=True}" x:Name="lbSourceList" Margin="0 0 0 8" ScrollViewer.HorizontalScrollBarVisibility="Disabled" AutomationProperties.LabeledBy="{Binding ElementName=label_scene_sources}">
+                <Label x:Name="label_scene_sources"
+                       Grid.Row="0"
+                       Content="{x:Static props:Resources.window_audio_check_scene_sources_label}"
+                       Target="{Binding ElementName=lbSourceList}"
+                       FontWeight="SemiBold"
+                       HorizontalAlignment="Left"
+                       Margin="0 0 2 8" />
+                <ScrollViewer Grid.Row="1"
+                              VerticalScrollBarVisibility="Auto">
+                    <ListBox ItemsSource="{Binding Sources,IsAsync=True}"
+                             x:Name="lbSourceList"
+                             Margin="0 0 0 8"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                             AutomationProperties.LabeledBy="{Binding ElementName=label_scene_sources}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Width="auto" TextWrapping="Wrap" Text="{Binding Source.Name, StringFormat={} * {0}, IsAsync=True}" />
+                                <TextBlock Width="auto"
+                                           TextWrapping="Wrap"
+                                           Text="{Binding Source.Name, StringFormat={x:Static props:Resources.window_audio_check_source_format}, IsAsync=True}" />
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                         <ListBox.ItemContainerStyle>
@@ -143,27 +231,39 @@
                                 <Style.Triggers>
                                     <MultiDataTrigger>
                                         <MultiDataTrigger.Conditions>
-                                            <Condition Binding="{Binding Source.Dependencies.DependencyProblem, IsAsync=True}" Value="True" />
-                                            <Condition Binding="{Binding Source={x:Static SystemParameters.HighContrast}}" Value="False" />
+                                            <Condition Binding="{Binding Source.Dependencies.DependencyProblem, IsAsync=True}"
+                                                       Value="True" />
+                                            <Condition Binding="{Binding Source={x:Static SystemParameters.HighContrast}}"
+                                                       Value="False" />
                                         </MultiDataTrigger.Conditions>
-                                        <Setter Property="Foreground" Value="{DynamicResource Text.Static.Error}" />
-                                        <Setter Property="FontWeight" Value="Bold" />
-                                        <Setter Property="AutomationProperties.Name" Value="{Binding Source.Name, StringFormat={}Dependency problem for {0}}" />
+                                        <Setter Property="Foreground"
+                                                Value="{DynamicResource Text.Static.Error}" />
+                                        <Setter Property="FontWeight"
+                                                Value="Bold" />
+                                        <Setter Property="AutomationProperties.Name"
+                                                Value="{Binding Source.Name, StringFormat={x:Static props:Resources.window_audio_check_source_dependency_problem_automation_name_format}}" />
                                     </MultiDataTrigger>
                                     <MultiDataTrigger>
                                         <MultiDataTrigger.Conditions>
-                                            <Condition Binding="{Binding Source.Dependencies.DependencyProblem, IsAsync=True}" Value="True" />
-                                            <Condition Binding="{Binding Source={x:Static SystemParameters.HighContrast}}" Value="True" />
+                                            <Condition Binding="{Binding Source.Dependencies.DependencyProblem, IsAsync=True}"
+                                                       Value="True" />
+                                            <Condition Binding="{Binding Source={x:Static SystemParameters.HighContrast}}"
+                                                       Value="True" />
                                         </MultiDataTrigger.Conditions>
-                                        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
-                                        <Setter Property="AutomationProperties.Name" Value="{Binding Source.Name, StringFormat={}Dependency problem for {0}}" />
+                                        <Setter Property="Foreground"
+                                                Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                                        <Setter Property="AutomationProperties.Name"
+                                                Value="{Binding Source.Name, StringFormat={x:Static props:Resources.window_audio_check_source_dependency_problem_automation_name_format}}" />
                                     </MultiDataTrigger>
-                                    <DataTrigger Binding="{Binding Source.Dependencies.DependencyProblem, IsAsync=True}" Value="False">
-                                        <Setter Property="AutomationProperties.Name" Value="{Binding Source.Name}" />
+                                    <DataTrigger Binding="{Binding Source.Dependencies.DependencyProblem, IsAsync=True}"
+                                                 Value="False">
+                                        <Setter Property="AutomationProperties.Name"
+                                                Value="{Binding Source.Name}" />
                                     </DataTrigger>
                                 </Style.Triggers>
                                 <Style.Setters>
-                                    <Setter Property="FocusVisualStyle" Value="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
+                                    <Setter Property="FocusVisualStyle"
+                                            Value="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
                                 </Style.Setters>
                             </Style>
                         </ListBox.ItemContainerStyle>
