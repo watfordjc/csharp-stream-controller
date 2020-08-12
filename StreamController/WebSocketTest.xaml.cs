@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Accessibility;
+using System;
 using System.Buffers.Text;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -103,65 +104,65 @@ namespace uk.JohnCook.dotnet.StreamController
             {
                 case ObsEventType.SourceFilterRemoved:
                     SourceFilterRemovedObsEvent temp1 = (obsEvent as SourceFilterRemovedObsEvent);
-                    txtOutput.AppendText($"{temp1.UpdateType}: {temp1.FilterName} ({temp1.FilterType}) removed from {temp1.SourceName}\n");
+                    txtOutput.AppendText(String.Format(CultureInfo.CurrentCulture, Properties.Resources.window_obs_message_SourceFilterRemoved_format,  temp1.UpdateType, temp1.FilterName, temp1.FilterType, temp1.SourceName));
                     break;
                 case ObsEventType.SourceDestroyed:
                     SourceDestroyedObsEvent temp2 = (obsEvent as SourceDestroyedObsEvent);
-                    txtOutput.AppendText($"{temp2.UpdateType}: {temp2.SourceName} ({temp2.SourceType})\n");
+                    txtOutput.AppendText(String.Format(CultureInfo.CurrentCulture, Properties.Resources.window_obs_message_generic_format, temp2.UpdateType, temp2.SourceName, temp2.SourceType));
                     break;
                 case ObsEventType.SourceCreated:
                     SourceCreatedObsEvent temp3 = (obsEvent as SourceCreatedObsEvent);
-                    txtOutput.AppendText($"{temp3.UpdateType}: {temp3.SourceName} ({temp3.SourceKind})\n");
+                    txtOutput.AppendText(String.Format(CultureInfo.CurrentCulture, Properties.Resources.window_obs_message_generic_format, temp3.UpdateType, temp3.SourceName, temp3.SourceKind));
                     break;
                 case ObsEventType.SourceVolumeChanged:
                     SourceVolumeChangedObsEvent temp4 = (obsEvent as SourceVolumeChangedObsEvent);
-                    txtOutput.AppendText($"{temp4.UpdateType}: {temp4.SourceName}'s volume now at {temp4.Volume}\n");
+                    txtOutput.AppendText(String.Format(CultureInfo.CurrentCulture, Properties.Resources.window_obs_message_SourceVolumeChanged_format, temp4.UpdateType, temp4.SourceName, temp4.Volume));
                     break;
                 case ObsEventType.SourceAudioSyncOffsetChanged:
                     SourceAudioSyncOffsetChangedObsEvent temp5 = (obsEvent as SourceAudioSyncOffsetChangedObsEvent);
-                    txtOutput.AppendText($"{temp5.UpdateType}: {temp5.SourceName}'s audio offset is now {temp5.SyncOffset}\n");
+                    txtOutput.AppendText(String.Format(CultureInfo.CurrentCulture, Properties.Resources.window_obs_message_SourceAudioSyncOffsetChanged_format, temp5.UpdateType, temp5.SourceName, temp5.SyncOffset));
                     break;
                 case ObsEventType.SourceMuteStateChanged:
                     SourceMuteStateChangedObsEvent temp6 = (obsEvent as SourceMuteStateChangedObsEvent);
-                    txtOutput.AppendText($"{temp6.UpdateType}: {temp6.SourceName} now has a muted state of {temp6.Muted}\n");
+                    txtOutput.AppendText(String.Format(CultureInfo.CurrentCulture, Properties.Resources.window_obs_message_SourceMuteStateChanged_format, temp6.UpdateType, temp6.SourceName, temp6.Muted));
                     break;
                 case ObsEventType.SourceFilterAdded:
                     SourceFilterAddedObsEvent temp7 = (obsEvent as SourceFilterAddedObsEvent);
-                    txtOutput.AppendText($"{temp7.UpdateType}: {temp7.FilterName} ({temp7.FilterType}) added to {temp7.SourceName}\n");
+                    txtOutput.AppendText(String.Format(CultureInfo.CurrentCulture, Properties.Resources.window_obs_message_SourceFilterAdded_format, temp7.UpdateType, temp7.FilterName, temp7.FilterType, temp7.SourceName));
                     break;
                 case ObsEventType.SceneItemAdded:
                     SceneItemAddedObsEvent temp8 = (obsEvent as SceneItemAddedObsEvent);
-                    txtOutput.AppendText($"{temp8.UpdateType}: {temp8.ItemName} added to {temp8.SceneName}\n");
+                    txtOutput.AppendText(String.Format(CultureInfo.CurrentCulture, Properties.Resources.window_obs_message_SceneItemAdded_format, temp8.UpdateType, temp8.ItemName, temp8.SceneName));
                     break;
                 case ObsEventType.SceneItemTransformChanged:
                     SceneItemTransformChangedObsEvent temp9 = (obsEvent as SceneItemTransformChangedObsEvent);
-                    txtOutput.AppendText($"{temp9.UpdateType}: Transform changed on {temp9.ItemName} in {temp9.SceneName}\n");
+                    txtOutput.AppendText(String.Format(CultureInfo.CurrentCulture, Properties.Resources.window_obs_message_SceneItemTransformChanged_format, temp9.UpdateType, temp9.ItemName, temp9.SceneName));
                     break;
                 case ObsEventType.SwitchScenes:
                     SwitchScenesObsEvent temp10 = (obsEvent as SwitchScenesObsEvent);
-                    txtOutput.AppendText($"{temp10.UpdateType}: Switching to {temp10.SceneName}; {temp10.Sources.Count} sources in the scene.\n");
+                    txtOutput.AppendText(String.Format(CultureInfo.CurrentCulture, Properties.Resources.window_obs_message_SwitchScenes_format, temp10.UpdateType, temp10.SceneName, temp10.Sources.Count));
                     break;
                 case ObsEventType.SceneCollectionChanged:
                     SceneCollectionChangedObsEvent temp11 = (obsEvent as SceneCollectionChangedObsEvent);
-                    txtOutput.AppendText($"{temp11.UpdateType}: Scene collection has changed.\n");
+                    txtOutput.AppendText(String.Format(CultureInfo.CurrentCulture, Properties.Resources.window_obs_message_SceneCollectionChanged_format, temp11.UpdateType));
                     break;
                 case ObsEventType.TransitionListChanged:
                     TransitionListChangedObsEvent temp12 = (obsEvent as TransitionListChangedObsEvent);
-                    txtOutput.AppendText($"{temp12.UpdateType}: Transition list has changed.\n");
+                    txtOutput.AppendText(String.Format(CultureInfo.CurrentCulture, Properties.Resources.window_obs_message_TransitionListChanged_format, temp12.UpdateType));
                     break;
                 case ObsEventType.SwitchTransition:
                     SwitchTransitionObsEvent temp13 = (obsEvent as SwitchTransitionObsEvent);
-                    txtOutput.AppendText($"{temp13.UpdateType}: Using transition {temp13.TransitionName}\n");
+                    txtOutput.AppendText(String.Format(CultureInfo.CurrentCulture, Properties.Resources.window_obs_message_SwitchTransition_format, temp13.UpdateType, temp13.TransitionName));
                     break;
                 case ObsEventType.ScenesChanged:
                     ScenesChangedObsEvent temp14 = (obsEvent as ScenesChangedObsEvent);
-                    txtOutput.AppendText($"{temp14.UpdateType}: The scene list has been modified.\n");
+                    txtOutput.AppendText(String.Format(CultureInfo.CurrentCulture, Properties.Resources.window_obs_message_ScenesChanged_format, temp14.UpdateType));
                     break;
                 default:
                     txtOutput.AppendText((obsEventObject.MessageObject as EventBase).UpdateType);
-                    txtOutput.AppendText("\n");
                     break;
             }
+            txtOutput.AppendText("\n");
 
             if (autoscroll == true)
             {
@@ -192,7 +193,7 @@ namespace uk.JohnCook.dotnet.StreamController
 
         private void WebSocket_StateChange(WebSocketState e)
         {
-            txtStatus.Text = $"Connection Status: {e}";
+            txtStatus.Text = String.Format(CultureInfo.InvariantCulture, Properties.Resources.window_obs_connection_status_format, e);
             if (e == WebSocketState.Closed)
             {
                 btnTest.IsEnabled = true;
@@ -200,8 +201,8 @@ namespace uk.JohnCook.dotnet.StreamController
             else if (e == WebSocketState.None)
             {
                 txtStatus.Text = webSocket.AutoReconnect
-                    ? $"Connection Status: {e} (Current reconnect delay: {reconnectDelay} seconds)"
-                    : $"Connection Status: {e}";
+                    ? String.Format(CultureInfo.InvariantCulture, Properties.Resources.window_obs_connection_status_reconnect_format, e, reconnectDelay)
+                    : String.Format(CultureInfo.InvariantCulture, Properties.Resources.window_obs_connection_status_format, e);
             }
         }
 

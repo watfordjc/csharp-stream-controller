@@ -1021,6 +1021,141 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Connection Status: {0}.
+        /// </summary>
+        public static string window_obs_connection_status_format {
+            get {
+                return ResourceManager.GetString("window_obs_connection-status_format", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Connection Status: {0} (Current reconnect delay: {1} seconds).
+        /// </summary>
+        public static string window_obs_connection_status_reconnect_format {
+            get {
+                return ResourceManager.GetString("window_obs_connection-status-reconnect_format", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}: {1} ({2}).
+        /// </summary>
+        public static string window_obs_message_generic_format {
+            get {
+                return ResourceManager.GetString("window_obs_message_generic_format", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}: Scene collection has changed..
+        /// </summary>
+        public static string window_obs_message_SceneCollectionChanged_format {
+            get {
+                return ResourceManager.GetString("window_obs_message_SceneCollectionChanged_format", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}: {1} added to {2}.
+        /// </summary>
+        public static string window_obs_message_SceneItemAdded_format {
+            get {
+                return ResourceManager.GetString("window_obs_message_SceneItemAdded_format", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}: Transform changed on {1} in {2}.
+        /// </summary>
+        public static string window_obs_message_SceneItemTransformChanged_format {
+            get {
+                return ResourceManager.GetString("window_obs_message_SceneItemTransformChanged_format", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}: The scene list has been modified..
+        /// </summary>
+        public static string window_obs_message_ScenesChanged_format {
+            get {
+                return ResourceManager.GetString("window_obs_message_ScenesChanged_format", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}: {1}&apos;s audio offset is now {2}.
+        /// </summary>
+        public static string window_obs_message_SourceAudioSyncOffsetChanged_format {
+            get {
+                return ResourceManager.GetString("window_obs_message_SourceAudioSyncOffsetChanged_format", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}: {1} ({2}) added to {3}.
+        /// </summary>
+        public static string window_obs_message_SourceFilterAdded_format {
+            get {
+                return ResourceManager.GetString("window_obs_message_SourceFilterAdded_format", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}: {1} ({2}) removed from {3}.
+        /// </summary>
+        public static string window_obs_message_SourceFilterRemoved_format {
+            get {
+                return ResourceManager.GetString("window_obs_message_SourceFilterRemoved_format", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}: {1} now has a muted state of {2}.
+        /// </summary>
+        public static string window_obs_message_SourceMuteStateChanged_format {
+            get {
+                return ResourceManager.GetString("window_obs_message_SourceMuteStateChanged_format", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}: {1}&apos;s volume now at {2}.
+        /// </summary>
+        public static string window_obs_message_SourceVolumeChanged_format {
+            get {
+                return ResourceManager.GetString("window_obs_message_SourceVolumeChanged_format", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}: Switching to {1}; {2} sources in the scene..
+        /// </summary>
+        public static string window_obs_message_SwitchScenes_format {
+            get {
+                return ResourceManager.GetString("window_obs_message_SwitchScenes_format", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}: Using transition {1}.
+        /// </summary>
+        public static string window_obs_message_SwitchTransition_format {
+            get {
+                return ResourceManager.GetString("window_obs_message_SwitchTransition_format", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}: Transition list has changed..
+        /// </summary>
+        public static string window_obs_message_TransitionListChanged_format {
+            get {
+                return ResourceManager.GetString("window_obs_message_TransitionListChanged_format", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to _Received Data.
         /// </summary>
         public static string window_obs_received_data {

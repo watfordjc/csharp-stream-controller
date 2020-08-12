@@ -517,6 +517,51 @@
     <value>_Auto Scroll</value>
     <comment>Text for (WebSocketTest.xaml -&gt; Auto-Scroll checkbox)</comment>
   </data>
+  <data name="window_obs_connection-status-reconnect_format" xml:space="preserve">
+    <value>Connection Status: {0} (Current reconnect delay: {1} seconds)</value>
+  </data>
+  <data name="window_obs_connection-status_format" xml:space="preserve">
+    <value>Connection Status: {0}</value>
+  </data>
+  <data name="window_obs_message_generic_format" xml:space="preserve">
+    <value>{0}: {1} ({2})</value>
+  </data>
+  <data name="window_obs_message_SceneCollectionChanged_format" xml:space="preserve">
+    <value>{0}: Scene collection has changed.</value>
+  </data>
+  <data name="window_obs_message_SceneItemAdded_format" xml:space="preserve">
+    <value>{0}: {1} added to {2}</value>
+  </data>
+  <data name="window_obs_message_SceneItemTransformChanged_format" xml:space="preserve">
+    <value>{0}: Transform changed on {1} in {2}</value>
+  </data>
+  <data name="window_obs_message_ScenesChanged_format" xml:space="preserve">
+    <value>{0}: The scene list has been modified.</value>
+  </data>
+  <data name="window_obs_message_SourceAudioSyncOffsetChanged_format" xml:space="preserve">
+    <value>{0}: {1}'s audio offset is now {2}</value>
+  </data>
+  <data name="window_obs_message_SourceFilterAdded_format" xml:space="preserve">
+    <value>{0}: {1} ({2}) added to {3}</value>
+  </data>
+  <data name="window_obs_message_SourceFilterRemoved_format" xml:space="preserve">
+    <value>{0}: {1} ({2}) removed from {3}</value>
+  </data>
+  <data name="window_obs_message_SourceMuteStateChanged_format" xml:space="preserve">
+    <value>{0}: {1} now has a muted state of {2}</value>
+  </data>
+  <data name="window_obs_message_SourceVolumeChanged_format" xml:space="preserve">
+    <value>{0}: {1}'s volume now at {2}</value>
+  </data>
+  <data name="window_obs_message_SwitchScenes_format" xml:space="preserve">
+    <value>{0}: Switching to {1}; {2} sources in the scene.</value>
+  </data>
+  <data name="window_obs_message_SwitchTransition_format" xml:space="preserve">
+    <value>{0}: Using transition {1}</value>
+  </data>
+  <data name="window_obs_message_TransitionListChanged_format" xml:space="preserve">
+    <value>{0}: Transition list has changed.</value>
+  </data>
   <data name="window_obs_received-data" xml:space="preserve">
     <value>_Received Data</value>
     <comment>Text for (WebSocketTest.xaml -&gt; Received Data group box)</comment>
