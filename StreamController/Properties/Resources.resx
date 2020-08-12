@@ -308,6 +308,34 @@
     <value>Stream Control</value>
     <comment>Title Bar for MainWindow.xaml</comment>
   </data>
+  <data name="window_network-test_connection-type_label" xml:space="preserve">
+    <value>Connection Type:</value>
+    <comment>Text for (NetworkTest.xaml -&gt; Connection Type)</comment>
+  </data>
+  <data name="window_network-test_connectivity_label" xml:space="preserve">
+    <value>Internet Connectivity:</value>
+    <comment>Text for (NetworkTest.xaml -&gt; Internet Connectivity)</comment>
+  </data>
+  <data name="window_network-test_metered_label" xml:space="preserve">
+    <value>Metered Connection:</value>
+    <comment>Text for (NetworkTest.xaml -&gt; Metered Connection)</comment>
+  </data>
+  <data name="window_network-test_status_ConstrainedInternetAccess" xml:space="preserve">
+    <value>Limited Connectivity 👎</value>
+    <comment>Text and emoji for (NetworkText.xaml -&gt; State -&gt; ConstrainedInternetAccess)</comment>
+  </data>
+  <data name="window_network-test_status_InternetAccess" xml:space="preserve">
+    <value>Internet ✔️</value>
+    <comment>Text and emoji for (NetworkText.xaml -&gt; State -&gt; InternetAccess)</comment>
+  </data>
+  <data name="window_network-test_status_LocalAccess" xml:space="preserve">
+    <value>⚠️ LAN Only!</value>
+    <comment>Text and emoji for (NetworkText.xaml -&gt; State -&gt; LocalAccess)</comment>
+  </data>
+  <data name="window_network-test_status_None" xml:space="preserve">
+    <value>No Network!</value>
+    <comment>Text and emoji for (NetworkText.xaml -&gt; State -&gt; None)</comment>
+  </data>
   <data name="window_network-test_title" xml:space="preserve">
     <value>NetworkTest</value>
     <comment>Title Bar for NetworkTest.xaml</comment>

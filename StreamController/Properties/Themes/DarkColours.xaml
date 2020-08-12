@@ -40,6 +40,23 @@
     <!-- Preferences Window -->
 
     <SolidColorBrush x:Key="Text.Static.Error" Color="Red" />
+
+    <!-- NetworkTest Window -->
+
+    <SolidColorBrush x:Key="NetworkTest.Metered.IsChecked.Foreground" Color="LightSalmon" />
+    <SolidColorBrush x:Key="NetworkTest.InternetConnectivity.IsChecked.Foreground" Color="PaleGreen" />
+    <SolidColorBrush x:Key="NetworkTest.NetworkState.None.Border" Color="Red" />
+    <SolidColorBrush x:Key="NetworkTest.NetworkState.None.Background" Color="Black" />
+    <SolidColorBrush x:Key="NetworkTest.NetworkState.None.Foreground" Color="WhiteSmoke" />
+    <SolidColorBrush x:Key="NetworkTest.NetworkState.LocalAccess.Border" Color="DarkOrange" />
+    <SolidColorBrush x:Key="NetworkTest.NetworkState.LocalAccess.Background" Color="Yellow" />
+    <SolidColorBrush x:Key="NetworkTest.NetworkState.LocalAccess.Foreground" Color="Black" />
+    <SolidColorBrush x:Key="NetworkTest.NetworkState.ConstrainedInternetAccess.Border" Color="DarkGoldenrod" />
+    <SolidColorBrush x:Key="NetworkTest.NetworkState.ConstrainedInternetAccess.Background" Color="PeachPuff" />
+    <SolidColorBrush x:Key="NetworkTest.NetworkState.ConstrainedInternetAccess.Foreground" Color="Black" />
+    <SolidColorBrush x:Key="NetworkTest.NetworkState.InternetAccess.Border" Color="Green" />
+    <SolidColorBrush x:Key="NetworkTest.NetworkState.InternetAccess.Background" Color="PaleGreen" />
+    <SolidColorBrush x:Key="NetworkTest.NetworkState.InternetAccess.Foreground" Color="Black" />
     
 </ResourceDictionary>
     

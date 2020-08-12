@@ -508,6 +508,69 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Connection Type:.
+        /// </summary>
+        public static string window_network_test_connection_type_label {
+            get {
+                return ResourceManager.GetString("window_network-test_connection-type_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Internet Connectivity:.
+        /// </summary>
+        public static string window_network_test_connectivity_label {
+            get {
+                return ResourceManager.GetString("window_network-test_connectivity_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Metered Connection:.
+        /// </summary>
+        public static string window_network_test_metered_label {
+            get {
+                return ResourceManager.GetString("window_network-test_metered_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Limited Connectivity 👎.
+        /// </summary>
+        public static string window_network_test_status_ConstrainedInternetAccess {
+            get {
+                return ResourceManager.GetString("window_network-test_status_ConstrainedInternetAccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Internet ✔️.
+        /// </summary>
+        public static string window_network_test_status_InternetAccess {
+            get {
+                return ResourceManager.GetString("window_network-test_status_InternetAccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ⚠️ LAN Only!.
+        /// </summary>
+        public static string window_network_test_status_LocalAccess {
+            get {
+                return ResourceManager.GetString("window_network-test_status_LocalAccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No Network!.
+        /// </summary>
+        public static string window_network_test_status_None {
+            get {
+                return ResourceManager.GetString("window_network-test_status_None", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to NetworkTest.
         /// </summary>
         public static string window_network_test_title {

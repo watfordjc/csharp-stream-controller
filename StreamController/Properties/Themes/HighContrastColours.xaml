@@ -42,5 +42,22 @@
     <!-- Preferences Window -->
 
     <SolidColorBrush x:Key="Text.Static.Error" Color="{DynamicResource {x:Static SystemColors.WindowTextColorKey}}" />
+
+    <!-- NetworkTest Window -->
+
+    <SolidColorBrush x:Key="NetworkTest.Metered.IsChecked.Foreground" Color="{DynamicResource {x:Static SystemColors.WindowColorKey}}" />
+    <SolidColorBrush x:Key="NetworkTest.InternetConnectivity.IsChecked.Foreground" Color="{DynamicResource {x:Static SystemColors.WindowColorKey}}" />
+    <SolidColorBrush x:Key="NetworkTest.NetworkState.None.Border" Color="{DynamicResource {x:Static SystemColors.WindowFrameColorKey}}" />
+    <SolidColorBrush x:Key="NetworkTest.NetworkState.None.Background" Color="{DynamicResource {x:Static SystemColors.WindowColorKey}}" />
+    <SolidColorBrush x:Key="NetworkTest.NetworkState.None.Foreground" Color="{DynamicResource {x:Static SystemColors.WindowTextColorKey}}" />
+    <SolidColorBrush x:Key="NetworkTest.NetworkState.LocalAccess.Border" Color="{DynamicResource {x:Static SystemColors.WindowFrameColorKey}}" />
+    <SolidColorBrush x:Key="NetworkTest.NetworkState.LocalAccess.Background" Color="{DynamicResource {x:Static SystemColors.WindowColorKey}}" />
+    <SolidColorBrush x:Key="NetworkTest.NetworkState.LocalAccess.Foreground" Color="{DynamicResource {x:Static SystemColors.WindowTextColorKey}}" />
+    <SolidColorBrush x:Key="NetworkTest.NetworkState.ConstrainedInternetAccess.Border" Color="{DynamicResource {x:Static SystemColors.WindowFrameColorKey}}" />
+    <SolidColorBrush x:Key="NetworkTest.NetworkState.ConstrainedInternetAccess.Background" Color="{DynamicResource {x:Static SystemColors.WindowColorKey}}" />
+    <SolidColorBrush x:Key="NetworkTest.NetworkState.ConstrainedInternetAccess.Foreground" Color="{DynamicResource {x:Static SystemColors.WindowTextColorKey}}" />
+    <SolidColorBrush x:Key="NetworkTest.NetworkState.InternetAccess.Border" Color="{DynamicResource {x:Static SystemColors.WindowFrameColorKey}}" />
+    <SolidColorBrush x:Key="NetworkTest.NetworkState.InternetAccess.Background" Color="{DynamicResource {x:Static SystemColors.WindowColorKey}}" />
+    <SolidColorBrush x:Key="NetworkTest.NetworkState.InternetAccess.Foreground" Color="{DynamicResource {x:Static SystemColors.WindowTextColorKey}}" />
     
 </ResourceDictionary>
