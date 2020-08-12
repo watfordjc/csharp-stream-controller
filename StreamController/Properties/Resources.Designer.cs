@@ -61,6 +61,60 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Stream Controller.
+        /// </summary>
+        public static string application_name {
+            get {
+                return ResourceManager.GetString("application_name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Connect.
+        /// </summary>
+        public static string button_connect {
+            get {
+                return ResourceManager.GetString("button_connect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ctrl+R.
+        /// </summary>
+        public static string button_connect_accelerator {
+            get {
+                return ResourceManager.GetString("button_connect_accelerator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Disconnect.
+        /// </summary>
+        public static string button_disconnect {
+            get {
+                return ResourceManager.GetString("button_disconnect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ctrl+D.
+        /// </summary>
+        public static string button_disconnect_accelerator {
+            get {
+                return ResourceManager.GetString("button_disconnect_accelerator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reconnect.
+        /// </summary>
+        public static string button_reconnect {
+            get {
+                return ResourceManager.GetString("button_reconnect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
         public static System.Drawing.Icon icon {
@@ -292,6 +346,60 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Default _Capture.
+        /// </summary>
+        public static string tray_contextmenu_default_capture {
+            get {
+                return ResourceManager.GetString("tray_contextmenu_default-capture", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Current default capture device, {0}.
+        /// </summary>
+        public static string tray_contextmenu_default_capture_default_automation_name_format {
+            get {
+                return ResourceManager.GetString("tray_contextmenu_default-capture_default_automation-name_format", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Default _Render.
+        /// </summary>
+        public static string tray_contextmenu_default_render {
+            get {
+                return ResourceManager.GetString("tray_contextmenu_default-render", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Current default render device, {0}.
+        /// </summary>
+        public static string tray_contextmenu_default_render_default_automation_name_format {
+            get {
+                return ResourceManager.GetString("tray_contextmenu_default-render_default_automation-name_format", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to E_xit.
+        /// </summary>
+        public static string tray_contextmenu_exit {
+            get {
+                return ResourceManager.GetString("tray_contextmenu_exit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to E_nsure Custom Audio.
+        /// </summary>
+        public static string tray_contextmenu_toggle_app_audio {
+            get {
+                return ResourceManager.GetString("tray_contextmenu_toggle-app-audio", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to AudioCheck.
         /// </summary>
         public static string window_audio_check_title {
@@ -315,6 +423,24 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         public static string window_network_test_title {
             get {
                 return ResourceManager.GetString("window_network-test_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Auto Scroll.
+        /// </summary>
+        public static string window_obs_auto_scroll {
+            get {
+                return ResourceManager.GetString("window_obs_auto-scroll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Received Data.
+        /// </summary>
+        public static string window_obs_received_data {
+            get {
+                return ResourceManager.GetString("window_obs_received-data", resourceCulture);
             }
         }
         

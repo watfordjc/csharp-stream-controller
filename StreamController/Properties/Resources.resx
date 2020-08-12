@@ -117,6 +117,30 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="application_name" xml:space="preserve">
+    <value>Stream Controller</value>
+    <comment>Friendly application name</comment>
+  </data>
+  <data name="button_connect" xml:space="preserve">
+    <value>Connect</value>
+    <comment>Button text - Connect</comment>
+  </data>
+  <data name="button_connect_accelerator" xml:space="preserve">
+    <value>Ctrl+R</value>
+    <comment>Accelerator key for Connect and Reconnect buttons</comment>
+  </data>
+  <data name="button_disconnect" xml:space="preserve">
+    <value>Disconnect</value>
+    <comment>Button text - Disconnect</comment>
+  </data>
+  <data name="button_disconnect_accelerator" xml:space="preserve">
+    <value>Ctrl+D</value>
+    <comment>Accelerator key for Disconnect buttons</comment>
+  </data>
+  <data name="button_reconnect" xml:space="preserve">
+    <value>Reconnect</value>
+    <comment>Button text - Reconnect</comment>
+  </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -212,6 +236,30 @@
     <value>obs-websocket Password Configured</value>
     <comment>Dialog box title - obs-websocket Password configured</comment>
   </data>
+  <data name="tray_contextmenu_default-capture" xml:space="preserve">
+    <value>Default _Capture</value>
+    <comment>Tray icon -&gt; right-click -&gt; Default Capture</comment>
+  </data>
+  <data name="tray_contextmenu_default-capture_default_automation-name_format" xml:space="preserve">
+    <value>Current default capture device, {0}</value>
+    <comment>Automation Name string format for (Tray icon -&gt; right-click -&gt; Default Capture -&gt; current default capture interface)</comment>
+  </data>
+  <data name="tray_contextmenu_default-render" xml:space="preserve">
+    <value>Default _Render</value>
+    <comment>Tray icon -&gt; right-click -&gt; Default Render</comment>
+  </data>
+  <data name="tray_contextmenu_default-render_default_automation-name_format" xml:space="preserve">
+    <value>Current default render device, {0}</value>
+    <comment>Automation Name string format for (Tray icon -&gt; right-click -&gt; Default Render -&gt; current default render interface)</comment>
+  </data>
+  <data name="tray_contextmenu_exit" xml:space="preserve">
+    <value>E_xit</value>
+    <comment>Tray icon -&gt; right-click -&gt; Exit (exits application)</comment>
+  </data>
+  <data name="tray_contextmenu_toggle-app-audio" xml:space="preserve">
+    <value>E_nsure Custom Audio</value>
+    <comment>Tray icon -&gt; right-click -&gt; Ensure Custom Audio</comment>
+  </data>
   <data name="window_audio-check_title" xml:space="preserve">
     <value>AudioCheck</value>
     <comment>Title Bar for AudioCheck.xaml</comment>
@@ -223,6 +271,14 @@
   <data name="window_network-test_title" xml:space="preserve">
     <value>NetworkTest</value>
     <comment>Title Bar for NetworkTest.xaml</comment>
+  </data>
+  <data name="window_obs_auto-scroll" xml:space="preserve">
+    <value>_Auto Scroll</value>
+    <comment>Text for (WebSocketTest.xaml -&gt; Auto-Scroll checkbox)</comment>
+  </data>
+  <data name="window_obs_received-data" xml:space="preserve">
+    <value>_Received Data</value>
+    <comment>Text for (WebSocketTest.xaml -&gt; Received Data group box)</comment>
   </data>
   <data name="window_obs_title" xml:space="preserve">
     <value>WebSocketTest</value>

@@ -48,16 +48,39 @@
                 <RowDefinition Height="16" />
             </Grid.RowDefinitions>
             <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="1">
-                <Button Width="auto" Height="auto"  x:Name="btnTest" Margin="8" Click="ButtonTest_Click" AutomationProperties.AcceleratorKey="Ctrl+R" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
-                    <TextBlock Padding="6 2" Text="Connect" />
+                <Button Width="auto"
+                        Height="auto" 
+                        x:Name="btnTest"
+                        Margin="8"
+                        Click="ButtonTest_Click"
+                        AutomationProperties.AcceleratorKey="{x:Static props:Resources.button_connect_accelerator}"
+                        FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
+                    <TextBlock Padding="6 2" Text="{x:Static props:Resources.button_connect}" />
                 </Button>
-                <Button Width="auto" Height="auto" x:Name="btnClose" Margin="8" Click="ButtonClose_Click" AutomationProperties.AcceleratorKey="Ctrl+D" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
-                <TextBlock Padding="6 2" Text="Disconnect" />
+                <Button Width="auto"
+                        Height="auto"
+                        x:Name="btnClose"
+                        Margin="8"
+                        Click="ButtonClose_Click"
+                        AutomationProperties.AcceleratorKey="{x:Static props:Resources.button_disconnect_accelerator}"
+                        FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
+                <TextBlock Padding="6 2" Text="{x:Static props:Resources.button_disconnect}" />
                 </Button>
                 <TextBlock VerticalAlignment="Center" x:Name="txtStatus" Margin="8"  />
             </StackPanel>
-            <CheckBox x:Name="cbAutoScroll" Content="_Auto Scroll" Grid.Column="3" Grid.Row="1" Margin="8" VerticalContentAlignment="Center" HorizontalAlignment="Right" Checked="AutoScroll_Checked" Unchecked="AutoScroll_Unchecked" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
-            <GroupBox x:Name="gb_data" Header="_Received Data" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" Grid.RowSpan="2">
+            <CheckBox x:Name="cbAutoScroll"
+                      Content="{x:Static props:Resources.window_obs_auto_scroll}"
+                      Grid.Column="3"
+                      Grid.Row="1"
+                      Margin="8"
+                      VerticalContentAlignment="Center"
+                      HorizontalAlignment="Right"
+                      Checked="AutoScroll_Checked"
+                      Unchecked="AutoScroll_Unchecked"
+                      FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
+            <GroupBox x:Name="gb_data"
+                      Header="{x:Static props:Resources.window_obs_received_data}"
+                      Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" Grid.RowSpan="2">
             <ScrollViewer x:Name="svScroll" ScrollViewer.ScrollChanged="TxtOutput_ScrollChanged" AutomationProperties.LabeledBy="{Binding ElementName=gb_data}">
                 <TextBox x:Name="txtOutput" IsReadOnly="True" IsUndoEnabled="False" AutomationProperties.Name="Data" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
             </ScrollViewer>

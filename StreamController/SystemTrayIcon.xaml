@@ -15,12 +15,15 @@
     <Grid>
         <tb:TaskbarIcon
             x:Name="NotifyIcon"
-            ToolTipText="Stream Controller"
+            ToolTipText="{x:Static props:Resources.application_name}"
             Visibility="Collapsed"
             MenuActivation="RightClick">
             <tb:TaskbarIcon.ContextMenu>
                 <ContextMenu x:Name="contextMenu" Style="{StaticResource ContextMenuStyle}">
-                    <MenuItem Header="Default _Render" x:Name="taskbarRenderMenu" Padding="2 7" Style="{StaticResource MenuItemStyle}">
+                    <MenuItem Header="{x:Static props:Resources.tray_contextmenu_default_render}"
+                              x:Name="taskbarRenderMenu"
+                              Padding="2 7"
+                              Style="{StaticResource MenuItemStyle}">
                         <MenuItem.ItemTemplate>
                             <DataTemplate DataType="MenuItem">
                                 <TextBlock Text="{Binding FriendlyName}" />
@@ -36,13 +39,17 @@
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding IsDefaultRender}" Value="True">
                                         <Setter Property="IsChecked" Value="True" />
-                                        <Setter Property="AutomationProperties.Name" Value="{Binding FriendlyName, StringFormat={}Current default render device\, {0}}" />
+                                        <Setter Property="AutomationProperties.Name"
+                                                Value="{Binding FriendlyName, StringFormat={x:Static props:Resources.tray_contextmenu_default_render_default_automation_name_format}}" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </MenuItem.ItemContainerStyle>
                     </MenuItem>
-                    <MenuItem Header="Default _Capture" x:Name="taskbarCaptureMenu" Padding="2 7" Style="{StaticResource MenuItemStyle}">
+                    <MenuItem Header="{x:Static props:Resources.tray_contextmenu_default_capture}"
+                              x:Name="taskbarCaptureMenu"
+                              Padding="2 7"
+                              Style="{StaticResource MenuItemStyle}">
                         <MenuItem.ItemTemplate>
                             <DataTemplate DataType="MenuItem">
                                 <TextBlock Text="{Binding FriendlyName}" />
@@ -58,16 +65,23 @@
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding IsDefaultCapture}" Value="True">
                                         <Setter Property="IsChecked" Value="True" />
-                                        <Setter Property="AutomationProperties.Name" Value="{Binding FriendlyName, StringFormat={}Current default capture device\, {0}}" />
+                                        <Setter Property="AutomationProperties.Name"
+                                                Value="{Binding FriendlyName, StringFormat={x:Static props:Resources.tray_contextmenu_default_capture_default_automation_name_format}}" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </MenuItem.ItemContainerStyle>
                     </MenuItem>
                     <Separator Margin="3 0" />
-                    <MenuItem Header="E_nsure Custom Audio" Click="SystemTrayToggleCustomAudio_Click" Padding="2 6" Style="{StaticResource MenuItemStyle}" />
+                    <MenuItem Header="{x:Static props:Resources.tray_contextmenu_toggle_app_audio}"
+                              Click="SystemTrayToggleCustomAudio_Click"
+                              Padding="2 6"
+                              Style="{StaticResource MenuItemStyle}" />
                     <Separator Margin="3 0" />
-                    <MenuItem Header="E_xit" Click="SystemTrayExit_Click" Padding="2 6" Style="{StaticResource MenuItemStyle}" />
+                    <MenuItem Header="{x:Static props:Resources.tray_contextmenu_exit}"
+                              Click="SystemTrayExit_Click"
+                              Padding="2 6"
+                              Style="{StaticResource MenuItemStyle}" />
                 </ContextMenu>
             </tb:TaskbarIcon.ContextMenu>
         </tb:TaskbarIcon>
