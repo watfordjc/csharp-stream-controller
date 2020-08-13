@@ -2,6 +2,7 @@
 using System;
 using System.Buffers;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Net.WebSockets;
 using System.Text;
@@ -371,7 +372,7 @@ namespace uk.JohnCook.dotnet.WebSocketLibrary
                          */
                         WebSocketException e = new WebSocketException(
                             WebSocketError.InvalidMessageType,
-                            $"This version of {typeof(GenericClient).Name} does not support the following ClientWebSocket MessageType: {receivedMessage.Result.MessageType}."
+                            String.Format(CultureInfo.CurrentCulture, Properties.Resources.exception_unknown_websocket_message_type_format, typeof(GenericClient).Name, receivedMessage.Result.MessageType)
                            );
                         OnErrorState(e, -1);
                         throw e;

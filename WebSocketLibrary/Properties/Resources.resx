@@ -117,20 +117,8 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="auth_required_no_password" xml:space="preserve">
-    <value>Server requires authentication but no password has been configured.</value>
-    <comment>Error text - password not configured</comment>
-  </data>
-  <data name="exception_obs_error_format" xml:space="preserve">
-    <value>The {0} request {1} was responded to by a status of {2}.</value>
-    <comment>Exception text format - obs-websocket error message in response to a request</comment>
-  </data>
-  <data name="exception_source-type-not-implemented_format" xml:space="preserve">
-    <value>Source type {0} has not yet been implemented.</value>
-    <comment>Exception text format - unimplemented obs-websocket source type</comment>
-  </data>
-  <data name="exception_source-type-not-implemented_inner_format" xml:space="preserve">
-    <value>Unable to parse: {0}</value>
-    <comment>Inner exception text format - JSON that couldn't be parsed</comment>
+  <data name="exception_unknown-websocket-message-type_format" xml:space="preserve">
+    <value>This version of {0} does not support the following ClientWebSocket MessageType: {1}.</value>
+    <comment>Exception text for unknown websocket message type.</comment>
   </data>
 </root>

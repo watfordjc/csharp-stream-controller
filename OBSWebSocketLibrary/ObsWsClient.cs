@@ -271,7 +271,8 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary
             Type modelType = ObsWsSourceType.GetType(sourceType);
             if (modelType == null)
             {
-                NotImplementedException ex = new NotImplementedException($"Source type {sourceType} has not yet been implemented.", new JsonException($"Unable to parse: {settingsJson}"));
+                JsonException je = new JsonException(String.Format(CultureInfo.CurrentCulture, Properties.Resources.exception_source_type_not_implemented_inner_format, settingsJson));
+                NotImplementedException ex = new NotImplementedException(String.Format(CultureInfo.CurrentCulture, Properties.Resources.exception_source_type_not_implemented_format, sourceType), je);
                 OnErrorState(ex, -1);
                 deserialisedObject = null;
                 return false;
@@ -375,7 +376,7 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary
                 {
                     Error = new Exception(
                         replyModel.Error,
-                        new Exception($"The {obsReply.RequestMetadata.OriginalRequestType} request {obsReply.MessageId} was responded to by a status of {obsReply.Status}.")
+                        new Exception(String.Format(CultureInfo.CurrentCulture, Properties.Resources.exception_obs_error_format, obsReply.RequestMetadata.OriginalRequestType, obsReply.MessageId, obsReply.Status))
                         ),
                     ReconnectDelay = -1
                 };

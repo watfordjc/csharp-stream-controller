@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.Properties {
+namespace uk.JohnCook.dotnet.WebSocketLibrary.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("uk.JohnCook.dotnet.OBSWebSocketLibrary.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("uk.JohnCook.dotnet.WebSocketLibrary.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,38 +61,11 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Server requires authentication but no password has been configured..
+        ///   Looks up a localized string similar to This version of {0} does not support the following ClientWebSocket MessageType: {1}..
         /// </summary>
-        internal static string auth_required_no_password {
+        internal static string exception_unknown_websocket_message_type_format {
             get {
-                return ResourceManager.GetString("auth_required_no_password", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The {0} request {1} was responded to by a status of {2}..
-        /// </summary>
-        internal static string exception_obs_error_format {
-            get {
-                return ResourceManager.GetString("exception_obs_error_format", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Source type {0} has not yet been implemented..
-        /// </summary>
-        internal static string exception_source_type_not_implemented_format {
-            get {
-                return ResourceManager.GetString("exception_source-type-not-implemented_format", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unable to parse: {0}.
-        /// </summary>
-        internal static string exception_source_type_not_implemented_inner_format {
-            get {
-                return ResourceManager.GetString("exception_source-type-not-implemented_inner_format", resourceCulture);
+                return ResourceManager.GetString("exception_unknown-websocket-message-type_format", resourceCulture);
             }
         }
     }
