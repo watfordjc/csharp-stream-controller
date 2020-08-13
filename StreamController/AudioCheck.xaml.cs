@@ -49,7 +49,6 @@ namespace uk.JohnCook.dotnet.StreamController
         private static readonly Brush secondaryBrush = new SolidColorBrush(Color.FromArgb(0xFF, 0xC5, 0xC0, 0xEB));
         private readonly SemaphoreSlim iconSemaphore = new SemaphoreSlim(1);
         private readonly System.Timers.Timer _ReconnectCountdownTimer = new System.Timers.Timer(1000);
-        private readonly System.Timers.Timer _PreferencesApplied = new System.Timers.Timer(500);
         private int _ReconnectTimeRemaining;
         private readonly ObservableCollection<ObsScene> sceneList = new ObservableCollection<ObsScene>();
         private ObsScene currentScene;
@@ -64,7 +63,7 @@ namespace uk.JohnCook.dotnet.StreamController
         {
             InitializeComponent();
             _Context = SynchronizationContext.Current;
-            CreateWebsocketClient();
+            webSocket = CreateWebsocketClient();
         }
 
         private async void Window_ContentRendered(object sender, EventArgs e)
@@ -78,14 +77,13 @@ namespace uk.JohnCook.dotnet.StreamController
             AudioInterfaceCollection.Instance.DefaultDeviceChanged += DefaultAudioDeviceChanged;
             Preferences.Default.PropertyChanged += Default_PropertyChanged;
             _ReconnectCountdownTimer.Elapsed += ReconnectCountdownTimer_Elapsed;
-            _PreferencesApplied.Elapsed += PreferencesApplied_Elapsed;
             SystemTrayIcon.UpdateTrayIcon();
             cbScenes.ItemsSource = sceneList;
             webSocket.AutoReconnect = Preferences.Default.obs_auto_reconnect;
             await ObsWebsocketConnect().ConfigureAwait(true);
         }
 
-        private void CreateWebsocketClient()
+        private ObsWsClient CreateWebsocketClient()
         {
             Uri obs_uri = new UriBuilder(
                 Preferences.Default.obs_uri_scheme,
@@ -101,44 +99,28 @@ namespace uk.JohnCook.dotnet.StreamController
             webSocket.ErrorState += WebSocket_Error_ContextSwitch;
             webSocket.OnObsEvent += WebSocket_Event_ContextSwitch;
             webSocket.OnObsReply += Websocket_Reply_ContextSwitch;
+            return webSocket;
         }
 
-        private void Default_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private async void Default_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            switch (e.PropertyName)
+            if (e.PropertyName != nameof(Preferences.Default.obs_settings_changed) || Preferences.Default.obs_settings_changed == false)
             {
-                case nameof(Preferences.Default.obs_uri_scheme):
-                case nameof(Preferences.Default.obs_uri_host):
-                case nameof(Preferences.Default.obs_uri_port):
-                case nameof(Preferences.Default.obs_password):
-                case nameof(Preferences.Default.obs_use_password):
-                    if (_ReconnectCountdownTimer.Enabled || webSocket.CanSend)
-                    {
-                        _ReconnectCountdownTimer.Enabled = false;
-                    }
-                    if (_PreferencesApplied.Enabled)
-                    {
-                        _PreferencesApplied.Stop();
-                    }
-                    _PreferencesApplied.Start();
-                    break;
-                case nameof(Preferences.Default.obs_reconnect_min_seconds):
-                case nameof(Preferences.Default.obs_reconnect_max_minutes):
-                    webSocket.SetExponentialBackoff(Preferences.Default.obs_reconnect_min_seconds, Preferences.Default.obs_reconnect_max_minutes);
-                    break;
+                return;
             }
-        }
 
-        private async void PreferencesApplied_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            _PreferencesApplied.Stop();
-            if (webSocket != null && !_PreferencesApplied.Enabled)
+            if (_ReconnectCountdownTimer.Enabled || webSocket.CanSend)
+            {
+                _ReconnectCountdownTimer.Enabled = false;
+            }
+            if (webSocket != null)
             {
                 webSocket.Dispose();
             }
-            CreateWebsocketClient();
+            webSocket = CreateWebsocketClient();
             SystemTrayIcon.UpdateTrayIcon();
             webSocket.AutoReconnect = Preferences.Default.obs_auto_reconnect;
+            webSocket.SetExponentialBackoff(Preferences.Default.obs_reconnect_min_seconds, Preferences.Default.obs_reconnect_max_minutes);
             if (webSocket.AutoReconnect)
             {
                 await ObsWebsocketConnect().ConfigureAwait(true);
@@ -281,7 +263,7 @@ namespace uk.JohnCook.dotnet.StreamController
             {
                 UpdateUIConnectStatus(Properties.Resources.text_disconnected, Brushes.Red, null, true);
                 connectionError = Properties.Resources.window_audio_check_successfully_disconnected;
-                CreateWebsocketClient();
+                webSocket = CreateWebsocketClient();
             }
             else if (newState == WebSocketState.None && webSocket.AutoReconnect)
             {
@@ -1053,7 +1035,6 @@ namespace uk.JohnCook.dotnet.StreamController
             if (disposing)
             {
                 _ReconnectCountdownTimer.Dispose();
-                _PreferencesApplied.Dispose();
                 iconSemaphore.Dispose();
                 silentAudioEvent?.Stop();
                 silentAudioEvent?.Dispose();

@@ -153,6 +153,10 @@ namespace uk.JohnCook.dotnet.WebSocketLibrary
                     {
                         await DisconnectAsync(false).ConfigureAwait(false);
                         OnStateChange(WebSocketState.None);
+                        if (connectionCancellation.IsCancellationRequested)
+                        {
+                            return false;
+                        }
                         await Task.Delay(retryMs, connectionCancellation.Token).ConfigureAwait(false);
                         retryMs = (int)(
                             retryMs * 2 < TimeSpan.FromMinutes(_MaximumRetryMinutes).TotalMilliseconds
@@ -400,27 +404,31 @@ namespace uk.JohnCook.dotnet.WebSocketLibrary
             {
                 if (disposing)
                 {
+                    connectionCancellation?.Cancel();
                     connectionCancellation?.Dispose();
                     sendAsyncSemaphore.Dispose();
                     receiveAsyncSemaphore.Dispose();
                     ArrayPool<byte>.Shared.Return(receiveBuffer.Array);
+                    if (_Client?.State == WebSocketState.Open)
+                    {
+                        _Client?.CloseAsync(WebSocketCloseStatus.Empty, null, CancellationToken.None).GetAwaiter().GetResult();
+                    }
+                    _Client?.Abort();
+                    _Client?.Dispose();
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override finalizer
                 // TODO: set large fields to null
-                _Client?.CloseAsync(WebSocketCloseStatus.Empty, null, CancellationToken.None).GetAwaiter().GetResult();
-                _Client?.Abort();
-                _Client?.Dispose();
                 disposedValue = true;
             }
         }
 
         // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
-        ~GenericClient()
-        {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: false);
-        }
+        //~GenericClient()
+        //{
+        //    // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        //    Dispose(disposing: false);
+        //}
 
         public void Dispose()
         {

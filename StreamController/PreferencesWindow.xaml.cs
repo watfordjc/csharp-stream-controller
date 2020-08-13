@@ -54,6 +54,7 @@ namespace uk.JohnCook.dotnet.StreamController
         private bool Save()
         {
             save_button.IsEnabled = false;
+            Preferences.Default.obs_settings_changed = false;
             if (!WindowUtilityLibrary.DependencyObjectIsValid(this))
             {
                 save_validation_error.Visibility = Visibility.Visible;
@@ -73,7 +74,8 @@ namespace uk.JohnCook.dotnet.StreamController
             {
                 if (!Preferences.Default.obs_use_password)
                 {
-                    _ = MessageBox.Show(rm.GetString("new_password_placeholder_error", CultureInfo.CurrentUICulture), rm.GetString("title_new_password_error", CultureInfo.CurrentUICulture), MessageBoxButton.OK);
+                    _ = MessageBox.Show(rm.GetString("new_password_placeholder_error", CultureInfo.CurrentCulture), rm.GetString("title_new_password_error", CultureInfo.CurrentCulture), MessageBoxButton.OK);
+                    save_button.IsEnabled = true;
                     return false;
                 }
             }
@@ -88,7 +90,7 @@ namespace uk.JohnCook.dotnet.StreamController
                 pbPassword.Password = PASSWORD_PLACEHOLDER;
                 Preferences.Default.obs_use_password = true;
 
-                _ = MessageBox.Show(rm.GetString("new_password_set_message", CultureInfo.CurrentUICulture), rm.GetString("title_new_password_saved", CultureInfo.CurrentUICulture), MessageBoxButton.OK);
+                _ = MessageBox.Show(rm.GetString("new_password_set_message", CultureInfo.CurrentCulture), rm.GetString("title_new_password_saved", CultureInfo.CurrentCulture), MessageBoxButton.OK);
             }
             else
             {
@@ -96,6 +98,7 @@ namespace uk.JohnCook.dotnet.StreamController
                 Preferences.Default.obs_password = String.Empty;
             }
             Preferences.Default.Save();
+            Preferences.Default.obs_settings_changed = true;
             // TODO: Update existing ObsWsClient.AutoReconnect if necessary
             return true;
         }

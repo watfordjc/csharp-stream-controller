@@ -12,7 +12,7 @@ namespace uk.JohnCook.dotnet.StreamController {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.6.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.7.0.0")]
     public sealed partial class Preferences : global::System.Configuration.ApplicationSettingsBase {
         
         private static Preferences defaultInstance = ((Preferences)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Preferences())));
@@ -224,6 +224,18 @@ namespace uk.JohnCook.dotnet.StreamController {
             }
             set {
                 this["obs_password"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool obs_settings_changed {
+            get {
+                return ((bool)(this["obs_settings_changed"]));
+            }
+            set {
+                this["obs_settings_changed"] = value;
             }
         }
     }
