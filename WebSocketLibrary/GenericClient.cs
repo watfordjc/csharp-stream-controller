@@ -109,6 +109,7 @@ namespace uk.JohnCook.dotnet.WebSocketLibrary
         /// <param name="url">The WebSocket server URI to connect to.</param>
         public GenericClient(Uri url)
         {
+            Properties.Resources.Culture = CultureInfo.CurrentCulture;
             receiveBuffer = ArrayPool<byte>.Shared.Rent(RECV_BUFFER_SIZE);
             _Client.Options.SetBuffer(RECV_BUFFER_SIZE, SEND_BUFFER_SIZE, receiveBuffer);
             _ServerUrl = url;

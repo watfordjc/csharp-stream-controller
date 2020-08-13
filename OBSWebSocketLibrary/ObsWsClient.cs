@@ -41,6 +41,7 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary
 
         public ObsWsClient(Uri url) : base(url)
         {
+            Properties.Resources.Culture = CultureInfo.CurrentCulture;
             context = SynchronizationContext.Current;
             StateChange += WebSocket_StateChange;
             OnObsEvent += FurtherProcessObsEvent;
@@ -309,7 +310,7 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary
                             if (PasswordPreference == null || PasswordPreference.Length == 0)
                             {
                                 AutoReconnect = false;
-                                OnErrorState(new Exception(rm.GetString("auth_required_no_password", CultureInfo.CurrentUICulture)), -1);
+                                OnErrorState(new Exception(rm.GetString("auth_required_no_password", CultureInfo.CurrentCulture)), -1);
                                 break;
                             }
                             PopulateAuthenticateRequest(ref authRequest, getAuthRequiredReply);
