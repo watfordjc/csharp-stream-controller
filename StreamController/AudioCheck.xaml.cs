@@ -40,16 +40,8 @@ namespace uk.JohnCook.dotnet.StreamController
     public partial class AudioCheck : StyledWindow
     {
         private readonly SynchronizationContext _Context;
-        private ObsWsClient webSocket;
         private readonly TaskCompletionSource<bool> audioDevicesEnumerated = new TaskCompletionSource<bool>();
-        private string connectionError = String.Empty;
-        private string extendedConnectionError = String.Empty;
         private WaveOutEvent silentAudioEvent = null;
-        private static readonly Brush primaryBrush = new SolidColorBrush(Color.FromArgb(0xFF, 0xE2, 0xC1, 0xEA));
-        private static readonly Brush secondaryBrush = new SolidColorBrush(Color.FromArgb(0xFF, 0xC5, 0xC0, 0xEB));
-        private readonly SemaphoreSlim iconSemaphore = new SemaphoreSlim(1);
-        private readonly System.Timers.Timer _ReconnectCountdownTimer = new System.Timers.Timer(1000);
-        private int _ReconnectTimeRemaining;
         private readonly ObservableCollection<ObsScene> sceneList = new ObservableCollection<ObsScene>();
         private ObsScene currentScene;
         private GetSourceTypesListReply sourceTypes;
@@ -63,88 +55,70 @@ namespace uk.JohnCook.dotnet.StreamController
         {
             InitializeComponent();
             _Context = SynchronizationContext.Current;
-            webSocket = CreateWebsocketClient();
         }
 
         private async void Window_ContentRendered(object sender, EventArgs e)
         {
-            UpdateUIConnectStatus(null, null, null, false);
             AudioInterfaceCollection.Instance.CollectionEnumerated += AudioDevicesEnumerated;
             if (AudioInterfaceCollection.Instance.DevicesAreEnumerated)
             {
                 AudioDevicesEnumerated(this, EventArgs.Empty);
             }
             AudioInterfaceCollection.Instance.DefaultDeviceChanged += DefaultAudioDeviceChanged;
-            Preferences.Default.PropertyChanged += Default_PropertyChanged;
-            _ReconnectCountdownTimer.Elapsed += ReconnectCountdownTimer_Elapsed;
-            SystemTrayIcon.UpdateTrayIcon();
+            SystemTrayIcon.Instance.UpdateTrayIcon();
             cbScenes.ItemsSource = sceneList;
-            webSocket.AutoReconnect = Preferences.Default.obs_auto_reconnect;
-            await ObsWebsocketConnect().ConfigureAwait(true);
+            if (ObsWebsocketConnection.Instance.Client == null)
+            {
+                ObsWebsocketConnection.CreateClient();
+                if (Preferences.Default.obs_connect_launch)
+                {
+                    await ObsWebsocketConnection.Instance.Connect().ConfigureAwait(true);
+                }
+                else
+                {
+                    await ObsWebsocketConnection.Instance.ChangeStatusColor(Brushes.Gray, false).ConfigureAwait(true);
+
+                }
+            }
+            //ObsWebsocketConnection.Instance.Client.StateChange += WebSocket_StateChange_ContextSwitch;
+            ObsWebsocketConnection.Instance.Client.ErrorState += WebSocket_Error_ContextSwitch;
+            ObsWebsocketConnection.Instance.Client.OnObsEvent += WebSocket_Event_ContextSwitch;
+            ObsWebsocketConnection.Instance.Client.OnObsReply += Websocket_Reply_ContextSwitch;
+            ObsWebsocketConnection.Instance.PropertyChanged += Instance_PropertyChanged;
         }
 
-        private ObsWsClient CreateWebsocketClient()
+        private void Instance_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            Uri obs_uri = new UriBuilder(
-                Preferences.Default.obs_uri_scheme,
-                Preferences.Default.obs_uri_host,
-                int.Parse(Preferences.Default.obs_uri_port, CultureInfo.InvariantCulture)
-                ).Uri;
-            webSocket = new ObsWsClient(obs_uri)
+            if (e.PropertyName == nameof(ObsWebsocketConnection.ConnectionStatus))
             {
-                PasswordPreference = Preferences.Default.obs_password
-            };
-            webSocket.SetExponentialBackoff(Preferences.Default.obs_reconnect_min_seconds, Preferences.Default.obs_reconnect_max_minutes);
-            webSocket.StateChange += WebSocket_StateChange_ContextSwitch;
-            webSocket.ErrorState += WebSocket_Error_ContextSwitch;
-            webSocket.OnObsEvent += WebSocket_Event_ContextSwitch;
-            webSocket.OnObsReply += Websocket_Reply_ContextSwitch;
-            return webSocket;
-        }
-
-        private async void Default_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName != nameof(Preferences.Default.obs_settings_changed) || Preferences.Default.obs_settings_changed == false)
-            {
-                return;
-            }
-
-            if (_ReconnectCountdownTimer.Enabled || webSocket.CanSend)
-            {
-                _ReconnectCountdownTimer.Enabled = false;
-            }
-            if (webSocket != null)
-            {
-                webSocket.Dispose();
-            }
-            webSocket = CreateWebsocketClient();
-            SystemTrayIcon.UpdateTrayIcon();
-            webSocket.AutoReconnect = Preferences.Default.obs_auto_reconnect;
-            webSocket.SetExponentialBackoff(Preferences.Default.obs_reconnect_min_seconds, Preferences.Default.obs_reconnect_max_minutes);
-            if (webSocket.AutoReconnect)
-            {
-                await ObsWebsocketConnect().ConfigureAwait(true);
+                switch (ObsWebsocketConnection.Instance.Client.State)
+                {
+                    case WebSocketState.Open:
+                    case WebSocketState.Connecting:
+                    case WebSocketState.Closed:
+                        Dispatcher.Invoke(
+                        () => TextBlock_AnnounceChanged(tbReconnectCountdown)
+                        );
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 
-        private async void Window_Closed(object sender, EventArgs e)
+        private void Window_Closed(object sender, EventArgs e)
         {
             AudioInterfaceCollection.Instance.CollectionEnumerated -= AudioDevicesEnumerated;
             AudioInterfaceCollection.Instance.DefaultDeviceChanged -= DefaultAudioDeviceChanged;
-            Preferences.Default.PropertyChanged -= Default_PropertyChanged;
-            webSocket.StateChange -= WebSocket_StateChange_ContextSwitch;
-            webSocket.ErrorState -= WebSocket_Error_ContextSwitch;
-            webSocket.OnObsEvent -= WebSocket_Event_ContextSwitch;
-            webSocket.OnObsReply -= Websocket_Reply_ContextSwitch;
-            _ReconnectCountdownTimer.Elapsed -= ReconnectCountdownTimer_Elapsed;
-            webSocket.AutoReconnect = false;
-            await webSocket.DisconnectAsync(true).ConfigureAwait(true);
+            ObsWebsocketConnection.Instance.PropertyChanged -= Instance_PropertyChanged;
+            ObsWebsocketConnection.Instance.Client.ErrorState -= WebSocket_Error_ContextSwitch;
+            ObsWebsocketConnection.Instance.Client.OnObsEvent -= WebSocket_Event_ContextSwitch;
+            ObsWebsocketConnection.Instance.Client.OnObsReply -= Websocket_Reply_ContextSwitch;
             sceneList.Clear();
             currentScene = null;
             sourceTypes = null;
             obsSourceDictionary.Clear();
             obsSceneItemSceneDictionary.Clear();
-            SystemTrayIcon.Instance.NotifyIcon.Icon = Properties.Resources.icon_neutral;
         }
         #endregion
 
@@ -223,68 +197,6 @@ namespace uk.JohnCook.dotnet.StreamController
 
         #region obs-websocket
 
-        private async Task ObsWebsocketConnect()
-        {
-            await webSocket.AutoReconnectConnectAsync().ConfigureAwait(true);
-        }
-
-        private void ReconnectCountdownTimer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            _ReconnectTimeRemaining--;
-            if (_ReconnectTimeRemaining > 0)
-            {
-                UpdateUIConnectStatus(String.Format(CultureInfo.CurrentCulture, Properties.Resources.window_audio_check_reconnect_delay_format, TimeSpan.FromSeconds(_ReconnectTimeRemaining).ToString("c", CultureInfo.CurrentCulture)), null, null, false);
-            }
-        }
-
-        private void WebSocket_StateChange_ContextSwitch(object sender, WebSocketState newState)
-        {
-            _Context.Send(
-                x => WebSocket_StateChange(newState),
-                null);
-        }
-
-        private void WebSocket_StateChange(WebSocketState newState)
-        {
-            if (newState == WebSocketState.Open)
-            {
-                connectionError = Properties.Resources.text_aok;
-                extendedConnectionError = String.Empty;
-                _ReconnectCountdownTimer.Stop();
-                UpdateUIConnectStatus(Properties.Resources.text_connected, Brushes.DarkGreen, null, true);
-                obsSourceDictionary.Clear();
-            }
-            else if (newState != WebSocketState.Connecting && webSocket.AutoReconnect == true)
-            {
-                _ReconnectCountdownTimer.Start();
-                UpdateUIConnectStatus(null, Brushes.Red, null, false);
-            }
-            else if (newState == WebSocketState.Closed)
-            {
-                UpdateUIConnectStatus(Properties.Resources.text_disconnected, Brushes.Red, null, true);
-                connectionError = Properties.Resources.window_audio_check_successfully_disconnected;
-                webSocket = CreateWebsocketClient();
-            }
-            else if (newState == WebSocketState.None && webSocket.AutoReconnect)
-            {
-                if (!_ReconnectCountdownTimer.Enabled)
-                {
-                    _ReconnectCountdownTimer.Start();
-                }
-            }
-            else if (newState == WebSocketState.Connecting)
-            {
-                if (webSocket.PasswordPreference != Preferences.Default.obs_password)
-                {
-                    webSocket.PasswordPreference = Preferences.Default.obs_password;
-                }
-                connectionError = Properties.Resources.window_audio_check_error_state_cleared;
-                extendedConnectionError = String.Empty;
-                _ReconnectCountdownTimer.Stop();
-                UpdateUIConnectStatus(Properties.Resources.window_audio_check_connecting, Brushes.DarkGoldenrod, null, true);
-            }
-        }
-
         private void WebSocket_Error_ContextSwitch(object sender, WsClientErrorMessage e)
         {
             _Context.Send(
@@ -292,30 +204,15 @@ namespace uk.JohnCook.dotnet.StreamController
                 null);
         }
 
-        private async void WebSocket_Error(WsClientErrorMessage e)
+        private void WebSocket_Error(WsClientErrorMessage e)
         {
-            if (e.ReconnectDelay > 0)
+            if (e.ReconnectDelay > 0 && ObsWebsocketConnection.Instance.Client.AutoReconnect && e.Error != null)
             {
-                _ReconnectTimeRemaining = e.ReconnectDelay;
-                if (webSocket.AutoReconnect && e.Error != null)
-                {
-                    UpdateUIConnectStatus(String.Format(CultureInfo.CurrentCulture, Properties.Resources.window_audio_check_reconnect_delay_format, TimeSpan.FromSeconds(e.ReconnectDelay).ToString("c", CultureInfo.CurrentCulture)), null, null, true);
-                }
-            }
-            else
-            {
-                _ReconnectCountdownTimer.Stop();
-                await webSocket.DisconnectAsync(false).ConfigureAwait(true);
+                TextBlock_AnnounceChanged(tbReconnectCountdown);
             }
             if (e.Error != null)
             {
-                connectionError = $"{e.Error.Message}";
-                extendedConnectionError = $"{e.Error.InnerException?.Message}";
                 TextBlock_AnnounceChanged(tbStatus);
-                if (!webSocket.AutoReconnect)
-                {
-                    UpdateUIConnectStatus(Properties.Resources.text_disconnected, Brushes.Red, null, true);
-                }
             }
         }
 
@@ -331,7 +228,7 @@ namespace uk.JohnCook.dotnet.StreamController
             switch (eventObject.EventType)
             {
                 case ObsEventType.Heartbeat:
-                    Heartbeat_Event((HeartbeatObsEvent)eventObject.MessageObject);
+                    await Heartbeat_Event((HeartbeatObsEvent)eventObject.MessageObject).ConfigureAwait(true);
                     break;
                 case ObsEventType.SwitchScenes:
                     SwitchScenes_Event((SwitchScenesObsEvent)eventObject.MessageObject);
@@ -439,7 +336,7 @@ namespace uk.JohnCook.dotnet.StreamController
             {
                 case ObsRequestType.GetAuthRequired:
                 case ObsRequestType.Authenticate:
-                    if (webSocket.CanSend)
+                    if (ObsWebsocketConnection.Instance.Client.CanSend)
                     {
                         await Obs_Get(ObsRequestType.GetSourceTypesList).ConfigureAwait(true);
                     }
@@ -547,7 +444,7 @@ namespace uk.JohnCook.dotnet.StreamController
         private async Task GetDeviceIdsForSources()
         {
             await audioDevicesEnumerated.Task.ConfigureAwait(false);
-            while (webSocket.WaitingForReplyForType(ObsRequestType.GetSourceSettings))
+            while (ObsWebsocketConnection.Instance.Client.WaitingForReplyForType(ObsRequestType.GetSourceSettings))
             {
                 await Task.Delay(250).ConfigureAwait(false);
             }
@@ -588,13 +485,9 @@ namespace uk.JohnCook.dotnet.StreamController
 
         #region obs-events
 
-        private void Heartbeat_Event(HeartbeatObsEvent messageObject)
+        private static async Task Heartbeat_Event(HeartbeatObsEvent messageObject)
         {
-                UpdateUIConnectStatus(
-                    null,
-                    messageObject.Pulse ? primaryBrush : secondaryBrush,
-                    Brushes.Gray,
-                    false);
+            await ObsWebsocketConnection.Instance.ChangeStatusColor(messageObject.Pulse ? ObsWebsocketConnection.PrimaryBrush : ObsWebsocketConnection.SecondaryBrush, true).ConfigureAwait(false);
         }
 
         private void SwitchScenes_Event(SwitchScenesObsEvent messageObject)
@@ -805,7 +698,7 @@ namespace uk.JohnCook.dotnet.StreamController
         /// <returns>The Guid for the request.</returns>
         private async ValueTask<Guid> Obs_Get(ObsRequestType requestType)
         {
-            return await webSocket.ObsSend(ObsWsRequest.GetInstanceOfType(requestType)).ConfigureAwait(true);
+            return await ObsWebsocketConnection.Instance.Client.ObsSend(ObsWsRequest.GetInstanceOfType(requestType)).ConfigureAwait(true);
         }
 
         /// <summary>
@@ -834,7 +727,7 @@ namespace uk.JohnCook.dotnet.StreamController
                 default:
                     return Guid.Empty;
             }
-            return await webSocket.ObsSend(request).ConfigureAwait(true);
+            return await ObsWebsocketConnection.Instance.Client.ObsSend(request).ConfigureAwait(true);
         }
 
         /// <summary>
@@ -856,7 +749,7 @@ namespace uk.JohnCook.dotnet.StreamController
                 default:
                     return Guid.Empty;
             }
-            return await webSocket.ObsSend(request).ConfigureAwait(true);
+            return await ObsWebsocketConnection.Instance.Client.ObsSend(request).ConfigureAwait(true);
         }
 
         #endregion
@@ -865,13 +758,6 @@ namespace uk.JohnCook.dotnet.StreamController
 
         #region User Interface
 
-        private void UpdateUIConnectStatus(string countdownText, Brush brush1, Brush brush2, bool announceChange)
-        {
-            Task.Run(
-                () => UpdateConnectStatus(countdownText, brush1, brush2, announceChange)
-                );
-        }
-
         private void TextBlock_AnnounceChanged(object sender)
         {
             AutomationPeer peer = UIElementAutomationPeer.FromElement(sender as UIElement);
@@ -879,91 +765,6 @@ namespace uk.JohnCook.dotnet.StreamController
             _Context.Send(
                 x => peer.RaiseAutomationEvent(AutomationEvents.LiveRegionChanged),
                 null);
-        }
-
-        private async Task UpdateConnectStatus(string countdownText, Brush brush1, Brush brush2, bool announceChange)
-        {
-            _Context.Send(
-                _ => tbStatus.Text = connectionError,
-                null);
-            _Context.Send(
-                _ => tbStatusExtended.Text = extendedConnectionError,
-                null);
-            if (countdownText != null)
-            {
-                _Context.Send(
-                    _ => tbReconnectCountdown.Text = countdownText,
-                    null);
-            }
-            if (announceChange)
-            {
-                _Context.Send(
-                    x => TextBlock_AnnounceChanged(tbReconnectCountdown),
-                    null);
-            }
-            await ChangeIconColor(announceChange, brush1, brush2).ConfigureAwait(false);
-        }
-
-        private async Task ChangeIconColor(bool highPriority, Brush brush1, Brush brush2)
-        {
-            // System tray icon must be visible at this point for its icon to change, with some high priority exceptions (disconnected).
-            bool taskbarIconVisible = SystemTrayIcon.Instance.NotifyIcon.Visibility == Visibility.Visible;
-            // Low priority changes are out of date after 250ms.
-            bool haveSemaphore = await iconSemaphore.WaitAsync(250).ConfigureAwait(true);
-
-            if (!haveSemaphore && !highPriority)
-            {
-                return;
-            }
-            else if (!haveSemaphore && highPriority)
-            {
-                // High priority changes can wait forever.
-                await iconSemaphore.WaitAsync(-1).ConfigureAwait(true);
-            }
-
-            // Set the first (colour change) brush to the status bar and system tray.
-            if (brush1 != null)
-            {
-                _Context.Send(
-                    _ => sbCircleStatus.Fill = brush1,
-                    null);
-                if (brush1 == primaryBrush && taskbarIconVisible)
-                {
-                    SystemTrayIcon.Instance.NotifyIcon.Icon = Properties.Resources.icon;
-                }
-                else if (brush1 == secondaryBrush && taskbarIconVisible)
-                {
-                    SystemTrayIcon.Instance.NotifyIcon.Icon = Properties.Resources.icon_secondary;
-                }
-                else if (brush1 == Brushes.DarkGoldenrod && taskbarIconVisible)
-                {
-                    SystemTrayIcon.Instance.NotifyIcon.Icon = Properties.Resources.icon_dark_golden_rod;
-                }
-                else if (brush1 == Brushes.Red)
-                {
-                    SystemTrayIcon.Instance.NotifyIcon.Icon = Properties.Resources.icon_red;
-                }
-                else if (brush1 == Brushes.DarkGreen && taskbarIconVisible)
-                {
-                    SystemTrayIcon.Instance.NotifyIcon.Icon = Properties.Resources.icon_dark_green;
-                }
-            }
-
-            // Set the second (return colour) brush to the status bar after 250ms and return system tray to neutral icon.
-            if (brush2 != null)
-            {
-                await Task.Delay(250).ConfigureAwait(true);
-                _Context.Send(
-                    _ => sbCircleStatus.Fill = brush2,
-                    null);
-                SystemTrayIcon.Instance.NotifyIcon.Icon = Properties.Resources.icon_neutral;
-            }
-            // If there is no return colour, prevent the colour changing for one second.
-            else
-            {
-                await Task.Delay(1000).ConfigureAwait(true);
-            }
-            iconSemaphore.Release();
         }
 
         private Task UpdateSceneInformation()
@@ -1001,7 +802,7 @@ namespace uk.JohnCook.dotnet.StreamController
             }
             else if (e.Key == Key.F12)
             {
-                if (!string.IsNullOrEmpty(extendedConnectionError))
+                if (!string.IsNullOrEmpty(ObsWebsocketConnection.Instance.ExtendedConnectionError))
                 {
                     TextBlock_AnnounceChanged(tbStatusExtended);
                 }
@@ -1020,7 +821,7 @@ namespace uk.JohnCook.dotnet.StreamController
             if (selectedScene == e.AddedItems) { return; }
             SetCurrentSceneRequest request = ObsWsRequest.GetInstanceOfType(ObsRequestType.SetCurrentScene) as SetCurrentSceneRequest;
             request.SceneName = selectedScene.Name;
-            await webSocket.ObsSend(request).ConfigureAwait(true);
+            await ObsWebsocketConnection.Instance.Client.ObsSend(request).ConfigureAwait(true);
         }
 
         #region dispose
@@ -1034,11 +835,8 @@ namespace uk.JohnCook.dotnet.StreamController
 
             if (disposing)
             {
-                _ReconnectCountdownTimer.Dispose();
-                iconSemaphore.Dispose();
                 silentAudioEvent?.Stop();
                 silentAudioEvent?.Dispose();
-                webSocket.Dispose();
             }
 
             disposedValue = true;
@@ -1049,40 +847,31 @@ namespace uk.JohnCook.dotnet.StreamController
 
         private void Menu_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            string menuItemName = (e.OriginalSource as MenuItem).Name;
-            if (menuItemName == Properties.Resources.menu_connection_reconnect)
+            switch ((e.OriginalSource as MenuItem).Name)
             {
-                e.CanExecute = webSocket.State != WebSocketState.Connecting;
-            }
-            else if (menuItemName == Properties.Resources.menu_connection_disconnect)
-            {
-                e.CanExecute = webSocket.State == WebSocketState.Open;
-            }
-            else
-            {
-                return;
+                case "Reconnect":
+                    e.CanExecute = ObsWebsocketConnection.Instance.Client.State != WebSocketState.Connecting;
+                    break;
+                case "Disconnect":
+                    e.CanExecute = ObsWebsocketConnection.Instance.Client.State == WebSocketState.Open;
+                    break;
+                default:
+                    return;
             }
         }
 
         private async void Menu_Execute(object sender, ExecutedRoutedEventArgs e)
         {
-            string menuItemName = (e.OriginalSource as MenuItem).Name;
-            if (menuItemName == Properties.Resources.menu_connection_reconnect)
+            switch ((e.OriginalSource as MenuItem).Name)
             {
-                if (webSocket.State == WebSocketState.Open)
-                {
-                    await webSocket.DisconnectAsync(true).ConfigureAwait(true);
-                }
-                await ObsWebsocketConnect().ConfigureAwait(true);
-            }
-            else if (menuItemName == Properties.Resources.menu_connection_disconnect)
-            {
-                webSocket.AutoReconnect = false;
-                await webSocket.DisconnectAsync(true).ConfigureAwait(true);
-            }
-            else
-            {
-                return;
+                case "Reconnect":
+                    await ObsWebsocketConnection.Instance.Reconnect().ConfigureAwait(true);
+                    break;
+                case "Disconnect":
+                    await ObsWebsocketConnection.Instance.Disconnect().ConfigureAwait(true);
+                    break;
+                default:
+                    return;
             }
         }
     }

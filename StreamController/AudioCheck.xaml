@@ -57,7 +57,7 @@
                 <Ellipse HorizontalAlignment="Right"
                          Width="16"
                          Height="16"
-                         Fill="{DynamicResource {x:Static SystemColors.WindowFrameBrushKey}}"
+                         Fill="{Binding Source={x:Static local:ObsWebsocketConnection.Instance}, Path=ConnectionStatusBrush}"
                          x:Name="sbCircleStatus"
                          AutomationProperties.Name="{x:Static props:Resources.window_audio_check_status_icon_automation_name}" />
             </StatusBarItem>
@@ -66,7 +66,8 @@
                            MinWidth="10"
                            TextAlignment="Right"
                            AutomationProperties.Name="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text, StringFormat={}{0}}"
-                           AutomationProperties.LiveSetting="Assertive" />
+                           AutomationProperties.LiveSetting="Assertive"
+                           Text="{Binding Source={x:Static local:ObsWebsocketConnection.Instance}, Path=ConnectionStatus}" />
             </StatusBarItem>
             <StatusBarItem DockPanel.Dock="Right"
                            VerticalContentAlignment="Stretch">
@@ -91,11 +92,13 @@
                     <TextBlock x:Name="tbStatus"
                                AutomationProperties.Name="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text, StringFormat={}{0}}"
                                AutomationProperties.LiveSetting="Polite"
-                               AutomationProperties.IsOffscreenBehavior="Offscreen" />
+                               AutomationProperties.IsOffscreenBehavior="Offscreen"
+                               Text="{Binding Source={x:Static local:ObsWebsocketConnection.Instance}, Path=ConnectionError}" />
                     <TextBlock x:Name="tbStatusExtended"
                                AutomationProperties.Name="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text, StringFormat={x:Static props:Resources.window_audio_check_status_error_details_automation_name_format}}"
                                AutomationProperties.AcceleratorKey="F12"
-                               AutomationProperties.LiveSetting="Polite">
+                               AutomationProperties.LiveSetting="Polite"
+                               Text="{Binding Source={x:Static local:ObsWebsocketConnection.Instance}, Path=ExtendedConnectionError}">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
                                 <Style.Triggers>

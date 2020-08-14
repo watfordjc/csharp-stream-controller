@@ -180,12 +180,12 @@ namespace uk.JohnCook.dotnet.WebSocketLibrary
         /// Try to connect once (no retries).
         /// </summary>
         /// <returns>True if connected.</returns>
-        private async Task<bool> ConnectAsync()
+        public async Task<bool> ConnectAsync()
         {
             if (_Client == null)
             {
                 _Client = new ClientWebSocket();
-                OnStateChange(_Client.State);
+                OnStateChange(WebSocketState.Connecting);
             }
             if (_Status == WebSocketState.Open)
             {

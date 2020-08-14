@@ -67,7 +67,7 @@ namespace uk.JohnCook.dotnet.StreamController.Controls
         /// </summary>
         private void StyledWindow_Closed(object sender, EventArgs e)
         {
-            SystemTrayIcon.UpdateTrayIcon();
+            SystemTrayIcon.Instance.UpdateTrayIcon();
         }
 
         /// <summary>

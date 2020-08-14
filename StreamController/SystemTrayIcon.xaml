@@ -13,11 +13,10 @@
         Title="{x:Static props:Resources.window_system_tray_icon_title}"
         Height="450" Width="800">
     <Grid>
-        <tb:TaskbarIcon
-            x:Name="NotifyIcon"
-            ToolTipText="{x:Static props:Resources.application_name}"
-            Visibility="Collapsed"
-            MenuActivation="RightClick">
+        <tb:TaskbarIcon x:Name="NotifyIcon"
+                        ToolTipText="{x:Static props:Resources.application_name}"
+                        Visibility="Collapsed"
+                        MenuActivation="RightClick">
             <tb:TaskbarIcon.ContextMenu>
                 <ContextMenu x:Name="contextMenu" Style="{StaticResource ContextMenuStyle}">
                     <MenuItem Header="{x:Static props:Resources.tray_contextmenu_default_render}"

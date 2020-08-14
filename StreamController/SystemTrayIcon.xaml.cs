@@ -70,24 +70,22 @@ namespace uk.JohnCook.dotnet.StreamController
             taskbarCaptureMenu.ItemsSource = AudioInterfaceCollection.ActiveDevices;
         }
 
-        public static async void UpdateTrayIcon()
+        public async void UpdateTrayIcon()
         {
             try
             {
-                Instance.Dispatcher.Invoke(
-                    () => Instance.NotifyIcon.Icon = Properties.Resources.icon
-                    );
-                await Task.Delay(1500).ConfigureAwait(true);
-                Instance.Dispatcher.Invoke(
-                    () => Instance.NotifyIcon.Visibility = Visibility.Visible
-                    );
-
+                if (NotifyIcon.Visibility != Visibility.Visible)
+                {
+                    await Task.Delay(1500).ConfigureAwait(true);
+                    Dispatcher.Invoke(
+                        () => NotifyIcon.Visibility = Visibility.Visible
+                        );
+                }
             }
             catch (NullReferenceException)
             {
                 return;
             }
-
         }
 
         #region System Tray Context Menu
