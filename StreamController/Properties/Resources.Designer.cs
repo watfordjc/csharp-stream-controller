@@ -634,6 +634,15 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to None.
+        /// </summary>
+        public static string window_audio_check_current_scene_fallback {
+            get {
+                return ResourceManager.GetString("window_audio-check_current-scene_fallback", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Current Scene:.
         /// </summary>
         public static string window_audio_check_current_scene_label {

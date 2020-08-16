@@ -114,7 +114,7 @@
                 </StackPanel>
             </StatusBarItem>
         </StatusBar>
-        <Grid>
+        <Grid DataContext="{Binding Source={x:Static local:ObsWebsocketConnection.Instance}, Path=CurrentScene}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="16" />
                 <ColumnDefinition Width="*" />
@@ -148,7 +148,9 @@
                               Margin="2 0 0 8"
                               SelectionChanged="CbScenes_SelectionChanged"
                               AutomationProperties.LabeledBy="{Binding ElementName=label_available_scenes}"
-                              FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
+                              FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}"
+                              ItemsSource="{Binding Source={x:Static local:ObsWebsocketConnection.Instance}, Path=SceneList}"
+                              SelectedItem="{Binding Source={x:Static local:ObsWebsocketConnection.Instance}, Path=CurrentScene, Mode=OneWay}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Name}" />
@@ -173,17 +175,18 @@
                                Margin="2 0 0 8"
                                TextWrapping="Wrap"
                                VerticalAlignment="Center"
-                               Text="{Binding Name, TargetNullValue='None', FallbackValue='None', IsAsync=True}"
+                               Text="{Binding Name, TargetNullValue={x:Static props:Resources.window_audio_check_current_scene_fallback}, FallbackValue={x:Static props:Resources.window_audio_check_current_scene_fallback}, IsAsync=True}"
                                AutomationProperties.LiveSetting="Polite"
-                               AutomationProperties.Name="{Binding Name, TargetNullValue='None', FallbackValue='None', IsAsync=True, StringFormat={x:Static props:Resources.window_audio_check_current_scene_automation_name_format}}" />
+                               AutomationProperties.Name="{Binding Name, TargetNullValue={x:Static props:Resources.window_audio_check_current_scene_fallback}, FallbackValue={x:Static props:Resources.window_audio_check_current_scene_fallback}, IsAsync=True, StringFormat={x:Static props:Resources.window_audio_check_current_scene_automation_name_format}}" />
                 </StackPanel>
                 <TextBlock x:Name="tbTransitioning"
                            Margin="0 0 0 8"
-                           TextWrapping="Wrap">
+                           TextWrapping="Wrap"
+                           Text="{Binding Source={x:Static local:ObsWebsocketConnection.Instance}, Path=NextScene, StringFormat={x:Static props:Resources.window_audio_check_transition_format}}">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text}"
+                                <DataTrigger Binding="{Binding Source={x:Static local:ObsWebsocketConnection.Instance}, Path=NextScene}"
                                              Value="">
                                     <Setter Property="AutomationProperties.LiveSetting"
                                             Value="Off" />

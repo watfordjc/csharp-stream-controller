@@ -364,6 +364,10 @@
     <value>Current scene: {0}</value>
     <comment>Automation name string format for (AudioCheck.xaml -&gt; Current Scene)</comment>
   </data>
+  <data name="window_audio-check_current-scene_fallback" xml:space="preserve">
+    <value>None</value>
+    <comment>Fallback value for (AudioCheck.xaml -&gt; Current Scene)</comment>
+  </data>
   <data name="window_audio-check_current-scene_label" xml:space="preserve">
     <value>Current Scene:</value>
     <comment>AudioCheck.xaml -&gt; Current Scene</comment>
