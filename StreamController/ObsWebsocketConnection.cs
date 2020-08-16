@@ -34,6 +34,7 @@ namespace uk.JohnCook.dotnet.StreamController
 
         private readonly SynchronizationContext _Context;
         private readonly AudioWorkarounds audioWorkarounds = new AudioWorkarounds();
+        private readonly ChronoTimer chronoTimer = new ChronoTimer();
         public static ObsWebsocketConnection Instance { get { return lazySingleton.Value; } }
         public ObsWsClient Client { get; private set; }
         public string ConnectionStatus { get; private set; } = Properties.Resources.text_disconnected;

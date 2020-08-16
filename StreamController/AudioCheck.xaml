@@ -47,6 +47,23 @@
                                 Executed="Menu_Execute" />
             </Menu.CommandBindings>
         </Menu>
+        <TextBlock DockPanel.Dock="Top"
+                   FontFamily="Courier New"
+                   Margin="0 8 0 0"
+                   HorizontalAlignment="Center"
+                   Text="{Binding Source={x:Static local:ChronoTimer.Instance}, Path=CurrentLocalTime, StringFormat=yyyy-MM-dd HH:mm:ss zzz}">
+            <TextBlock.Style>
+                <Style TargetType="{x:Type TextBlock}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Source={x:Static local:ChronoTimer.Instance}, Path=DateTimeSet}"
+                                     Value="False">
+                            <Setter Property="Visibility"
+                                    Value="Hidden" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
         <StatusBar DockPanel.Dock="Bottom"
                    Height="auto"
                    HorizontalAlignment="Stretch"
@@ -180,7 +197,7 @@
                                AutomationProperties.Name="{Binding Name, TargetNullValue={x:Static props:Resources.window_audio_check_current_scene_fallback}, FallbackValue={x:Static props:Resources.window_audio_check_current_scene_fallback}, IsAsync=True, StringFormat={x:Static props:Resources.window_audio_check_current_scene_automation_name_format}}" />
                 </StackPanel>
                 <TextBlock x:Name="tbTransitioning"
-                           Margin="0 0 0 8"
+                           Margin="8 0 0 8"
                            TextWrapping="Wrap"
                            Text="{Binding Source={x:Static local:ObsWebsocketConnection.Instance}, Path=NextScene, StringFormat={x:Static props:Resources.window_audio_check_transition_format}}">
                     <TextBlock.Style>
