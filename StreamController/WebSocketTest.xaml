@@ -13,9 +13,11 @@
         Title="{x:Static props:Resources.window_obs_title}"
         MinHeight="450" MinWidth="800">
     <Window.Resources>
-        <Style x:Key="{x:Static SystemParameters.FocusVisualStyleKey}" BasedOn="{StaticResource ResourceKey={x:Static SystemParameters.FocusVisualStyleKey}}">
+        <Style x:Key="{x:Static SystemParameters.FocusVisualStyleKey}"
+               BasedOn="{StaticResource ResourceKey={x:Static SystemParameters.FocusVisualStyleKey}}">
             <Style.Triggers>
-                <DataTrigger Binding="{Binding Source={x:Static SystemParameters.HighContrast}}" Value="False">
+                <DataTrigger Binding="{Binding Source={x:Static SystemParameters.HighContrast}}"
+                             Value="False">
                     <Setter Property="Control.Template">
                         <Setter.Value>
                             <ControlTemplate>
@@ -30,6 +32,11 @@
             </Style.Triggers>
         </Style>
     </Window.Resources>
+    <Window.CommandBindings>
+        <CommandBinding Command="{x:Static local:WebSocketTest.routedConnectionButtonCommand}"
+                        CanExecute="CommandBinding_CanExecute"
+                        Executed="CommandBinding_Executed" />
+    </Window.CommandBindings>
     <DockPanel>
         <Menu DockPanel.Dock="Top" ItemsSource="{StaticResource ResourceKey=MenuItems}" AutomationProperties.Name="Application" KeyboardNavigation.TabNavigation="None" />
         <Grid>
@@ -52,19 +59,21 @@
                         Height="auto" 
                         x:Name="btnTest"
                         Margin="8"
-                        Click="ButtonTest_Click"
+                        Command="{x:Static local:WebSocketTest.routedConnectionButtonCommand}"
                         AutomationProperties.AcceleratorKey="{x:Static props:Resources.button_connect_accelerator}"
                         FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
-                    <TextBlock Padding="6 2" Text="{x:Static props:Resources.button_connect}" />
+                    <TextBlock Padding="6 2"
+                               Text="{x:Static props:Resources.button_connect}" />
                 </Button>
                 <Button Width="auto"
                         Height="auto"
                         x:Name="btnClose"
                         Margin="8"
-                        Click="ButtonClose_Click"
+                        Command="{x:Static local:WebSocketTest.routedConnectionButtonCommand}"
                         AutomationProperties.AcceleratorKey="{x:Static props:Resources.button_disconnect_accelerator}"
                         FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
-                <TextBlock Padding="6 2" Text="{x:Static props:Resources.button_disconnect}" />
+                    <TextBlock Padding="6 2"
+                               Text="{x:Static props:Resources.button_disconnect}" />
                 </Button>
                 <TextBlock VerticalAlignment="Center" x:Name="txtStatus" Margin="8"  />
             </StackPanel>

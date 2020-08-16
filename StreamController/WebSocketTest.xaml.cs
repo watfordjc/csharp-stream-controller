@@ -42,27 +42,19 @@ namespace uk.JohnCook.dotnet.StreamController
     /// </summary>
     public partial class WebSocketTest : StyledWindow
     {
-        private readonly ObsWsClient webSocket;
         private bool autoscroll = false;
         private int reconnectDelay;
-        private bool disposedValue;
         private readonly int SCROLL_BUFFER_MAX_CHARS = 65000;
         private readonly SynchronizationContext _Context;
+        private readonly System.Timers.Timer scrollBufferTimer = new System.Timers.Timer(5000);
+
+        public static readonly RoutedUICommand routedConnectionButtonCommand = new RoutedUICommand("ConnectionButtonCommand", "ConnectionButtonCommand", typeof(Button));
 
         public WebSocketTest()
         {
             InitializeComponent();
             _Context = SynchronizationContext.Current;
             InitialiseWindow();
-            Uri obs_uri = new UriBuilder(
-                Preferences.Default.obs_uri_scheme,
-                Preferences.Default.obs_uri_host,
-                int.Parse(Preferences.Default.obs_uri_port, CultureInfo.InvariantCulture)
-                ).Uri;
-            webSocket = new ObsWsClient(obs_uri)
-            {
-                AutoReconnect = Preferences.Default.obs_auto_reconnect
-            };
         }
 
         private void InitialiseWindow()
@@ -73,21 +65,16 @@ namespace uk.JohnCook.dotnet.StreamController
             this.Left = Preferences.Default.obs_left;
             this.Top = Preferences.Default.obs_top;
             this.cbAutoScroll.IsChecked = Preferences.Default.obs_autoscroll;
+            scrollBufferTimer.Elapsed += ScrollBufferTimer_Elapsed;
+            scrollBufferTimer.Start();
         }
 
-        private async void Window_ContentRendered(object sender, EventArgs e)
+        private void Window_ContentRendered(object sender, EventArgs e)
         {
-            webSocket.SetExponentialBackoff(Preferences.Default.obs_reconnect_min_seconds, Preferences.Default.obs_reconnect_max_minutes);
-            webSocket.StateChange += WebSocket_StateChange_ContextSwitch;
-            webSocket.StateChange += WebSocket_Connected_ContextSwitch;
-            webSocket.ReceiveTextMessage += WebSocket_NewTextMessage_ContextSwitch;
-            //webSocket.OnObsEvent += WebSocket_NewObsEvent_ContextSwitch;
-            webSocket.ErrorState += WebSocket_ErrorMessage_ContextSwitch;
-            if (Preferences.Default.obs_connect_launch)
-            {
-                btnTest.IsEnabled = false;
-                await webSocket.AutoReconnectConnectAsync().ConfigureAwait(true);
-            }
+            ObsWebsocketConnection.Instance.Client.StateChange += WebSocket_StateChange_ContextSwitch;
+            //ObsWebsocketConnection.Instance.Client.ReceiveTextMessage += WebSocket_NewTextMessage_ContextSwitch;
+            ObsWebsocketConnection.Instance.Client.OnObsEvent += WebSocket_NewObsEvent_ContextSwitch;
+            ObsWebsocketConnection.Instance.Client.ErrorState += WebSocket_ErrorMessage_ContextSwitch;
         }
 
         private void WebSocket_NewObsEvent_ContextSwitch(object sender, ObsEventObject e)
@@ -104,7 +91,7 @@ namespace uk.JohnCook.dotnet.StreamController
             {
                 case ObsEventType.SourceFilterRemoved:
                     SourceFilterRemovedObsEvent temp1 = (obsEvent as SourceFilterRemovedObsEvent);
-                    txtOutput.AppendText(String.Format(CultureInfo.CurrentCulture, Properties.Resources.window_obs_message_SourceFilterRemoved_format,  temp1.UpdateType, temp1.FilterName, temp1.FilterType, temp1.SourceName));
+                    txtOutput.AppendText(String.Format(CultureInfo.CurrentCulture, Properties.Resources.window_obs_message_SourceFilterRemoved_format, temp1.UpdateType, temp1.FilterName, temp1.FilterType, temp1.SourceName));
                     break;
                 case ObsEventType.SourceDestroyed:
                     SourceDestroyedObsEvent temp2 = (obsEvent as SourceDestroyedObsEvent);
@@ -176,12 +163,10 @@ namespace uk.JohnCook.dotnet.StreamController
             Preferences.Default.obs_height = this.Height;
             Preferences.Default.obs_left = this.Left;
             Preferences.Default.obs_top = this.Top;
-            webSocket.StateChange -= WebSocket_StateChange_ContextSwitch;
-            webSocket.StateChange -= WebSocket_Connected_ContextSwitch;
-            webSocket.ReceiveTextMessage -= WebSocket_NewTextMessage_ContextSwitch;
-            webSocket.ErrorState -= WebSocket_ErrorMessage_ContextSwitch;
-            webSocket.AutoReconnect = false;
-            webSocket.DisconnectAsync(true).ConfigureAwait(true);
+            ObsWebsocketConnection.Instance.Client.StateChange -= WebSocket_StateChange_ContextSwitch;
+            ObsWebsocketConnection.Instance.Client.ReceiveTextMessage -= WebSocket_NewTextMessage_ContextSwitch;
+            ObsWebsocketConnection.Instance.Client.OnObsEvent += WebSocket_NewObsEvent_ContextSwitch;
+            ObsWebsocketConnection.Instance.Client.ErrorState -= WebSocket_ErrorMessage_ContextSwitch;
         }
 
         private void WebSocket_StateChange_ContextSwitch(object sender, WebSocketState e)
@@ -200,7 +185,7 @@ namespace uk.JohnCook.dotnet.StreamController
             }
             else if (e == WebSocketState.None)
             {
-                txtStatus.Text = webSocket.AutoReconnect
+                txtStatus.Text = ObsWebsocketConnection.Instance.Client.AutoReconnect
                     ? String.Format(CultureInfo.InvariantCulture, Properties.Resources.window_obs_connection_status_reconnect_format, e, reconnectDelay)
                     : String.Format(CultureInfo.InvariantCulture, Properties.Resources.window_obs_connection_status_format, e);
             }
@@ -223,18 +208,6 @@ namespace uk.JohnCook.dotnet.StreamController
             }
         }
 
-        private void WebSocket_Connected_ContextSwitch(object sender, WebSocketState e)
-        {
-            _Context.Send(
-                x => WebSocket_Connected(e),
-                null);
-        }
-
-        private static void WebSocket_Connected(WebSocketState e)
-        {
-            if (e != WebSocketState.Open) { return; }
-        }
-
         private void WebSocket_NewTextMessage_ContextSwitch(object sender, MemoryStream message)
         {
             _Context.Send(
@@ -246,6 +219,14 @@ namespace uk.JohnCook.dotnet.StreamController
         {
             txtOutput.AppendText(Encoding.UTF8.GetString(message.ToArray()));
             txtOutput.AppendText("\n\n");
+            if (autoscroll == true)
+            {
+                svScroll.ScrollToBottom();
+            }
+        }
+
+        private void ScrollBufferTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
             if (txtOutput.Text.Length > SCROLL_BUFFER_MAX_CHARS)
             {
                 txtOutput.Text = txtOutput.Text.AsSpan(txtOutput.Text.Length - SCROLL_BUFFER_MAX_CHARS).ToString();
@@ -254,31 +235,6 @@ namespace uk.JohnCook.dotnet.StreamController
             {
                 svScroll.ScrollToBottom();
             }
-        }
-
-        private async Task Connect()
-        {
-            btnTest.IsEnabled = false;
-            webSocket.AutoReconnect = Preferences.Default.obs_auto_reconnect;
-            await webSocket.AutoReconnectConnectAsync().ConfigureAwait(true);
-        }
-
-        private async Task Disconnect()
-        {
-            webSocket.AutoReconnect = false;
-            await webSocket.DisconnectAsync(true).ConfigureAwait(true);
-        }
-
-        private async void ButtonTest_Click(object sender, RoutedEventArgs e)
-        {
-            await Connect().ConfigureAwait(true);
-            e.Handled = true;
-        }
-
-        private async void ButtonClose_Click(object sender, RoutedEventArgs e)
-        {
-            await Disconnect().ConfigureAwait(true);
-            e.Handled = true;
         }
 
         private void AutoScroll_Checked(object sender, RoutedEventArgs e)
@@ -313,32 +269,45 @@ namespace uk.JohnCook.dotnet.StreamController
             else if (e.Key == Key.R
                 && (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)))
             {
-                await Connect().ConfigureAwait(true);
+                await ObsWebsocketConnection.Instance.Reconnect().ConfigureAwait(true);
                 e.Handled = true;
             }
             else if (e.Key == Key.D
                 && (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)))
             {
-                await Disconnect().ConfigureAwait(true);
+                await ObsWebsocketConnection.Instance.Disconnect().ConfigureAwait(true);
                 e.Handled = true;
             }
         }
 
-        protected override void Dispose(bool disposing)
+        private void CommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            if (disposedValue)
+            switch ((e.OriginalSource as Button).Name)
             {
-                return;
+                case "btnTest":
+                    e.CanExecute = ObsWebsocketConnection.Instance.Client.State != WebSocketState.Open;
+                    break;
+                case "btnClose":
+                    e.CanExecute = ObsWebsocketConnection.Instance.Client.State == WebSocketState.Open;
+                    break;
+                default:
+                    return;
             }
-            if (disposing)
-            {
-                webSocket.Dispose();
-            }
+        }
 
-            // TODO: free unmanaged resources (unmanaged objects) and override finalizer
-            // TODO: set large fields to null
-            disposedValue = true;
-            base.Dispose(disposing);
+        private async void CommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            switch ((e.OriginalSource as Button).Name)
+            {
+                case "btnTest":
+                    await ObsWebsocketConnection.Instance.Reconnect().ConfigureAwait(true);
+                    break;
+                case "btnClose":
+                    await ObsWebsocketConnection.Instance.Disconnect().ConfigureAwait(true);
+                    break;
+                default:
+                    return;
+            }
         }
     }
 }
