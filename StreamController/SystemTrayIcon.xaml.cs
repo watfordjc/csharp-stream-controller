@@ -1,16 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+using System.Windows.Controls.Primitives;
 using uk.JohnCook.dotnet.NAudioWrapperLibrary;
 using uk.JohnCook.dotnet.StreamController.Controls;
 
@@ -21,7 +13,6 @@ namespace uk.JohnCook.dotnet.StreamController
     /// </summary>
     public partial class SystemTrayIcon : StyledWindow
     {
-        private bool disposedValue;
         public static SystemTrayIcon Instance { get { return lazySingleton.Value; } }
 
         private static Lazy<SystemTrayIcon> lazySingleton =
@@ -37,7 +28,20 @@ namespace uk.JohnCook.dotnet.StreamController
             NotifyIcon.TrayMouseDoubleClick += NotifyIcon_TrayMouseDoubleClick;
         }
 
-        private void SystemTrayIcon_ThemeChanged(object sender, WindowUtilityLibrary.WindowsTheme oldTheme)
+        private void StyledWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            ThemeChanged -= SystemTrayIcon_ThemeChanged;
+            AudioInterfaceCollection.Instance.CollectionEnumerated -= Devices_CollectionEnumerated;
+            NotifyIcon.TrayMouseDoubleClick -= NotifyIcon_TrayMouseDoubleClick;
+            NotifyIcon.Dispose();
+        }
+
+        private void ContextMenu_Opened(object sender, RoutedEventArgs e)
+        {
+            NotifyIcon.ContextMenu.Placement = PlacementMode.RelativePoint;
+        }
+
+        private async void SystemTrayIcon_ThemeChanged(object sender, WindowUtilityLibrary.WindowsTheme oldTheme)
         {
             if (Instance.CurrentTheme == oldTheme)
             {
@@ -46,7 +50,7 @@ namespace uk.JohnCook.dotnet.StreamController
             SystemTrayIcon oldWindow = Instance;
             oldWindow.NotifyIcon.ContextMenu.IsOpen = false;
             oldWindow.NotifyIcon.Visibility = Visibility.Hidden;
-            oldWindow.Close();
+            oldWindow.Visibility = Visibility.Collapsed;
 
             lazySingleton = new Lazy<SystemTrayIcon>(
                 () => new SystemTrayIcon(false)
@@ -55,8 +59,10 @@ namespace uk.JohnCook.dotnet.StreamController
             {
                 Instance.Devices_CollectionEnumerated(this, EventArgs.Empty);
             }
-            UpdateTrayIcon();
-            oldWindow.Dispose(true);
+            Instance.Visibility = Visibility.Collapsed;
+            await Instance.UpdateTrayIcon().ConfigureAwait(true);
+            oldWindow.Close();
+            oldWindow.Dispose();
         }
 
         private void NotifyIcon_TrayMouseDoubleClick(object sender, RoutedEventArgs e)
@@ -70,7 +76,7 @@ namespace uk.JohnCook.dotnet.StreamController
             taskbarCaptureMenu.ItemsSource = AudioInterfaceCollection.ActiveDevices;
         }
 
-        public async void UpdateTrayIcon()
+        public async Task UpdateTrayIcon()
         {
             try
             {
@@ -119,28 +125,5 @@ namespace uk.JohnCook.dotnet.StreamController
 
         #endregion
 
-        #region dispose
-
-        protected override void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    // TODO: dispose managed state (managed objects)
-                    ThemeChanged -= SystemTrayIcon_ThemeChanged;
-                    AudioInterfaceCollection.Instance.CollectionEnumerated -= Devices_CollectionEnumerated;
-                    NotifyIcon.TrayMouseDoubleClick -= NotifyIcon_TrayMouseDoubleClick;
-                    NotifyIcon.Dispose();
-                }
-
-                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
-                // TODO: set large fields to null
-                disposedValue = true;
-            }
-            base.Dispose(disposing);
-        }
-
-        #endregion
     }
 }

@@ -10,6 +10,7 @@
         xmlns:props="clr-namespace:uk.JohnCook.dotnet.StreamController.Properties"
         mc:Ignorable="d"
         Visibility="Collapsed"
+        Closing="StyledWindow_Closing"
         Title="{x:Static props:Resources.window_system_tray_icon_title}"
         Height="450" Width="800">
     <Grid>
@@ -18,7 +19,7 @@
                         Visibility="Collapsed"
                         MenuActivation="RightClick">
             <tb:TaskbarIcon.ContextMenu>
-                <ContextMenu x:Name="contextMenu" Style="{StaticResource ContextMenuStyle}">
+                <ContextMenu x:Name="contextMenu" Style="{StaticResource ContextMenuStyle}" Opened="ContextMenu_Opened">
                     <MenuItem Header="{x:Static props:Resources.tray_contextmenu_default_render}"
                               x:Name="taskbarRenderMenu"
                               Padding="2 7"
