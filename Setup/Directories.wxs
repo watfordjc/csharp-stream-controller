@@ -53,8 +53,8 @@
                   Target="[System64Folder]msiexec.exe"
                   Arguments="/x $(var.ProductCode)" />
         <RemoveFolder Id="CleanUpShortcut" Directory="ProgramCreatorStartMenuFolder" On="uninstall" />
-        <RegistryKey Root="HKCU" Key="!(loc.ProgramCreatorCompany)\!(loc.ProductName)\Uninstall">
-          <RegistryValue Name="installed" Type="integer" Value="1" KeyPath="yes" />
+        <RegistryKey Root="HKCU" Key="Software\!(loc.ProgramCreatorCompany)\!(loc.ProductName)\Uninstall">
+        <RegistryValue Name="installPath" Type="string" Value="[INSTALLFOLDER]" KeyPath="yes" />
         </RegistryKey>
       </Component>
     </DirectoryRef>

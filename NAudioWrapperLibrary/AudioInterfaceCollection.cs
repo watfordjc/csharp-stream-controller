@@ -6,10 +6,12 @@ using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
+using Microsoft.Win32;
 using NAudio.CoreAudioApi;
 using NAudio.CoreAudioApi.Interfaces;
 
@@ -22,7 +24,7 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
         private static readonly MMDeviceEnumerator _Enumerator = new MMDeviceEnumerator();
         private static AudioEndpointNotificationCallback _NotificationCallback = null;
         private static IMMNotificationClient _NotificationClient;
-        private static readonly string appdataPath = Path.GetDirectoryName(ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal).FilePath) + "\\";
+        private static string appdataPath;
         private const string deviceApplicationPreferencesFilename = "DeviceApplicationPreferences.json";
         private const string applicationDevicePreferencesFilename = "ApplicationDevicePreferences.json";
         private SharedModels.DeviceApplicationPreferences deviceApplicationPreferences;
@@ -53,7 +55,36 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
             _Context = SynchronizationContext.Current;
             _NotificationCallback = new AudioEndpointNotificationCallback(_Context);
             _NotificationClient = (IMMNotificationClient)_NotificationCallback;
+
+            string installDirectory = InstallPath();
+            string runningDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+            bool isInstalledVersion = installDirectory != null && runningDirectory == installDirectory;
+
+            appdataPath = isInstalledVersion switch
+            {
+                true => Path.GetDirectoryName(ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal).FilePath) + "\\",
+                false => runningDirectory
+            };
+
             Initialise();
+        }
+
+        private static string InstallPath()
+        {
+            // Determine if program is installed from an installer
+            // Registry key created by Setup project on installation:
+            //  HKCU\Software\!(loc.ProgramCreatorCompany)\!(loc.ProductName)\Uninstall\installPath = [INSTALLFOLDER]
+            //  HKCU\Software\John Cook\Stream Controller\Uninstall\installPath = C:\Program Files\John Cook\Stream Controller\
+
+            // Get assembly information of main executable.
+            FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo((Assembly.GetEntryAssembly() as Assembly).Location);
+            // Convert assembly information into registry key
+            //  * NB: ProductName uses PascalCase whereas Setup project (loc.ProductName) uses spaces
+            string subkey = "Software\\" + fileVersionInfo.CompanyName + "\\" + System.Text.RegularExpressions.Regex.Replace(fileVersionInfo.ProductName, "(\\B[A-Z])", " $1") + "\\Uninstall";
+
+            using RegistryKey registryKey = Registry.CurrentUser.OpenSubKey(subkey);
+            return registryKey?.GetValue("installPath", null).ToString();
         }
 
         private async void Initialise()
