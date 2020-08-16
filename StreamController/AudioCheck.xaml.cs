@@ -25,9 +25,6 @@ namespace uk.JohnCook.dotnet.StreamController
     public partial class AudioCheck : StyledWindow
     {
         private readonly SynchronizationContext _Context;
-        private readonly TaskCompletionSource<bool> audioDevicesEnumerated = new TaskCompletionSource<bool>();
-        private WaveOutEvent silentAudioEvent = null;
-        private bool disposedValue;
 
         #region Instantiation and initialisation
 
@@ -39,12 +36,6 @@ namespace uk.JohnCook.dotnet.StreamController
 
         private async void Window_ContentRendered(object sender, EventArgs e)
         {
-            AudioInterfaceCollection.Instance.CollectionEnumerated += AudioDevicesEnumerated;
-            if (AudioInterfaceCollection.Instance.DevicesAreEnumerated)
-            {
-                AudioDevicesEnumerated(this, EventArgs.Empty);
-            }
-            AudioInterfaceCollection.Instance.DefaultDeviceChanged += DefaultAudioDeviceChanged;
             SystemTrayIcon.Instance.UpdateTrayIcon();
             if (ObsWebsocketConnection.Instance.Client == null)
             {
@@ -108,82 +99,8 @@ namespace uk.JohnCook.dotnet.StreamController
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            AudioInterfaceCollection.Instance.CollectionEnumerated -= AudioDevicesEnumerated;
-            AudioInterfaceCollection.Instance.DefaultDeviceChanged -= DefaultAudioDeviceChanged;
             ObsWebsocketConnection.Instance.PropertyChanged -= Instance_PropertyChanged;
             ObsWebsocketConnection.Instance.Client.ErrorState -= WebSocket_Error_ContextSwitch;
-        }
-        #endregion
-
-        #region Audio interfaces
-
-        private void AudioDevicesEnumerated(object sender, EventArgs e)
-        {
-            audioDevicesEnumerated.SetResult(true);
-        }
-
-        private async void DefaultAudioDeviceChanged(object sender, DataFlow dataFlow)
-        {
-            if (dataFlow == DataFlow.Render)
-            {
-                await audioDevicesEnumerated.Task.ConfigureAwait(false);
-                DisplayPortAudioWorkaround();
-            }
-        }
-
-        private void DisplayPortAudioWorkaround()
-        {
-            if (AudioInterfaceCollection.Instance.DefaultRender.FriendlyName.Contains("NVIDIA", StringComparison.Ordinal) && silentAudioEvent?.PlaybackState != PlaybackState.Playing)
-            {
-                _ = Task.Run(
-                    () => StartPlaySilence(AudioInterfaceCollection.Instance.DefaultRender)
-                );
-            }
-            else
-            {
-                _ = Task.Run(
-                    () => StopPlaySilence()
-                    );
-            }
-        }
-
-        private Task StartPlaySilence(AudioInterface audioInterface)
-        {
-            if (audioInterface.IsActive && silentAudioEvent?.PlaybackState != PlaybackState.Playing)
-            {
-                SilenceProvider provider = new SilenceProvider(WaveFormat.CreateIeeeFloatWaveFormat(44100, 2));
-                silentAudioEvent = new WaveOutEvent()
-                {
-                    DeviceNumber = GetWaveOutDeviceNumber(audioInterface)
-                };
-                silentAudioEvent.Init(provider);
-                silentAudioEvent.Play();
-            }
-            return Task.CompletedTask;
-        }
-
-        private Task StopPlaySilence()
-        {
-            if (silentAudioEvent?.PlaybackState == PlaybackState.Playing)
-            {
-                silentAudioEvent.Stop();
-                silentAudioEvent.Dispose();
-            }
-            return Task.CompletedTask;
-        }
-
-        private static int GetWaveOutDeviceNumber(AudioInterface audioInterface)
-        {
-            int deviceNameMaxLength = Math.Min(audioInterface.FriendlyName.Length, 31);
-            string deviceNameTruncated = audioInterface.FriendlyName.Substring(0, deviceNameMaxLength);
-            for (int i = 0; i < WaveOut.DeviceCount; i++)
-            {
-                if (WaveOut.GetCapabilities(i).ProductName == deviceNameTruncated)
-                {
-                    return i;
-                }
-            }
-            return -1;
         }
 
         #endregion
@@ -226,42 +143,6 @@ namespace uk.JohnCook.dotnet.StreamController
 
         #region User Interface
 
-        private void TextBlock_AnnounceChanged(object sender)
-        {
-            AutomationPeer peer = (sender as UIElement).Dispatcher.Invoke(
-                () => UIElementAutomationPeer.FromElement(sender as UIElement));
-            if (peer == null) { return; }
-            _Context.Send(
-                x => peer.RaiseAutomationEvent(AutomationEvents.LiveRegionChanged),
-                null);
-        }
-
-        #endregion
-
-        private void Window_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.F4)
-            {
-                if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)
-                    && (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)))
-                {
-                    App.Current.Shutdown();
-                }
-            }
-            else if (e.Key == Key.F12)
-            {
-                if (!string.IsNullOrEmpty(ObsWebsocketConnection.Instance.ExtendedConnectionError))
-                {
-                    TextBlock_AnnounceChanged(tbStatusExtended);
-                }
-                else
-                {
-                    TextBlock_AnnounceChanged(tbStatus);
-                }
-            }
-        }
-
-
         private async void CbScenes_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (e.AddedItems.Count == 0) { return; }
@@ -272,26 +153,15 @@ namespace uk.JohnCook.dotnet.StreamController
             await ObsWebsocketConnection.Instance.Client.ObsSend(request).ConfigureAwait(true);
         }
 
-        #region dispose
-
-        protected override void Dispose(bool disposing)
+        private void TextBlock_AnnounceChanged(object sender)
         {
-            if (disposedValue)
-            {
-                return;
-            }
-
-            if (disposing)
-            {
-                silentAudioEvent?.Stop();
-                silentAudioEvent?.Dispose();
-            }
-
-            disposedValue = true;
-            base.Dispose(disposing);
+            AutomationPeer peer = (sender as UIElement).Dispatcher.Invoke(
+                () => UIElementAutomationPeer.FromElement(sender as UIElement));
+            if (peer == null) { return; }
+            _Context.Send(
+                x => peer.RaiseAutomationEvent(AutomationEvents.LiveRegionChanged),
+                null);
         }
-
-        #endregion
 
         private void Menu_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
@@ -322,5 +192,31 @@ namespace uk.JohnCook.dotnet.StreamController
                     return;
             }
         }
+
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.F4)
+            {
+                if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)
+                    && (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)))
+                {
+                    App.Current.Shutdown();
+                }
+            }
+            else if (e.Key == Key.F12)
+            {
+                if (!string.IsNullOrEmpty(ObsWebsocketConnection.Instance.ExtendedConnectionError))
+                {
+                    TextBlock_AnnounceChanged(tbStatusExtended);
+                }
+                else
+                {
+                    TextBlock_AnnounceChanged(tbStatus);
+                }
+            }
+        }
+
+        #endregion
+
     }
 }

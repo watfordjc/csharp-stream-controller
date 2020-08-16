@@ -37,6 +37,7 @@ namespace uk.JohnCook.dotnet.StreamController
         #region Properties and Variables
 
         private readonly SynchronizationContext _Context;
+        private readonly AudioWorkarounds audioWorkarounds = new AudioWorkarounds();
         public static ObsWebsocketConnection Instance { get { return lazySingleton.Value; } }
         public ObsWsClient Client { get; private set; }
         public string ConnectionStatus { get; private set; } = Properties.Resources.text_disconnected;
@@ -942,6 +943,7 @@ namespace uk.JohnCook.dotnet.StreamController
                     // TODO: dispose managed state (managed objects)
                     ReconnectCountdownTimer.Dispose();
                     iconSemaphore.Dispose();
+                    audioWorkarounds.Dispose();
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override finalizer
