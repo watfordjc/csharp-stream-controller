@@ -562,6 +562,15 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Stream Controller - {0}.
+        /// </summary>
+        public static string tray_tooltip_format {
+            get {
+                return ResourceManager.GetString("tray_tooltip_format", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Please select an item..
         /// </summary>
         public static string validation_error_ComboBoxOneItemSelected {

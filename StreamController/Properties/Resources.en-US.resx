@@ -313,6 +313,10 @@
     <value>E_nsure Custom Audio</value>
     <comment>Tray icon -&gt; right-click -&gt; Ensure Custom Audio</comment>
   </data>
+  <data name="tray_tooltip_format" xml:space="preserve">
+    <value>Stream Controller - {0}</value>
+    <comment>String format for (Tray icon -&gt; tool tip)</comment>
+  </data>
   <data name="validation_error_ComboBoxOneItemSelected" xml:space="preserve">
     <value>Please select an item.</value>
     <comment>Validation error - no combo box items selected</comment>
@@ -344,6 +348,10 @@
   <data name="window_audio-check_current-scene_automation-name_format" xml:space="preserve">
     <value>Current scene: {0}</value>
     <comment>Automation name string format for (AudioCheck.xaml -&gt; Current Scene)</comment>
+  </data>
+  <data name="window_audio-check_current-scene_fallback" xml:space="preserve">
+    <value>None</value>
+    <comment>Fallback value for (AudioCheck.xaml -&gt; Current Scene)</comment>
   </data>
   <data name="window_audio-check_current-scene_label" xml:space="preserve">
     <value>Current Scene:</value>

@@ -14,7 +14,7 @@
         Height="450" Width="800">
     <Grid>
         <tb:TaskbarIcon x:Name="NotifyIcon"
-                        ToolTipText="{x:Static props:Resources.application_name}"
+                        ToolTipText="{Binding Source={x:Static local:ObsWebsocketConnection.Instance}, Path=ConnectionStatus, StringFormat={x:Static props:Resources.tray_tooltip_format}}"
                         Visibility="Collapsed"
                         MenuActivation="RightClick">
             <tb:TaskbarIcon.ContextMenu>
