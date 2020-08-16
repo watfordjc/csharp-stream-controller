@@ -61,7 +61,9 @@ namespace uk.JohnCook.dotnet.StreamController
         private void Processes_CollectionEnumerated(object sender, EventArgs e)
         {
             int currentProcessId = Process.GetCurrentProcess().Id;
-            cb_applications.SelectedItem = ProcessCollection.Processes.FirstOrDefault(x => x.Id == currentProcessId);
+            ObservableProcess thisProcess = ProcessCollection.Processes.FirstOrDefault(x => x.Id == currentProcessId);
+            cb_applications.SelectedItem = thisProcess;
+            UpdateApplicationAudioDevices(thisProcess, false);
         }
 
         private void Processes_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)

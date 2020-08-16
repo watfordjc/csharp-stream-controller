@@ -1,5 +1,4 @@
-﻿using Hardcodet.Wpf.TaskbarNotification;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -16,7 +15,6 @@ using System.Timers;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
-using System.Windows.Shapes;
 using uk.JohnCook.dotnet.NAudioWrapperLibrary;
 using uk.JohnCook.dotnet.OBSWebSocketLibrary;
 using uk.JohnCook.dotnet.OBSWebSocketLibrary.Data;
@@ -24,9 +22,7 @@ using uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsEvents;
 using uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequestReplies;
 using uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequests;
 using uk.JohnCook.dotnet.OBSWebSocketLibrary.TypeDefs;
-using uk.JohnCook.dotnet.StreamController.Properties;
 using uk.JohnCook.dotnet.WebSocketLibrary;
-using Windows.UI;
 
 namespace uk.JohnCook.dotnet.StreamController
 {
@@ -126,10 +122,10 @@ namespace uk.JohnCook.dotnet.StreamController
         {
             if (Instance.Client != null)
             {
-                Instance.Client.StateChange -= Instance.Client_StateChange_ContextSwitch;
-                Instance.Client.ErrorState -= Instance.Client_Error_ContextSwitch;
-                Instance.Client.OnObsEvent -= Instance.Client_Event_ContextSwitch;
-                Instance.Client.OnObsReply -= Instance.Client_Reply_ContextSwitch;
+                Instance.Client.StateChange -= Instance.Client_StateChange;
+                Instance.Client.ErrorState -= Instance.Client_Error;
+                Instance.Client.OnObsEvent -= Instance.Client_Event;
+                Instance.Client.OnObsReply -= Instance.Client_Reply;
                 Instance.Client.Dispose();
             }
             Instance.Client = new ObsWsClient(new UriBuilder(
@@ -142,10 +138,10 @@ namespace uk.JohnCook.dotnet.StreamController
                 AutoReconnect = Preferences.Default.obs_auto_reconnect
             };
             Instance.Client.SetExponentialBackoff(Preferences.Default.obs_reconnect_min_seconds, Preferences.Default.obs_reconnect_max_minutes);
-            Instance.Client.StateChange += Instance.Client_StateChange_ContextSwitch;
-            Instance.Client.ErrorState += Instance.Client_Error_ContextSwitch;
-            Instance.Client.OnObsEvent += Instance.Client_Event_ContextSwitch;
-            Instance.Client.OnObsReply += Instance.Client_Reply_ContextSwitch;
+            Instance.Client.StateChange += Instance.Client_StateChange;
+            Instance.Client.ErrorState += Instance.Client_Error;
+            Instance.Client.OnObsEvent += Instance.Client_Event;
+            Instance.Client.OnObsReply += Instance.Client_Reply;
         }
 
         /// <summary>
@@ -211,19 +207,12 @@ namespace uk.JohnCook.dotnet.StreamController
             }
         }
 
-        private void Client_StateChange_ContextSwitch(object sender, WebSocketState newState)
-        {
-            _Context.Send(
-                x => Client_StateChange(newState),
-                null);
-        }
-
         /// <summary>
         /// React to websocket connection state changes
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="newState">New websocket connection state</param>
-        private void Client_StateChange(WebSocketState newState)
+        private void Client_StateChange(object sender, WebSocketState newState)
         {
             if (newState == WebSocketState.Open)
             {
@@ -275,7 +264,9 @@ namespace uk.JohnCook.dotnet.StreamController
 
         private void ResetScenes()
         {
-            SceneList.Clear();
+            _Context.Send(
+                x => SceneList.Clear(),
+                null);
             NotifyPropertyChanged(nameof(SceneList));
             CurrentScene = null;
             NotifyPropertyChanged(nameof(CurrentScene));
@@ -289,14 +280,7 @@ namespace uk.JohnCook.dotnet.StreamController
             ObsSceneItemSceneDictionary.Clear();
         }
 
-        private void Client_Error_ContextSwitch(object sender, WsClientErrorMessage e)
-        {
-            _Context.Send(
-                x => Client_Error(e),
-                null);
-        }
-
-        private async void Client_Error(WsClientErrorMessage e)
+        private async void Client_Error(object sender, WsClientErrorMessage e)
         {
             if (e.ReconnectDelay > 0)
             {
@@ -321,14 +305,7 @@ namespace uk.JohnCook.dotnet.StreamController
 
         #region obs-websocket
 
-        private void Client_Event_ContextSwitch(object sender, ObsEventObject eventObject)
-        {
-            _Context.Send(
-                x => Client_Event(eventObject),
-                null);
-        }
-
-        private async void Client_Event(ObsEventObject eventObject)
+        private async void Client_Event(object sender, ObsEventObject eventObject)
         {
             switch (eventObject.EventType)
             {
@@ -415,20 +392,13 @@ namespace uk.JohnCook.dotnet.StreamController
             }
         }
 
-        private void Client_Reply_ContextSwitch(object sender, ObsReplyObject replyObject)
-        {
-            _Context.Send(
-                x => Client_Reply(replyObject),
-                null);
-        }
-
-        private async void Client_Reply(ObsReplyObject replyObject)
+        private async void Client_Reply(object sender, ObsReplyObject replyObject)
         {
             switch (replyObject.RequestType)
             {
                 case ObsRequestType.GetAuthRequired:
                 case ObsRequestType.Authenticate:
-                    if (ObsWebsocketConnection.Instance.Client.CanSend)
+                    if (Client.CanSend)
                     {
                         await Obs_Get(ObsRequestType.GetSourceTypesList).ConfigureAwait(true);
                     }
@@ -440,10 +410,14 @@ namespace uk.JohnCook.dotnet.StreamController
                     break;
                 case ObsRequestType.GetSceneList:
                     ReadOnlyMemory<char> currentSceneName = (replyObject.MessageObject as GetSceneListReply).CurrentScene.AsMemory();
-                    SceneList.Clear();
+                    _Context.Send(
+                        x => SceneList.Clear(),
+                        null);
                     foreach (ObsScene scene in (replyObject.MessageObject as GetSceneListReply).Scenes)
                     {
-                        SceneList.Add(scene);
+                        _Context.Send(
+                            x => SceneList.Add(scene),
+                            null);
                         await PopulateSceneItemSources(scene.Sources, scene).ConfigureAwait(true);
                     }
                     Debug.Assert(SceneList.Any(x => x.Name == currentSceneName.ToString()), $"Scene {currentSceneName} wasn't added to sceneList.");
@@ -551,7 +525,7 @@ namespace uk.JohnCook.dotnet.StreamController
         private async Task GetDeviceIdsForSources()
         {
             await audioDevicesEnumerated.Task.ConfigureAwait(false);
-            while (ObsWebsocketConnection.Instance.Client.WaitingForReplyForType(ObsRequestType.GetSourceSettings))
+            while (Client.WaitingForReplyForType(ObsRequestType.GetSourceSettings))
             {
                 await Task.Delay(250).ConfigureAwait(false);
             }
@@ -596,7 +570,7 @@ namespace uk.JohnCook.dotnet.StreamController
 
         private static async Task Heartbeat_Event(HeartbeatObsEvent messageObject)
         {
-            await ObsWebsocketConnection.Instance.ChangeStatusColor(messageObject.Pulse ? ObsWebsocketConnection.PrimaryBrush : ObsWebsocketConnection.SecondaryBrush, true).ConfigureAwait(false);
+            await Instance.ChangeStatusColor(messageObject.Pulse ? PrimaryBrush : SecondaryBrush, true).ConfigureAwait(false);
         }
 
         private void SwitchScenes_Event(SwitchScenesObsEvent messageObject)
@@ -649,7 +623,9 @@ namespace uk.JohnCook.dotnet.StreamController
                     Name = (createdSource as Scene).Name,
                     Sources = new ObservableCollection<ObsSceneItem>()
                 };
-                SceneList.Add(newScene);
+                _Context.Send(
+                    x => SceneList.Add(newScene),
+                    null);
             }
         }
 
@@ -661,7 +637,9 @@ namespace uk.JohnCook.dotnet.StreamController
                 ObsScene scene = SceneList.FirstOrDefault(x => x.Name == messageObject.SourceName);
                 if (scene != default)
                 {
-                    SceneList.Remove(scene);
+                    _Context.Send(
+                    x => SceneList.Remove(scene),
+                    null);
                 }
             }
         }
@@ -683,7 +661,9 @@ namespace uk.JohnCook.dotnet.StreamController
             newSceneItem.Type = newSceneItem.Source.Type.TypeId;
             if (SceneList.Any(x => x.Name == messageObject.SceneName))
             {
-                SceneList.First(x => x.Name == messageObject.SceneName).Sources.Insert(0, newSceneItem);
+                _Context.Send(
+                    x => SceneList.First(x => x.Name == messageObject.SceneName).Sources.Insert(0, newSceneItem),
+                    null);
             }
         }
 

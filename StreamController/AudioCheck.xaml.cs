@@ -88,12 +88,19 @@ namespace uk.JohnCook.dotnet.StreamController
                     }
                     break;
                 case nameof(ObsWebsocketConnection.SourceOrderList):
-                    ListCollectionView listCollection = (ListCollectionView)CollectionViewSource.GetDefaultView(lbSourceList.ItemsSource);
-                    if (listCollection != null)
-                    {
-                        listCollection.CustomSort = new Utils.OrderSceneItemsByListOfIds(ObsWebsocketConnection.Instance.SourceOrderList);
-                    }
+                    lbSourceList.Dispatcher.Invoke(
+                        () => UpdateSceneSourceListOrder()
+                        );
                     break;
+            }
+        }
+
+        private void UpdateSceneSourceListOrder()
+        {
+            ListCollectionView listCollection = (ListCollectionView)CollectionViewSource.GetDefaultView(lbSourceList.ItemsSource);
+            if (listCollection != null)
+            {
+                listCollection.CustomSort = new Utils.OrderSceneItemsByListOfIds(ObsWebsocketConnection.Instance.SourceOrderList);
             }
         }
 
