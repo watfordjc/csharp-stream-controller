@@ -68,5 +68,32 @@
     <Setting Name="local_timezone_abbreviation" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="obs_local_clock_weather_symbol_source_name" Type="System.String" Scope="User">
+      <Value Profile="(Default)">LocalClockWeatherSymbol</Value>
+    </Setting>
+    <Setting Name="obs_local_clock_weather_temp_source_name" Type="System.String" Scope="User">
+      <Value Profile="(Default)">LocalClockWeatherTemperature</Value>
+    </Setting>
+    <Setting Name="obs_local_clock_location_source_name" Type="System.String" Scope="User">
+      <Value Profile="(Default)">LocalClockLocation</Value>
+    </Setting>
+    <Setting Name="obs_local_clock_weather_attrib1_source_name" Type="System.String" Scope="User">
+      <Value Profile="(Default)">LocalClockWeatherAttribution1</Value>
+    </Setting>
+    <Setting Name="obs_local_clock_weather_attrib2_source_name" Type="System.String" Scope="User">
+      <Value Profile="(Default)">LocalClockWeatherAttribution2</Value>
+    </Setting>
+    <Setting Name="obs_local_clock_weather_json_url" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="obs_slideshow_source_name" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Lower Third Slide Show</Value>
+    </Setting>
+    <Setting Name="obs_slideshow_next_scene_delay" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">30</Value>
+    </Setting>
+    <Setting Name="obs_local_clock_cycle_delay" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">5</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

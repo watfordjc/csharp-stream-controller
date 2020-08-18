@@ -286,5 +286,113 @@ namespace uk.JohnCook.dotnet.StreamController {
                 this["local_timezone_abbreviation"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("LocalClockWeatherSymbol")]
+        public string obs_local_clock_weather_symbol_source_name {
+            get {
+                return ((string)(this["obs_local_clock_weather_symbol_source_name"]));
+            }
+            set {
+                this["obs_local_clock_weather_symbol_source_name"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("LocalClockWeatherTemperature")]
+        public string obs_local_clock_weather_temp_source_name {
+            get {
+                return ((string)(this["obs_local_clock_weather_temp_source_name"]));
+            }
+            set {
+                this["obs_local_clock_weather_temp_source_name"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("LocalClockLocation")]
+        public string obs_local_clock_location_source_name {
+            get {
+                return ((string)(this["obs_local_clock_location_source_name"]));
+            }
+            set {
+                this["obs_local_clock_location_source_name"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("LocalClockWeatherAttribution1")]
+        public string obs_local_clock_weather_attrib1_source_name {
+            get {
+                return ((string)(this["obs_local_clock_weather_attrib1_source_name"]));
+            }
+            set {
+                this["obs_local_clock_weather_attrib1_source_name"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("LocalClockWeatherAttribution2")]
+        public string obs_local_clock_weather_attrib2_source_name {
+            get {
+                return ((string)(this["obs_local_clock_weather_attrib2_source_name"]));
+            }
+            set {
+                this["obs_local_clock_weather_attrib2_source_name"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string obs_local_clock_weather_json_url {
+            get {
+                return ((string)(this["obs_local_clock_weather_json_url"]));
+            }
+            set {
+                this["obs_local_clock_weather_json_url"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Lower Third Slide Show")]
+        public string obs_slideshow_source_name {
+            get {
+                return ((string)(this["obs_slideshow_source_name"]));
+            }
+            set {
+                this["obs_slideshow_source_name"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("30")]
+        public int obs_slideshow_next_scene_delay {
+            get {
+                return ((int)(this["obs_slideshow_next_scene_delay"]));
+            }
+            set {
+                this["obs_slideshow_next_scene_delay"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        public int obs_local_clock_cycle_delay {
+            get {
+                return ((int)(this["obs_local_clock_cycle_delay"]));
+            }
+            set {
+                this["obs_local_clock_cycle_delay"] = value;
+            }
+        }
     }
 }

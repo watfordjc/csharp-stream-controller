@@ -5,15 +5,19 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Net.WebSockets;
 using System.Runtime.CompilerServices;
 using System.Security.Policy;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Input;
 using System.Windows.Media;
 using uk.JohnCook.dotnet.NAudioWrapperLibrary;
 using uk.JohnCook.dotnet.OBSWebSocketLibrary;
@@ -22,6 +26,7 @@ using uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsEvents;
 using uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequestReplies;
 using uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequests;
 using uk.JohnCook.dotnet.OBSWebSocketLibrary.TypeDefs;
+using uk.JohnCook.dotnet.StreamController.Models;
 using uk.JohnCook.dotnet.WebSocketLibrary;
 
 namespace uk.JohnCook.dotnet.StreamController
@@ -50,7 +55,14 @@ namespace uk.JohnCook.dotnet.StreamController
         private Dictionary<string, object> ObsSourceDictionary { get; } = new Dictionary<string, object>();
         private Dictionary<int, ObsScene> ObsSceneItemSceneDictionary { get; } = new Dictionary<int, ObsScene>();
 
-        private string TimezoneString { get; set; }
+        private string TimezoneString { get; set; } = String.Empty;
+        private string PreviousLocalClockWeatherAttrib1 { get; set; } = String.Empty;
+        private string PreviousLocalClockWeatherAttrib2 { get; set; } = String.Empty;
+        private int CurrentLocalClockWeatherRecord { get; set; }
+        private bool FirstWeatherCycle { get; set; } = true;
+        private readonly HttpClient httpClient = new HttpClient();
+        private readonly Uri WeatherJsonUri;
+        private Models.WeatherData WeatherDataCollection { get; set; }
 
         public static readonly Brush PrimaryBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(0xFF, 0xE2, 0xC1, 0xEA));
         public static readonly Brush SecondaryBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(0xFF, 0xC5, 0xC0, 0xEB));
@@ -84,6 +96,8 @@ namespace uk.JohnCook.dotnet.StreamController
                 AudioDevicesEnumerated(this, EventArgs.Empty);
             }
             UpdateTimezoneString();
+            ChronoTimer.Instance.MinuteChanged += FetchWeatherData;
+            FetchWeatherData(this, DateTime.UtcNow);
         }
 
         private void AudioDevicesEnumerated(object sender, EventArgs e)
@@ -281,6 +295,11 @@ namespace uk.JohnCook.dotnet.StreamController
             SourceTypes = null;
             NotifyPropertyChanged(nameof(SourceTypes));
             ChronoTimer.Instance.MinuteChanged -= UpdateLocalClock;
+            ChronoTimer.Instance.MinuteChanged -= FetchWeatherData;
+            ChronoTimer.Instance.MinuteChanged -= UpdateLocalWeather;
+            ChronoTimer.Instance.SecondChanged -= UpdateLocalWeather;
+            ChronoTimer.Instance.MinuteChanged -= SlideShowNextSlide;
+            ChronoTimer.Instance.SecondChanged -= SlideShowNextSlide;
             ObsSourceDictionary.Clear();
             ObsSceneItemSceneDictionary.Clear();
         }
@@ -455,6 +474,24 @@ namespace uk.JohnCook.dotnet.StreamController
                         UpdateLocalClock(this, DateTime.UtcNow);
                         ChronoTimer.Instance.MinuteChanged += UpdateLocalClock;
                     }
+                    else if (newSource.Name == Preferences.Default.obs_local_clock_weather_symbol_source_name)
+                    {
+                        ClearObsGdi2PlusText(newSource.Name);
+                        ChronoTimer.Instance.MinuteChanged += UpdateLocalWeather;
+                        ChronoTimer.Instance.SecondChanged += UpdateLocalWeather;
+                    }
+                    else if (newSource.Name == Preferences.Default.obs_local_clock_weather_temp_source_name ||
+                       newSource.Name == Preferences.Default.obs_local_clock_location_source_name ||
+                       newSource.Name == Preferences.Default.obs_local_clock_weather_attrib1_source_name ||
+                       newSource.Name == Preferences.Default.obs_local_clock_weather_attrib2_source_name)
+                    {
+                        ClearObsGdi2PlusText(newSource.Name);
+                    }
+                    else if (newSource.Name == Preferences.Default.obs_slideshow_source_name)
+                    {
+                        ChronoTimer.Instance.MinuteChanged += SlideShowNextSlide;
+                        ChronoTimer.Instance.SecondChanged += SlideShowNextSlide;
+                    }
                     await Obs_Get(ObsRequestType.GetSourceFilters, sourceSettings.SourceName).ConfigureAwait(true);
                     break;
                 case ObsRequestType.GetSourceFilters:
@@ -485,6 +522,29 @@ namespace uk.JohnCook.dotnet.StreamController
             }
         }
 
+        private static void SlideShowNextSlide(object sender, DateTime e)
+        {
+
+            const UInt32 WM_KEYDOWN = 0x0100;
+            Int32 VK_F20 = KeyInterop.VirtualKeyFromKey(Key.F20);
+
+            // Next Slide is only available via Hotkeys in OBS Settings
+            // Hard-coded to F20 for now until I find a way to send modifier keys without changing active window.
+            if (e.Second == 0 || e.Second % Preferences.Default.obs_slideshow_next_scene_delay == 0)
+            {
+                ObservableProcess obsObservableProcess = ProcessCollection.Processes.Where(x => x.ProcessName == "obs64").FirstOrDefault();
+                if (obsObservableProcess == default)
+                {
+                    return;
+                }
+                else
+                {
+                    Process obsProcess = Process.GetProcessById(obsObservableProcess.Id);
+                    bool success = Utils.NativeMethods.PostMessage(obsProcess.MainWindowHandle, WM_KEYDOWN, VK_F20, 0);
+                }
+            }
+        }
+
         /// <summary>
         /// Update the current timezone abbreviation
         /// </summary>
@@ -505,12 +565,12 @@ namespace uk.JohnCook.dotnet.StreamController
                 if (TimeZoneInfo.Local.IsDaylightSavingTime(DateTime.Now))
                 {
                     TimezoneString = !string.IsNullOrEmpty(Preferences.Default.local_timezone_dst_abbreviation) ? Preferences.Default.local_timezone_dst_abbreviation : "?????";
-                } else
+                }
+                else
                 {
                     TimezoneString = !string.IsNullOrEmpty(Preferences.Default.local_timezone_abbreviation) ? Preferences.Default.local_timezone_abbreviation : "?????";
                 }
             }
-
         }
 
         private async void UpdateLocalClock(object sender, DateTime e)
@@ -522,7 +582,158 @@ namespace uk.JohnCook.dotnet.StreamController
                 Text = localDisplayTime
             };
             await Obs_Get(request).ConfigureAwait(true);
-            Trace.WriteLine($"{localDisplayTime}");
+        }
+
+        private async void ClearObsGdi2PlusText(string sourceName)
+        {
+            SetTextGDIPlusPropertiesRequestTextPropertyOnly request = new SetTextGDIPlusPropertiesRequestTextPropertyOnly()
+            {
+                Source = sourceName,
+                Text = String.Empty
+            };
+            await Obs_Get(request).ConfigureAwait(true);
+        }
+
+        private async void FetchWeatherData(object sender, DateTime e)
+        {
+            // URI for Weather JSON
+            Uri weatherUri = null;
+            if (!string.IsNullOrEmpty(Preferences.Default.obs_local_clock_weather_json_url))
+            {
+                weatherUri = new Uri(Preferences.Default.obs_local_clock_weather_json_url);
+            }
+            else if (WeatherJsonUri != null)
+            {
+                weatherUri = WeatherJsonUri;
+            }
+            // Early return if URI isn't valid
+            if (weatherUri == null)
+            {
+                return;
+            }
+            // Fetch JSON from URI
+            using HttpResponseMessage weatherdataResponse = await httpClient.GetAsync(weatherUri, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+            try
+            {
+                weatherdataResponse.EnsureSuccessStatusCode();
+            }
+            catch (HttpRequestException)
+            {
+                // How long should old data be used for?
+                return;
+            }
+            // Parse JSON
+            if (!(weatherdataResponse.Content.Headers.ContentType.MediaType == "application/json"))
+            {
+                return;
+            }
+            var responseStream = await weatherdataResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
+            try
+            {
+                WeatherDataCollection = await JsonSerializer.DeserializeAsync<WeatherData>(responseStream).ConfigureAwait(false);
+                if (CurrentLocalClockWeatherRecord == 0 && string.IsNullOrEmpty(PreviousLocalClockWeatherAttrib1))
+                {
+                    UpdateLocalWeather(this, DateTime.UtcNow);
+                }
+            }
+            catch (JsonException)
+            {
+                Trace.WriteLine("Error parsing JSON.");
+            }
+        }
+
+        private async void UpdateLocalWeather(object sender, DateTime e)
+        {
+            // Return early if nothing is changing this second
+            if (e.Second % Preferences.Default.obs_local_clock_cycle_delay > 0)
+            {
+                return;
+            }
+            // Return early if there is no weather data
+            if (WeatherDataCollection == null || WeatherDataCollection.Items.Count == 0)
+            {
+                return;
+            }
+            // Set hold time (display duration) for local weather to the configured default
+            int localWeatherHoldCount = Preferences.Default.obs_local_clock_cycle_delay;
+            // Get the total duration of one cycle of weather data locations
+            int localWeatherCycleTotalTime = WeatherDataCollection.Items.Count * Preferences.Default.obs_local_clock_cycle_delay;
+            // If total duration of a cycle is less than a minute, increase display duration of our location and weather
+            //  - i.e. if there are 10 weather data items, and we cycle every 5 seconds, we have a spare 10 seconds
+            if (localWeatherCycleTotalTime < 60)
+            {
+                localWeatherHoldCount += 60 - localWeatherCycleTotalTime;
+            }
+            if (CurrentLocalClockWeatherRecord == 0 && e.Second < localWeatherHoldCount && !string.IsNullOrEmpty(PreviousLocalClockWeatherAttrib1))
+            {
+                return;
+            }
+            if (FirstWeatherCycle && e.Second == 0)
+            {
+                FirstWeatherCycle = false;
+            }
+
+            string weatherSymbolText = WebUtility.HtmlDecode(WeatherDataCollection.Items[CurrentLocalClockWeatherRecord].Symbol);
+            string weatherTempText = WebUtility.HtmlDecode(WeatherDataCollection.Items[CurrentLocalClockWeatherRecord].Temperature);
+            string weatherLocationText = WebUtility.HtmlDecode(WeatherDataCollection.Items[CurrentLocalClockWeatherRecord].Location);
+            string weatherAttrib1Text = "Powered by";
+            string weatherAttrib2Text = "Met Office Data";
+
+            if (ObsSourceDictionary.ContainsKey(Preferences.Default.obs_local_clock_weather_symbol_source_name))
+            {
+                SetTextGDIPlusPropertiesRequestTextPropertyOnly weatherSymbol = new SetTextGDIPlusPropertiesRequestTextPropertyOnly()
+                {
+                    Source = Preferences.Default.obs_local_clock_weather_symbol_source_name,
+                    Text = weatherSymbolText
+                };
+                await Obs_Get(weatherSymbol).ConfigureAwait(true);
+            }
+            if (ObsSourceDictionary.ContainsKey(Preferences.Default.obs_local_clock_weather_temp_source_name))
+            {
+                SetTextGDIPlusPropertiesRequestTextPropertyOnly weatherTemp = new SetTextGDIPlusPropertiesRequestTextPropertyOnly()
+                {
+                    Source = Preferences.Default.obs_local_clock_weather_temp_source_name,
+                    Text = weatherTempText
+                };
+                await Obs_Get(weatherTemp).ConfigureAwait(true);
+            }
+            if (ObsSourceDictionary.ContainsKey(Preferences.Default.obs_local_clock_location_source_name))
+            {
+                SetTextGDIPlusPropertiesRequestTextPropertyOnly weatherLocation = new SetTextGDIPlusPropertiesRequestTextPropertyOnly()
+                {
+                    Source = Preferences.Default.obs_local_clock_location_source_name,
+                    Text = weatherLocationText
+                };
+                await Obs_Get(weatherLocation).ConfigureAwait(true);
+            }
+            if (ObsSourceDictionary.ContainsKey(Preferences.Default.obs_local_clock_weather_attrib1_source_name))
+            {
+                if (weatherAttrib1Text != PreviousLocalClockWeatherAttrib1)
+                {
+                    SetTextGDIPlusPropertiesRequestTextPropertyOnly weatherAttrib1 = new SetTextGDIPlusPropertiesRequestTextPropertyOnly()
+                    {
+                        Source = Preferences.Default.obs_local_clock_weather_attrib1_source_name,
+                        Text = weatherAttrib1Text
+                    };
+                    await Obs_Get(weatherAttrib1).ConfigureAwait(true);
+                }
+            }
+            if (ObsSourceDictionary.ContainsKey(Preferences.Default.obs_local_clock_weather_attrib2_source_name))
+            {
+                if (weatherAttrib2Text != PreviousLocalClockWeatherAttrib2)
+                {
+                    SetTextGDIPlusPropertiesRequestTextPropertyOnly weatherAttrib2 = new SetTextGDIPlusPropertiesRequestTextPropertyOnly()
+                    {
+                        Source = Preferences.Default.obs_local_clock_weather_attrib2_source_name,
+                        Text = weatherAttrib2Text
+                    };
+                    await Obs_Get(weatherAttrib2).ConfigureAwait(true);
+                }
+            }
+            if (FirstWeatherCycle || e.Second + Preferences.Default.obs_local_clock_cycle_delay < localWeatherHoldCount || ++CurrentLocalClockWeatherRecord >= WeatherDataCollection.Items.Count)
+            {
+                CurrentLocalClockWeatherRecord = 0;
+            }
         }
 
         private async Task PopulateSceneItemSources(IList<ObsSceneItem> sceneItems, ObsScene scene)
@@ -985,6 +1196,7 @@ namespace uk.JohnCook.dotnet.StreamController
                     ReconnectCountdownTimer.Dispose();
                     iconSemaphore.Dispose();
                     audioWorkarounds.Dispose();
+                    httpClient.Dispose();
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override finalizer
