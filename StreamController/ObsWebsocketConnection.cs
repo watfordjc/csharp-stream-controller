@@ -553,14 +553,14 @@ namespace uk.JohnCook.dotnet.StreamController
                 ObsScene firstScene = ObsSceneItemSceneDictionary[sceneItemId];
                 returnValue = GetSceneItemFromSceneItemId(sceneItemId, firstScene.Sources);
             }
-            if (returnValue == null && sceneItems != null)
+            if (returnValue == null)
             {
-                returnValue = sceneItems.Where(x => x.Id == sceneItemId).First();
+                returnValue = sceneItems.Where(x => x.Id == sceneItemId).FirstOrDefault();
             }
 
             if (returnValue == null)
             {
-                foreach (ObsSceneItem nextSceneItem in sceneItems.Where(x => x.GroupChildren.Count > 0).ToArray())
+                foreach (ObsSceneItem nextSceneItem in sceneItems.Where(x => x?.GroupChildren?.Count > 0).ToArray())
                 {
                     returnValue = GetSceneItemFromSceneItemId(sceneItemId, nextSceneItem.GroupChildren);
                     if (returnValue != null)
