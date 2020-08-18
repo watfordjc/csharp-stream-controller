@@ -14,8 +14,6 @@ namespace uk.JohnCook.dotnet.StreamController
 {
     public class ChronoTimer : INotifyPropertyChanged
     {
-        public DateTime CurrentUtcTime { get; internal set; }
-        public DateTime CurrentLocalTime { get; internal set; }
         public bool DateTimeSet { get; internal set; }
 
         public static ChronoTimer Instance { get { return lazySingleton.Value; } }
@@ -37,8 +35,10 @@ namespace uk.JohnCook.dotnet.StreamController
             );
 
         public event PropertyChangedEventHandler PropertyChanged;
+        public event EventHandler<DateTime> MinuteChanged;
+        public event EventHandler<DateTime> SecondChanged;
 
-        public ChronoTimer()
+        private ChronoTimer()
         {
             ICronTrigger cronTrigger = (ICronTrigger)chronoMinuteTrigger;
             cronTrigger.TimeZone = TimeZoneInfo.Utc;
@@ -47,49 +47,41 @@ namespace uk.JohnCook.dotnet.StreamController
             Scheduler = schedulerFactory.GetScheduler().Result;
             Scheduler.Start();
 
-            AddMinuteJob(JobBuilder.Create<ClockMinute>()
+            Scheduler.ScheduleJob(
+                JobBuilder.Create<ClockMinute>()
                 .WithIdentity("ClockMinute", "OBS")
-                .Build());
+                .Build(),
+                chronoMinuteTrigger);
 
-            AddSecondJob(JobBuilder.Create<ClockSecond>()
+            Scheduler.ScheduleJob(JobBuilder.Create<ClockSecond>()
                 .WithIdentity("ClockSecond", "OBS")
-                .Build());
-        }
-
-        public void AddMinuteJob(IJobDetail jobDetail)
-        {
-            Scheduler.ScheduleJob(jobDetail, chronoMinuteTrigger);
-        }
-
-        public void RemoveJob(TriggerKey triggerKey)
-        {
-            Scheduler.UnscheduleJob(triggerKey);
-        }
-
-        public void AddSecondJob(IJobDetail jobDetail)
-        {
-            Scheduler.ScheduleJob(jobDetail, chronoSecondTrigger);
+                .Build(),
+                chronoSecondTrigger);
         }
 
         public void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        public void NotifyMinuteChanged(DateTime dateTime)
+        {
+            MinuteChanged?.Invoke(this, dateTime);
+        }
+
+        public void NotifySecondChanged(DateTime dateTime)
+        {
+            SecondChanged?.Invoke(this, dateTime);
+        }
     }
 
     internal class ClockMinute : IJob
     {
+        public ClockMinute() { }
+
         public Task Execute(IJobExecutionContext context)
         {
-            ChronoTimer.Instance.CurrentUtcTime = DateTime.UtcNow;
-            ChronoTimer.Instance.CurrentLocalTime = DateTime.Now;
-            ChronoTimer.Instance.NotifyPropertyChanged(nameof(ChronoTimer.CurrentUtcTime));
-            ChronoTimer.Instance.NotifyPropertyChanged(nameof(ChronoTimer.CurrentLocalTime));
-            if (!ChronoTimer.Instance.DateTimeSet)
-            {
-                ChronoTimer.Instance.DateTimeSet = true;
-                ChronoTimer.Instance.NotifyPropertyChanged(nameof(ChronoTimer.DateTimeSet));
-            }
+            ChronoTimer.Instance.NotifyMinuteChanged(DateTime.UtcNow);
             return Task.CompletedTask;
         }
     }
@@ -98,15 +90,7 @@ namespace uk.JohnCook.dotnet.StreamController
     {
         public Task Execute(IJobExecutionContext context)
         {
-            ChronoTimer.Instance.CurrentUtcTime = DateTime.UtcNow;
-            ChronoTimer.Instance.CurrentLocalTime = DateTime.Now;
-            ChronoTimer.Instance.NotifyPropertyChanged(nameof(ChronoTimer.CurrentUtcTime));
-            ChronoTimer.Instance.NotifyPropertyChanged(nameof(ChronoTimer.CurrentLocalTime));
-            if (!ChronoTimer.Instance.DateTimeSet)
-            {
-                ChronoTimer.Instance.DateTimeSet = true;
-                ChronoTimer.Instance.NotifyPropertyChanged(nameof(ChronoTimer.DateTimeSet));
-            }
+            ChronoTimer.Instance.NotifySecondChanged(DateTime.UtcNow);
             return Task.CompletedTask;
         }
     }

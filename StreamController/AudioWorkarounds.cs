@@ -12,7 +12,7 @@ namespace uk.JohnCook.dotnet.StreamController
     public class AudioWorkarounds : IDisposable
     {
         private readonly TaskCompletionSource<bool> audioDevicesEnumerated = new TaskCompletionSource<bool>();
-        private WaveOutEvent silentAudioEvent = null;
+        private WaveOutEvent silentAudioEvent;
         private bool disposedValue;
 
         public AudioWorkarounds()

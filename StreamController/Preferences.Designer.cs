@@ -238,5 +238,53 @@ namespace uk.JohnCook.dotnet.StreamController {
                 this["obs_settings_changed"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("LocalClockTime")]
+        public string obs_local_clock_source_name {
+            get {
+                return ((string)(this["obs_local_clock_source_name"]));
+            }
+            set {
+                this["obs_local_clock_source_name"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool local_timezone_use_utc_offset {
+            get {
+                return ((bool)(this["local_timezone_use_utc_offset"]));
+            }
+            set {
+                this["local_timezone_use_utc_offset"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string local_timezone_dst_abbreviation {
+            get {
+                return ((string)(this["local_timezone_dst_abbreviation"]));
+            }
+            set {
+                this["local_timezone_dst_abbreviation"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string local_timezone_abbreviation {
+            get {
+                return ((string)(this["local_timezone_abbreviation"]));
+            }
+            set {
+                this["local_timezone_abbreviation"] = value;
+            }
+        }
     }
 }

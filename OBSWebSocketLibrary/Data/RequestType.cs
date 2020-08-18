@@ -319,6 +319,14 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.Data
             { ObsRequestType.GetTransitionPosition, typeof(ObsRequests.GetTransitionPositionRequest) }
             };
 
+        /// <summary>
+        /// Classes for partial requests are needed until .NET Core supports ignoring default properties during serialization
+        /// </summary>
+        private static readonly Dictionary<Type, ObsRequestType> partialRequestDictionary = new Dictionary<Type, ObsRequestType>()
+        {
+            { typeof(ObsRequests.SetTextGDIPlusPropertiesRequestTextPropertyOnly), ObsRequestType.SetTextGDIPlusProperties }
+        };
+
         public static Type GetType(ObsRequestType requestType)
         {
             return requestDictionary.TryGetValue(requestType, out Type value) ? value : null;
@@ -331,7 +339,15 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.Data
 
         public static Data.ObsRequestType GetRequestEnum(Type objectType)
         {
-            return requestDictionary.FirstOrDefault(k => k.Value == objectType).Key;
+            Data.ObsRequestType type = requestDictionary.FirstOrDefault(k => k.Value == objectType).Key;
+            if (type != default)
+            {
+                return type;
+            }
+            else
+            {
+                return partialRequestDictionary.TryGetValue(objectType, out ObsRequestType value) ? value : value;
+            }
         }
     }
 }

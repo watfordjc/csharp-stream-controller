@@ -42,7 +42,7 @@ namespace uk.JohnCook.dotnet.StreamController
     /// </summary>
     public partial class WebSocketTest : StyledWindow
     {
-        private bool autoscroll = false;
+        private bool autoscroll;
         private int reconnectDelay;
         private readonly int SCROLL_BUFFER_MAX_CHARS = 65000;
         private readonly SynchronizationContext _Context;

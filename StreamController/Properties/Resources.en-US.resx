@@ -257,6 +257,14 @@
     <value>The next time you open Preferences the password box will contain placeholder text.</value>
     <comment>Dialog box text - password will be replaced with placeholder text when preferences window is next opened.</comment>
   </data>
+  <data name="obs_time_display_format" xml:space="preserve">
+    <value>{0} {1}</value>
+    <comment>Display format for OBS clocks</comment>
+  </data>
+  <data name="obs_time_string_format" xml:space="preserve">
+    <value>HH:mm</value>
+    <comment>Time format string for OBS clocks</comment>
+  </data>
   <data name="text_aok" xml:space="preserve">
     <value>AOK</value>
     <comment>Text - AOK</comment>

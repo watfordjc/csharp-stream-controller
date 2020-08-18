@@ -34,7 +34,7 @@ namespace uk.JohnCook.dotnet.StreamController
 
         private readonly SynchronizationContext _Context;
         private readonly AudioWorkarounds audioWorkarounds = new AudioWorkarounds();
-        private readonly ChronoTimer chronoTimer = new ChronoTimer();
+        private readonly ChronoTimer chronoTimer = ChronoTimer.Instance;
         public static ObsWebsocketConnection Instance { get { return lazySingleton.Value; } }
         public ObsWsClient Client { get; private set; }
         public string ConnectionStatus { get; private set; } = Properties.Resources.text_disconnected;
@@ -43,12 +43,14 @@ namespace uk.JohnCook.dotnet.StreamController
         public Brush ConnectionStatusBrush { get; private set; } = Brushes.Gray;
 
         public ObservableCollection<ObsScene> SceneList { get; } = new ObservableCollection<ObsScene>();
-        public ObsScene CurrentScene { get; private set; } = null;
+        public ObsScene CurrentScene { get; private set; }
         public List<int> SourceOrderList { get; } = new List<int>();
         public string NextScene { get; private set; } = String.Empty;
         public GetSourceTypesListReply SourceTypes { get; private set; }
         private Dictionary<string, object> ObsSourceDictionary { get; } = new Dictionary<string, object>();
         private Dictionary<int, ObsScene> ObsSceneItemSceneDictionary { get; } = new Dictionary<int, ObsScene>();
+
+        private string TimezoneString { get; set; }
 
         public static readonly Brush PrimaryBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(0xFF, 0xE2, 0xC1, 0xEA));
         public static readonly Brush SecondaryBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(0xFF, 0xC5, 0xC0, 0xEB));
@@ -81,6 +83,7 @@ namespace uk.JohnCook.dotnet.StreamController
             {
                 AudioDevicesEnumerated(this, EventArgs.Empty);
             }
+            UpdateTimezoneString();
         }
 
         private void AudioDevicesEnumerated(object sender, EventArgs e)
@@ -105,7 +108,7 @@ namespace uk.JohnCook.dotnet.StreamController
             }
 
             CreateClient();
-            SystemTrayIcon.Instance.UpdateTrayIcon();
+            SystemTrayIcon.Instance.UpdateTrayIcon().ConfigureAwait(true).GetAwaiter();
             if (Client.AutoReconnect)
             {
                 await Connect().ConfigureAwait(false);
@@ -277,6 +280,7 @@ namespace uk.JohnCook.dotnet.StreamController
             NotifyPropertyChanged(nameof(NextScene));
             SourceTypes = null;
             NotifyPropertyChanged(nameof(SourceTypes));
+            ChronoTimer.Instance.MinuteChanged -= UpdateLocalClock;
             ObsSourceDictionary.Clear();
             ObsSceneItemSceneDictionary.Clear();
         }
@@ -446,6 +450,11 @@ namespace uk.JohnCook.dotnet.StreamController
                     Debug.Assert(SourceTypes.Types.Any(x => x.TypeId == sourceSettings.SourceType), $"Source type {sourceSettings.SourceType} isn't in list from server.");
                     newSource.Type = SourceTypes.Types.First(x => x.TypeId == sourceSettings.SourceType);
                     ObsSourceDictionary[newSource.Name] = newSource;
+                    if (newSource.Name == Preferences.Default.obs_local_clock_source_name)
+                    {
+                        UpdateLocalClock(this, DateTime.UtcNow);
+                        ChronoTimer.Instance.MinuteChanged += UpdateLocalClock;
+                    }
                     await Obs_Get(ObsRequestType.GetSourceFilters, sourceSettings.SourceName).ConfigureAwait(true);
                     break;
                 case ObsRequestType.GetSourceFilters:
@@ -474,6 +483,46 @@ namespace uk.JohnCook.dotnet.StreamController
                 default:
                     break;
             }
+        }
+
+        /// <summary>
+        /// Update the current timezone abbreviation
+        /// </summary>
+        private void UpdateTimezoneString()
+        {
+            if (Preferences.Default.local_timezone_use_utc_offset)
+            {
+                TimeSpan utcOffset = DateTimeOffset.Now.Offset;
+                int utcHourOffset = utcOffset.Hours;
+                string utcHourOffsetString = utcHourOffset > -1 ? $"+{utcHourOffset}" : utcHourOffset.ToString(CultureInfo.InvariantCulture);
+                int utcMinuteOffset = utcOffset.Minutes;
+                string utcMinuteOffsetString = utcMinuteOffset > 0 ? $":{utcMinuteOffset.ToString(CultureInfo.InvariantCulture)}" : "";
+                TimezoneString = $"UTC{utcHourOffsetString}{utcMinuteOffsetString}";
+            }
+            else
+            {
+                // NB: WPF has no timezone abbreviation lookup table.
+                if (TimeZoneInfo.Local.IsDaylightSavingTime(DateTime.Now))
+                {
+                    TimezoneString = !string.IsNullOrEmpty(Preferences.Default.local_timezone_dst_abbreviation) ? Preferences.Default.local_timezone_dst_abbreviation : "?????";
+                } else
+                {
+                    TimezoneString = !string.IsNullOrEmpty(Preferences.Default.local_timezone_abbreviation) ? Preferences.Default.local_timezone_abbreviation : "?????";
+                }
+            }
+
+        }
+
+        private async void UpdateLocalClock(object sender, DateTime e)
+        {
+            string localDisplayTime = String.Format(CultureInfo.CurrentCulture, Properties.Resources.obs_time_display_format, e.ToLocalTime().ToString(Properties.Resources.obs_time_string_format, CultureInfo.InvariantCulture), TimezoneString);
+            SetTextGDIPlusPropertiesRequestTextPropertyOnly request = new SetTextGDIPlusPropertiesRequestTextPropertyOnly()
+            {
+                Source = Preferences.Default.obs_local_clock_source_name,
+                Text = localDisplayTime
+            };
+            await Obs_Get(request).ConfigureAwait(true);
+            Trace.WriteLine($"{localDisplayTime}");
         }
 
         private async Task PopulateSceneItemSources(IList<ObsSceneItem> sceneItems, ObsScene scene)
@@ -602,7 +651,9 @@ namespace uk.JohnCook.dotnet.StreamController
             ObsSceneItem sceneItem = scene.Sources.FirstOrDefault(x => x.Name == messageObject.ItemName);
             if (sceneItem != default)
             {
-                scene.Sources.Remove(sceneItem);
+                _Context.Send(
+                    x => scene.Sources.Remove(sceneItem),
+                    null);
             }
         }
 
@@ -633,14 +684,18 @@ namespace uk.JohnCook.dotnet.StreamController
         private void SourceDestroyed_Event(SourceDestroyedObsEvent messageObject)
         {
             ObsSourceDictionary.Remove(messageObject.SourceName);
+            if (messageObject.SourceName == Preferences.Default.obs_local_clock_source_name)
+            {
+                ChronoTimer.Instance.MinuteChanged -= UpdateLocalClock;
+            }
             if (ObsTypes.ObsTypeNameDictionary[messageObject.SourceKind] == ObsSourceType.Scene)
             {
                 ObsScene scene = SceneList.FirstOrDefault(x => x.Name == messageObject.SourceName);
                 if (scene != default)
                 {
                     _Context.Send(
-                    x => SceneList.Remove(scene),
-                    null);
+                        x => SceneList.Remove(scene),
+                        null);
                 }
             }
         }
@@ -817,6 +872,11 @@ namespace uk.JohnCook.dotnet.StreamController
                 default:
                     return Guid.Empty;
             }
+            return await Client.ObsSend(request).ConfigureAwait(true);
+        }
+
+        private async ValueTask<Guid> Obs_Get(object request)
+        {
             return await Client.ObsSend(request).ConfigureAwait(true);
         }
 

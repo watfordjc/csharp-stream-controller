@@ -150,6 +150,14 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequests
         public bool Vertical { get; set; }
     }
 
+    public class SetTextGDIPlusPropertiesRequestTextPropertyOnly : RequestBase
+    {
+        [JsonPropertyName("source")]
+        public string Source { get; set; }
+        [JsonPropertyName("text")]
+        public string Text { get; set; }
+    }
+
     public class GetTextFreetype2PropertiesRequest : RequestBase
     {
         [JsonPropertyName("source")]

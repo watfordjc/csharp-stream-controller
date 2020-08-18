@@ -56,5 +56,17 @@
     <Setting Name="obs_settings_changed" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="obs_local_clock_source_name" Type="System.String" Scope="User">
+      <Value Profile="(Default)">LocalClockTime</Value>
+    </Setting>
+    <Setting Name="local_timezone_use_utc_offset" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="local_timezone_dst_abbreviation" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="local_timezone_abbreviation" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

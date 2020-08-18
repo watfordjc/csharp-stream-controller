@@ -36,7 +36,7 @@ namespace uk.JohnCook.dotnet.StreamController
 
         private async void Window_ContentRendered(object sender, EventArgs e)
         {
-            SystemTrayIcon.Instance.UpdateTrayIcon();
+            SystemTrayIcon.Instance.UpdateTrayIcon().ConfigureAwait(true).GetAwaiter();
             if (ObsWebsocketConnection.Instance.Client == null)
             {
                 ObsWebsocketConnection.CreateClient();

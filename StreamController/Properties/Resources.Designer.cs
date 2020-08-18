@@ -436,6 +436,24 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} {1}.
+        /// </summary>
+        public static string obs_time_display_format {
+            get {
+                return ResourceManager.GetString("obs_time_display_format", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to HH:mm.
+        /// </summary>
+        public static string obs_time_string_format {
+            get {
+                return ResourceManager.GetString("obs_time_string_format", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to AOK.
         /// </summary>
         public static string text_aok {
