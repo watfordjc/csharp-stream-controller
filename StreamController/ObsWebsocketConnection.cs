@@ -300,6 +300,7 @@ namespace uk.JohnCook.dotnet.StreamController
             ChronoTimer.Instance.SecondChanged -= UpdateLocalWeather;
             ChronoTimer.Instance.MinuteChanged -= SlideShowNextSlide;
             ChronoTimer.Instance.SecondChanged -= SlideShowNextSlide;
+            FirstWeatherCycle = true;
             ObsSourceDictionary.Clear();
             ObsSceneItemSceneDictionary.Clear();
         }
@@ -838,8 +839,18 @@ namespace uk.JohnCook.dotnet.StreamController
         {
             if (SceneList.Any(x => x.Name == messageObject.SceneName))
             {
+                if (CurrentScene.Sources.Where(x => x.Name == Preferences.Default.obs_slideshow_source_name).Any())
+                {
+                    ChronoTimer.Instance.MinuteChanged -= SlideShowNextSlide;
+                    ChronoTimer.Instance.SecondChanged -= SlideShowNextSlide;
+                }
                 CurrentScene = SceneList.First(x => x.Name == messageObject.SceneName);
                 NotifyPropertyChanged(nameof(CurrentScene));
+                if (CurrentScene.Sources.Where(x => x.Name == Preferences.Default.obs_slideshow_source_name).Any())
+                {
+                    ChronoTimer.Instance.MinuteChanged += SlideShowNextSlide;
+                    ChronoTimer.Instance.SecondChanged += SlideShowNextSlide;
+                }
             }
         }
 
