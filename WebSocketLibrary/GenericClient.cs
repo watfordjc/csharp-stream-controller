@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Net.WebSockets;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -180,7 +181,7 @@ namespace uk.JohnCook.dotnet.WebSocketLibrary
         /// Try to connect once (no retries).
         /// </summary>
         /// <returns>True if connected.</returns>
-        public async Task<bool> ConnectAsync()
+        public async Task<bool> ConnectAsync([CallerMemberName] string callingMethod = "")
         {
             if (_Client == null)
             {
@@ -191,6 +192,10 @@ namespace uk.JohnCook.dotnet.WebSocketLibrary
             {
                 return true;
             }
+            if (connectionCancellation == null)
+            {
+                connectionCancellation = new CancellationTokenSource();
+            }
             try
             {
                 await _Client.ConnectAsync(_ServerUrl, connectionCancellation.Token).ConfigureAwait(false);
@@ -199,9 +204,16 @@ namespace uk.JohnCook.dotnet.WebSocketLibrary
             {
                 OnErrorState(e, -1);
             }
-            catch (WebSocketException)
+            catch (WebSocketException we)
             {
-                throw;
+                if (callingMethod != nameof(AutoReconnectConnectAsync))
+                {
+                    OnErrorState(we, -1);
+                }
+                else
+                {
+                    throw;
+                }
             }
             finally
             {
