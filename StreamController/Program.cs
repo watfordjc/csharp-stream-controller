@@ -43,14 +43,14 @@ namespace uk.JohnCook.dotnet.StreamController
             {
                 App application = new App
                 {
-                    StartupUri = new Uri("AudioCheck.xaml", UriKind.Relative),
+                    StartupUri = new Uri("pack://application:,,,/AudioCheck.xaml", UriKind.Absolute),
                     Resources = new ResourceDictionary()
                 };
-                ResourceDictionary dictionary = new ResourceDictionary
+                ResourceDictionary appMenuBarDictionary = new ResourceDictionary
                 {
-                    Source = new Uri(@"Properties\Menus.xaml", UriKind.Relative)
+                    Source = new Uri("pack://application:,,,/Properties/Menus.xaml", UriKind.Absolute)
                 };
-                application.Resources.MergedDictionaries.Add(dictionary);
+                application.Resources.MergedDictionaries.Add(appMenuBarDictionary);
                 application.Run();
             }
         }

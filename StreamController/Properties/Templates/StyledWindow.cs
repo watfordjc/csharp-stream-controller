@@ -39,6 +39,7 @@ namespace uk.JohnCook.dotnet.StreamController.Controls
         /// <param name="applicationWindow">Whether this is an application window (true) or a Windows window (false).</param>
         public StyledWindow(bool applicationWindow = true)
         {
+            SetResourceReference(StyleProperty, typeof(StyledWindow));
             IsApplicationWindow = applicationWindow;
             CurrentTheme = GetApplicableTheme();
             CreateResourceDictionary(CurrentTheme);
@@ -60,6 +61,11 @@ namespace uk.JohnCook.dotnet.StreamController.Controls
 
             App.Current.Resources["DpiX"] = dpiXProperty.GetValue(null, null);
             App.Current.Resources["DpiY"] = dpiYProperty.GetValue(null, null);
+        }
+
+        public override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
         }
 
         /// <summary>
