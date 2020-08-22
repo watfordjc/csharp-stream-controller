@@ -394,5 +394,53 @@ namespace uk.JohnCook.dotnet.StreamController {
                 this["obs_local_clock_cycle_delay"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Powered by")]
+        public string obs_local_clock_weather_attrib1_text {
+            get {
+                return ((string)(this["obs_local_clock_weather_attrib1_text"]));
+            }
+            set {
+                this["obs_local_clock_weather_attrib1_text"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Met Office Data")]
+        public string obs_local_clock_weather_attrib2_text {
+            get {
+                return ((string)(this["obs_local_clock_weather_attrib2_text"]));
+            }
+            set {
+                this["obs_local_clock_weather_attrib2_text"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("F20")]
+        public string obs_slideshow_next_scene_hotkey {
+            get {
+                return ((string)(this["obs_slideshow_next_scene_hotkey"]));
+            }
+            set {
+                this["obs_slideshow_next_scene_hotkey"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int obs_local_clock_weather_json_url_fetch_delay {
+            get {
+                return ((int)(this["obs_local_clock_weather_json_url_fetch_delay"]));
+            }
+            set {
+                this["obs_local_clock_weather_json_url_fetch_delay"] = value;
+            }
+        }
     }
 }

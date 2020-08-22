@@ -95,5 +95,17 @@
     <Setting Name="obs_local_clock_cycle_delay" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">5</Value>
     </Setting>
+    <Setting Name="obs_local_clock_weather_attrib1_text" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Powered by</Value>
+    </Setting>
+    <Setting Name="obs_local_clock_weather_attrib2_text" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Met Office Data</Value>
+    </Setting>
+    <Setting Name="obs_slideshow_next_scene_hotkey" Type="System.String" Scope="User">
+      <Value Profile="(Default)">F20</Value>
+    </Setting>
+    <Setting Name="obs_local_clock_weather_json_url_fetch_delay" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">1</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
