@@ -291,7 +291,7 @@ namespace uk.JohnCook.dotnet.WebSocketLibrary
         /// <returns>True if message sent.</returns>
         public async Task<bool> SendMessageAsync(ReadOnlyMemory<byte> message)
         {
-            if (_Client.State != WebSocketState.Open)
+            if (_Client?.State != WebSocketState.Open)
             {
                 return false;
             }

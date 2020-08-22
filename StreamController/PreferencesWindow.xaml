@@ -31,30 +31,447 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <local:BooleanInverterConverter x:Key="BooleanInverterConverter" />
     </Window.Resources>
-    <ScrollViewer VerticalScrollBarVisibility="Auto"
-                  Margin="16 0">
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="16" />
-                <ColumnDefinition Width="auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="16" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="16" />
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="16" />
-            </Grid.RowDefinitions>
-            <GroupBox Header="{x:Static props:Resources.application_name_obs_websocket}"
-                      Grid.Row="1"
-                      Grid.Column="1"
-                      Grid.ColumnSpan="2"
-                      Padding="4">
-                <StackPanel Orientation="Vertical">
-                    <GroupBox Header="{x:Static props:Resources.window_preferences_groupbox_server_uri_label}"
+    <TabControl>
+        <TabItem Header="{x:Static props:Resources.application_name_obs_websocket}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto"
+                          Margin="16 0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="16" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="16" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="16" />
+                    </Grid.RowDefinitions>
+                    <StackPanel Orientation="Vertical"
+                                Grid.Row="1"
+                                Grid.Column="1"
+                                Grid.ColumnSpan="2">
+                        <GroupBox Header="{x:Static props:Resources.window_preferences_groupbox_server_uri_label}"
+                                  Margin="4"
+                                  Padding="4">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto" />
+                                    <ColumnDefinition Width="auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                </Grid.RowDefinitions>
+                                <Label Grid.Row="0"
+                                       Grid.Column="0"
+                                       x:Name="scheme_label"
+                                       Content="{x:Static props:Resources.window_preferences_scheme_label}"
+                                       Target="{Binding ElementName=cbUriProtocol}"
+                                       Margin="8 4 2 4"
+                                       VerticalAlignment="Center" />
+                                <StackPanel Grid.Row="0"
+                                            Grid.Column="1"
+                                            Orientation="Horizontal">
+                                    <ComboBox SelectedIndex="0"
+                                              AutomationProperties.LabeledBy="{Binding ElementName=scheme_label}"
+                                              Margin="2 4 8 4"
+                                              Padding="5"
+                                              MinWidth="50"
+                                              VerticalContentAlignment="Center"
+                                              x:Name="cbUriProtocol"
+                                              FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
+                                        <ComboBoxItem Content="ws" />
+                                        <ComboBoxItem Content="wss" />
+                                        <ComboBox.SelectedItem>
+                                            <Binding Path="SelectedItem"
+                                                     Mode="OneWay"
+                                                     ElementName="cbUriProtocol">
+                                                <Binding.ValidationRules>
+                                                    <v:ComboBoxOneItemSelected ValidatesOnTargetUpdated="True" />
+                                                </Binding.ValidationRules>
+                                            </Binding>
+                                        </ComboBox.SelectedItem>
+                                    </ComboBox>
+                                    <TextBlock VerticalAlignment="Center"
+                                               Margin="8 4 8 4"
+                                               Foreground="{DynamicResource Text.Static.Error}"
+                                               FontWeight="SemiBold"
+                                               AutomationProperties.LiveSetting="Polite"
+                                               IsVisibleChanged="ValidationErrorTextBlock_IsVisibleChanged">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ElementName=cbUriProtocol, Path=(Validation.HasError)}"
+                                                                 Value="True">
+                                                        <Setter Property="Text"
+                                                                Value="{Binding ElementName=cbUriProtocol, Path=(Validation.Errors).CurrentItem.ErrorContent}" />
+                                                        <Setter Property="Focusable"
+                                                                Value="True" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding ElementName=cbUriProtocol, Path=(Validation.HasError)}"
+                                                                 Value="False">
+                                                        <Setter Property="Visibility"
+                                                                Value="Collapsed" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </StackPanel>
+                                <Label Grid.Column="0"
+                                       Grid.Row="1"
+                                       x:Name="hostname_label"
+                                       Content="{x:Static props:Resources.window_preferences_hostname_label}"
+                                       Target="{Binding ElementName=tbUriHostname}"
+                                       VerticalAlignment="Center"
+                                       Margin="8 4 2 4" />
+                                <TextBox Grid.Column="1"
+                                         Grid.Row="1"
+                                         Grid.ColumnSpan="2"
+                                         Style="{DynamicResource TextBoxStyle}"
+                                         AutomationProperties.LabeledBy="{Binding ElementName=hostname_label}"
+                                         VerticalAlignment="Center"
+                                         Margin="2 4 2 4"
+                                         Padding="5"
+                                         MinWidth="200"
+                                         x:Name="tbUriHostname"
+                                         FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
+                                    <TextBox.Text>
+                                        <Binding Path="obs_uri_host"
+                                                 UpdateSourceTrigger="PropertyChanged"
+                                                 Source="{x:Static local:Preferences.Default}"
+                                                 Mode="TwoWay">
+                                            <Binding.ValidationRules>
+                                                <v:Hostname />
+                                            </Binding.ValidationRules>
+                                        </Binding>
+                                    </TextBox.Text>
+                                </TextBox>
+                                <TextBlock Grid.Row="2"
+                                           Grid.Column="1"
+                                           Grid.ColumnSpan="3"
+                                           Margin="8 4 4 4"
+                                           Foreground="{DynamicResource Text.Static.Error}"
+                                           FontWeight="SemiBold"
+                                           AutomationProperties.LiveSetting="Polite"
+                                           IsVisibleChanged="ValidationErrorTextBlock_IsVisibleChanged">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ElementName=tbUriHostname, Path=(Validation.HasError)}"
+                                                             Value="True">
+                                                    <Setter Property="Text"
+                                                            Value="{Binding ElementName=tbUriHostname, Path=(Validation.Errors).CurrentItem.ErrorContent}" />
+                                                    <Setter Property="Focusable"
+                                                            Value="True" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding ElementName=tbUriHostname, Path=(Validation.HasError)}"
+                                                             Value="False">
+                                                    <Setter Property="Visibility"
+                                                            Value="Collapsed" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                                <Label Grid.Row="3"
+                                       Grid.Column="0"
+                                       x:Name="port_label"
+                                       Content="{x:Static props:Resources.window_preferences_port_label}"
+                                       Target="{Binding ElementName=tbUriPort}"
+                                       VerticalAlignment="Center"
+                                       Margin="8 4 2 4" />
+                                <StackPanel Grid.Row="3"
+                                            Grid.Column="1"
+                                            Orientation="Horizontal">
+                                    <TextBox AutomationProperties.LabeledBy="{Binding ElementName=port_label}"
+                                             Style="{DynamicResource TextBoxStyle}"
+                                             TextAlignment="Center"
+                                             VerticalAlignment="Center"
+                                             MinWidth="60"
+                                             Padding="5"
+                                             Margin="2 4 8 4"
+                                             x:Name="tbUriPort"
+                                             FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
+                                        <TextBox.Text>
+                                            <Binding Path="obs_uri_port"
+                                                     UpdateSourceTrigger="PropertyChanged"
+                                                     Source="{x:Static local:Preferences.Default}"
+                                                     Mode="TwoWay">
+                                                <Binding.ValidationRules>
+                                                    <v:PortNumber />
+                                                </Binding.ValidationRules>
+                                            </Binding>
+                                        </TextBox.Text>
+                                    </TextBox>
+                                    <TextBlock VerticalAlignment="Center"
+                                               Margin="4 4 8 4"
+                                               Foreground="{DynamicResource Text.Static.Error}"
+                                               FontWeight="SemiBold"
+                                               AutomationProperties.LiveSetting="Polite"
+                                               IsVisibleChanged="ValidationErrorTextBlock_IsVisibleChanged">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ElementName=tbUriPort, Path=(Validation.HasError)}"
+                                                                 Value="True">
+                                                        <Setter Property="Text"
+                                                                Value="{Binding ElementName=tbUriPort, Path=(Validation.Errors).CurrentItem.ErrorContent}" />
+                                                        <Setter Property="Focusable"
+                                                                Value="True" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding ElementName=tbUriPort, Path=(Validation.HasError)}"
+                                                                 Value="False">
+                                                        <Setter Property="Visibility"
+                                                                Value="Collapsed" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </StackPanel>
+                            </Grid>
+                        </GroupBox>
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox Content="{x:Static props:Resources.window_preferences_use_password_label}"
+                                      Margin="8 6"
+                                      Padding="5"
+                                      VerticalContentAlignment="Center"
+                                      VerticalAlignment="Center"
+                                      x:Name="cbUsePassword"
+                                      IsChecked="{Binding Path=obs_use_password, Source={x:Static local:Preferences.Default}, Mode=OneWay}"
+                                      FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
+                            <PasswordBox AutomationProperties.Name="{x:Static props:Resources.window_preferences_password_automation_name}"
+                                         MinWidth="160"
+                                         Style="{DynamicResource PasswordBoxStyle}"
+                                         PasswordChar="_"
+                                         x:Name="pbPassword"
+                                         Margin="0 6"
+                                         Padding="5"
+                                         IsEnabled="{Binding ElementName=cbUsePassword, Path=IsChecked}"
+                                         FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox Content="{x:Static props:Resources.window_preferences_connect_on_launch}"
+                                      VerticalContentAlignment="Center"
+                                      Margin="8 6"
+                                      Padding="5"
+                                      x:Name="cbConnectLaunch"
+                                      IsChecked="{Binding Path=obs_connect_launch, Source={x:Static local:Preferences.Default}}"
+                                      FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
+                            <CheckBox Content="{x:Static props:Resources.window_preferences_automatic_reconnect}"
+                                      VerticalContentAlignment="Center"
+                                      Margin="8 6"
+                                      Padding="5"
+                                      x:Name="cbAutoReconnect"
+                                      IsChecked="{Binding Path=obs_auto_reconnect, Source={x:Static local:Preferences.Default}}"
+                                      FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
+                        </StackPanel>
+                        <GroupBox Header="{x:Static props:Resources.window_preferences_groupbox_backoff}"
+                                  Margin="8 4">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="auto" />
+                                    <ColumnDefinition Width="auto" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                </Grid.RowDefinitions>
+                                <Label x:Name="minBackoffLabel"
+                                       Grid.Row="0"
+                                       Grid.Column="0"
+                                       Content="{x:Static props:Resources.window_preferences_backoff_min_label}"
+                                       Target="{Binding ElementName=tbBackoffMin}"
+                                       Margin="2 4"
+                                       VerticalAlignment="Center" />
+                                <TextBox AutomationProperties.Name="{x:Static props:Resources.window_preferences_backoff_min_automation_name}"
+                                         Grid.Row="0"
+                                         Grid.Column="1"
+                                         Margin="2 4"
+                                         Style="{DynamicResource TextBoxStyle}"
+                                         VerticalAlignment="Center"
+                                         Width="40"
+                                         Padding="5"
+                                         TextAlignment="Right"
+                                         x:Name="tbBackoffMin"
+                                         FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
+                                    <TextBox.Text>
+                                        <Binding Path="obs_reconnect_min_seconds"
+                                                 UpdateSourceTrigger="PropertyChanged"
+                                                 Source="{x:Static local:Preferences.Default}"
+                                                 Mode="TwoWay">
+                                            <Binding.ValidationRules>
+                                                <v:NumberGreaterZero />
+                                            </Binding.ValidationRules>
+                                        </Binding>
+                                    </TextBox.Text>
+                                </TextBox>
+                                <TextBlock Grid.Row="0"
+                                           Grid.Column="2"
+                                           Text="{x:Static props:Resources.text_seconds}"
+                                           Margin="2 4"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Grid.Row="1"
+                                           Grid.Column="0"
+                                           Grid.ColumnSpan="3"
+                                           TextAlignment="Right"
+                                           Margin="8 2 8 4"
+                                           Foreground="{DynamicResource Text.Static.Error}"
+                                           FontWeight="SemiBold"
+                                           AutomationProperties.LiveSetting="Polite"
+                                           IsVisibleChanged="ValidationErrorTextBlock_IsVisibleChanged">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ElementName=tbBackoffMin, Path=(Validation.HasError), UpdateSourceTrigger=PropertyChanged}"
+                                                             Value="True">
+                                                    <Setter Property="Text"
+                                                            Value="{Binding ElementName=tbBackoffMin, Path=(Validation.Errors).CurrentItem.ErrorContent}" />
+                                                    <Setter Property="Focusable"
+                                                            Value="True" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding ElementName=tbBackoffMin, Path=(Validation.HasError)}"
+                                                             Value="False">
+                                                    <Setter Property="Visibility"
+                                                            Value="Collapsed" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                                <Label x:Name="maxBackoffLabel"
+                                       Grid.Row="2"
+                                       Grid.Column="0"
+                                       Content="{x:Static props:Resources.window_preferences_backoff_max_label}"
+                                       Target="{Binding ElementName=tbBackoffMax}"
+                                       Margin="2 4"
+                                       VerticalAlignment="Center" />
+                                <TextBox AutomationProperties.Name="{x:Static props:Resources.window_preferences_backoff_max_automation_name}"
+                                         Grid.Row="2"
+                                         Grid.Column="1"
+                                         Margin="2 4"
+                                         Style="{DynamicResource TextBoxStyle}"
+                                         VerticalAlignment="Center"
+                                         Width="40"
+                                         Padding="5"
+                                         TextAlignment="Right"
+                                         x:Name="tbBackoffMax"
+                                         FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
+                                    <TextBox.Text>
+                                        <Binding Path="obs_reconnect_max_minutes"
+                                                 UpdateSourceTrigger="PropertyChanged"
+                                                 Source="{x:Static local:Preferences.Default}"
+                                                 Mode="TwoWay">
+                                            <Binding.ValidationRules>
+                                                <v:NumberGreaterZero />
+                                            </Binding.ValidationRules>
+                                        </Binding>
+                                    </TextBox.Text>
+                                </TextBox>
+                                <TextBlock Grid.Row="2"
+                                           Grid.Column="2"
+                                           Text="{x:Static props:Resources.text_minutes}"
+                                           Margin="2 4"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Grid.Row="3"
+                                           Grid.Column="0"
+                                           Grid.ColumnSpan="3"
+                                           TextAlignment="Right"
+                                           Margin="8 2 8 4"
+                                           Foreground="{DynamicResource Text.Static.Error}"
+                                           FontWeight="SemiBold"
+                                           AutomationProperties.LiveSetting="Polite"
+                                           IsVisibleChanged="ValidationErrorTextBlock_IsVisibleChanged">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ElementName=tbBackoffMax, Path=(Validation.HasError)}"
+                                                             Value="True">
+                                                    <Setter Property="Text"
+                                                            Value="{Binding ElementName=tbBackoffMax, Path=(Validation.Errors).CurrentItem.ErrorContent}" />
+                                                    <Setter Property="Focusable"
+                                                            Value="True" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding ElementName=tbBackoffMax, Path=(Validation.HasError)}"
+                                                             Value="False">
+                                                    <Setter Property="Visibility"
+                                                            Value="Collapsed" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Grid>
+                        </GroupBox>
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox Content="{x:Static props:Resources.window_preferences_auto_scroll}"
+                                      VerticalContentAlignment="Center"
+                                      Padding="6"
+                                      Margin="8 6"
+                                      x:Name="cbAutoscroll"
+                                      IsChecked="{Binding Path=obs_autoscroll, Source={x:Static local:Preferences.Default}, Mode=TwoWay}"
+                                      FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
+                        </StackPanel>
+                    </StackPanel>
+                    <StackPanel Margin="0 12 0 0"
+                                HorizontalAlignment="Right"
+                                Orientation="Horizontal"
+                                Grid.Row="2"
+                                Grid.Column="2">
+                        <TextBlock Margin="16 0"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Text.Static.Error}"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Right"
+                                   Grid.Row="0"
+                                   Grid.Column="1"
+                                   x:Name="save_validation_error"
+                                   AutomationProperties.LiveSetting="Polite"
+                                   Text="{x:Static props:Resources.validation_error_window_preferences_save}"
+                                   Visibility="Hidden" />
+                        <Button x:Name="save_button"
+                                Content="{x:Static props:Resources.button_save}"
+                                Padding="7 4"
+                                Click="SaveButton_Click"
+                                AutomationProperties.AcceleratorKey="{x:Static props:Resources.button_save_accelerator}"
+                                FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
+                    </StackPanel>
+                </Grid>
+            </ScrollViewer>
+        </TabItem>
+        <TabItem Header="{x:Static props:Resources.window_preferences_tab_obs_sync}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="16" />
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="16" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="16" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="16" />
+                </Grid.RowDefinitions>
+                <StackPanel Orientation="Vertical"
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Grid.ColumnSpan="2">
+                    <GroupBox Header="{x:Static props:Resources.window_preferences_groupbox_clock_weather}"
                               Margin="4"
                               Padding="4">
                         <Grid>
@@ -69,386 +486,408 @@
                                 <RowDefinition Height="auto" />
                                 <RowDefinition Height="auto" />
                                 <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
                             </Grid.RowDefinitions>
-                            <Label Grid.Row="0"
+                            <StackPanel Orientation="Horizontal"
+                                        Grid.Row="0"
+                                        Grid.Column="0"
+                                        Grid.ColumnSpan="2">
+                                <CheckBox Content="{x:Static props:Resources.window_preferences_custom_timezone}"
+                                          Margin="8 6 12 6"
+                                          Padding="5"
+                                          VerticalContentAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          x:Name="CheckBoxLocalClockCustomTimezone"
+                                          IsChecked="{Binding Path=local_timezone_use_utc_offset, Source={x:Static local:Preferences.Default}, Mode=OneWay, Converter={StaticResource BooleanInverterConverter}}"
+                                          FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}"/>
+                                <Label x:Name="LabelLocalClockTimezoneNormal"
+                                       Content="{x:Static props:Resources.window_preferences_regular_timezone_label}"
+                                       Target="{Binding ElementName=TextBoxLocalClockTimezoneNormal}"
+                                       Margin="0 4 2 4"
+                                       VerticalAlignment="Center" />
+                                <TextBox x:Name="TextBoxLocalClockTimezoneNormal"
+                                         AutomationProperties.LabeledBy="{Binding ElementName=LabelLocalClockTimezoneNormal}"
+                                         MinWidth="60"
+                                         Style="{DynamicResource TextBoxStyle}"
+                                         Margin="0 6"
+                                         Padding="5"
+                                         IsEnabled="{Binding ElementName=CheckBoxLocalClockCustomTimezone, Path=IsChecked}"
+                                         FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}"
+                                         Text="{Binding Path=local_timezone_abbreviation, Source={x:Static local:Preferences.Default}, Mode=OneWay}" />
+                                <Label x:Name="LabelLocalClockTimezoneDst"
+                                       Content="{x:Static props:Resources.window_preferences_dst_timezone_label}"
+                                       Target="{Binding ElementName=TextBoxLocalClockTimezoneDst}"
+                                       Margin="8 4 2 4"
+                                       VerticalAlignment="Center" />
+                                <TextBox x:Name="TextBoxLocalClockTimezoneDst"
+                                         AutomationProperties.LabeledBy="{Binding ElementName=LabelLocalClockTimezoneDst}"
+                                         MinWidth="60"
+                                         Style="{DynamicResource TextBoxStyle}"
+                                         Margin="0 6"
+                                         Padding="5"
+                                         IsEnabled="{Binding ElementName=CheckBoxLocalClockCustomTimezone, Path=IsChecked}"
+                                         FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}"
+                                         Text="{Binding Path=local_timezone_dst_abbreviation, Source={x:Static local:Preferences.Default}, Mode=OneWay}" />
+                            </StackPanel>
+                            <Label Grid.Row="1"
                                    Grid.Column="0"
-                                   x:Name="scheme_label"
-                                   Content="{x:Static props:Resources.window_preferences_scheme_label}"
-                                   Target="{Binding ElementName=cbUriProtocol}"
+                                   x:Name="LabelLocalClockTimeSource"
+                                   Content="{x:Static props:Resources.window_preferences_time_source_label}"
+                                   Target="{Binding ElementName=ComboBoxLocalClockTimeSource}"
                                    Margin="8 4 2 4"
                                    VerticalAlignment="Center" />
-                            <StackPanel Grid.Row="0"
-                                        Grid.Column="1"
-                                        Orientation="Horizontal">
+                            <StackPanel Orientation="Horizontal"
+                                        Grid.Row="1"
+                                        Grid.Column="1">
                                 <ComboBox SelectedIndex="0"
-                                          AutomationProperties.LabeledBy="{Binding ElementName=scheme_label}"
+                                          AutomationProperties.LabeledBy="{Binding ElementName=LabelLocalClockTimeSource}"
                                           Margin="2 4 8 4"
                                           Padding="5"
                                           MinWidth="50"
                                           VerticalContentAlignment="Center"
-                                          x:Name="cbUriProtocol"
-                                          FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
-                                    <ComboBoxItem Content="ws" />
-                                    <ComboBoxItem Content="wss" />
-                                    <ComboBox.SelectedItem>
-                                        <Binding Path="SelectedItem"
-                                                 Mode="OneWay"
-                                                 ElementName="cbUriProtocol">
-                                            <Binding.ValidationRules>
-                                                <v:ComboBoxOneItemSelected ValidatesOnTargetUpdated="True" />
-                                            </Binding.ValidationRules>
-                                        </Binding>
-                                    </ComboBox.SelectedItem>
+                                          x:Name="ComboBoxLocalClockTimeSource"
+                                          IsEditable="True"
+                                          FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}"
+                                          ItemsSource="{Binding Source={x:Static local:ObsWebsocketConnection.Instance}, Path=ObsSourceDictionary.Keys}"
+                                          Text="{Binding Path=obs_local_clock_source_name, Source={x:Static local:Preferences.Default}, Mode=OneWay}">
                                 </ComboBox>
-                                <TextBlock VerticalAlignment="Center"
-                                           Margin="8 4 8 4"
-                                           Foreground="{DynamicResource Text.Static.Error}"
-                                           FontWeight="SemiBold"
-                                           AutomationProperties.LiveSetting="Polite"
-                                           IsVisibleChanged="ValidationErrorTextBlock_IsVisibleChanged">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding ElementName=cbUriProtocol, Path=(Validation.HasError)}"
-                                                             Value="True">
-                                                    <Setter Property="Text"
-                                                            Value="{Binding ElementName=cbUriProtocol, Path=(Validation.Errors).CurrentItem.ErrorContent}" />
-                                                    <Setter Property="Focusable"
-                                                            Value="True" />
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding ElementName=cbUriProtocol, Path=(Validation.HasError)}"
-                                                             Value="False">
-                                                    <Setter Property="Visibility"
-                                                            Value="Collapsed" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
                             </StackPanel>
-                            <Label Grid.Column="0"
-                                   Grid.Row="1"
-                                   x:Name="hostname_label"
-                                   Content="{x:Static props:Resources.window_preferences_hostname_label}"
-                                   Target="{Binding ElementName=tbUriHostname}"
-                                   VerticalAlignment="Center"
-                                   Margin="8 4 2 4" />
-                            <TextBox Grid.Column="1"
-                                     Grid.Row="1"
-                                     Grid.ColumnSpan="2"
-                                     Style="{DynamicResource TextBoxStyle}"
-                                     AutomationProperties.LabeledBy="{Binding ElementName=hostname_label}"
-                                     VerticalAlignment="Center"
-                                     Margin="2 4 2 4"
-                                     Padding="5"
-                                     MinWidth="200"
-                                     x:Name="tbUriHostname"
-                                     FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
-                                <TextBox.Text>
-                                    <Binding Path="obs_uri_host"
-                                             UpdateSourceTrigger="PropertyChanged"
-                                             Source="{x:Static local:Preferences.Default}"
-                                             Mode="TwoWay">
-                                        <Binding.ValidationRules>
-                                            <v:Hostname />
-                                        </Binding.ValidationRules>
-                                    </Binding>
-                                </TextBox.Text>
-                            </TextBox>
-                            <TextBlock Grid.Row="2"
-                                       Grid.Column="1"
-                                       Grid.ColumnSpan="3"
-                                       Margin="8 4 4 4"
-                                       Foreground="{DynamicResource Text.Static.Error}"
-                                       FontWeight="SemiBold"
-                                       AutomationProperties.LiveSetting="Polite"
-                                       IsVisibleChanged="ValidationErrorTextBlock_IsVisibleChanged">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding ElementName=tbUriHostname, Path=(Validation.HasError)}"
-                                                         Value="True">
-                                                <Setter Property="Text"
-                                                        Value="{Binding ElementName=tbUriHostname, Path=(Validation.Errors).CurrentItem.ErrorContent}" />
-                                                <Setter Property="Focusable"
-                                                        Value="True" />
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding ElementName=tbUriHostname, Path=(Validation.HasError)}"
-                                                         Value="False">
-                                                <Setter Property="Visibility"
-                                                        Value="Collapsed" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
+                            <Label Grid.Row="2"
+                                   Grid.Column="0"
+                                   x:Name="LabelLocalClockWeatherUrl"
+                                   Content="{x:Static props:Resources.window_preferences_weather_json_url_label}"
+                                   Target="{Binding ElementName=TextBoxLocalClockWeatherUrl}"
+                                   Margin="8 4 2 4"
+                                   VerticalAlignment="Center" />
+                            <StackPanel Grid.Row="2"
+                                        Grid.Column="1"
+                                        Orientation="Horizontal">
+                                <TextBox AutomationProperties.LabeledBy="{Binding ElementName=LabelLocalClockWeatherUrl}"
+                                         MinWidth="320"
+                                         Style="{DynamicResource TextBoxStyle}"
+                                         Margin="0 6"
+                                         Padding="5"
+                                         x:Name="TextBoxLocalClockWeatherUrl"
+                                         FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}"
+                                         Text="{Binding Path=obs_local_clock_weather_json_url, Source={x:Static local:Preferences.Default}, Mode=OneWay}" />
+                            </StackPanel>
                             <Label Grid.Row="3"
                                    Grid.Column="0"
-                                   x:Name="port_label"
-                                   Content="{x:Static props:Resources.window_preferences_port_label}"
-                                   Target="{Binding ElementName=tbUriPort}"
-                                   VerticalAlignment="Center"
-                                   Margin="8 4 2 4" />
+                                   x:Name="LabelLocalClockWeatherUrlFetchDelay"
+                                   Content="{x:Static props:Resources.window_preferences_weather_json_fetch_delay_label}"
+                                   Target="{Binding ElementName=TextBoxLocalClockWeatherUrlFetchDelay}"
+                                   Margin="8 4 2 4"
+                                   VerticalAlignment="Center" />
                             <StackPanel Grid.Row="3"
                                         Grid.Column="1"
                                         Orientation="Horizontal">
-                                <TextBox AutomationProperties.LabeledBy="{Binding ElementName=port_label}"
+                                <TextBox x:Name="TextBoxLocalClockWeatherUrlFetchDelay"
+                                         Grid.ColumnSpan="2"
                                          Style="{DynamicResource TextBoxStyle}"
-                                         TextAlignment="Center"
+                                         AutomationProperties.Name="{x:Static props:Resources.window_preferences_weather_json_fetch_delay_automation_name}"
                                          VerticalAlignment="Center"
-                                         MinWidth="60"
+                                         Margin="2 4 2 4"
                                          Padding="5"
-                                         Margin="2 4 8 4"
-                                         x:Name="tbUriPort"
-                                         FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
-                                    <TextBox.Text>
-                                        <Binding Path="obs_uri_port"
-                                                 UpdateSourceTrigger="PropertyChanged"
-                                                 Source="{x:Static local:Preferences.Default}"
-                                                 Mode="TwoWay">
-                                            <Binding.ValidationRules>
-                                                <v:PortNumber />
-                                            </Binding.ValidationRules>
-                                        </Binding>
-                                    </TextBox.Text>
-                                </TextBox>
-                                <TextBlock VerticalAlignment="Center"
-                                           Margin="4 4 8 4"
-                                           Foreground="{DynamicResource Text.Static.Error}"
-                                           FontWeight="SemiBold"
-                                           AutomationProperties.LiveSetting="Polite"
-                                           IsVisibleChanged="ValidationErrorTextBlock_IsVisibleChanged">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding ElementName=tbUriPort, Path=(Validation.HasError)}"
-                                                             Value="True">
-                                                    <Setter Property="Text"
-                                                            Value="{Binding ElementName=tbUriPort, Path=(Validation.Errors).CurrentItem.ErrorContent}" />
-                                                    <Setter Property="Focusable"
-                                                            Value="True" />
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding ElementName=tbUriPort, Path=(Validation.HasError)}"
-                                                             Value="False">
-                                                    <Setter Property="Visibility"
-                                                            Value="Collapsed" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
+                                         Width="60"
+                                         TextAlignment="Right"
+                                         FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}"
+                                         Text="{Binding Path=obs_local_clock_weather_json_url_fetch_delay, Source={x:Static local:Preferences.Default}, Mode=OneWay}" />
+                                <TextBlock Grid.Row="0"
+                                           Grid.Column="2"
+                                           Text="{x:Static props:Resources.text_minutes}"
+                                           Margin="2 4"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
+                            <Label Grid.Row="4"
+                                   Grid.Column="0"
+                                   x:Name="LabelLocalClockWeatherLocationSource"
+                                   Content="{x:Static props:Resources.window_preferences_weather_location_source_label}"
+                                   Target="{Binding ElementName=ComboBoxLocalClockWeatherLocationSource}"
+                                   Margin="8 4 2 4"
+                                   VerticalAlignment="Center" />
+                            <StackPanel Grid.Row="4"
+                                        Grid.Column="1"
+                                        Orientation="Horizontal">
+                                <ComboBox SelectedIndex="0"
+                                          AutomationProperties.LabeledBy="{Binding ElementName=LabelLocalClockWeatherLocationSource}"
+                                          Margin="2 4 8 4"
+                                          Padding="5"
+                                          MinWidth="50"
+                                          VerticalContentAlignment="Center"
+                                          x:Name="ComboBoxLocalClockWeatherLocationSource"
+                                          IsEditable="True"
+                                          FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}"
+                                          ItemsSource="{Binding Source={x:Static local:ObsWebsocketConnection.Instance}, Path=ObsSourceDictionary.Keys}"
+                                          Text="{Binding Path=obs_local_clock_location_source_name, Source={x:Static local:Preferences.Default}, Mode=OneWay}">
+                                </ComboBox>
+                            </StackPanel>
+                            <Label Grid.Row="5"
+                                   Grid.Column="0"
+                                   x:Name="LabelLocalClockWeatherSymbolSource"
+                                   Content="{x:Static props:Resources.window_preferences_weather_symbol_source_label}"
+                                   Target="{Binding ElementName=ComboBoxLocalClockWeatherSymbolSource}"
+                                   Margin="8 4 2 4"
+                                   VerticalAlignment="Center" />
+                            <StackPanel Grid.Row="5"
+                                        Grid.Column="1"
+                                        Orientation="Horizontal">
+                                <ComboBox SelectedIndex="0"
+                                          AutomationProperties.LabeledBy="{Binding ElementName=LabelLocalClockWeatherSymbolSource}"
+                                          Margin="2 4 8 4"
+                                          Padding="5"
+                                          MinWidth="50"
+                                          VerticalContentAlignment="Center"
+                                          x:Name="ComboBoxLocalClockWeatherSymbolSource"
+                                          IsEditable="True"
+                                          FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}"
+                                          ItemsSource="{Binding Source={x:Static local:ObsWebsocketConnection.Instance}, Path=ObsSourceDictionary.Keys}"
+                                          Text="{Binding Path=obs_local_clock_weather_symbol_source_name, Source={x:Static local:Preferences.Default}, Mode=OneWay}">
+                                </ComboBox>
+                            </StackPanel>
+                            <Label Grid.Row="6"
+                                   Grid.Column="0"
+                                   x:Name="LabelLocalClockWeatherTempSource"
+                                   Content="{x:Static props:Resources.window_preferences_weather_temperature_source_label}"
+                                   Target="{Binding ElementName=ComboBoxLocalClockWeatherTempSource}"
+                                   Margin="8 4 2 4"
+                                   VerticalAlignment="Center" />
+                            <StackPanel Grid.Row="6"
+                                        Grid.Column="1"
+                                        Orientation="Horizontal">
+                                <ComboBox SelectedIndex="0"
+                                          AutomationProperties.LabeledBy="{Binding ElementName=LabelLocalClockWeatherTempSource}"
+                                          Margin="2 4 8 4"
+                                          Padding="5"
+                                          MinWidth="50"
+                                          VerticalContentAlignment="Center"
+                                          x:Name="ComboBoxLocalClockWeatherTempSource"
+                                          IsEditable="True"
+                                          FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}"
+                                          ItemsSource="{Binding Source={x:Static local:ObsWebsocketConnection.Instance}, Path=ObsSourceDictionary.Keys}"
+                                          Text="{Binding Path=obs_local_clock_weather_temp_source_name, Source={x:Static local:Preferences.Default}, Mode=OneWay}">
+                                </ComboBox>
+                            </StackPanel>
+                            <Label Grid.Row="7"
+                                   Grid.Column="0"
+                                   x:Name="LabelLocalClockWeatherAttrib1Source"
+                                   Content="{x:Static props:Resources.window_preferences_weather_attribution1_source_label}"
+                                   Target="{Binding ElementName=ComboBoxLocalClockWeatherAttrib1Source}"
+                                   Margin="8 4 2 4"
+                                   VerticalAlignment="Center" />
+                            <StackPanel Grid.Row="7"
+                                        Grid.Column="1"
+                                        Orientation="Horizontal">
+                                <ComboBox SelectedIndex="0"
+                                          AutomationProperties.LabeledBy="{Binding ElementName=LabelLocalClockWeatherAttrib1Source}"
+                                          Margin="2 4 8 4"
+                                          Padding="5"
+                                          MinWidth="50"
+                                          VerticalContentAlignment="Center"
+                                          x:Name="ComboBoxLocalClockWeatherAttrib1Source"
+                                          IsEditable="True"
+                                          FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}"
+                                          ItemsSource="{Binding Source={x:Static local:ObsWebsocketConnection.Instance}, Path=ObsSourceDictionary.Keys}"
+                                          Text="{Binding Path=obs_local_clock_weather_attrib1_source_name, Source={x:Static local:Preferences.Default}, Mode=OneWay}">
+                                </ComboBox>
+                                <TextBox x:Name="TextBoxLocalClockWeatherAttrib1Value"
+                                         Grid.ColumnSpan="2"
+                                         Style="{DynamicResource TextBoxStyle}"
+                                         AutomationProperties.Name="{x:Static props:Resources.window_preferences_weather_attribution1_value_automation_name}"
+                                         VerticalAlignment="Center"
+                                         Margin="2 4 2 4"
+                                         Padding="5"
+                                         MinWidth="200"
+                                         FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}"
+                                         Text="{Binding Path=obs_local_clock_weather_attrib1_text, Source={x:Static local:Preferences.Default}, Mode=OneWay}" />
+                            </StackPanel>
+                            <Label Grid.Row="8"
+                                   Grid.Column="0"
+                                   x:Name="LabelLocalClockWeatherAttrib2Source"
+                                   Content="{x:Static props:Resources.window_preferences_weather_attribution2_source_label}"
+                                   Target="{Binding ElementName=ComboBoxLocalClockWeatherAttrib2Source}"
+                                   Margin="8 4 2 4"
+                                   VerticalAlignment="Center" />
+                            <StackPanel Grid.Row="8"
+                                        Grid.Column="1"
+                                        Orientation="Horizontal">
+                                <ComboBox SelectedIndex="0"
+                                          AutomationProperties.LabeledBy="{Binding ElementName=LabelLocalClockWeatherAttrib2Source}"
+                                          Margin="2 4 8 4"
+                                          Padding="5"
+                                          MinWidth="50"
+                                          VerticalContentAlignment="Center"
+                                          x:Name="ComboBoxLocalClockWeatherAttrib2Source"
+                                          IsEditable="True"
+                                          FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}"
+                                          ItemsSource="{Binding Source={x:Static local:ObsWebsocketConnection.Instance}, Path=ObsSourceDictionary.Keys}"
+                                          Text="{Binding Path=obs_local_clock_weather_attrib2_source_name, Source={x:Static local:Preferences.Default}, Mode=OneWay}">
+                                </ComboBox>
+                                <TextBox x:Name="TextBoxLocalClockWeatherAttrib2Value"
+                                         Grid.ColumnSpan="2"
+                                         Style="{DynamicResource TextBoxStyle}"
+                                         AutomationProperties.Name="{x:Static props:Resources.window_preferences_weather_attribution2_value_automation_name}"
+                                         VerticalAlignment="Center"
+                                         Margin="2 4 2 4"
+                                         Padding="5"
+                                         MinWidth="200"
+                                         FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}"
+                                         Text="{Binding Path=obs_local_clock_weather_attrib2_text, Source={x:Static local:Preferences.Default}, Mode=OneWay}" />
+                            </StackPanel>
+                            <Label Grid.Row="9"
+                                   Grid.Column="0"
+                                   x:Name="LabelLocalClockWeatherCycleDelay"
+                                   Content="{x:Static props:Resources.window_preferences_weather_cycle_delay_label}"
+                                   Target="{Binding ElementName=TextBoxLocalClockWeatherCycleDelay}"
+                                   Margin="8 4 2 4"
+                                   VerticalAlignment="Center" />
+                            <StackPanel Grid.Row="9"
+                                        Grid.Column="1"
+                                        Orientation="Horizontal">
+                                <TextBox x:Name="TextBoxLocalClockWeatherCycleDelay"
+                                         Grid.ColumnSpan="2"
+                                         Style="{DynamicResource TextBoxStyle}"
+                                         AutomationProperties.Name="{x:Static props:Resources.window_preferences_weather_cycle_delay_automation_name}"
+                                         VerticalAlignment="Center"
+                                         Margin="2 4 2 4"
+                                         Padding="5"
+                                         Width="40"
+                                         TextAlignment="Right"
+                                         FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}"
+                                         Text="{Binding Path=obs_local_clock_cycle_delay, Source={x:Static local:Preferences.Default}, Mode=OneWay}" />
+                                <TextBlock Grid.Row="0"
+                                           Grid.Column="2"
+                                           Text="{x:Static props:Resources.text_seconds}"
+                                           Margin="2 4"
+                                           VerticalAlignment="Center" />
                             </StackPanel>
                         </Grid>
                     </GroupBox>
-                    <StackPanel Orientation="Horizontal">
-                        <CheckBox Content="{x:Static props:Resources.window_preferences_use_password_label}"
-                                  Margin="8 6"
-                                  Padding="5"
-                                  VerticalContentAlignment="Center"
-                                  VerticalAlignment="Center"
-                                  x:Name="cbUsePassword"
-                                  IsChecked="{Binding Path=obs_use_password, Source={x:Static local:Preferences.Default}, Mode=OneWay}"
-                                  FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
-                        <PasswordBox AutomationProperties.Name="{x:Static props:Resources.window_preferences_password_automation_name}"
-                                     MinWidth="160"
-                                     Style="{DynamicResource PasswordBoxStyle}"
-                                     PasswordChar="_"
-                                     x:Name="pbPassword"
-                                     Margin="0 6"
-                                     Padding="5"
-                                     IsEnabled="{Binding ElementName=cbUsePassword, Path=IsChecked}"
-                                     FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <CheckBox Content="{x:Static props:Resources.window_preferences_connect_on_launch}"
-                                  VerticalContentAlignment="Center"
-                                  Margin="8 6"
-                                  Padding="5"
-                                  x:Name="cbConnectLaunch"
-                                  IsChecked="{Binding Path=obs_connect_launch, Source={x:Static local:Preferences.Default}}"
-                                  FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
-                        <CheckBox Content="{x:Static props:Resources.window_preferences_automatic_reconnect}"
-                                  VerticalContentAlignment="Center"
-                                  Margin="8 6"
-                                  Padding="5"
-                                  x:Name="cbAutoReconnect"
-                                  IsChecked="{Binding Path=obs_auto_reconnect, Source={x:Static local:Preferences.Default}}"
-                                  FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
-                    </StackPanel>
-                    <GroupBox Header="{x:Static props:Resources.window_preferences_groupbox_backoff}"
-                              Margin="8 4">
+                    <GroupBox Header="{x:Static props:Resources.window_preferences_groupbox_slide_shows}"
+                              Margin="4"
+                              Padding="4">
                         <Grid>
                             <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="auto" />
                                 <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="auto" />
-                                <ColumnDefinition Width="auto" />
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="auto" />
                                 <RowDefinition Height="auto" />
                                 <RowDefinition Height="auto" />
                                 <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
                             </Grid.RowDefinitions>
-                            <Label x:Name="minBackoffLabel"
-                                   Grid.Row="0"
+                            <Label Grid.Row="0"
                                    Grid.Column="0"
-                                   Content="{x:Static props:Resources.window_preferences_backoff_min_label}"
-                                   Target="{Binding ElementName=tbBackoffMin}"
-                                   Margin="2 4"
+                                   x:Name="LabelSlideShowSource"
+                                   Content="{x:Static props:Resources.window_preferences_slideshow_source_label}"
+                                   Target="{Binding ElementName=ComboBoxSlideShowSource}"
+                                   Margin="8 4 2 4"
                                    VerticalAlignment="Center" />
-                            <TextBox AutomationProperties.Name="{x:Static props:Resources.window_preferences_backoff_min_automation_name}"
-                                     Grid.Row="0"
-                                     Grid.Column="1"
-                                     Margin="2 4"
-                                     Style="{DynamicResource TextBoxStyle}"
-                                     VerticalAlignment="Center"
-                                     Width="40"
-                                     Padding="5"
-                                     TextAlignment="Right"
-                                     x:Name="tbBackoffMin"
-                                     FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
-                                <TextBox.Text>
-                                    <Binding Path="obs_reconnect_min_seconds"
-                                             UpdateSourceTrigger="PropertyChanged"
-                                             Source="{x:Static local:Preferences.Default}"
-                                             Mode="TwoWay">
-                                        <Binding.ValidationRules>
-                                            <v:NumberGreaterZero />
-                                        </Binding.ValidationRules>
-                                    </Binding>
-                                </TextBox.Text>
-                            </TextBox>
-                            <TextBlock Grid.Row="0"
-                                       Grid.Column="2"
-                                       Text="{x:Static props:Resources.text_seconds}"
-                                       Margin="2 4"
-                                       VerticalAlignment="Center" />
-                            <TextBlock Grid.Row="1"
-                                       Grid.Column="0"
-                                       Grid.ColumnSpan="3"
-                                       TextAlignment="Right"
-                                       Margin="8 2 8 4"
-                                       Foreground="{DynamicResource Text.Static.Error}"
-                                       FontWeight="SemiBold"
-                                       AutomationProperties.LiveSetting="Polite"
-                                       IsVisibleChanged="ValidationErrorTextBlock_IsVisibleChanged">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding ElementName=tbBackoffMin, Path=(Validation.HasError), UpdateSourceTrigger=PropertyChanged}"
-                                                         Value="True">
-                                                <Setter Property="Text"
-                                                        Value="{Binding ElementName=tbBackoffMin, Path=(Validation.Errors).CurrentItem.ErrorContent}" />
-                                                <Setter Property="Focusable"
-                                                        Value="True" />
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding ElementName=tbBackoffMin, Path=(Validation.HasError)}"
-                                                         Value="False">
-                                                <Setter Property="Visibility"
-                                                        Value="Collapsed" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
-                            <Label x:Name="maxBackoffLabel"
-                                   Grid.Row="2"
+                            <StackPanel Grid.Row="0"
+                                        Grid.Column="1"
+                                        Orientation="Horizontal">
+                                <ComboBox SelectedIndex="0"
+                                          AutomationProperties.LabeledBy="{Binding ElementName=LabelSlideShowSource}"
+                                          Margin="2 4 8 4"
+                                          Padding="5"
+                                          MinWidth="50"
+                                          VerticalContentAlignment="Center"
+                                          x:Name="ComboBoxSlideShowSource"
+                                          IsEditable="True"
+                                          FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}"
+                                          ItemsSource="{Binding Source={x:Static local:ObsWebsocketConnection.Instance}, Path=ObsSourceDictionary.Keys}"
+                                          Text="{Binding Path=obs_slideshow_source_name, Source={x:Static local:Preferences.Default}, Mode=OneWay}">
+                                </ComboBox>
+                            </StackPanel>
+                            <Label Grid.Row="1"
                                    Grid.Column="0"
-                                   Content="{x:Static props:Resources.window_preferences_backoff_max_label}"
-                                   Target="{Binding ElementName=tbBackoffMax}"
-                                   Margin="2 4"
+                                   x:Name="LabelSlideShowSceneDelay"
+                                   Content="{x:Static props:Resources.window_preferences_next_slide_delay_label}"
+                                   Target="{Binding ElementName=TextBoxSlideShowSceneDelay}"
+                                   Margin="8 4 2 4"
                                    VerticalAlignment="Center" />
-                            <TextBox AutomationProperties.Name="{x:Static props:Resources.window_preferences_backoff_max_automation_name}"
-                                     Grid.Row="2"
-                                     Grid.Column="1"
-                                     Margin="2 4"
-                                     Style="{DynamicResource TextBoxStyle}"
-                                     VerticalAlignment="Center"
-                                     Width="40"
-                                     Padding="5"
-                                     TextAlignment="Right"
-                                     x:Name="tbBackoffMax"
-                                     FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}">
-                                <TextBox.Text>
-                                    <Binding Path="obs_reconnect_max_minutes"
-                                             UpdateSourceTrigger="PropertyChanged"
-                                             Source="{x:Static local:Preferences.Default}"
-                                             Mode="TwoWay">
-                                        <Binding.ValidationRules>
-                                            <v:NumberGreaterZero />
-                                        </Binding.ValidationRules>
-                                    </Binding>
-                                </TextBox.Text>
-                            </TextBox>
-                            <TextBlock Grid.Row="2"
-                                       Grid.Column="2"
-                                       Text="{x:Static props:Resources.text_minutes}"
-                                       Margin="2 4"
-                                       VerticalAlignment="Center" />
-                            <TextBlock Grid.Row="3"
-                                       Grid.Column="0"
-                                       Grid.ColumnSpan="3"
-                                       TextAlignment="Right"
-                                       Margin="8 2 8 4"
-                                       Foreground="{DynamicResource Text.Static.Error}"
-                                       FontWeight="SemiBold"
-                                       AutomationProperties.LiveSetting="Polite"
-                                       IsVisibleChanged="ValidationErrorTextBlock_IsVisibleChanged">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding ElementName=tbBackoffMax, Path=(Validation.HasError)}"
-                                                         Value="True">
-                                                <Setter Property="Text"
-                                                        Value="{Binding ElementName=tbBackoffMax, Path=(Validation.Errors).CurrentItem.ErrorContent}" />
-                                                <Setter Property="Focusable"
-                                                        Value="True" />
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding ElementName=tbBackoffMax, Path=(Validation.HasError)}"
-                                                         Value="False">
-                                                <Setter Property="Visibility"
-                                                        Value="Collapsed" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
+                            <StackPanel Grid.Row="1"
+                                        Grid.Column="1"
+                                        Orientation="Horizontal">
+                                <TextBox x:Name="TextBoxSlideShowSceneDelay"
+                                         Grid.ColumnSpan="2"
+                                         Style="{DynamicResource TextBoxStyle}"
+                                         AutomationProperties.Name="{x:Static props:Resources.window_preferences_next_scene_delay_automation_name}"
+                                         VerticalAlignment="Center"
+                                         Margin="2 4 2 4"
+                                         Padding="5"
+                                         Width="40"
+                                         TextAlignment="Right"
+                                         FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}"
+                                         Text="{Binding Path=obs_slideshow_next_scene_delay, Source={x:Static local:Preferences.Default}, Mode=OneWay}" />
+                                <TextBlock Grid.Row="0"
+                                           Grid.Column="2"
+                                           Text="{x:Static props:Resources.text_seconds}"
+                                           Margin="2 4"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
+                            <Label Grid.Row="2"
+                                   Grid.Column="0"
+                                   x:Name="LabelSlideShowNextSceneHotkey"
+                                   Content="{x:Static props:Resources.window_preferences_next_slide_hotkey_label}"
+                                   Target="{Binding ElementName=TextBoxSlideShowNextSceneHotkey}"
+                                   Margin="8 4 2 4"
+                                   VerticalAlignment="Center" />
+                            <StackPanel Grid.Row="2"
+                                        Grid.Column="1"
+                                        Orientation="Horizontal">
+                                <TextBox x:Name="TextBoxSlideShowNextSceneHotkey"
+                                         Grid.ColumnSpan="2"
+                                         Style="{DynamicResource TextBoxStyle}"
+                                         AutomationProperties.LabeledBy="{Binding ElementName=LabelSlideShowNextSceneHotkey}"
+                                         VerticalAlignment="Center"
+                                         Margin="2 4 2 4"
+                                         Padding="5"
+                                         Width="40"
+                                         FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}"
+                                         IsReadOnly="True"
+                                         IsEnabled="False"
+                                         Text="{Binding Path=obs_slideshow_next_scene_hotkey, Source={x:Static local:Preferences.Default}, Mode=OneWay}" />
+                                <TextBlock VerticalAlignment="Center"
+                                           Margin="2 4 2 4"
+                                           Padding="5"
+                                           Text="{x:Static props:Resources.window_preferences_hardcoded_hotkey}" />
+                            </StackPanel>
                         </Grid>
                     </GroupBox>
-                    <StackPanel Orientation="Horizontal">
-                        <CheckBox Content="{x:Static props:Resources.window_preferences_auto_scroll}"
-                                  VerticalContentAlignment="Center"
-                                  Padding="6"
-                                  Margin="8 6"
-                                  x:Name="cbAutoscroll"
-                                  IsChecked="{Binding Path=obs_autoscroll, Source={x:Static local:Preferences.Default}, Mode=TwoWay}"
-                                  FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
-                    </StackPanel>
                 </StackPanel>
-            </GroupBox>
-            <StackPanel Margin="0 12 0 0"
-                        HorizontalAlignment="Right"
-                        Orientation="Horizontal"
-                        Grid.Row="2"
-                        Grid.Column="2">
-                <TextBlock Margin="16 0"
-                           FontWeight="SemiBold"
-                           Foreground="{DynamicResource Text.Static.Error}"
-                           VerticalAlignment="Center"
-                           HorizontalAlignment="Right"
-                           Grid.Row="0"
-                           Grid.Column="1"
-                           x:Name="save_validation_error"
-                           AutomationProperties.LiveSetting="Polite"
-                           Text="{x:Static props:Resources.validation_error_window_preferences_save}"
-                           Visibility="Hidden" />
-                <Button x:Name="save_button"
-                        Content="{x:Static props:Resources.button_save}"
-                        Padding="7 4"
-                        Click="SaveButton_Click"
-                        AutomationProperties.AcceleratorKey="{x:Static props:Resources.button_save_accelerator}"
-                        FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
-            </StackPanel>
-        </Grid>
-    </ScrollViewer>
+                <StackPanel Margin="0 12 0 0"
+                            HorizontalAlignment="Right"
+                            Orientation="Horizontal"
+                            Grid.Row="2"
+                            Grid.Column="2">
+                    <TextBlock Margin="16 0"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource Text.Static.Error}"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Right"
+                               Grid.Row="0"
+                               Grid.Column="1"
+                               x:Name="save_validation_error2"
+                               AutomationProperties.LiveSetting="Polite"
+                               Text="{x:Static props:Resources.validation_error_window_preferences_save}"
+                               Visibility="Hidden" />
+                    <Button x:Name="save_button2"
+                            Content="{x:Static props:Resources.button_save}"
+                            Padding="7 4"
+                            Click="SaveButton_Click"
+                            AutomationProperties.AcceleratorKey="{x:Static props:Resources.button_save_accelerator}"
+                            FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
+                </StackPanel>
+            </Grid>
+        </TabItem>
+    </TabControl>
 </controls:StyledWindow>

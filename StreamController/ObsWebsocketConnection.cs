@@ -52,7 +52,7 @@ namespace uk.JohnCook.dotnet.StreamController
         public List<int> SourceOrderList { get; } = new List<int>();
         public string NextScene { get; private set; } = String.Empty;
         public GetSourceTypesListReply SourceTypes { get; private set; }
-        private Dictionary<string, object> ObsSourceDictionary { get; } = new Dictionary<string, object>();
+        public Dictionary<string, object> ObsSourceDictionary { get; } = new Dictionary<string, object>();
         private Dictionary<int, ObsScene> ObsSceneItemSceneDictionary { get; } = new Dictionary<int, ObsScene>();
 
         private string TimezoneString { get; set; } = String.Empty;
@@ -61,7 +61,6 @@ namespace uk.JohnCook.dotnet.StreamController
         private int CurrentLocalClockWeatherRecord { get; set; }
         private bool FirstWeatherCycle { get; set; } = true;
         private readonly HttpClient httpClient = new HttpClient();
-        private readonly Uri WeatherJsonUri;
         private Models.WeatherData WeatherDataCollection { get; set; }
 
         public static readonly Brush PrimaryBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(0xFF, 0xE2, 0xC1, 0xEA));
@@ -121,6 +120,7 @@ namespace uk.JohnCook.dotnet.StreamController
                 ReconnectCountdownTimer.Enabled = false;
             }
 
+            UpdateTimezoneString();
             CreateClient();
             SystemTrayIcon.Instance.UpdateTrayIcon().ConfigureAwait(true).GetAwaiter();
             if (Client.AutoReconnect)
@@ -234,7 +234,6 @@ namespace uk.JohnCook.dotnet.StreamController
         {
             if (newState == WebSocketState.Open)
             {
-                ResetScenes();
                 ConnectionError = Properties.Resources.text_aok;
                 NotifyPropertyChanged(nameof(ConnectionError));
                 ExtendedConnectionError = String.Empty;
@@ -243,6 +242,7 @@ namespace uk.JohnCook.dotnet.StreamController
                 ConnectionStatus = Properties.Resources.text_connected;
                 NotifyPropertyChanged(nameof(ConnectionStatus));
                 _ = ChangeStatusColor(newState).ConfigureAwait(false);
+                ResetScenes();
             }
             else if (newState != WebSocketState.Connecting && Client.AutoReconnect)
             {
@@ -265,6 +265,7 @@ namespace uk.JohnCook.dotnet.StreamController
             }
             else if (newState == WebSocketState.Connecting)
             {
+                ResetScenes();
                 ReconnectCountdownTimer.Stop();
                 ConnectionStatus = Properties.Resources.window_audio_check_connecting;
                 NotifyPropertyChanged(nameof(ConnectionStatus));
@@ -282,6 +283,22 @@ namespace uk.JohnCook.dotnet.StreamController
 
         private void ResetScenes()
         {
+            if (Client.CanSend)
+            {
+                FirstWeatherCycle = true;
+                NotifyPropertyChanged(nameof(FirstWeatherCycle));
+                PreviousLocalClockWeatherAttrib1 = String.Empty;
+                NotifyPropertyChanged(nameof(PreviousLocalClockWeatherAttrib1));
+                PreviousLocalClockWeatherAttrib2 = String.Empty;
+                NotifyPropertyChanged(nameof(PreviousLocalClockWeatherAttrib2));
+                return;
+            }
+            ChronoTimer.Instance.MinuteChanged -= UpdateLocalClock;
+            ChronoTimer.Instance.MinuteChanged -= FetchWeatherData;
+            ChronoTimer.Instance.MinuteChanged -= UpdateLocalWeather;
+            ChronoTimer.Instance.SecondChanged -= UpdateLocalWeather;
+            ChronoTimer.Instance.MinuteChanged -= SlideShowNextSlide;
+            ChronoTimer.Instance.SecondChanged -= SlideShowNextSlide;
             _Context.Send(
                 x => SceneList.Clear(),
                 null);
@@ -294,13 +311,6 @@ namespace uk.JohnCook.dotnet.StreamController
             NotifyPropertyChanged(nameof(NextScene));
             SourceTypes = null;
             NotifyPropertyChanged(nameof(SourceTypes));
-            ChronoTimer.Instance.MinuteChanged -= UpdateLocalClock;
-            ChronoTimer.Instance.MinuteChanged -= FetchWeatherData;
-            ChronoTimer.Instance.MinuteChanged -= UpdateLocalWeather;
-            ChronoTimer.Instance.SecondChanged -= UpdateLocalWeather;
-            ChronoTimer.Instance.MinuteChanged -= SlideShowNextSlide;
-            ChronoTimer.Instance.SecondChanged -= SlideShowNextSlide;
-            FirstWeatherCycle = true;
             ObsSourceDictionary.Clear();
             ObsSceneItemSceneDictionary.Clear();
         }
@@ -473,12 +483,15 @@ namespace uk.JohnCook.dotnet.StreamController
                     if (newSource.Name == Preferences.Default.obs_local_clock_source_name)
                     {
                         UpdateLocalClock(this, DateTime.UtcNow);
+                        ChronoTimer.Instance.MinuteChanged -= UpdateLocalClock;
                         ChronoTimer.Instance.MinuteChanged += UpdateLocalClock;
                     }
                     else if (newSource.Name == Preferences.Default.obs_local_clock_weather_symbol_source_name)
                     {
                         ClearObsGdi2PlusText(newSource.Name);
+                        ChronoTimer.Instance.MinuteChanged -= UpdateLocalWeather;
                         ChronoTimer.Instance.MinuteChanged += UpdateLocalWeather;
+                        ChronoTimer.Instance.SecondChanged -= UpdateLocalWeather;
                         ChronoTimer.Instance.SecondChanged += UpdateLocalWeather;
                     }
                     else if (newSource.Name == Preferences.Default.obs_local_clock_weather_temp_source_name ||
@@ -490,7 +503,9 @@ namespace uk.JohnCook.dotnet.StreamController
                     }
                     else if (newSource.Name == Preferences.Default.obs_slideshow_source_name)
                     {
+                        ChronoTimer.Instance.MinuteChanged -= SlideShowNextSlide;
                         ChronoTimer.Instance.MinuteChanged += SlideShowNextSlide;
+                        ChronoTimer.Instance.SecondChanged -= SlideShowNextSlide;
                         ChronoTimer.Instance.SecondChanged += SlideShowNextSlide;
                     }
                     await Obs_Get(ObsRequestType.GetSourceFilters, sourceSettings.SourceName).ConfigureAwait(true);
@@ -576,6 +591,10 @@ namespace uk.JohnCook.dotnet.StreamController
 
         private async void UpdateLocalClock(object sender, DateTime e)
         {
+            if (Client == null || !Client.CanSend)
+            {
+                return;
+            }
             string localDisplayTime = String.Format(CultureInfo.CurrentCulture, Properties.Resources.obs_time_display_format, e.ToLocalTime().ToString(Properties.Resources.obs_time_string_format, CultureInfo.InvariantCulture), TimezoneString);
             SetTextGDIPlusPropertiesRequestTextPropertyOnly request = new SetTextGDIPlusPropertiesRequestTextPropertyOnly()
             {
@@ -587,6 +606,10 @@ namespace uk.JohnCook.dotnet.StreamController
 
         private async void ClearObsGdi2PlusText(string sourceName)
         {
+            if (Client == null || !Client.CanSend)
+            {
+                return;
+            }
             SetTextGDIPlusPropertiesRequestTextPropertyOnly request = new SetTextGDIPlusPropertiesRequestTextPropertyOnly()
             {
                 Source = sourceName,
@@ -597,18 +620,14 @@ namespace uk.JohnCook.dotnet.StreamController
 
         private async void FetchWeatherData(object sender, DateTime e)
         {
-            // URI for Weather JSON
-            Uri weatherUri = null;
-            if (!string.IsNullOrEmpty(Preferences.Default.obs_local_clock_weather_json_url))
+            // Early return if weather URI isn't set
+            if (string.IsNullOrEmpty(Preferences.Default.obs_local_clock_weather_json_url))
             {
-                weatherUri = new Uri(Preferences.Default.obs_local_clock_weather_json_url);
+                return;
             }
-            else if (WeatherJsonUri != null)
-            {
-                weatherUri = WeatherJsonUri;
-            }
-            // Early return if URI isn't valid
-            if (weatherUri == null)
+            Uri weatherUri = new Uri(Preferences.Default.obs_local_clock_weather_json_url);
+            // Early return if we already have data and aren't fetching this minute
+            if (WeatherDataCollection?.Items.Count > 0 && e.Minute % Preferences.Default.obs_local_clock_weather_json_url_fetch_delay > 0)
             {
                 return;
             }
@@ -645,8 +664,13 @@ namespace uk.JohnCook.dotnet.StreamController
 
         private async void UpdateLocalWeather(object sender, DateTime e)
         {
+            // Return early if not connected
+            if (Client == null || !Client.CanSend)
+            {
+                return;
+            }
             // Return early if nothing is changing this second
-            if (e.Second % Preferences.Default.obs_local_clock_cycle_delay > 0)
+            if (!string.IsNullOrEmpty(PreviousLocalClockWeatherAttrib1) && e.Second % Preferences.Default.obs_local_clock_cycle_delay > 0)
             {
                 return;
             }
@@ -665,20 +689,24 @@ namespace uk.JohnCook.dotnet.StreamController
             {
                 localWeatherHoldCount += 60 - localWeatherCycleTotalTime;
             }
-            if (CurrentLocalClockWeatherRecord == 0 && e.Second < localWeatherHoldCount && !string.IsNullOrEmpty(PreviousLocalClockWeatherAttrib1))
+            if (CurrentLocalClockWeatherRecord == 0)
             {
-                return;
-            }
-            if (FirstWeatherCycle && e.Second == 0)
-            {
-                FirstWeatherCycle = false;
+                if (FirstWeatherCycle && e.Second == 0)
+                {
+                    FirstWeatherCycle = false;
+                    NotifyPropertyChanged(nameof(FirstWeatherCycle));
+                }
+                else if (e.Second > 0 && e.Second < localWeatherHoldCount && !string.IsNullOrEmpty(PreviousLocalClockWeatherAttrib1))
+                {
+                    return;
+                }
             }
 
             string weatherSymbolText = WebUtility.HtmlDecode(WeatherDataCollection.Items[CurrentLocalClockWeatherRecord].Symbol);
             string weatherTempText = WebUtility.HtmlDecode(WeatherDataCollection.Items[CurrentLocalClockWeatherRecord].Temperature);
             string weatherLocationText = WebUtility.HtmlDecode(WeatherDataCollection.Items[CurrentLocalClockWeatherRecord].Location);
-            string weatherAttrib1Text = "Powered by";
-            string weatherAttrib2Text = "Met Office Data";
+            string weatherAttrib1Text = Preferences.Default.obs_local_clock_weather_attrib1_text;
+            string weatherAttrib2Text = Preferences.Default.obs_local_clock_weather_attrib2_text;
 
             if (ObsSourceDictionary.ContainsKey(Preferences.Default.obs_local_clock_weather_symbol_source_name))
             {
@@ -717,6 +745,7 @@ namespace uk.JohnCook.dotnet.StreamController
                         Text = weatherAttrib1Text
                     };
                     await Obs_Get(weatherAttrib1).ConfigureAwait(true);
+                    PreviousLocalClockWeatherAttrib1 = weatherAttrib1Text;
                 }
             }
             if (ObsSourceDictionary.ContainsKey(Preferences.Default.obs_local_clock_weather_attrib2_source_name))
@@ -729,6 +758,7 @@ namespace uk.JohnCook.dotnet.StreamController
                         Text = weatherAttrib2Text
                     };
                     await Obs_Get(weatherAttrib2).ConfigureAwait(true);
+                    PreviousLocalClockWeatherAttrib2 = weatherAttrib2Text;
                 }
             }
             if (FirstWeatherCycle || e.Second + Preferences.Default.obs_local_clock_cycle_delay < localWeatherHoldCount || ++CurrentLocalClockWeatherRecord >= WeatherDataCollection.Items.Count)
@@ -839,11 +869,8 @@ namespace uk.JohnCook.dotnet.StreamController
         {
             if (SceneList.Any(x => x.Name == messageObject.SceneName))
             {
-                if (CurrentScene.Sources.Where(x => x.Name == Preferences.Default.obs_slideshow_source_name).Any())
-                {
                     ChronoTimer.Instance.MinuteChanged -= SlideShowNextSlide;
                     ChronoTimer.Instance.SecondChanged -= SlideShowNextSlide;
-                }
                 CurrentScene = SceneList.First(x => x.Name == messageObject.SceneName);
                 NotifyPropertyChanged(nameof(CurrentScene));
                 if (CurrentScene.Sources.Where(x => x.Name == Preferences.Default.obs_slideshow_source_name).Any())
@@ -1233,5 +1260,3 @@ namespace uk.JohnCook.dotnet.StreamController
         #endregion
     }
 }
-
-

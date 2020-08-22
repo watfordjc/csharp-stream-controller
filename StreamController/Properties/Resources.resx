@@ -648,17 +648,49 @@
     <value>_Connect on Launch</value>
     <comment>Text for (Preferences.xaml -&gt; OBS-websocket -&gt; Connect on Launch checkbox)</comment>
   </data>
+  <data name="window_preferences_custom-timezone" xml:space="preserve">
+    <value>_Custom Timezone</value>
+    <comment>Text for (Preferences.xaml -&gt; Local Clock and Weather -&gt; Custom Timezone)</comment>
+  </data>
+  <data name="window_preferences_dst-timezone_label" xml:space="preserve">
+    <value>_DST Timezone:</value>
+    <comment>Text for (Preferences.xaml -&gt; Local Clock and Weather -&gt; DST Timezone)</comment>
+  </data>
   <data name="window_preferences_groupbox_backoff" xml:space="preserve">
     <value>Exponential Back-off</value>
     <comment>Text for (Preferences.xaml -&gt; Exponential Back-off)</comment>
+  </data>
+  <data name="window_preferences_groupbox_clock-weather" xml:space="preserve">
+    <value>Local Clock and Weather</value>
+    <comment>Text for (Preferences.xaml -&gt; Local Clock and Weather)</comment>
   </data>
   <data name="window_preferences_groupbox_server-uri_label" xml:space="preserve">
     <value>Server URI</value>
     <comment>Text for (Preferences.xaml -&gt; OBS-websocket -&gt; Server URI)</comment>
   </data>
+  <data name="window_preferences_groupbox_slide-shows" xml:space="preserve">
+    <value>Slide Shows</value>
+    <comment>Text for (Preferences.xaml -&gt; Slide Shows)</comment>
+  </data>
+  <data name="window_preferences_hardcoded-hotkey" xml:space="preserve">
+    <value>(hard-coded hotkey)</value>
+    <comment>Text for (Preferences.xaml -&gt; Slide Shows -&gt; hard-coded hotkey)</comment>
+  </data>
   <data name="window_preferences_hostname_label" xml:space="preserve">
     <value>_Hostname:</value>
     <comment>Text for (Preferences.xaml -&gt; Server URI -&gt; Hostname)</comment>
+  </data>
+  <data name="window_preferences_next-scene-delay_automation-name" xml:space="preserve">
+    <value>Slideshow next slide delay in seconds</value>
+    <comment>Automation name for (Preferences.xaml -&gt; Slide Shows -&gt; Next Scene Delay)</comment>
+  </data>
+  <data name="window_preferences_next-slide-delay_label" xml:space="preserve">
+    <value>_Next Slide Delay:</value>
+    <comment>Text for (Preferences.xaml -&gt; Slide Shows -&gt; Next Scene Delay)</comment>
+  </data>
+  <data name="window_preferences_next-slide-hotkey_label" xml:space="preserve">
+    <value>Next Slide Hotkey:</value>
+    <comment>Text for (Preferences.xaml -&gt; Slide Shows -&gt; Next Scene Hotkey)</comment>
   </data>
   <data name="window_preferences_password_automation-name" xml:space="preserve">
     <value>Password</value>
@@ -668,9 +700,29 @@
     <value>_Port:</value>
     <comment>Text for (Preferences.xaml -&gt; Server URI -&gt; Port)</comment>
   </data>
+  <data name="window_preferences_regular-timezone_label" xml:space="preserve">
+    <value>_Regular Timezone:</value>
+    <comment>Text for (Preferences.xaml -&gt; Local Clock and Weather -&gt; Regular Timezone)</comment>
+  </data>
   <data name="window_preferences_scheme_label" xml:space="preserve">
     <value>_Scheme:</value>
     <comment>Text for (Preferences.xaml -&gt; Server URI -&gt; Scheme)</comment>
+  </data>
+  <data name="window_preferences_slideshow_source_label" xml:space="preserve">
+    <value>_Slideshow:</value>
+    <comment>Text for (Preferences.xaml -&gt; Slide Shows -&gt; Slideshow)</comment>
+  </data>
+  <data name="window_preferences_tab_obs-sync" xml:space="preserve">
+    <value>OBS Sync</value>
+    <comment>Text for (Preferences.xaml -&gt; OBS Sync)</comment>
+  </data>
+  <data name="window_preferences_time-source_label" xml:space="preserve">
+    <value>_Time:</value>
+    <comment>Text for (Preferences.xaml -&gt; Local Clock and Weather -&gt; Time)</comment>
+  </data>
+  <data name="window_preferences_timezone" xml:space="preserve">
+    <value>Timezone:</value>
+    <comment>Text for (Preferences.xaml -&gt; Local Clock and Weather -&gt; Timezone)</comment>
   </data>
   <data name="window_preferences_title" xml:space="preserve">
     <value>Preferences</value>
@@ -679,6 +731,54 @@
   <data name="window_preferences_use-password_label" xml:space="preserve">
     <value>_Use Password:</value>
     <comment>Text for (Preferences.xaml -&gt; Server URI -&gt; Use Password)</comment>
+  </data>
+  <data name="window_preferences_weather-attribution1-source_label" xml:space="preserve">
+    <value>Weather Attribution _1:</value>
+    <comment>Text for (Preferences.xaml -&gt; Local Clock and Weather -&gt; Weather Attribution 1)</comment>
+  </data>
+  <data name="window_preferences_weather-attribution1-value_automation_name" xml:space="preserve">
+    <value>Display text for Weather Attribution 1</value>
+    <comment>Automation name for (Preferences.xaml -&gt; Local Clock and Weather -&gt; Weather Attribution 1 value)</comment>
+  </data>
+  <data name="window_preferences_weather-attribution2-source_label" xml:space="preserve">
+    <value>Weather Attribution _2:</value>
+    <comment>Text for (Preferences.xaml -&gt; Local Clock and Weather -&gt; Weather Attribution 2)</comment>
+  </data>
+  <data name="window_preferences_weather-attribution2-value_automation_name" xml:space="preserve">
+    <value>Display text for Weather Attribution 2</value>
+    <comment>Automation name for (Preferences.xaml -&gt; Local Clock and Weather -&gt; Weather Attribution 2 value)</comment>
+  </data>
+  <data name="window_preferences_weather-cycle-delay_automation-name" xml:space="preserve">
+    <value>Weather location cycling delay in seconds</value>
+    <comment>Automation name for (Preferences.xaml -&gt; Local Clock and Weather -&gt; Weather Cycle Delay)</comment>
+  </data>
+  <data name="window_preferences_weather-cycle-delay_label" xml:space="preserve">
+    <value>_Weather Cycle Delay:</value>
+    <comment>Text for (Preferences.xaml -&gt; Local Clock and Weather -&gt; Weather Cycle Delay)</comment>
+  </data>
+  <data name="window_preferences_weather-json-fetch-delay_automation-name" xml:space="preserve">
+    <value>Weather JSON fetch delay in minutes</value>
+    <comment>Automation name for (Preferences.xaml -&gt; Local Clock and Weather -&gt; Fetch JSON Every)</comment>
+  </data>
+  <data name="window_preferences_weather-json-fetch-delay_label" xml:space="preserve">
+    <value>_Fetch JSON every:</value>
+    <comment>Text for (Preferences.xaml -&gt; Local Clock and Weather -&gt; Fetch JSON Every)</comment>
+  </data>
+  <data name="window_preferences_weather-json-url_label" xml:space="preserve">
+    <value>Weather _JSON URL:</value>
+    <comment>Text for (Preferences.xaml -&gt; Local Clock and Weather -&gt; Weather JSON URL)</comment>
+  </data>
+  <data name="window_preferences_weather-location-source_label" xml:space="preserve">
+    <value>Weather _Location:</value>
+    <comment>Text for (Preferences.xaml -&gt; Local Clock and Weather -&gt; Weather Location)</comment>
+  </data>
+  <data name="window_preferences_weather-symbol-source_label" xml:space="preserve">
+    <value>Weather Sym_bol:</value>
+    <comment>Text for (Preferences.xaml -&gt; Local Clock and Weather -&gt; Weather Symbol)</comment>
+  </data>
+  <data name="window_preferences_weather-temperature-source_label" xml:space="preserve">
+    <value>Weather T_emperature:</value>
+    <comment>Text for (Preferences.xaml -&gt; Local Clock and Weather -&gt; Weather Temperature)</comment>
   </data>
   <data name="window_system-tray-icon_title" xml:space="preserve">
     <value>SystemTrayIcon</value>

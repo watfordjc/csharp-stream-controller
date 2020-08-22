@@ -1273,11 +1273,38 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to _Custom Timezone.
+        /// </summary>
+        public static string window_preferences_custom_timezone {
+            get {
+                return ResourceManager.GetString("window_preferences_custom-timezone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _DST Timezone:.
+        /// </summary>
+        public static string window_preferences_dst_timezone_label {
+            get {
+                return ResourceManager.GetString("window_preferences_dst-timezone_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Exponential Back-off.
         /// </summary>
         public static string window_preferences_groupbox_backoff {
             get {
                 return ResourceManager.GetString("window_preferences_groupbox_backoff", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Local Clock and Weather.
+        /// </summary>
+        public static string window_preferences_groupbox_clock_weather {
+            get {
+                return ResourceManager.GetString("window_preferences_groupbox_clock-weather", resourceCulture);
             }
         }
         
@@ -1291,11 +1318,56 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Slide Shows.
+        /// </summary>
+        public static string window_preferences_groupbox_slide_shows {
+            get {
+                return ResourceManager.GetString("window_preferences_groupbox_slide-shows", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (hard-coded hotkey).
+        /// </summary>
+        public static string window_preferences_hardcoded_hotkey {
+            get {
+                return ResourceManager.GetString("window_preferences_hardcoded-hotkey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to _Hostname:.
         /// </summary>
         public static string window_preferences_hostname_label {
             get {
                 return ResourceManager.GetString("window_preferences_hostname_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Slideshow next slide delay in seconds.
+        /// </summary>
+        public static string window_preferences_next_scene_delay_automation_name {
+            get {
+                return ResourceManager.GetString("window_preferences_next-scene-delay_automation-name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Next Slide Delay:.
+        /// </summary>
+        public static string window_preferences_next_slide_delay_label {
+            get {
+                return ResourceManager.GetString("window_preferences_next-slide-delay_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Next Slide Hotkey:.
+        /// </summary>
+        public static string window_preferences_next_slide_hotkey_label {
+            get {
+                return ResourceManager.GetString("window_preferences_next-slide-hotkey_label", resourceCulture);
             }
         }
         
@@ -1318,11 +1390,56 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to _Regular Timezone:.
+        /// </summary>
+        public static string window_preferences_regular_timezone_label {
+            get {
+                return ResourceManager.GetString("window_preferences_regular-timezone_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to _Scheme:.
         /// </summary>
         public static string window_preferences_scheme_label {
             get {
                 return ResourceManager.GetString("window_preferences_scheme_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Slideshow:.
+        /// </summary>
+        public static string window_preferences_slideshow_source_label {
+            get {
+                return ResourceManager.GetString("window_preferences_slideshow_source_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to OBS Sync.
+        /// </summary>
+        public static string window_preferences_tab_obs_sync {
+            get {
+                return ResourceManager.GetString("window_preferences_tab_obs-sync", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Time:.
+        /// </summary>
+        public static string window_preferences_time_source_label {
+            get {
+                return ResourceManager.GetString("window_preferences_time-source_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Timezone:.
+        /// </summary>
+        public static string window_preferences_timezone {
+            get {
+                return ResourceManager.GetString("window_preferences_timezone", resourceCulture);
             }
         }
         
@@ -1341,6 +1458,114 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         public static string window_preferences_use_password_label {
             get {
                 return ResourceManager.GetString("window_preferences_use-password_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Weather Attribution _1:.
+        /// </summary>
+        public static string window_preferences_weather_attribution1_source_label {
+            get {
+                return ResourceManager.GetString("window_preferences_weather-attribution1-source_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Display text for Weather Attribution 1.
+        /// </summary>
+        public static string window_preferences_weather_attribution1_value_automation_name {
+            get {
+                return ResourceManager.GetString("window_preferences_weather-attribution1-value_automation_name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Weather Attribution _2:.
+        /// </summary>
+        public static string window_preferences_weather_attribution2_source_label {
+            get {
+                return ResourceManager.GetString("window_preferences_weather-attribution2-source_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Display text for Weather Attribution 2.
+        /// </summary>
+        public static string window_preferences_weather_attribution2_value_automation_name {
+            get {
+                return ResourceManager.GetString("window_preferences_weather-attribution2-value_automation_name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Weather location cycling delay in seconds.
+        /// </summary>
+        public static string window_preferences_weather_cycle_delay_automation_name {
+            get {
+                return ResourceManager.GetString("window_preferences_weather-cycle-delay_automation-name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Weather Cycle Delay:.
+        /// </summary>
+        public static string window_preferences_weather_cycle_delay_label {
+            get {
+                return ResourceManager.GetString("window_preferences_weather-cycle-delay_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Weather JSON fetch delay in minutes.
+        /// </summary>
+        public static string window_preferences_weather_json_fetch_delay_automation_name {
+            get {
+                return ResourceManager.GetString("window_preferences_weather-json-fetch-delay_automation-name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Fetch JSON every:.
+        /// </summary>
+        public static string window_preferences_weather_json_fetch_delay_label {
+            get {
+                return ResourceManager.GetString("window_preferences_weather-json-fetch-delay_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Weather _JSON URL:.
+        /// </summary>
+        public static string window_preferences_weather_json_url_label {
+            get {
+                return ResourceManager.GetString("window_preferences_weather-json-url_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Weather _Location:.
+        /// </summary>
+        public static string window_preferences_weather_location_source_label {
+            get {
+                return ResourceManager.GetString("window_preferences_weather-location-source_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Weather Sym_bol:.
+        /// </summary>
+        public static string window_preferences_weather_symbol_source_label {
+            get {
+                return ResourceManager.GetString("window_preferences_weather-symbol-source_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Weather T_emperature:.
+        /// </summary>
+        public static string window_preferences_weather_temperature_source_label {
+            get {
+                return ResourceManager.GetString("window_preferences_weather-temperature-source_label", resourceCulture);
             }
         }
         
