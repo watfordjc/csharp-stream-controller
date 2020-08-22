@@ -17,9 +17,14 @@
         </MenuItem>
         <MenuItem Header="{x:Static props:Resources.menu_edit}">
             <MenuItem Header="{x:Static props:Resources.menu_edit_preferences}"
-                      Click="MenuWindowItem_Click"
                       x:Name="PreferencesWindow"
-                      Loaded="MenuWindowItemLoaded" />
+                      Command="{x:Static local:MenuItemCollection.routedWindowMenuCommand}">
+                <MenuItem.CommandBindings>
+                    <CommandBinding Command="{x:Static local:MenuItemCollection.routedWindowMenuCommand}"
+                                    CanExecute="WindowMenuItemCommand_CanExecute"
+                                    Executed="WindowMenuItemCommand_Executed" />
+                </MenuItem.CommandBindings>
+            </MenuItem>
         </MenuItem>
         <MenuItem Header="{x:Static props:Resources.menu_connection}"
                   Loaded="ConnectItemLoaded">
@@ -37,17 +42,19 @@
         </MenuItem>
         <MenuItem Header="{x:Static props:Resources.menu_window}">
             <MenuItem Header="{x:Static props:Resources.menu_window_audio_interfaces}"
-                      Click="MenuWindowItem_Click"
-                      x:Name="MainWindow"
-                      Loaded="MenuWindowItemLoaded" />
+                      Command="{x:Static local:MenuItemCollection.routedWindowMenuCommand}"
+                      x:Name="MainWindow" />
             <MenuItem Header="{x:Static props:Resources.menu_window_audio_check}"
-                      Click="MenuWindowItem_Click"
-                      x:Name="Audiocheck"
-                      Loaded="MenuWindowItemLoaded" />
+                      Command="{x:Static local:MenuItemCollection.routedWindowMenuCommand}"
+                      x:Name="Audiocheck" />
             <MenuItem Header="{x:Static props:Resources.menu_window_obs}"
-                      Click="MenuWindowItem_Click"
-                      x:Name="WebSocketTest"
-                      Loaded="MenuWindowItemLoaded" />
+                      Command="{x:Static local:MenuItemCollection.routedWindowMenuCommand}"
+                      x:Name="WebSocketTest" />
+            <MenuItem.CommandBindings>
+                <CommandBinding Command="{x:Static local:MenuItemCollection.routedWindowMenuCommand}"
+                            CanExecute="WindowMenuItemCommand_CanExecute"
+                            Executed="WindowMenuItemCommand_Executed" />
+            </MenuItem.CommandBindings>
         </MenuItem>
     </Collections:ArrayList>
 </ResourceDictionary>

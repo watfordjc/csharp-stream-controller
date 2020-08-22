@@ -11,6 +11,7 @@ namespace uk.JohnCook.dotnet.StreamController
     public partial class MenuItemCollection : ResourceDictionary, ICollection<KeyValuePair<string, object>>
     {
         public static readonly RoutedUICommand routedConnectionMenuCommand = new RoutedUICommand("ConnectionMenuItemCommand", "ConnectionMenuItemCommand", typeof(MenuItemCollection));
+        public static readonly RoutedUICommand routedWindowMenuCommand = new RoutedUICommand("WindowMenuItemCommand", "WindowMenuItemCommand", typeof(MenuItemCollection));
 
         private void MenuItemClose_Click(object sender, RoutedEventArgs e)
         {
@@ -23,23 +24,18 @@ namespace uk.JohnCook.dotnet.StreamController
             Application.Current.Shutdown();
         }
 
-        private void MenuWindowItem_Click(object sender, RoutedEventArgs e)
+        private void WindowMenuItemCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            WindowUtilityLibrary.WindowType clickedWindowType = (WindowUtilityLibrary.WindowType)Enum.Parse(typeof(WindowUtilityLibrary.WindowType), ((MenuItem)sender).Name);
-            WindowUtilityLibrary.MakeWindowActive(clickedWindowType);
+            WindowUtilityLibrary.WindowType windowType = (WindowUtilityLibrary.WindowType)Enum.Parse(typeof(WindowUtilityLibrary.WindowType), (e.OriginalSource as MenuItem).Name);
+            WindowUtilityLibrary.MakeWindowActive(windowType);
         }
 
-        private void MenuWindowItemLoaded(object sender, RoutedEventArgs e)
+        private void WindowMenuItemCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            if (sender == null) { throw new ArgumentNullException(nameof(sender)); }
-
-            WindowUtilityLibrary.WindowType clickedWindowType = (WindowUtilityLibrary.WindowType)Enum.Parse(typeof(WindowUtilityLibrary.WindowType), (sender as MenuItem).Name);
-            Window parent = Window.GetWindow((MenuItem)sender);
-            WindowUtilityLibrary.WindowType windowType = WindowUtilityLibrary.GetWindowTypeEnum(parent.GetType());
-            if (clickedWindowType == windowType)
-            {
-                (sender as MenuItem).IsEnabled = false;
-            }
+            Window parent = Window.GetWindow((MenuItem)e.OriginalSource);
+            e.CanExecute =
+                (e.OriginalSource as MenuItem).Name !=
+                Enum.GetName(typeof(WindowUtilityLibrary.WindowType), WindowUtilityLibrary.GetWindowTypeEnum(parent.GetType()));
         }
 
         private void ConnectItem_Click(object sender, RoutedEventArgs e)
