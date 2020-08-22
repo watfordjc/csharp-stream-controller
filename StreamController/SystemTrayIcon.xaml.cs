@@ -60,6 +60,7 @@ namespace uk.JohnCook.dotnet.StreamController
                 Instance.Devices_CollectionEnumerated(this, EventArgs.Empty);
             }
             Instance.Visibility = Visibility.Collapsed;
+            Instance.NotifyIcon.Icon = oldWindow.NotifyIcon.Icon;
             await Instance.UpdateTrayIcon().ConfigureAwait(true);
             oldWindow.Close();
             oldWindow.Dispose();
