@@ -9,6 +9,8 @@ using System.Security.Cryptography.X509Certificates;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
 {
@@ -67,10 +69,27 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
             // If DeviceState is Active, more properties exist.
             if (state == DeviceState.Active)
             {
-                Volume = Math.Round(Device.AudioEndpointVolume.MasterVolumeLevelScalar * 100f);
-                Device.AudioEndpointVolume.OnVolumeNotification += VolumeChanged;
-                Muted = Device.AudioEndpointVolume.Mute;
-                IsActive = true;
+                try
+                {
+                    Volume = Math.Round(Device.AudioEndpointVolume.MasterVolumeLevelScalar * 100f);
+                    Device.AudioEndpointVolume.OnVolumeNotification += VolumeChanged;
+                    Muted = Device.AudioEndpointVolume.Mute;
+                    IsActive = true;
+                }
+                catch (COMException e)
+                {
+                    if (e.ErrorCode == unchecked((int)0x88890008))
+                    {
+                        // This error can have several causes, but in general it is because the audio settings for device bitrate are invalid.
+                        // In my case, the drop down menu in device properties was greyed out as I use "headphones" over "headset" for my Bluetooth (it makes "headset" settings unavailable).
+                        Trace.WriteLine($"Error 0x88890008 - Unable to monitor volume for {Device.DataFlow} device {Device.FriendlyName}.");
+                        IsActive = false;
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
             } else
             {
                 IsActive = false;
