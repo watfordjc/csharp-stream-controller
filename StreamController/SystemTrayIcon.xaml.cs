@@ -38,7 +38,13 @@ namespace uk.JohnCook.dotnet.StreamController
 
         private void ContextMenu_Opened(object sender, RoutedEventArgs e)
         {
-            NotifyIcon.ContextMenu.Placement = PlacementMode.RelativePoint;
+            if (NotifyIcon.ContextMenu.Placement == PlacementMode.AbsolutePoint &&
+                NotifyIcon.ContextMenu.HorizontalOffset == Int32.MinValue &&
+                NotifyIcon.ContextMenu.VerticalOffset == Int32.MinValue)
+            {
+                NotifyIcon.ContextMenu.IsOpen = false;
+                e.Handled = true;
+            }
         }
 
         private async void SystemTrayIcon_ThemeChanged(object sender, WindowUtilityLibrary.WindowsTheme oldTheme)
