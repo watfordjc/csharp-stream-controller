@@ -196,6 +196,42 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Reset Capture Device.
+        /// </summary>
+        public static string button_use_default_capture_audio_interface {
+            get {
+                return ResourceManager.GetString("button_use_default_capture_audio_interface", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ctrl+e.
+        /// </summary>
+        public static string button_use_default_capture_audio_interface_accelerator {
+            get {
+                return ResourceManager.GetString("button_use_default_capture_audio_interface_accelerator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reset Render Device.
+        /// </summary>
+        public static string button_use_default_render_audio_interface {
+            get {
+                return ResourceManager.GetString("button_use_default_render_audio_interface", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ctrl+r.
+        /// </summary>
+        public static string button_use_default_render_audio_interface_accelerator {
+            get {
+                return ResourceManager.GetString("button_use_default_render_audio_interface_accelerator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Use Selected Audio Interface.
         /// </summary>
         public static string button_use_selected_audio_interface {

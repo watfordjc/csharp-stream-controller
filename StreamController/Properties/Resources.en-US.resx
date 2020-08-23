@@ -185,6 +185,22 @@
     <value>Ctrl+u</value>
     <comment>Accelerator key for Use Selected Audio Interface buttons</comment>
   </data>
+  <data name="button_use_default_capture_audio_interface" xml:space="preserve">
+    <value>Reset Capture Device</value>
+    <comment>Button text - Reset Capture Device</comment>
+  </data>
+  <data name="button_use_default_capture_audio_interface_accelerator" xml:space="preserve">
+    <value>Ctrl+e</value>
+    <comment>Accelerator key for Reset Capture Device</comment>
+  </data>
+  <data name="button_use_default_render_audio_interface" xml:space="preserve">
+    <value>Reset Render Device</value>
+    <comment>Button text - Reset Render Device</comment>
+  </data>
+  <data name="button_use_default_render_audio_interface_accelerator" xml:space="preserve">
+    <value>Ctrl+r</value>
+    <comment>Accelerator key for Reset Render Device</comment>
+  </data>
   <data name="menu_connection" xml:space="preserve">
     <value>_Connection</value>
     <comment>Menu Bar -&gt; Connection</comment>

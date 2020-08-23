@@ -238,7 +238,7 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
                 // Windows doesn't think this process uses the default device. We agree, but we disagree on the preferred audio device.
                 else if (!windowsThinksDefault)
                 {
-                    bool changeNeeded = preferredRenderId != windowsPreferredRender.ID;
+                    bool changeNeeded = preferredRenderId != windowsPreferredRender?.ID;
                     changeNeeded = changeNeeded || preferredCaptureId != windowsPreferredCapture?.ID;
                     if (changeNeeded)
                     {
@@ -446,6 +446,23 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
             Instance.RemoveOldApplicationDevicePreference(process, audioInterface);
             Instance.AddDeviceApplicationPreference(audioInterface, process);
             Instance.AddApplicationDevicePreference(process, audioInterface);
+        }
+
+        public static void ClearApplicationDefaultDevice(DataFlow dataFlow, ObservableProcess process)
+        {
+            if (process == null) { throw new ArgumentNullException(nameof(process)); }
+
+            AudioInterface dataFlowInterface = dataFlow switch
+            {
+                DataFlow.Render => Instance.DefaultRender,
+                DataFlow.Capture => Instance.DefaultCapture,
+                _ => null
+            };
+            if (dataFlowInterface == null) { throw new ArgumentException($"{Enum.GetName(typeof(DataFlow),dataFlow)} is not {Enum.GetName(typeof(DataFlow), DataFlow.Render)} or {Enum.GetName(typeof(DataFlow), DataFlow.Capture)}.", nameof(dataFlow)); }
+
+            EarTrumpet.DataModel.WindowsAudio.Internal.AudioPolicyConfig audioPolicyConfig = new EarTrumpet.DataModel.WindowsAudio.Internal.AudioPolicyConfig(dataFlow);
+            audioPolicyConfig.SetDefaultEndPoint(String.Empty, process.Id);
+            Instance.RemoveOldApplicationDevicePreference(process, dataFlowInterface);
         }
 
         public static void ClearAllApplicationDefaultDevices(DataFlow dataFlow)

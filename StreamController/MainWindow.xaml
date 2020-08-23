@@ -199,6 +199,8 @@
                                         <RowDefinition />
                                         <RowDefinition />
                                         <RowDefinition />
+                                        <RowDefinition />
+                                        <RowDefinition />
                                     </Grid.RowDefinitions>
                                     <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static props:Resources.window_main_window_application_name_label}" Style="{DynamicResource property_label_style}" />
                                     <TextBlock Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Text="{Binding ProcessName}" />
@@ -212,6 +214,30 @@
                                     <TextBlock Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" AutomationProperties.Name="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text, StringFormat={}Application capture device: {0}}" x:Name="app_capture" AutomationProperties.LiveSetting="Polite" />
                                     <StackPanel Margin="4 8 4 4" HorizontalAlignment="Left" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal">
                                         <Button Padding="4" Content="{x:Static props:Resources.button_use_selected_audio_interface}" Click="BtnSetApplicationDefault_Click" FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" AutomationProperties.AcceleratorKey="{x:Static props:Resources.button_use_selected_audio_interface_accelerator}" />
+                                    </StackPanel>
+                                    <StackPanel Margin="4 8 4 4"
+                                                HorizontalAlignment="Left"
+                                                Grid.Row="6"
+                                                Grid.Column="0"
+                                                Grid.ColumnSpan="2"
+                                                Orientation="Horizontal">
+                                        <Button Padding="4"
+                                                Content="{x:Static props:Resources.button_use_default_render_audio_interface}"
+                                                Click="BtnResetApplicationDefaultRender_Click"
+                                                FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}"
+                                                AutomationProperties.AcceleratorKey="{x:Static props:Resources.button_use_default_render_audio_interface_accelerator}" />
+                                    </StackPanel>
+                                    <StackPanel Margin="4 8 4 4"
+                                                HorizontalAlignment="Left"
+                                                Grid.Row="7"
+                                                Grid.Column="0"
+                                                Grid.ColumnSpan="2"
+                                                Orientation="Horizontal">
+                                        <Button Padding="4"
+                                                Content="{x:Static props:Resources.button_use_default_capture_audio_interface}"
+                                                Click="BtnResetApplicationDefaultCapture_Click"
+                                                FocusVisualStyle="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}"
+                                                AutomationProperties.AcceleratorKey="{x:Static props:Resources.button_use_default_capture_audio_interface_accelerator}" />
                                     </StackPanel>
                                 </Grid>
                             </GroupBox>

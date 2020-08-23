@@ -142,6 +142,13 @@ namespace uk.JohnCook.dotnet.StreamController
             UpdateApplicationAudioDevices(process, true);
         }
 
+        private void ResetApplicationDefaultDevice(DataFlow dataFlow)
+        {
+            ObservableProcess process = (cb_applications.SelectedItem as ObservableProcess);
+            AudioInterfaceCollection.ClearApplicationDefaultDevice(dataFlow, process);
+            UpdateApplicationAudioDevices(cb_applications.SelectedItem as ObservableProcess, true);
+        }
+
         private void ResetCustomAudioDevices()
         {
             AudioInterfaceCollection.ClearAllApplicationDefaultDevices(DataFlow.All);
@@ -174,6 +181,16 @@ namespace uk.JohnCook.dotnet.StreamController
             SetApplicationDefaultDevice();
         }
 
+        private void BtnResetApplicationDefaultRender_Click(object sender, RoutedEventArgs e)
+        {
+            ResetApplicationDefaultDevice(DataFlow.Render);
+        }
+
+        private void BtnResetApplicationDefaultCapture_Click(object sender, RoutedEventArgs e)
+        {
+            ResetApplicationDefaultDevice(DataFlow.Capture);
+        }
+
         private void BtnResetAllApplicationDefault_Click(object sender, RoutedEventArgs e)
         {
             ResetCustomAudioDevices();
@@ -203,11 +220,25 @@ namespace uk.JohnCook.dotnet.StreamController
                     ResetCustomAudioDevices();
                 }
             }
+            else if (e.Key == Key.E)
+            {
+                if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+                {
+                    ResetApplicationDefaultDevice(DataFlow.Capture);
+                }
+            }
             else if (e.Key == Key.M)
             {
                 if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
                 {
                     MakeInterfaceDefaultRenderDevice();
+                }
+            }
+            else if (e.Key == Key.R)
+            {
+                if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+                {
+                    ResetApplicationDefaultDevice(DataFlow.Render);
                 }
             }
             else if (e.Key == Key.T)
