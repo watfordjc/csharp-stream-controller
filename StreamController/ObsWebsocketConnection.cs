@@ -287,6 +287,7 @@ namespace uk.JohnCook.dotnet.StreamController
             {
                 FirstWeatherCycle = true;
                 NotifyPropertyChanged(nameof(FirstWeatherCycle));
+                CurrentLocalClockWeatherRecord = 0;
                 PreviousLocalClockWeatherAttrib1 = String.Empty;
                 NotifyPropertyChanged(nameof(PreviousLocalClockWeatherAttrib1));
                 PreviousLocalClockWeatherAttrib2 = String.Empty;
@@ -294,7 +295,6 @@ namespace uk.JohnCook.dotnet.StreamController
                 return;
             }
             ChronoTimer.Instance.MinuteChanged -= UpdateLocalClock;
-            ChronoTimer.Instance.MinuteChanged -= FetchWeatherData;
             ChronoTimer.Instance.MinuteChanged -= UpdateLocalWeather;
             ChronoTimer.Instance.SecondChanged -= UpdateLocalWeather;
             ChronoTimer.Instance.MinuteChanged -= SlideShowNextSlide;
@@ -627,7 +627,7 @@ namespace uk.JohnCook.dotnet.StreamController
             }
             Uri weatherUri = new Uri(Preferences.Default.obs_local_clock_weather_json_url);
             // Early return if we already have data and aren't fetching this minute
-            if (WeatherDataCollection?.Items.Count > 0 && e.Minute % Preferences.Default.obs_local_clock_weather_json_url_fetch_delay > 0)
+            if (WeatherDataCollection?.Items.Count > 0 && (e.Minute == 0 || e.Minute % Preferences.Default.obs_local_clock_weather_json_url_fetch_delay > 0))
             {
                 return;
             }
@@ -664,18 +664,13 @@ namespace uk.JohnCook.dotnet.StreamController
 
         private async void UpdateLocalWeather(object sender, DateTime e)
         {
-            // Return early if not connected
-            if (Client == null || !Client.CanSend)
-            {
-                return;
-            }
-            // Return early if nothing is changing this second
-            if (!string.IsNullOrEmpty(PreviousLocalClockWeatherAttrib1) && e.Second % Preferences.Default.obs_local_clock_cycle_delay > 0)
-            {
-                return;
-            }
-            // Return early if there is no weather data
-            if (WeatherDataCollection == null || WeatherDataCollection.Items.Count == 0)
+            // Return early if not connected, no weather data, or nothing to change this second
+            if (Client == null ||
+                !Client.CanSend ||
+                WeatherDataCollection == null ||
+                WeatherDataCollection.Items.Count == 0 ||
+                (!string.IsNullOrEmpty(PreviousLocalClockWeatherAttrib1) && e.Second % Preferences.Default.obs_local_clock_cycle_delay > 0)
+                )
             {
                 return;
             }
@@ -689,25 +684,42 @@ namespace uk.JohnCook.dotnet.StreamController
             {
                 localWeatherHoldCount += 60 - localWeatherCycleTotalTime;
             }
-            if (CurrentLocalClockWeatherRecord == 0)
+
+            // FirstWeatherCycle ends at 0 seconds past the minute
+            if (FirstWeatherCycle && e.Second == 0)
             {
-                if (FirstWeatherCycle && e.Second == 0)
-                {
-                    FirstWeatherCycle = false;
-                    NotifyPropertyChanged(nameof(FirstWeatherCycle));
-                }
-                else if (e.Second > 0 && e.Second < localWeatherHoldCount && !string.IsNullOrEmpty(PreviousLocalClockWeatherAttrib1))
-                {
-                    return;
-                }
+                FirstWeatherCycle = false;
+                NotifyPropertyChanged(nameof(FirstWeatherCycle));
+            }
+            // Return to first record at 0 seconds past the minute
+            else if (!FirstWeatherCycle && e.Second == 0)
+            {
+                CurrentLocalClockWeatherRecord = 0;
+            }
+            // During FirstWeatherCycle there is nothing to do after initial run of this method
+            // After FirstWeatherCycle there is nothing to do if we're holding at first record
+            else if ((FirstWeatherCycle && !string.IsNullOrEmpty(PreviousLocalClockWeatherAttrib1)) ||
+                (!FirstWeatherCycle && e.Second < localWeatherHoldCount))
+            {
+                return;
+            }
+            // After FirstWeatherCycle, switch to next record (we already returned early if e.Second % obs_local_clock_cycle_delay > 0)
+            else if (!FirstWeatherCycle && e.Second >= localWeatherHoldCount)
+            {
+                CurrentLocalClockWeatherRecord++;
             }
 
+            // JSON API text may contain HTML entities - &deg; is easier to type, &#xf002; won't usually look like a cloud, also avoids icon font hard-coding
             string weatherSymbolText = WebUtility.HtmlDecode(WeatherDataCollection.Items[CurrentLocalClockWeatherRecord].Symbol);
             string weatherTempText = WebUtility.HtmlDecode(WeatherDataCollection.Items[CurrentLocalClockWeatherRecord].Temperature);
             string weatherLocationText = WebUtility.HtmlDecode(WeatherDataCollection.Items[CurrentLocalClockWeatherRecord].Location);
+            // Weather data attribution is currently stored as UTF-16 strings in user preferences
             string weatherAttrib1Text = Preferences.Default.obs_local_clock_weather_attrib1_text;
             string weatherAttrib2Text = Preferences.Default.obs_local_clock_weather_attrib2_text;
 
+            List<SetTextGDIPlusPropertiesRequestTextPropertyOnly> requestList = new List<SetTextGDIPlusPropertiesRequestTextPropertyOnly>();
+
+            // Add weather symbol update to list
             if (ObsSourceDictionary.ContainsKey(Preferences.Default.obs_local_clock_weather_symbol_source_name))
             {
                 SetTextGDIPlusPropertiesRequestTextPropertyOnly weatherSymbol = new SetTextGDIPlusPropertiesRequestTextPropertyOnly()
@@ -715,8 +727,9 @@ namespace uk.JohnCook.dotnet.StreamController
                     Source = Preferences.Default.obs_local_clock_weather_symbol_source_name,
                     Text = weatherSymbolText
                 };
-                await Obs_Get(weatherSymbol).ConfigureAwait(true);
+                requestList.Add(weatherSymbol);
             }
+            // Add weather temperature update to list
             if (ObsSourceDictionary.ContainsKey(Preferences.Default.obs_local_clock_weather_temp_source_name))
             {
                 SetTextGDIPlusPropertiesRequestTextPropertyOnly weatherTemp = new SetTextGDIPlusPropertiesRequestTextPropertyOnly()
@@ -724,8 +737,9 @@ namespace uk.JohnCook.dotnet.StreamController
                     Source = Preferences.Default.obs_local_clock_weather_temp_source_name,
                     Text = weatherTempText
                 };
-                await Obs_Get(weatherTemp).ConfigureAwait(true);
+                requestList.Add(weatherTemp);
             }
+            // Add weather location update to list
             if (ObsSourceDictionary.ContainsKey(Preferences.Default.obs_local_clock_location_source_name))
             {
                 SetTextGDIPlusPropertiesRequestTextPropertyOnly weatherLocation = new SetTextGDIPlusPropertiesRequestTextPropertyOnly()
@@ -733,8 +747,9 @@ namespace uk.JohnCook.dotnet.StreamController
                     Source = Preferences.Default.obs_local_clock_location_source_name,
                     Text = weatherLocationText
                 };
-                await Obs_Get(weatherLocation).ConfigureAwait(true);
+                requestList.Add(weatherLocation);
             }
+            // Add weather data attribution line 1 update to list (if necessary)
             if (ObsSourceDictionary.ContainsKey(Preferences.Default.obs_local_clock_weather_attrib1_source_name))
             {
                 if (weatherAttrib1Text != PreviousLocalClockWeatherAttrib1)
@@ -744,10 +759,12 @@ namespace uk.JohnCook.dotnet.StreamController
                         Source = Preferences.Default.obs_local_clock_weather_attrib1_source_name,
                         Text = weatherAttrib1Text
                     };
-                    await Obs_Get(weatherAttrib1).ConfigureAwait(true);
+                    requestList.Add(weatherAttrib1);
                     PreviousLocalClockWeatherAttrib1 = weatherAttrib1Text;
+                    NotifyPropertyChanged(PreviousLocalClockWeatherAttrib1);
                 }
             }
+            // Add weather data attribution line 2 update to list (if necessary)
             if (ObsSourceDictionary.ContainsKey(Preferences.Default.obs_local_clock_weather_attrib2_source_name))
             {
                 if (weatherAttrib2Text != PreviousLocalClockWeatherAttrib2)
@@ -757,14 +774,18 @@ namespace uk.JohnCook.dotnet.StreamController
                         Source = Preferences.Default.obs_local_clock_weather_attrib2_source_name,
                         Text = weatherAttrib2Text
                     };
-                    await Obs_Get(weatherAttrib2).ConfigureAwait(true);
+                    requestList.Add(weatherAttrib2);
                     PreviousLocalClockWeatherAttrib2 = weatherAttrib2Text;
+                    NotifyPropertyChanged(PreviousLocalClockWeatherAttrib2);
                 }
             }
-            if (FirstWeatherCycle || e.Second + Preferences.Default.obs_local_clock_cycle_delay < localWeatherHoldCount || ++CurrentLocalClockWeatherRecord >= WeatherDataCollection.Items.Count)
+
+            // Send all update requests in list
+            foreach (SetTextGDIPlusPropertiesRequestTextPropertyOnly request in requestList)
             {
-                CurrentLocalClockWeatherRecord = 0;
+                _ = await Obs_Get(request).ConfigureAwait(true);
             }
+            requestList.Clear();
         }
 
         private async Task PopulateSceneItemSources(IList<ObsSceneItem> sceneItems, ObsScene scene)
@@ -869,8 +890,8 @@ namespace uk.JohnCook.dotnet.StreamController
         {
             if (SceneList.Any(x => x.Name == messageObject.SceneName))
             {
-                    ChronoTimer.Instance.MinuteChanged -= SlideShowNextSlide;
-                    ChronoTimer.Instance.SecondChanged -= SlideShowNextSlide;
+                ChronoTimer.Instance.MinuteChanged -= SlideShowNextSlide;
+                ChronoTimer.Instance.SecondChanged -= SlideShowNextSlide;
                 CurrentScene = SceneList.First(x => x.Name == messageObject.SceneName);
                 NotifyPropertyChanged(nameof(CurrentScene));
                 if (CurrentScene.Sources.Where(x => x.Name == Preferences.Default.obs_slideshow_source_name).Any())
