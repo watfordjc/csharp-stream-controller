@@ -867,7 +867,11 @@ namespace uk.JohnCook.dotnet.StreamController
                 ReadOnlyMemory<char> deviceName = ((DShowInput)source).AudioDeviceId.AsMemory();
                 dependencies.AudioDeviceId = AudioInterfaceCollection.GetAudioInterfaceByName(deviceName[0..^1].ToString()).ID;
             }
-            dependencies.AudioInterface = AudioInterfaceCollection.GetAudioInterfaceById(dependencies.AudioDeviceId);
+            AudioInterface audioInterface = AudioInterfaceCollection.GetAudioInterfaceById(dependencies.AudioDeviceId);
+            if (audioInterface != null)
+            {
+                dependencies.AudioInterface = audioInterface;
+            }
             //Trace.WriteLine($"{sourceReply.SourceName} -> {sourceReply.SourceType} -> device_id: {audioInterface?.ID} AKA {audioInterface?.FriendlyName}");
             // WASAPI and DirectShow source types should reference an audio device
             if (!dependencies.HasAudioInterface)
