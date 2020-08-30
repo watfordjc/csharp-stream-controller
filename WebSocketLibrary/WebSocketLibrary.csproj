@@ -49,7 +49,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if &quot;$(ConfigurationName)&quot; == &quot;Release&quot; (&#xD;&#xA;&quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\signtool.exe&quot; sign /tr http://timestamp.digicert.com /td sha256 /fd sha256 /n  &quot;$(Company)&quot; &quot;$(TargetDir)$(TargetFileName)&quot;&#xD;&#xA;)" />
+    <Exec Command="if &quot;$(ConfigurationName)&quot; == &quot;Release&quot; (&#xD;&#xA;&quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\signtool.exe&quot; sign /tr http://timestamp.comodoca.com/rfc3161 /td sha256 /fd sha256 /n  &quot;$(Company)&quot; &quot;$(TargetDir)$(TargetFileName)&quot; &quot;$(TargetDir)en-US\*.dll&quot;&#xD;&#xA;)" />
   </Target>
 
 </Project>

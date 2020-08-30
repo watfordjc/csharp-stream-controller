@@ -78,7 +78,7 @@
     <CreateProperty Value="C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\signtool.exe">
       <Output TaskParameter="Value" PropertyName="SignToolPath" />
     </CreateProperty>
-    <CreateProperty Value="http://timestamp.digicert.com">
+    <CreateProperty Value="http://timestamp.comodoca.com/rfc3161">
       <Output TaskParameter="Value" PropertyName="TimestampServiceURL" />
     </CreateProperty>
     <CreateProperty Value="sha256">
@@ -93,8 +93,7 @@
     <!-- Publish application for HeatDirectory step -->
     <Exec Command="dotnet publish &quot;..\StreamController\StreamController.csproj&quot; -c $(Configuration) -r win-$(Platform) --no-self-contained" />
     <!-- Sign application exe and dll -->
-    <Exec Command="&quot;$(SignToolPath)&quot; sign /tr $(TimestampServiceURL) /td $(TimestampServiceDigestAlgo) /fd $(TimestampServiceDigestAlgo) /n &quot;$(SignerCN)&quot; &quot;$(PublishPath)\publish\StreamController.dll&quot;" />
-    <Exec Command="&quot;$(SignToolPath)&quot; sign /tr $(TimestampServiceURL) /td $(TimestampServiceDigestAlgo) /fd $(TimestampServiceDigestAlgo) /n &quot;$(SignerCN)&quot; &quot;$(PublishPath)\publish\StreamController.exe&quot;" />
+    <Exec Command="&quot;$(SignToolPath)&quot; sign /tr $(TimestampServiceURL) /td $(TimestampServiceDigestAlgo) /fd $(TimestampServiceDigestAlgo) /n &quot;$(SignerCN)&quot; &quot;$(PublishPath)\publish\StreamController.dll&quot; &quot;$(PublishPath)\publish\StreamController.exe&quot; &quot;$(PublishPath)\publish\en-US\*.dll&quot;" />
     <!-- Create variables for file name and installation path -->
     <GetAssemblyIdentity AssemblyFiles="$(PublishPath)\StreamController.dll">
       <Output TaskParameter="Assemblies" ItemName="AssemblyVersion" />

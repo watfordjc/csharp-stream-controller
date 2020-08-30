@@ -5,7 +5,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>uk.JohnCook.dotnet.StreamController</RootNamespace>
     <UseWPF>true</UseWPF>
-    <Version>0.0.4</Version>
+    <Version>0.0.5</Version>
     <StartupObject>uk.JohnCook.dotnet.StreamController.Program</StartupObject>
     <Authors>John Cook</Authors>
     <Copyright>Copyright © John Cook 2020</Copyright>
@@ -14,7 +14,7 @@
     <ApplicationIcon>icon-neutral.ico</ApplicationIcon>
     <Description>A work-in-progress stream control application that acts as a helper connectivity hub for video streaming.</Description>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <PackageReleaseNotes>First planned release of StreamController.</PackageReleaseNotes>
+    <PackageReleaseNotes>Second planned release of StreamController.</PackageReleaseNotes>
     <RepositoryUrl>https://github.com/watfordjc/csharp-stream-controller</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://github.com/watfordjc/csharp-stream-controller</PackageProjectUrl>
@@ -91,6 +91,6 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if &quot;$(ConfigurationName)&quot; == &quot;Release&quot; (&#xD;&#xA;&quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\signtool.exe&quot; sign /tr http://timestamp.digicert.com /td sha256 /fd sha256 /n  &quot;$(Company)&quot;  &quot;$(TargetDir)$(TargetName).dll&quot;&#xD;&#xA;&quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\signtool.exe&quot; sign /tr http://timestamp.digicert.com /td sha256 /fd sha256 /n  &quot;$(Company)&quot;  &quot;$(TargetDir)$(TargetName).exe&quot;&#xD;&#xA;)" />
+    <Exec Command="if &quot;$(ConfigurationName)&quot; == &quot;Release&quot; (&#xD;&#xA;&quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\signtool.exe&quot; sign /tr http://timestamp.comodoca.com/rfc3161 /td sha256 /fd sha256 /n  &quot;$(Company)&quot;  &quot;$(TargetDir)$(TargetName).dll&quot; &quot;$(TargetDir)$(TargetName).exe&quot; &quot;$(TargetDir)en-US\*.dll&quot;&#xD;&#xA;)" />
   </Target>
 </Project>
