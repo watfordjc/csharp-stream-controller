@@ -19,6 +19,7 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+using uk.JohnCook.dotnet.MessageToImageLibrary;
 using uk.JohnCook.dotnet.NAudioWrapperLibrary;
 using uk.JohnCook.dotnet.OBSWebSocketLibrary;
 using uk.JohnCook.dotnet.OBSWebSocketLibrary.Data;
@@ -62,6 +63,7 @@ namespace uk.JohnCook.dotnet.StreamController
         private bool FirstWeatherCycle { get; set; } = true;
         private readonly HttpClient httpClient = new HttpClient();
         private Models.WeatherData WeatherDataCollection { get; set; }
+        private VerticalMessagePanel verticalMessagePanel = new VerticalMessagePanel();
 
         public static readonly Brush PrimaryBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(0xFF, 0xE2, 0xC1, 0xEA));
         public static readonly Brush SecondaryBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(0xFF, 0xC5, 0xC0, 0xEB));
@@ -1260,6 +1262,7 @@ namespace uk.JohnCook.dotnet.StreamController
                     iconSemaphore.Dispose();
                     audioWorkarounds.Dispose();
                     httpClient.Dispose();
+                    verticalMessagePanel.Dispose();
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override finalizer
