@@ -19,6 +19,15 @@ The main purpose of the solution in this repository is to create a connectivity 
 ## Solution Projects
 Project names and purposes are subject to changes, and this README is likely to lag such changes.
 
+### [MessageToImageLibrary (external repository)](https://github.com/watfordjc/csharp-message-to-image-library)
+The purpose of this library is to interface with Direct2D and DirectWrite so that messages such as Tweets can be converted to images with colour emoji support (among other things).
+
+This is an offshoot repository containing a C# library project **[MessageToImageLibrary](https://github.com/watfordjc/csharp-message-to-image-library/tree/master/MessageToImageLibrary)** and a C++ project **[Direct2DWrapper](https://github.com/watfordjc/csharp-message-to-image-library/tree/master/Direct2DWrapper)**.
+
+If *MessageToImageLibrary.dll* is in directory ```./```, it expects to find *Direct2DWrapper.dll* at the relative location ```./lib/Direct2DWrapper.dll```
+
+The MessageToImageLibrary repository is under a separate release cycle but is under the same library versioning scheme as this repository.
+
 ### [NAudioWrapperLibrary](NAudioWrapperLibrary)
 The purpose of this library is to interface with the Windows audio devices via the [NAudio library](https://github.com/naudio/NAudio).
 

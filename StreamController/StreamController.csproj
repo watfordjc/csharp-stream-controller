@@ -33,6 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\csharp-message-to-image-library\MessageToImageLibrary\MessageToImageLibrary.csproj" />
     <ProjectReference Include="..\NetworkingWrapperLibrary\NetworkingWrapperLibrary.csproj" />
     <ProjectReference Include="..\OBSWebSocketLibrary\OBSWebSocketLibrary.csproj" />
   </ItemGroup>
