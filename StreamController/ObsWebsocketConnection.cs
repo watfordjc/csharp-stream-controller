@@ -68,11 +68,13 @@ namespace uk.JohnCook.dotnet.StreamController
         private Models.WeatherData WeatherDataCollection { get; set; }
         private VerticalMessagePanel verticalMessagePanel = new VerticalMessagePanel();
         private FileSystemWatcher fileSystemWatcher;
+        private readonly SemaphoreSlim logChangeCheckSemaphore = new SemaphoreSlim(1, 1);
         private long logFileSize;
         private static readonly System.Text.RegularExpressions.Regex ircLogTweetRegex = new System.Text.RegularExpressions.Regex(@"^\[(.....)\] \<(.*)\>( \u0002\u000309,01 (.*) \u0003\u0002 \(\u0002(.*)\u0002\) (.*) )?.*\u0002\u000311,01 (.*) \u0003\u0002 \(\u0002(.*)\u0002\).?(.*)?:\u000305 (.*) \u0003\| (.*)$");
         private readonly SemaphoreSlim createMessageImageSemaphore = new SemaphoreSlim(1, 1);
         private readonly Queue<QueuedDisplayMessage> tweetImageQueue = new Queue<QueuedDisplayMessage>();
         private string previousTweetImage = String.Empty;
+        private int tweetImageReuseCount;
         private readonly Windows.Media.SpeechSynthesis.SpeechSynthesizer speechSynthesizer = new Windows.Media.SpeechSynthesis.SpeechSynthesizer();
 
         private class QueuedDisplayMessage
@@ -120,11 +122,12 @@ namespace uk.JohnCook.dotnet.StreamController
         }
 
         [PermissionSet(SecurityAction.Demand, Name = "FullTrust")]
-        private async void MonitorIRCLogs()
+        private void MonitorIRCLogs()
         {
             fileSystemWatcher = new FileSystemWatcher()
             {
                 Path = @"G:\Program Files (x86)\mIRC\logs\",
+                NotifyFilter = NotifyFilters.Size | NotifyFilters.LastWrite | NotifyFilters.LastAccess,
                 Filter = "*.log",
                 IncludeSubdirectories = false
             };
@@ -132,7 +135,6 @@ namespace uk.JohnCook.dotnet.StreamController
             fileSystemWatcher.EnableRaisingEvents = true;
             Trace.WriteLine("Monitoring log changes...");
             FileSystemWatcher_Changed(this, new FileSystemEventArgs(WatcherChangeTypes.Changed, "", ""));
-            await Task.Delay(15000).ConfigureAwait(false);
             chronoTimer.MinuteChanged += RefreshFileStats;
             chronoTimer.SecondChanged += RefreshFileStats;
             chronoTimer.MinuteChanged += ShowNextTweet;
@@ -163,6 +165,7 @@ namespace uk.JohnCook.dotnet.StreamController
             if (tweetImageQueue.Count > 0)
             {
                 displayMessage = tweetImageQueue.Dequeue();
+                tweetImageReuseCount = 0;
                 Trace.WriteLine($"Dequeue at {e.Hour}:{e.Minute}:{e.Second} - {displayMessage.filename}");
                 OBSWebSocketLibrary.TypeDefs.ImageSource imageSource = new OBSWebSocketLibrary.TypeDefs.ImageSource()
                 {
@@ -181,7 +184,15 @@ namespace uk.JohnCook.dotnet.StreamController
             }
             else
             {
-                await ClearTweet().ConfigureAwait(false);
+                if (tweetImageReuseCount >= 1)
+                {
+                    await ClearTweet().ConfigureAwait(false);
+                }
+                else
+                {
+                    tweetImageReuseCount += 1;
+                    return;
+                }
             }
             if (!string.IsNullOrEmpty(previousTweetImage))
             {
@@ -209,33 +220,45 @@ namespace uk.JohnCook.dotnet.StreamController
 
         private void RefreshFileStats(object sender, DateTime e)
         {
-            if (e.Second % 2 == 0) { return; }
+            if (e.Second % 2 == 0 || logChangeCheckSemaphore.CurrentCount == 0) { return; }
+            string today = DateTime.Now.ToString("yyyyMM", CultureInfo.InvariantCulture) + ((DateTime.Now.Day / 7) + 1).ToString("00", CultureInfo.InvariantCulture);
             DirectoryInfo dirInfo = new DirectoryInfo(@"G:\Program Files (x86)\mIRC\logs\");
-            FileInfo[] fileNames = dirInfo.GetFiles("#UK-Emergency-Advice.DALnet.20200901.log");
+            FileInfo[] fileNames = dirInfo.GetFiles($"#UK-Emergency-Advice.DALnet.{today}.log");
             using FileStream fileStream = File.Open(fileNames[0].FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            fileStream.Seek(logFileSize, SeekOrigin.Begin);
+            fileStream.Seek(0, SeekOrigin.End);
+            if (fileStream.Position > Thread.VolatileRead(ref logFileSize))
+            {
+                FileSystemWatcher_Changed(this, new FileSystemEventArgs(WatcherChangeTypes.Changed, "", ""));
+            }
         }
 
-        void FileSystemWatcher_Changed(object sender, FileSystemEventArgs e)
+        private async void FileSystemWatcher_Changed(object sender, FileSystemEventArgs e)
         {
+            if (logChangeCheckSemaphore.CurrentCount == 0)
+            {
+                return;
+            }
+            await logChangeCheckSemaphore.WaitAsync().ConfigureAwait(false);
+            string today = DateTime.Now.ToString("yyyyMM", CultureInfo.InvariantCulture) + ((DateTime.Now.Day / 7) + 1).ToString("00", CultureInfo.InvariantCulture);
             DirectoryInfo dirInfo = new DirectoryInfo(@"G:\Program Files (x86)\mIRC\logs\");
-            FileInfo[] fileNames = dirInfo.GetFiles("#UK-Emergency-Advice.DALnet.20200901.log");
-            if (logFileSize > 0)
+            FileInfo[] fileNames = dirInfo.GetFiles($"#UK-Emergency-Advice.DALnet.{today}.log");
+            if (e.Name == fileNames[0].Name && Thread.VolatileRead(ref logFileSize) > 0)
             {
                 using FileStream fileStream = File.Open(fileNames[0].FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                fileStream.Seek(logFileSize, SeekOrigin.Begin);
+                fileStream.Seek(Thread.VolatileRead(ref logFileSize), SeekOrigin.Begin);
                 using StreamReader streamReader = new StreamReader(fileStream);
                 while (streamReader.Peek() >= 0)
                 {
                     string currentLine = streamReader.ReadLine();
                     ParseMessageFromIrcLog(currentLine).ConfigureAwait(false).GetAwaiter();
                 }
-                logFileSize = fileNames[0].Length;
+                Thread.VolatileWrite(ref logFileSize, fileNames[0].Length);
             }
             else
             {
-                logFileSize = fileNames[0].Length;
+                Thread.VolatileWrite(ref logFileSize, fileNames[0].Length);
             }
+            logChangeCheckSemaphore.Release();
         }
 
         private async Task ParseMessageFromIrcLog(string message)
@@ -1512,6 +1535,7 @@ namespace uk.JohnCook.dotnet.StreamController
                     audioWorkarounds.Dispose();
                     httpClient.Dispose();
                     verticalMessagePanel.Dispose();
+                    logChangeCheckSemaphore.Dispose();
                     fileSystemWatcher.Dispose();
                     createMessageImageSemaphore.Dispose();
                     speechSynthesizer.Dispose();
