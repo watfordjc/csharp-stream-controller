@@ -4,11 +4,13 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.WebSockets;
 using System.Runtime.CompilerServices;
+using System.Security.Permissions;
 using System.Security.Policy;
 using System.Text;
 using System.Text.Json;
@@ -29,6 +31,7 @@ using uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequests;
 using uk.JohnCook.dotnet.OBSWebSocketLibrary.TypeDefs;
 using uk.JohnCook.dotnet.StreamController.Models;
 using uk.JohnCook.dotnet.WebSocketLibrary;
+using Windows.UI.Xaml.Controls;
 
 namespace uk.JohnCook.dotnet.StreamController
 {
@@ -64,6 +67,20 @@ namespace uk.JohnCook.dotnet.StreamController
         private readonly HttpClient httpClient = new HttpClient();
         private Models.WeatherData WeatherDataCollection { get; set; }
         private VerticalMessagePanel verticalMessagePanel = new VerticalMessagePanel();
+        private FileSystemWatcher fileSystemWatcher;
+        private long logFileSize;
+        private static readonly System.Text.RegularExpressions.Regex ircLogTweetRegex = new System.Text.RegularExpressions.Regex(@"^\[(.....)\] \<(.*)\>( \u0002\u000309,01 (.*) \u0003\u0002 \(\u0002(.*)\u0002\) (.*) )?.*\u0002\u000311,01 (.*) \u0003\u0002 \(\u0002(.*)\u0002\).?(.*)?:\u000305 (.*) \u0003\| (.*)$");
+        private readonly SemaphoreSlim createMessageImageSemaphore = new SemaphoreSlim(1, 1);
+        private readonly Queue<QueuedDisplayMessage> tweetImageQueue = new Queue<QueuedDisplayMessage>();
+        private string previousTweetImage = String.Empty;
+        private readonly Windows.Media.SpeechSynthesis.SpeechSynthesizer speechSynthesizer = new Windows.Media.SpeechSynthesis.SpeechSynthesizer();
+
+        private class QueuedDisplayMessage
+        {
+            public string filename { get; set; }
+            public string speechPrepend { get; set; }
+            public string speechText { get; set; }
+        }
 
         public static readonly Brush PrimaryBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(0xFF, 0xE2, 0xC1, 0xEA));
         public static readonly Brush SecondaryBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(0xFF, 0xC5, 0xC0, 0xEB));
@@ -99,7 +116,231 @@ namespace uk.JohnCook.dotnet.StreamController
             UpdateTimezoneString();
             ChronoTimer.Instance.MinuteChanged += FetchWeatherData;
             FetchWeatherData(this, DateTime.UtcNow);
+            MonitorIRCLogs();
         }
+
+        [PermissionSet(SecurityAction.Demand, Name = "FullTrust")]
+        private async void MonitorIRCLogs()
+        {
+            fileSystemWatcher = new FileSystemWatcher()
+            {
+                Path = @"G:\Program Files (x86)\mIRC\logs\",
+                Filter = "*.log",
+                IncludeSubdirectories = false
+            };
+            fileSystemWatcher.Changed += FileSystemWatcher_Changed;
+            fileSystemWatcher.EnableRaisingEvents = true;
+            Trace.WriteLine("Monitoring log changes...");
+            FileSystemWatcher_Changed(this, new FileSystemEventArgs(WatcherChangeTypes.Changed, "", ""));
+            await Task.Delay(15000).ConfigureAwait(false);
+            chronoTimer.MinuteChanged += RefreshFileStats;
+            chronoTimer.SecondChanged += RefreshFileStats;
+            chronoTimer.MinuteChanged += ShowNextTweet;
+            chronoTimer.SecondChanged += ShowNextTweet;
+        }
+
+        private async Task ClearTweet()
+        {
+            OBSWebSocketLibrary.TypeDefs.ImageSource imageSource = new OBSWebSocketLibrary.TypeDefs.ImageSource()
+            {
+                File = verticalMessagePanel.blankPanel
+            };
+            SetSourceSettingsRequest request = new SetSourceSettingsRequest()
+            {
+                SourceName = "TextFormatterOutput",
+                SourceSettings = imageSource
+            };
+            await Obs_Get(request).ConfigureAwait(false);
+        }
+
+        private async void ShowNextTweet(object sender, DateTime e)
+        {
+            if (e.Second % 10 > 0)
+            {
+                return;
+            }
+            QueuedDisplayMessage displayMessage = null;
+            if (tweetImageQueue.Count > 0)
+            {
+                displayMessage = tweetImageQueue.Dequeue();
+                Trace.WriteLine($"Dequeue at {e.Hour}:{e.Minute}:{e.Second} - {displayMessage.filename}");
+                OBSWebSocketLibrary.TypeDefs.ImageSource imageSource = new OBSWebSocketLibrary.TypeDefs.ImageSource()
+                {
+                    File = displayMessage.filename
+                };
+                SetSourceSettingsRequest request = new SetSourceSettingsRequest()
+                {
+                    SourceName = "TextFormatterOutput",
+                    SourceSettings = imageSource
+                };
+                await Obs_Get(request).ConfigureAwait(false);
+                //_Context.Send(
+                //    async x => await Speak(displayMessage).ConfigureAwait(true), null
+                //    );
+
+            }
+            else
+            {
+                await ClearTweet().ConfigureAwait(false);
+            }
+            if (!string.IsNullOrEmpty(previousTweetImage))
+            {
+                File.Delete(previousTweetImage);
+            }
+            if (displayMessage != null)
+            {
+                previousTweetImage = displayMessage.filename;
+            }
+            else
+            {
+                previousTweetImage = String.Empty;
+            }
+        }
+
+        //private async Task Speak(QueuedDisplayMessage displayMessage)
+        //{
+        //    Windows.Media.SpeechSynthesis.SpeechSynthesisStream speech = await speechSynthesizer.SynthesizeTextToStreamAsync(displayMessage.speechPrepend + displayMessage.speechText);
+
+        //    using Windows.Media.Core.MediaSource source = Windows.Media.Core.MediaSource.CreateFromStream(speech, speech.ContentType);
+        //    Windows.Media.Playback.MediaPlaybackItem mediaPlaybackItem = new Windows.Media.Playback.MediaPlaybackItem(source);
+        //    MediaPlayerElement mediaPlayer = new MediaPlayerElement() { Source = mediaPlaybackItem };
+        //    mediaPlayer.MediaPlayer.Play();
+        //}
+
+        private void RefreshFileStats(object sender, DateTime e)
+        {
+            if (e.Second % 2 == 0) { return; }
+            DirectoryInfo dirInfo = new DirectoryInfo(@"G:\Program Files (x86)\mIRC\logs\");
+            FileInfo[] fileNames = dirInfo.GetFiles("#UK-Emergency-Advice.DALnet.20200901.log");
+            using FileStream fileStream = File.Open(fileNames[0].FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            fileStream.Seek(logFileSize, SeekOrigin.Begin);
+        }
+
+        void FileSystemWatcher_Changed(object sender, FileSystemEventArgs e)
+        {
+            DirectoryInfo dirInfo = new DirectoryInfo(@"G:\Program Files (x86)\mIRC\logs\");
+            FileInfo[] fileNames = dirInfo.GetFiles("#UK-Emergency-Advice.DALnet.20200901.log");
+            if (logFileSize > 0)
+            {
+                using FileStream fileStream = File.Open(fileNames[0].FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                fileStream.Seek(logFileSize, SeekOrigin.Begin);
+                using StreamReader streamReader = new StreamReader(fileStream);
+                while (streamReader.Peek() >= 0)
+                {
+                    string currentLine = streamReader.ReadLine();
+                    ParseMessageFromIrcLog(currentLine).ConfigureAwait(false).GetAwaiter();
+                }
+                logFileSize = fileNames[0].Length;
+            }
+            else
+            {
+                logFileSize = fileNames[0].Length;
+            }
+        }
+
+        private async Task ParseMessageFromIrcLog(string message)
+        {
+            System.Text.RegularExpressions.Match match = ircLogTweetRegex.Match(message);
+
+            string relayTime = match.Groups[1].Value;
+            string ircUser = match.Groups[2].Value;
+            bool isTweet = match.Groups[9].Value == "Tweeted";
+            bool isRetweet = match.Groups[6].Value == "Retweeted";
+            if ((!isTweet && !isRetweet) || ircUser != "UKEM-Bot")
+            {
+                return;
+            }
+            string displayName = match.Groups[7].Value;
+            string username = match.Groups[8].Value;
+            string retweeterDisplayName = match.Groups[4].Value;
+            string retweeterUsername = match.Groups[5].Value;
+            string tweetText = match.Groups[10].Value;
+            string tweetId = match.Groups[11].Value;
+
+            Trace.WriteLine($"time: {relayTime}, luser: {ircUser}, isRetweet: {isRetweet} ({retweeterDisplayName}({retweeterUsername})), {displayName} ({username}) Tweeted ({tweetId}) {tweetText}");
+
+            string time = isRetweet ? $"Retweeted Today" : $"Today, {relayTime} UTC+1";
+            string profileImageFile = null;
+
+            DirectoryInfo imageDir1 = new DirectoryInfo(@"G:\Program Files (x86)\mIRC\twimg\");
+            DirectoryInfo imageDir2 = new DirectoryInfo(@"G:\Program Files (x86)\mIRC\twimg\tmp\");
+
+            FileInfo[] imageFile1 = imageDir1.GetFiles(username.Remove(0, 1) + ".*");
+            FileInfo[] imageFile2 = imageDir2.GetFiles(username.Remove(0, 1) + ".*");
+
+            if (imageFile1.Length > 0)
+            {
+                profileImageFile = imageFile1[0].FullName;
+            }
+            else if (imageFile2.Length > 0)
+            {
+                profileImageFile = imageFile2[0].FullName;
+            }
+
+            if (profileImageFile == null)
+            {
+                Trace.WriteLine("No image file immediately available.");
+                return;
+            }
+
+            if (!isRetweet)
+            {
+                retweeterDisplayName = null;
+                retweeterUsername = null;
+            }
+
+            await createMessageImageSemaphore.WaitAsync().ConfigureAwait(false);
+
+            string createdImage = null;
+
+            try
+            {
+                createdImage = verticalMessagePanel.DrawVerticalTweet(profileImageFile, displayName, username, tweetText, time, retweeterDisplayName, retweeterUsername);
+                Trace.WriteLine($"Tweet image saved to {createdImage}.");
+            }
+            catch (System.Runtime.InteropServices.COMException ce)
+            {
+                Trace.WriteLine($"Exception whilst processing Tweet with ID {tweetId} by {username} (retrying...) - {ce.Message}");
+                try
+                {
+                    verticalMessagePanel.Dispose();
+                    verticalMessagePanel = new VerticalMessagePanel();
+                    createdImage = verticalMessagePanel.DrawVerticalTweet(profileImageFile, displayName, username, tweetText, time, retweeterDisplayName, retweeterUsername);
+                }
+                catch (System.Runtime.InteropServices.COMException ce2)
+                {
+                    Trace.WriteLine($"Exception whilst processing Tweet with ID {tweetId} by {username} (retry failed) - {ce2.Message}");
+                }
+            }
+            catch (AccessViolationException ave)
+            {
+                Trace.WriteLine($"Exception whilst processing Tweet with ID {tweetId} by {username} (retrying...) - {ave.Message}");
+                try
+                {
+                    verticalMessagePanel.Dispose();
+                    verticalMessagePanel = new VerticalMessagePanel();
+                    createdImage = verticalMessagePanel.DrawVerticalTweet(profileImageFile, displayName, username, tweetText, time, retweeterDisplayName, retweeterUsername);
+                }
+                catch (AccessViolationException ave2)
+                {
+                    Trace.WriteLine($"Exception whilst processing Tweet with ID {tweetId} by {username} (retry failed) - {ave2.Message}");
+                }
+            }
+            createMessageImageSemaphore.Release();
+
+            if (createdImage != null)
+            {
+                QueuedDisplayMessage displayMessage = new QueuedDisplayMessage()
+                {
+                    filename = createdImage,
+                    speechPrepend = isRetweet ? $"{retweeterDisplayName} Retweeted {displayName}: " : $"{displayName} Tweeted: ",
+                    speechText = tweetText
+                };
+                tweetImageQueue.Enqueue(displayMessage);
+            }
+        }
+
+
 
         private void AudioDevicesEnumerated(object sender, EventArgs e)
         {
@@ -510,6 +751,10 @@ namespace uk.JohnCook.dotnet.StreamController
                         ChronoTimer.Instance.SecondChanged -= SlideShowNextSlide;
                         ChronoTimer.Instance.SecondChanged += SlideShowNextSlide;
                     }
+                    else if (newSource.Name == "TextFormatterOutput")
+                    {
+                        await ClearTweet().ConfigureAwait(true);
+                    }
                     await Obs_Get(ObsRequestType.GetSourceFilters, sourceSettings.SourceName).ConfigureAwait(true);
                     break;
                 case ObsRequestType.GetSourceFilters:
@@ -709,6 +954,10 @@ namespace uk.JohnCook.dotnet.StreamController
             else if (!FirstWeatherCycle && e.Second >= localWeatherHoldCount)
             {
                 CurrentLocalClockWeatherRecord++;
+            }
+            if (CurrentLocalClockWeatherRecord >= WeatherDataCollection.Items.Count)
+            {
+                return;
             }
 
             // JSON API text may contain HTML entities - &deg; is easier to type, &#xf002; won't usually look like a cloud, also avoids icon font hard-coding
@@ -1263,6 +1512,9 @@ namespace uk.JohnCook.dotnet.StreamController
                     audioWorkarounds.Dispose();
                     httpClient.Dispose();
                     verticalMessagePanel.Dispose();
+                    fileSystemWatcher.Dispose();
+                    createMessageImageSemaphore.Dispose();
+                    speechSynthesizer.Dispose();
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override finalizer

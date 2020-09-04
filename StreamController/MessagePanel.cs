@@ -18,12 +18,16 @@ namespace uk.JohnCook.dotnet.StreamController
         private readonly UInt32 panelBackgroundColor = (uint)System.Drawing.Color.Black.ToArgb();
         private readonly Direct2DWrapper direct2DWrapper = new Direct2DWrapper();
         private readonly MessagePanel verticalMessagePanel;
+        private PointF messageBlankingAreaOriginPoint;
+        private RectF messageBlankingArea;
+        public string blankPanel = String.Empty;
 
         public VerticalMessagePanel()
         {
             verticalMessagePanel = direct2DWrapper.CreateMessagePanel(panelSize, panelBackgroundColor);
             InitialiseMessagePanel();
-            DrawVerticalTweet(@"G:\Program Files (x86)\mIRC\twimg\tmp\GMMH_NHS.jpg", "Greater Manchester Mental Health", "@GMMH_NHS", "A huge thank you to the wonderful team at HMP Hindley. You are all #GMMHSuperstars! 🌟🌟 #TogetherGMMH 💙", "Today, 13:42 UTC+1");
+            blankPanel = SaveImage();
+            //blankPanel = DrawVerticalTweet(@"G:\Program Files (x86)\mIRC\twimg\tmp\HighwaysNWEST.jpg", "Highways England", "@HighwaysNWEST", "@CheshireFire @OfficialTfGM @NWAmbulance @NWmwaypolice Incident Update:  A lane has been re-opened past the scene of the vehicle fire so if you are stuck in traffic on the A556 you will be moving again very soon.  There is still no access yet to the A556 from the #M6 #J19 #Tabley @CheshireFire @OfficialTfGM @NWAmbulance @NWmwaypolice", "Today, 15:00 UTC+1", "Cheshire Fire and Rescue Service", "@CheshireFire");
         }
 
         private void CreateBrushes()
@@ -91,7 +95,7 @@ namespace uk.JohnCook.dotnet.StreamController
             verticalMessagePanel.SetFont(CanvasElement.TEXT, new FontSettings()
             {
                 FontName = "Segoe UI Emoji",
-                FontSize = 90.0f,
+                FontSize = 84.0f,
                 FontWeight = 700,
                 LocaleName = "en-GB"
             });
@@ -191,6 +195,18 @@ namespace uk.JohnCook.dotnet.StreamController
                 Right = verticalMessagePanel.PanelRectangle.Width - (verticalMessagePanel.MessageOriginPoint.X * 2),
                 Bottom = verticalMessagePanel.PanelRectangle.Height - verticalMessagePanel.MessageOriginPoint.Y - 60.0f
             };
+            messageBlankingAreaOriginPoint = new PointF()
+            {
+                X = 0.0f,
+                Y = verticalMessagePanel.HeadingSeparatorRectangle.Bottom + 45.0f
+            };
+            messageBlankingArea = new RectF()
+            {
+                Left = 0,
+                Top = 0,
+                Right = verticalMessagePanel.PanelRectangle.Width,
+                Bottom = verticalMessagePanel.PanelRectangle.Height - messageBlankingAreaOriginPoint.Y
+            };
             #endregion
 
             #region Set Tweet profile image area relative to canvas
@@ -219,9 +235,9 @@ namespace uk.JohnCook.dotnet.StreamController
             #endregion
         }
 
-        private string DrawVerticalTweet(string profileImageFilename, string displayName, string username, string text, string time, string retweeterDisplayName = null, string retweeterUsername = null)
+        public string DrawVerticalTweet(string profileImageFilename, string displayName, string username, string text, string time, string retweeterDisplayName = null, string retweeterUsername = null)
         {
-            verticalMessagePanel.ClearArea(verticalMessagePanel.MessageOriginPoint, verticalMessagePanel.MessageRectangle, verticalMessagePanel.Brushes["backgroundBrush"], true, true);
+            verticalMessagePanel.ClearArea(messageBlankingAreaOriginPoint, messageBlankingArea, verticalMessagePanel.Brushes["backgroundBrush"], true, true);
 
             #region Profile image
             // TODO: Set ProfileImageFilename
@@ -387,6 +403,11 @@ namespace uk.JohnCook.dotnet.StreamController
             verticalMessagePanel.EndDraw();
             #endregion
 
+            return SaveImage();
+        }
+
+        private string SaveImage()
+        {
             #region Save Image
             // Date/Time format to append to file name. Custom format because filenames cannot contain colons.
             DateTimeFormat dateTimeFormat = new DateTimeFormat("yyyy-MM-ddTHHmmss.fffffffZ");
@@ -399,8 +420,8 @@ namespace uk.JohnCook.dotnet.StreamController
                 verticalMessagePanel.SaveImage(saveLocation);
                 Trace.WriteLine($"Image successfully saved to {saveLocation}");
                 // Open file explorer with the saved file selected
-                string selectFileArgument = $"/select, \"{saveLocation}\"";
-                Process.Start("explorer.exe", selectFileArgument);
+                //string selectFileArgument = $"/select, \"{saveLocation}\"";
+                //Process.Start("explorer.exe", selectFileArgument);
                 return saveLocation;
             }
             catch (FileNotFoundException e)
@@ -414,6 +435,7 @@ namespace uk.JohnCook.dotnet.StreamController
         public void Dispose()
         {
             direct2DWrapper.Dispose();
+            File.Delete(blankPanel);
         }
     }
 }
