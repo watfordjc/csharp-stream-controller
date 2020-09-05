@@ -130,7 +130,7 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
                     x => SortCollection(),
                     null);
             }
-            Trace.WriteLine($"A new {processName} process was created with PID {processId}!");
+            //Trace.WriteLine($"A new {processName} process was created with PID {processId}!");
         }
 
         public static void ProcessDeletedEventArrived(object sender, EventArrivedEventArgs e)
@@ -150,7 +150,7 @@ namespace uk.JohnCook.dotnet.NAudioWrapperLibrary
                     x => SortCollection(),
                     null);
             }
-            Trace.WriteLine($"Process {processName} with PID {processId} has been destroyed!");
+            //Trace.WriteLine($"Process {processName} with PID {processId} has been destroyed!");
         }
 
 

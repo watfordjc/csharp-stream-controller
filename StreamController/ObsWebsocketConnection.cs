@@ -167,6 +167,10 @@ namespace uk.JohnCook.dotnet.StreamController
                 displayMessage = tweetImageQueue.Dequeue();
                 tweetImageReuseCount = 0;
                 Trace.WriteLine($"Dequeue at {e.Hour}:{e.Minute}:{e.Second} - {displayMessage.filename}");
+                if (!Instance.Client.CanSend || String.IsNullOrEmpty(displayMessage.filename))
+                {
+                    return;
+                }
                 OBSWebSocketLibrary.TypeDefs.ImageSource imageSource = new OBSWebSocketLibrary.TypeDefs.ImageSource()
                 {
                     File = displayMessage.filename
@@ -261,6 +265,73 @@ namespace uk.JohnCook.dotnet.StreamController
             logChangeCheckSemaphore.Release();
         }
 
+        private static string FetchProfileImage(string username)
+        {
+            // Default Twitter profile image
+            string fallbackProfileImage = @"G:\Program Files (x86)\mIRC\twitter_default.png";
+            // One-dimensional array of folders containing profile images.
+            // The last item in the array is where freshly downloaded images are expected to be saved.
+            string[] profileImageDirs = {
+                @"G:\Program Files (x86)\mIRC\twimg\",
+                @"G:\Program Files (x86)\mIRC\twimg\tmp\"
+            };
+            DirectoryInfo userProfileImageDir = null;
+            FileInfo[] userProfileImageFiles = null;
+
+            foreach (string dir in profileImageDirs)
+            {
+                userProfileImageDir = new DirectoryInfo(dir);
+                userProfileImageFiles = userProfileImageDir.GetFiles(username.Remove(0, 1) + ".*");
+                if (userProfileImageFiles.Length > 0)
+                {
+                    return userProfileImageFiles[0].FullName;
+                }
+            }
+
+            Trace.WriteLine($"Attempting to download profile image for Twitter user {username}.");
+
+            TaskCompletionSource<int> returnCode = new TaskCompletionSource<int>();
+
+            // Path to dash script and username parameter
+            string commandArguments = $@"/home/thejc/Scripts/tweets/get-profile-image.sh {username.Remove(0, 1)}";
+            // Path to WSL2 instance of Ubuntu
+            string wslPath = @"C:\Users\John\AppData\Local\Microsoft\WindowsApps\ubuntu.exe";
+
+            using Process getProfileImageProcess = new Process()
+            {
+                StartInfo = {
+                    FileName = wslPath,
+                    Arguments = $"-c {commandArguments}",
+                    CreateNoWindow = true
+                },
+                EnableRaisingEvents = true
+            };
+            getProfileImageProcess.Exited += (sender, args) =>
+            {
+                returnCode.SetResult(getProfileImageProcess.ExitCode);
+                getProfileImageProcess.Dispose();
+            };
+
+            getProfileImageProcess.Start();
+
+            if (returnCode.Task.Result == 0)
+            {
+                userProfileImageFiles = userProfileImageDir.GetFiles(username.Remove(0, 1) + ".*");
+                if (userProfileImageFiles.Length > 0)
+                {
+                    return userProfileImageFiles[0].FullName;
+                }
+                else
+                {
+                    return fallbackProfileImage;
+                }
+            }
+            else
+            {
+                return fallbackProfileImage;
+            }
+        }
+
         private async Task ParseMessageFromIrcLog(string message)
         {
             System.Text.RegularExpressions.Match match = ircLogTweetRegex.Match(message);
@@ -275,42 +346,15 @@ namespace uk.JohnCook.dotnet.StreamController
             }
             string displayName = match.Groups[7].Value;
             string username = match.Groups[8].Value;
-            string retweeterDisplayName = match.Groups[4].Value;
-            string retweeterUsername = match.Groups[5].Value;
+            string retweeterDisplayName = isRetweet ? match.Groups[4].Value : null;
+            string retweeterUsername = isRetweet ? match.Groups[5].Value : null;
             string tweetText = match.Groups[10].Value;
             string tweetId = match.Groups[11].Value;
 
-            Trace.WriteLine($"time: {relayTime}, luser: {ircUser}, isRetweet: {isRetweet} ({retweeterDisplayName}({retweeterUsername})), {displayName} ({username}) Tweeted ({tweetId}) {tweetText}");
+            //Trace.WriteLine($"time: {relayTime}, luser: {ircUser}, isRetweet: {isRetweet} ({retweeterDisplayName}({retweeterUsername})), {displayName} ({username}) Tweeted ({tweetId}) {tweetText}");
 
             string time = isRetweet ? $"Retweeted Today" : $"Today, {relayTime} UTC+1";
-            string profileImageFile = null;
-
-            DirectoryInfo imageDir1 = new DirectoryInfo(@"G:\Program Files (x86)\mIRC\twimg\");
-            DirectoryInfo imageDir2 = new DirectoryInfo(@"G:\Program Files (x86)\mIRC\twimg\tmp\");
-
-            FileInfo[] imageFile1 = imageDir1.GetFiles(username.Remove(0, 1) + ".*");
-            FileInfo[] imageFile2 = imageDir2.GetFiles(username.Remove(0, 1) + ".*");
-
-            if (imageFile1.Length > 0)
-            {
-                profileImageFile = imageFile1[0].FullName;
-            }
-            else if (imageFile2.Length > 0)
-            {
-                profileImageFile = imageFile2[0].FullName;
-            }
-
-            if (profileImageFile == null)
-            {
-                Trace.WriteLine("No image file immediately available.");
-                return;
-            }
-
-            if (!isRetweet)
-            {
-                retweeterDisplayName = null;
-                retweeterUsername = null;
-            }
+            string profileImageFile = FetchProfileImage(username);
 
             await createMessageImageSemaphore.WaitAsync().ConfigureAwait(false);
 
@@ -323,7 +367,7 @@ namespace uk.JohnCook.dotnet.StreamController
             }
             catch (System.Runtime.InteropServices.COMException ce)
             {
-                Trace.WriteLine($"Exception whilst processing Tweet with ID {tweetId} by {username} (retrying...) - {ce.Message}");
+                Trace.WriteLine($"Exception whilst processing Tweet with ID {tweetId} by {username} (retrying...) - {ce.Message} - {ce.InnerException?.Message}");
                 try
                 {
                     verticalMessagePanel.Dispose();
@@ -332,7 +376,7 @@ namespace uk.JohnCook.dotnet.StreamController
                 }
                 catch (System.Runtime.InteropServices.COMException ce2)
                 {
-                    Trace.WriteLine($"Exception whilst processing Tweet with ID {tweetId} by {username} (retry failed) - {ce2.Message}");
+                    Trace.WriteLine($"Exception whilst processing Tweet with ID {tweetId} by {username} (retry failed) - {ce2.Message} - {ce2.InnerException?.Message}");
                 }
             }
             catch (AccessViolationException ave)

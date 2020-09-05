@@ -434,6 +434,7 @@ namespace uk.JohnCook.dotnet.StreamController
 
         public void Dispose()
         {
+            verticalMessagePanel.Dispose();
             direct2DWrapper.Dispose();
             File.Delete(blankPanel);
         }

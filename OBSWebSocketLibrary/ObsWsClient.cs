@@ -233,7 +233,7 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary
             }
             else if (root.TryGetProperty("update-type", out JsonElement updateTypeJson))
             {
-                Trace.WriteLine($"Received a message of type {updateTypeJson}.");
+                //Trace.WriteLine($"Received a message of type {updateTypeJson}.");
                 bool isStreaming = root.TryGetProperty("stream-timecode", out JsonElement jsonStreamTimecode);
                 bool isRecording = root.TryGetProperty("rec-timecode", out JsonElement jsonRecTimecode);
                 ObsEventObject obsEvent = new ObsEventObject();
