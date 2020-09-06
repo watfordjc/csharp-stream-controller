@@ -85,8 +85,10 @@ namespace uk.JohnCook.dotnet.StreamController
             return Task.CompletedTask;
         }
 
-        private static int GetWaveOutDeviceNumber(AudioInterface audioInterface)
+        public static int GetWaveOutDeviceNumber(AudioInterface audioInterface)
         {
+            if (audioInterface == null) { throw new ArgumentNullException(nameof(audioInterface)); }
+
             int deviceNameMaxLength = Math.Min(audioInterface.FriendlyName.Length, 31);
             string deviceNameTruncated = audioInterface.FriendlyName.Substring(0, deviceNameMaxLength);
             for (int i = 0; i < WaveOut.DeviceCount; i++)

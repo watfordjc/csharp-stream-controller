@@ -21,7 +21,6 @@ namespace uk.JohnCook.dotnet.StreamController
 
         #region Properties and Variables
 
-        private SynchronizationContext _Context = SynchronizationContext.Current;
         private readonly ChronoTimer chronoTimer = ChronoTimer.Instance;
         private string TimezoneString { get; set; } = String.Empty;
         private string PreviousLocalClockWeatherAttrib1 { get; set; } = String.Empty;

@@ -1,12 +1,15 @@
-﻿using System;
+﻿using NAudio.Wave;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Security.Permissions;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using uk.JohnCook.dotnet.NAudioWrapperLibrary;
 using uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequests;
 
 namespace uk.JohnCook.dotnet.StreamController
@@ -19,7 +22,7 @@ namespace uk.JohnCook.dotnet.StreamController
 
         private readonly SynchronizationContext _Context;
         private readonly ChronoTimer chronoTimer = ChronoTimer.Instance;
-        private VerticalMessagePanel verticalMessagePanel = new VerticalMessagePanel();
+        private readonly VerticalMessagePanel verticalMessagePanel = new VerticalMessagePanel();
         private readonly FileSystemWatcher fileSystemWatcher;
         private readonly SemaphoreSlim logChangeCheckSemaphore = new SemaphoreSlim(1, 1);
         private long logFileSize;
@@ -29,10 +32,13 @@ namespace uk.JohnCook.dotnet.StreamController
         private string previousTweetImage = String.Empty;
         private const int minimumTweetDisplayPeriods = 2;
         private const int maximumTweetDisplayPeriods = 4;
-        private int tweetDisplayPeriodsRemaining;
+        private volatile int tweetDisplayPeriodsRemaining;
         private bool disposedValue;
         private readonly Windows.Media.SpeechSynthesis.SpeechSynthesizer speechSynthesizer = new Windows.Media.SpeechSynthesis.SpeechSynthesizer();
-        private readonly System.Media.SoundPlayer soundPlayer = new System.Media.SoundPlayer();
+        private WaveOut waveOut;
+        WaveFileReader waveFileReader;
+
+        public volatile int countdownTimerValue;
 
         private static readonly Dictionary<string, string> speechReplacementDictionary = new Dictionary<string, string>()
             {
@@ -265,8 +271,8 @@ namespace uk.JohnCook.dotnet.StreamController
                 Trace.WriteLine($"Exception whilst processing Tweet with ID {tweetId} by {username} (retrying...) - {ce.Message} - {ce.InnerException?.Message}");
                 try
                 {
-                    verticalMessagePanel.Dispose();
-                    verticalMessagePanel = new VerticalMessagePanel();
+                    //verticalMessagePanel.Dispose();
+                    //verticalMessagePanel = new VerticalMessagePanel();
                     createdImage = verticalMessagePanel.DrawVerticalTweet(profileImageFile, displayName, username, tweetText, time, retweeterDisplayName, retweeterUsername);
                 }
                 catch (System.Runtime.InteropServices.COMException ce2)
@@ -279,8 +285,8 @@ namespace uk.JohnCook.dotnet.StreamController
                 Trace.WriteLine($"Exception whilst processing Tweet with ID {tweetId} by {username} (retrying...) - {ave.Message}");
                 try
                 {
-                    verticalMessagePanel.Dispose();
-                    verticalMessagePanel = new VerticalMessagePanel();
+                    //verticalMessagePanel.Dispose();
+                    //verticalMessagePanel = new VerticalMessagePanel();
                     createdImage = verticalMessagePanel.DrawVerticalTweet(profileImageFile, displayName, username, tweetText, time, retweeterDisplayName, retweeterUsername);
                 }
                 catch (AccessViolationException ave2)
@@ -336,39 +342,69 @@ namespace uk.JohnCook.dotnet.StreamController
         /// <param name="e">DateTime from a ChronoTimer</param>
         private async void ShowNextTweet(object sender, DateTime e)
         {
-            if (e.Second % Preferences.Default.obs_local_clock_cycle_delay > 0)
+            if (!string.IsNullOrEmpty(previousTweetImage))
+            {
+                countdownTimerValue--;
+                UpdateCountdownDisplay();
+            }
+            //Trace.WriteLine($"Display periods remaining: {tweetDisplayPeriodsRemaining}, countdown value: {countdownTimerValue}, Tweet queue size: {tweetImageQueue.Count}");
+
+            int clockCycleRemainder = e.Second % Preferences.Default.obs_local_clock_cycle_delay;
+            int remainderPrecedingSecond = Preferences.Default.obs_local_clock_cycle_delay - 1;
+            if (clockCycleRemainder > 0 && (clockCycleRemainder < remainderPrecedingSecond && Preferences.Default.obs_local_clock_cycle_delay > 1))
             {
                 return;
             }
-            int finalTweetDisplayPeriod = 0 - (maximumTweetDisplayPeriods - minimumTweetDisplayPeriods);
+
+            int finalTweetDisplayPeriod = minimumTweetDisplayPeriods - maximumTweetDisplayPeriods;
+
+            // The second preceding a new display period, reduce the display period number
+            if (clockCycleRemainder == remainderPrecedingSecond)
+            {
+                // Previous Tweet hasn't reached end of minimum display time yet, or
+                // Previous Tweet hasn't reached maximum display time yet - there are no more Tweets in the queue
+                if (!String.IsNullOrEmpty(previousTweetImage) && (
+                    (tweetDisplayPeriodsRemaining > 0) ||
+                    (tweetImageQueue.Count == 0 && tweetDisplayPeriodsRemaining > finalTweetDisplayPeriod)
+                    ))
+                {
+                    tweetDisplayPeriodsRemaining--;
+                }
+                return;
+            }
+
             // Previous Tweet hasn't reached end of minimum display time yet, or
             // Previous Tweet hasn't reached maximum display time yet - there are no more Tweets in the queue
             if (!String.IsNullOrEmpty(previousTweetImage) && (
                 (tweetDisplayPeriodsRemaining > 0) ||
-                (tweetDisplayPeriodsRemaining > finalTweetDisplayPeriod && tweetImageQueue.Count == 0)
+                (tweetImageQueue.Count == 0 && tweetDisplayPeriodsRemaining > finalTweetDisplayPeriod)
                 ))
             {
-                tweetDisplayPeriodsRemaining--;
                 return;
             }
-            // Previous Tweet has reached maximum display time - there are no more Tweets in the queue, or
-            else if (!String.IsNullOrEmpty(previousTweetImage) &&
-                tweetDisplayPeriodsRemaining == finalTweetDisplayPeriod && tweetImageQueue.Count == 0
-                )
+
+            // Previous Tweet has reached maximum display time - there are no more Tweets in the queue
+            else if (!String.IsNullOrEmpty(previousTweetImage) && tweetImageQueue.Count == 0)
             {
                 tweetDisplayPeriodsRemaining = 0;
                 await ClearTweet().ConfigureAwait(false);
+                countdownTimerValue = 0;
+                UpdateCountdownDisplay();
                 return;
             }
+
             // There are more Tweets in the queue and we're ready to show the next one
             else if (tweetImageQueue.Count > 0)
             {
                 tweetDisplayPeriodsRemaining = minimumTweetDisplayPeriods;
                 QueuedDisplayMessage displayMessage = tweetImageQueue.Dequeue();
                 Trace.WriteLine($"Dequeue at {e.Hour}:{e.Minute}:{e.Second} - {displayMessage.Filename}");
-                if (!ObsWebsocketConnection.Instance.Client.CanSend || String.IsNullOrEmpty(displayMessage.Filename))
+                // Unable to display next Tweet
+                if (ObsWebsocketConnection.Instance.Client != null && (!(ObsWebsocketConnection.Instance.Client.CanSend) || String.IsNullOrEmpty(displayMessage.Filename)))
                 {
                     tweetDisplayPeriodsRemaining = 0;
+                    countdownTimerValue = 0;
+                    UpdateCountdownDisplay();
                     await ClearTweet().ConfigureAwait(false);
                     if (File.Exists(displayMessage.Filename))
                     {
@@ -395,6 +431,27 @@ namespace uk.JohnCook.dotnet.StreamController
                 }
                 previousTweetImage = displayMessage.Filename;
             }
+        }
+
+        public async void UpdateCountdownDisplay()
+        {
+            if (ObsWebsocketConnection.Instance.Client == null || !ObsWebsocketConnection.Instance.Client.CanSend)
+            {
+                return;
+            }
+            //string localDisplayTime = String.Format(CultureInfo.CurrentCulture, Properties.Resources.obs_time_display_format, e.ToLocalTime().ToString(Properties.Resources.obs_time_string_format, CultureInfo.InvariantCulture), TimezoneString);
+            SetTextGDIPlusPropertiesRequestTextPropertyOnly request = new SetTextGDIPlusPropertiesRequestTextPropertyOnly()
+            {
+                Source = "Tweet Countdown",
+                Text = countdownTimerValue.ToString(CultureInfo.InvariantCulture)
+            };
+            SetTextGDIPlusPropertiesRequestTextPropertyOnly request2 = new SetTextGDIPlusPropertiesRequestTextPropertyOnly()
+            {
+                Source = "Tweet Countdown 2",
+                Text = countdownTimerValue.ToString(CultureInfo.InvariantCulture)
+            };
+            await ObsWebsocketConnection.Instance.Client.ObsSend(request).ConfigureAwait(true);
+            await ObsWebsocketConnection.Instance.Client.ObsSend(request2).ConfigureAwait(true);
         }
 
         #endregion
@@ -431,18 +488,25 @@ namespace uk.JohnCook.dotnet.StreamController
                 parsedSpeechString = parsedSpeechString.Replace(keyValuePair.Key, keyValuePair.Value, StringComparison.InvariantCultureIgnoreCase);
             }
 
-            parsedSpeechString = System.Text.RegularExpressions.Regex.Replace(displayMessage.SpeechText, @"https?://[^ ]*", ", Earl. ", System.Text.RegularExpressions.RegexOptions.None, TimeSpan.FromSeconds(2));
+            parsedSpeechString = System.Text.RegularExpressions.Regex.Replace(parsedSpeechString, @"https?://[^ ]*", ", Earl. ", System.Text.RegularExpressions.RegexOptions.None, TimeSpan.FromSeconds(2));
             Windows.Media.SpeechSynthesis.SpeechSynthesisStream speechStream = await speechSynth.SynthesizeTextToStreamAsync(parsedSpeechString);
-            soundPlayer.Stream = speechStream.AsStream();
 
-            // mono, 16-bit, 16kHz?
-            double secondsOfSpeech = soundPlayer.Stream.Length / 32000.0;
+            AudioInterface audioInterface = AudioInterfaceCollection.Devices.Where(x => x.FriendlyName.Contains("CABLE", StringComparison.Ordinal) && x.DataFlow == NAudio.CoreAudioApi.DataFlow.Render).FirstOrDefault();
+            waveOut = new WaveOut()
+            {
+                DeviceNumber = AudioWorkarounds.GetWaveOutDeviceNumber(audioInterface)
+            };
+
+            waveFileReader = new WaveFileReader(speechStream.AsStream());
+            waveOut.Init(waveFileReader);
+
             // Add additional Tweet display time if necessary
-            tweetDisplayPeriodsRemaining += Math.Max((int)Math.Ceiling(secondsOfSpeech / Preferences.Default.obs_local_clock_cycle_delay) - minimumTweetDisplayPeriods, 0);
-            Trace.WriteLine($"Expected playback length: {secondsOfSpeech} seconds. Number of Tweet display periods: {tweetDisplayPeriodsRemaining}.");
-            // TODO: Work out how to configure sound output device
-            soundPlayer.PlaySync();
-            soundPlayer.Stream = null;
+            tweetDisplayPeriodsRemaining += Math.Max((int)Math.Ceiling(waveFileReader.TotalTime.TotalSeconds / Preferences.Default.obs_local_clock_cycle_delay) - minimumTweetDisplayPeriods, 0);
+            Trace.WriteLine($"Expected playback length: {waveFileReader.TotalTime}. Number of Tweet display periods: {tweetDisplayPeriodsRemaining}.");
+            countdownTimerValue = tweetDisplayPeriodsRemaining * Preferences.Default.obs_local_clock_cycle_delay;
+            UpdateCountdownDisplay();
+
+            waveOut.Play();
         }
 
         #endregion
@@ -461,7 +525,8 @@ namespace uk.JohnCook.dotnet.StreamController
                     fileSystemWatcher.Dispose();
                     createMessageImageSemaphore.Dispose();
                     speechSynthesizer.Dispose();
-                    soundPlayer.Dispose();
+                    waveFileReader.Dispose();
+                    waveOut.Dispose();
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override finalizer
