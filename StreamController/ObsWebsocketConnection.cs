@@ -31,7 +31,6 @@ using uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequests;
 using uk.JohnCook.dotnet.OBSWebSocketLibrary.TypeDefs;
 using uk.JohnCook.dotnet.StreamController.Models;
 using uk.JohnCook.dotnet.WebSocketLibrary;
-using Windows.UI.Xaml.Controls;
 
 namespace uk.JohnCook.dotnet.StreamController
 {
@@ -74,14 +73,42 @@ namespace uk.JohnCook.dotnet.StreamController
         private readonly SemaphoreSlim createMessageImageSemaphore = new SemaphoreSlim(1, 1);
         private readonly Queue<QueuedDisplayMessage> tweetImageQueue = new Queue<QueuedDisplayMessage>();
         private string previousTweetImage = String.Empty;
-        private int tweetImageReuseCount;
+        private const int minimumTweetDisplayPeriods = 2;
+        private const int maximumTweetDisplayPeriods = 4;
+        private int tweetDisplayPeriodsRemaining;
         private readonly Windows.Media.SpeechSynthesis.SpeechSynthesizer speechSynthesizer = new Windows.Media.SpeechSynthesis.SpeechSynthesizer();
+        private readonly System.Media.SoundPlayer soundPlayer = new System.Media.SoundPlayer();
+
+        private static readonly Dictionary<string, string> speechReplacementDictionary = new Dictionary<string, string>()
+            {
+                { "#", "hash-tag-" },
+                { "hash-tag-stayhomesavelives", "hash-tag-stay-home-save-lithes" },
+                { "hash-tag-clapforthe", "hash-tag-clap-for-the-" },
+                { "hash-tag-uklockdown", "hash-tag-UK-lockdown" },
+                { "hash-tag-oneteam", "hash-tag-one-team" },
+                { "hash-tag-takeextracare", "hash-tag-take-extra-care" },
+                { "hash-tag-mentalhealth", "hash-tag-mental-health" },
+                { "hash-tag-domesticabuse", "hash-tag-domestic-abuse" },
+                { "hash-tag-worldhealthday", "hash-tag-world-health-day" },
+                { "NHS", "-N H S-" },
+                { "FRS", "-F R S-" },
+                { "coronavirus", "corona virus" },
+                { "999", "nine-nine-nine" },
+                { "101", "one-oh-one" },
+                { "555 111", "triple-five triple-one" },
+                { "herts", "hearts" },
+                { "carers", "-carers-" },
+                { "lockdownuk", "lockdown-UK" },
+                { "lives", "-lithes-" },
+                { "stayathome", "-stay-at-home-" },
+                { "govuk", "guv-UK"}
+            };
 
         private class QueuedDisplayMessage
         {
-            public string filename { get; set; }
-            public string speechPrepend { get; set; }
-            public string speechText { get; set; }
+            public string Filename { get; set; }
+            public string SpeechPrepend { get; set; }
+            public string SpeechText { get; set; }
         }
 
         public static readonly Brush PrimaryBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(0xFF, 0xE2, 0xC1, 0xEA));
@@ -141,8 +168,17 @@ namespace uk.JohnCook.dotnet.StreamController
             chronoTimer.SecondChanged += ShowNextTweet;
         }
 
+        /// <summary>
+        /// Replaces currently displayed Tweet with the blank panel image
+        /// </summary>
+        /// <returns>A Task</returns>
         private async Task ClearTweet()
         {
+            if (!string.IsNullOrEmpty(previousTweetImage))
+            {
+                File.Delete(previousTweetImage);
+                previousTweetImage = String.Empty;
+            }
             OBSWebSocketLibrary.TypeDefs.ImageSource imageSource = new OBSWebSocketLibrary.TypeDefs.ImageSource()
             {
                 File = verticalMessagePanel.blankPanel
@@ -155,25 +191,56 @@ namespace uk.JohnCook.dotnet.StreamController
             await Obs_Get(request).ConfigureAwait(false);
         }
 
+        /// <summary>
+        /// Tweet display timing code
+        /// </summary>
+        /// <param name="sender">Event sender</param>
+        /// <param name="e">DateTime from a ChronoTimer</param>
         private async void ShowNextTweet(object sender, DateTime e)
         {
-            if (e.Second % 10 > 0)
+            if (e.Second % Preferences.Default.obs_local_clock_cycle_delay > 0)
             {
                 return;
             }
-            QueuedDisplayMessage displayMessage = null;
-            if (tweetImageQueue.Count > 0)
+            int finalTweetDisplayPeriod = 0 - (maximumTweetDisplayPeriods - minimumTweetDisplayPeriods);
+            // Previous Tweet hasn't reached end of minimum display time yet, or
+            // Previous Tweet hasn't reached maximum display time yet - there are no more Tweets in the queue
+            if (!String.IsNullOrEmpty(previousTweetImage) && (
+                (tweetDisplayPeriodsRemaining > 0) ||
+                (tweetDisplayPeriodsRemaining > finalTweetDisplayPeriod && tweetImageQueue.Count == 0)
+                ))
             {
-                displayMessage = tweetImageQueue.Dequeue();
-                tweetImageReuseCount = 0;
-                Trace.WriteLine($"Dequeue at {e.Hour}:{e.Minute}:{e.Second} - {displayMessage.filename}");
-                if (!Instance.Client.CanSend || String.IsNullOrEmpty(displayMessage.filename))
+                tweetDisplayPeriodsRemaining--;
+                return;
+            }
+            // Previous Tweet has reached maximum display time - there are no more Tweets in the queue, or
+            else if (!String.IsNullOrEmpty(previousTweetImage) &&
+                tweetDisplayPeriodsRemaining == finalTweetDisplayPeriod && tweetImageQueue.Count == 0
+                )
+            {
+                tweetDisplayPeriodsRemaining = 0;
+                await ClearTweet().ConfigureAwait(false);
+                return;
+            }
+            // There are more Tweets in the queue and we're ready to show the next one
+            else if (tweetImageQueue.Count > 0)
+            {
+                tweetDisplayPeriodsRemaining = minimumTweetDisplayPeriods;
+                QueuedDisplayMessage displayMessage = tweetImageQueue.Dequeue();
+                Trace.WriteLine($"Dequeue at {e.Hour}:{e.Minute}:{e.Second} - {displayMessage.Filename}");
+                if (!Instance.Client.CanSend || String.IsNullOrEmpty(displayMessage.Filename))
                 {
+                    tweetDisplayPeriodsRemaining = 0;
+                    await ClearTweet().ConfigureAwait(false);
+                    if (File.Exists(displayMessage.Filename))
+                    {
+                        File.Delete(displayMessage.Filename);
+                    }
                     return;
                 }
                 OBSWebSocketLibrary.TypeDefs.ImageSource imageSource = new OBSWebSocketLibrary.TypeDefs.ImageSource()
                 {
-                    File = displayMessage.filename
+                    File = displayMessage.Filename
                 };
                 SetSourceSettingsRequest request = new SetSourceSettingsRequest()
                 {
@@ -181,47 +248,66 @@ namespace uk.JohnCook.dotnet.StreamController
                     SourceSettings = imageSource
                 };
                 await Obs_Get(request).ConfigureAwait(false);
-                //_Context.Send(
-                //    async x => await Speak(displayMessage).ConfigureAwait(true), null
-                //    );
-
-            }
-            else
-            {
-                if (tweetImageReuseCount >= 1)
+                _Context.Send(
+                    async x => await Speak(displayMessage).ConfigureAwait(true), null
+                    );
+                if (!string.IsNullOrEmpty(previousTweetImage))
                 {
-                    await ClearTweet().ConfigureAwait(false);
+                    File.Delete(previousTweetImage);
                 }
-                else
-                {
-                    tweetImageReuseCount += 1;
-                    return;
-                }
-            }
-            if (!string.IsNullOrEmpty(previousTweetImage))
-            {
-                File.Delete(previousTweetImage);
-            }
-            if (displayMessage != null)
-            {
-                previousTweetImage = displayMessage.filename;
-            }
-            else
-            {
-                previousTweetImage = String.Empty;
+                previousTweetImage = displayMessage.Filename;
             }
         }
 
-        //private async Task Speak(QueuedDisplayMessage displayMessage)
-        //{
-        //    Windows.Media.SpeechSynthesis.SpeechSynthesisStream speech = await speechSynthesizer.SynthesizeTextToStreamAsync(displayMessage.speechPrepend + displayMessage.speechText);
+        /// <summary>
+        /// Synthesise speech from a Tweet's text and play the audio
+        /// </summary>
+        /// <param name="displayMessage">The QueuedDisplayMessage being displayed</param>
+        /// <returns>A Task</returns>
+        private async Task Speak(QueuedDisplayMessage displayMessage)
+        {
+            using Windows.Media.SpeechSynthesis.SpeechSynthesizer speechSynth = new Windows.Media.SpeechSynthesis.SpeechSynthesizer()
+            {
+                Options =
+                {
+                    IncludeSentenceBoundaryMetadata = true,
+                    IncludeWordBoundaryMetadata = true,
+                    AudioPitch = 1.0,
+                    AudioVolume = 1.0,
+                    SpeakingRate = 1.0
+                }
+            };
+            if (tweetImageQueue.Count > 5)
+            {
+                speechSynth.Options.SpeakingRate = 1.4;
+            }
 
-        //    using Windows.Media.Core.MediaSource source = Windows.Media.Core.MediaSource.CreateFromStream(speech, speech.ContentType);
-        //    Windows.Media.Playback.MediaPlaybackItem mediaPlaybackItem = new Windows.Media.Playback.MediaPlaybackItem(source);
-        //    MediaPlayerElement mediaPlayer = new MediaPlayerElement() { Source = mediaPlaybackItem };
-        //    mediaPlayer.MediaPlayer.Play();
-        //}
+            string parsedSpeechString = displayMessage.SpeechPrepend + displayMessage.SpeechText;
 
+            foreach (KeyValuePair<string, string> keyValuePair in speechReplacementDictionary)
+            {
+                parsedSpeechString = parsedSpeechString.Replace(keyValuePair.Key, keyValuePair.Value, StringComparison.InvariantCultureIgnoreCase);
+            }
+
+            parsedSpeechString = System.Text.RegularExpressions.Regex.Replace(displayMessage.SpeechText, @"https?://[^ ]*", ", Earl. ", System.Text.RegularExpressions.RegexOptions.None, TimeSpan.FromSeconds(2));
+            Windows.Media.SpeechSynthesis.SpeechSynthesisStream speechStream = await speechSynth.SynthesizeTextToStreamAsync(parsedSpeechString);
+            soundPlayer.Stream = speechStream.AsStream();
+
+            // mono, 16-bit, 16kHz?
+            double secondsOfSpeech = soundPlayer.Stream.Length / 32000.0;
+            // Add additional Tweet display time if necessary
+            tweetDisplayPeriodsRemaining += Math.Max((int)Math.Ceiling(secondsOfSpeech / Preferences.Default.obs_local_clock_cycle_delay) - minimumTweetDisplayPeriods, 0);
+            Trace.WriteLine($"Expected playback length: {secondsOfSpeech} seconds. Number of Tweet display periods: {tweetDisplayPeriodsRemaining}.");
+            // TODO: Work out how to configure sound output device
+            soundPlayer.PlaySync();
+            soundPlayer.Stream = null;
+        }
+
+        /// <summary>
+        /// Checks if a mIRC log file has changed
+        /// </summary>
+        /// <param name="sender">Event sender</param>
+        /// <param name="e">DateTime from a ChronoTimer</param>
         private void RefreshFileStats(object sender, DateTime e)
         {
             if (e.Second % 2 == 0 || logChangeCheckSemaphore.CurrentCount == 0) { return; }
@@ -236,6 +322,11 @@ namespace uk.JohnCook.dotnet.StreamController
             }
         }
 
+        /// <summary>
+        /// Parses a mIRC log file for new relayed Tweets
+        /// </summary>
+        /// <param name="sender">Event sender</param>
+        /// <param name="e">FileSystemEventArgs from a FileSystemWatcher</param>
         private async void FileSystemWatcher_Changed(object sender, FileSystemEventArgs e)
         {
             if (logChangeCheckSemaphore.CurrentCount == 0)
@@ -265,6 +356,11 @@ namespace uk.JohnCook.dotnet.StreamController
             logChangeCheckSemaphore.Release();
         }
 
+        /// <summary>
+        /// Get the path for a Twitter profile image, downloading if necessary
+        /// </summary>
+        /// <param name="username">Twitter username including @</param>
+        /// <returns>Full file path for the image</returns>
         private static string FetchProfileImage(string username)
         {
             // Default Twitter profile image
@@ -332,6 +428,11 @@ namespace uk.JohnCook.dotnet.StreamController
             }
         }
 
+        /// <summary>
+        /// Parses a mIRC logfile line into a QueuedDisplayMessage
+        /// </summary>
+        /// <param name="message">A single line from a mIRC log file</param>
+        /// <returns>A Task</returns>
         private async Task ParseMessageFromIrcLog(string message)
         {
             System.Text.RegularExpressions.Match match = ircLogTweetRegex.Match(message);
@@ -399,15 +500,13 @@ namespace uk.JohnCook.dotnet.StreamController
             {
                 QueuedDisplayMessage displayMessage = new QueuedDisplayMessage()
                 {
-                    filename = createdImage,
-                    speechPrepend = isRetweet ? $"{retweeterDisplayName} Retweeted {displayName}: " : $"{displayName} Tweeted: ",
-                    speechText = tweetText
+                    Filename = createdImage,
+                    SpeechPrepend = isRetweet ? $"{retweeterDisplayName} Retweeted {displayName}: " : $"{displayName} Tweeted: ",
+                    SpeechText = tweetText
                 };
                 tweetImageQueue.Enqueue(displayMessage);
             }
         }
-
-
 
         private void AudioDevicesEnumerated(object sender, EventArgs e)
         {
@@ -1583,6 +1682,7 @@ namespace uk.JohnCook.dotnet.StreamController
                     fileSystemWatcher.Dispose();
                     createMessageImageSemaphore.Dispose();
                     speechSynthesizer.Dispose();
+                    soundPlayer.Dispose();
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override finalizer
