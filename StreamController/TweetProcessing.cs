@@ -491,10 +491,14 @@ namespace uk.JohnCook.dotnet.StreamController
             parsedSpeechString = System.Text.RegularExpressions.Regex.Replace(parsedSpeechString, @"https?://[^ ]*", ", Earl. ", System.Text.RegularExpressions.RegexOptions.None, TimeSpan.FromSeconds(2));
             Windows.Media.SpeechSynthesis.SpeechSynthesisStream speechStream = await speechSynth.SynthesizeTextToStreamAsync(parsedSpeechString);
 
-            AudioInterface audioInterface = AudioInterfaceCollection.Devices.Where(x => x.FriendlyName.Contains("CABLE", StringComparison.Ordinal) && x.DataFlow == NAudio.CoreAudioApi.DataFlow.Render).FirstOrDefault();
+            // TODO: Add configuration option for TTS output interface name
+            AudioInterface audioInterface = AudioInterfaceCollection.ActiveDevices.Where(x => x.FriendlyName.Contains("CABLE", StringComparison.Ordinal) && x.DataFlow == NAudio.CoreAudioApi.DataFlow.Render).FirstOrDefault();
+            AudioInterface defaultRenderInterface = AudioInterfaceCollection.Instance.DefaultRender;
+            // TODO: Add configuration option for monitor device and option for using default device if monitor device isn't the current default
+            bool useDefaultRender = audioInterface == default || !audioInterface.IsActive || defaultRenderInterface == null || !defaultRenderInterface.FriendlyName.Contains("Headphones", StringComparison.Ordinal);
             waveOut = new WaveOut()
             {
-                DeviceNumber = AudioWorkarounds.GetWaveOutDeviceNumber(audioInterface)
+                DeviceNumber = useDefaultRender ? -1 : AudioWorkarounds.GetWaveOutDeviceNumber(audioInterface)
             };
 
             waveFileReader = new WaveFileReader(speechStream.AsStream());
