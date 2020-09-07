@@ -39,8 +39,13 @@ namespace uk.JohnCook.dotnet.StreamController
         private readonly Windows.Media.SpeechSynthesis.SpeechSynthesizer speechSynthesizer = new Windows.Media.SpeechSynthesis.SpeechSynthesizer();
         private WaveOut waveOut;
         WaveFileReader waveFileReader;
+        private volatile int countdownTimerValue;
 
-        public volatile int countdownTimerValue;
+        public int CountdownTimerValue
+        {
+            get { return countdownTimerValue; }
+            set { countdownTimerValue = value; }
+        }
 
         private static readonly Dictionary<string, string> speechReplacementDictionary = new Dictionary<string, string>()
             {
@@ -295,42 +300,8 @@ namespace uk.JohnCook.dotnet.StreamController
             string profileImageFile = FetchProfileImage(username);
 
             await createMessageImageSemaphore.WaitAsync().ConfigureAwait(false);
-
-            string createdImage = null;
-
-            try
-            {
-                createdImage = verticalMessagePanel.DrawVerticalTweet(profileImageFile, displayName, username, tweetText, time, retweeterDisplayName, retweeterUsername);
-                Trace.WriteLine($"Tweet image saved to {createdImage}.");
-            }
-            catch (System.Runtime.InteropServices.COMException ce)
-            {
-                Trace.WriteLine($"Exception whilst processing Tweet with ID {tweetId} by {username} (retrying...) - {ce.Message} - {ce.InnerException?.Message}");
-                try
-                {
-                    //verticalMessagePanel.Dispose();
-                    //verticalMessagePanel = new VerticalMessagePanel();
-                    createdImage = verticalMessagePanel.DrawVerticalTweet(profileImageFile, displayName, username, tweetText, time, retweeterDisplayName, retweeterUsername);
-                }
-                catch (System.Runtime.InteropServices.COMException ce2)
-                {
-                    Trace.WriteLine($"Exception whilst processing Tweet with ID {tweetId} by {username} (retry failed) - {ce2.Message} - {ce2.InnerException?.Message}");
-                }
-            }
-            catch (AccessViolationException ave)
-            {
-                Trace.WriteLine($"Exception whilst processing Tweet with ID {tweetId} by {username} (retrying...) - {ave.Message}");
-                try
-                {
-                    //verticalMessagePanel.Dispose();
-                    //verticalMessagePanel = new VerticalMessagePanel();
-                    createdImage = verticalMessagePanel.DrawVerticalTweet(profileImageFile, displayName, username, tweetText, time, retweeterDisplayName, retweeterUsername);
-                }
-                catch (AccessViolationException ave2)
-                {
-                    Trace.WriteLine($"Exception whilst processing Tweet with ID {tweetId} by {username} (retry failed) - {ave2.Message}");
-                }
-            }
+            string createdImage = verticalMessagePanel.DrawVerticalTweet(profileImageFile, displayName, username, tweetText, time, retweeterDisplayName, retweeterUsername);
+            Trace.WriteLine($"Tweet image saved to {createdImage}.");
             createMessageImageSemaphore.Release();
 
             if (createdImage != null)

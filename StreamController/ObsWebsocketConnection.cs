@@ -240,7 +240,7 @@ namespace uk.JohnCook.dotnet.StreamController
                 NotifyPropertyChanged(nameof(ConnectionStatus));
                 _ = ChangeStatusColor(newState).ConfigureAwait(false);
                 ResetScenes();
-                tweetProcessing.countdownTimerValue = 0;
+                tweetProcessing.CountdownTimerValue = 0;
                 tweetProcessing.UpdateCountdownDisplay();
             }
             else if (newState != WebSocketState.Connecting && Client.AutoReconnect)

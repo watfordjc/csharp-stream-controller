@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Text;
 using uk.JohnCook.dotnet.MessageToImageLibrary;
@@ -237,7 +238,22 @@ namespace uk.JohnCook.dotnet.StreamController
 
         public string DrawVerticalTweet(string profileImageFilename, string displayName, string username, string text, string time, string retweeterDisplayName = null, string retweeterUsername = null)
         {
-            verticalMessagePanel.ClearArea(messageBlankingAreaOriginPoint, messageBlankingArea, verticalMessagePanel.Brushes["backgroundBrush"], true, true);
+            try
+            {
+                verticalMessagePanel.ClearArea(messageBlankingAreaOriginPoint, messageBlankingArea, verticalMessagePanel.Brushes["backgroundBrush"], true, true);
+            }
+            catch (COMException)
+            {
+                Trace.WriteLine("Error in clear area. We need to start over as we've probably lost the render target...");
+                Trace.WriteLine("Releasing resources from old render target, releasing old render target, and recreating Direct2DCanvas...");
+                verticalMessagePanel.RecreateDirect2DCanvas();
+                Trace.WriteLine("Initialising replacement panel...");
+                InitialiseMessagePanel();
+                Trace.WriteLine("Creating replacement blank panel image...");
+                blankPanel = SaveImage();
+                Trace.WriteLine($"Recursion: calling {nameof(DrawVerticalTweet)} with same parameters...");
+                return DrawVerticalTweet(profileImageFilename, displayName, username, text, time, retweeterDisplayName, retweeterUsername);
+            }
 
             #region Profile image
             // TODO: Set ProfileImageFilename
@@ -400,7 +416,22 @@ namespace uk.JohnCook.dotnet.StreamController
             #endregion
 
             #region Finish drawing to canvas
-            verticalMessagePanel.EndDraw();
+            try
+            {
+                verticalMessagePanel.EndDraw();
+            }
+            catch (COMException)
+            {
+                Trace.WriteLine("Error in EndDraw. We need to start over as we've probably lost the render target...");
+                Trace.WriteLine("Releasing resources from old render target, releasing old render target, and recreating Direct2DCanvas...");
+                verticalMessagePanel.RecreateDirect2DCanvas();
+                Trace.WriteLine("Initialising replacement panel...");
+                InitialiseMessagePanel();
+                Trace.WriteLine("Creating replacement blank panel image...");
+                blankPanel = SaveImage();
+                Trace.WriteLine($"Recursion: calling {nameof(DrawVerticalTweet)} with same parameters...");
+                return DrawVerticalTweet(profileImageFilename, displayName, username, text, time, retweeterDisplayName, retweeterUsername);
+            }
             #endregion
 
             return SaveImage();
