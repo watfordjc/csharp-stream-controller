@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Permissions;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using uk.JohnCook.dotnet.NAudioWrapperLibrary;
@@ -25,8 +26,8 @@ namespace uk.JohnCook.dotnet.StreamController
         private readonly VerticalMessagePanel verticalMessagePanel = new VerticalMessagePanel();
         private readonly FileSystemWatcher fileSystemWatcher;
         private readonly SemaphoreSlim logChangeCheckSemaphore = new SemaphoreSlim(1, 1);
-        private long logFileSize;
-        private static readonly System.Text.RegularExpressions.Regex ircLogTweetRegex = new System.Text.RegularExpressions.Regex(@"^\[(.....)\] \<(.*)\>( \u0002\u000309,01 (.*) \u0003\u0002 \(\u0002(.*)\u0002\) (.*) )?.*\u0002\u000311,01 (.*) \u0003\u0002 \(\u0002(.*)\u0002\).?(.*)?:\u000305 (.*) \u0003\| (.*)$");
+        private long logFileSize = -1;
+        private static readonly Regex ircLogTweetRegex = new Regex(@"^\[(.....)\] \<(.*)\>( \u0002\u000309,01 (.*) \u0003\u0002 \(\u0002(.*)\u0002\) (.*) )?.*\u0002\u000311,01 (.*) \u0003\u0002 \(\u0002(.*)\u0002\).?(.*)?:\u000305 (.*) \u0003\| (.*)$");
         private readonly SemaphoreSlim createMessageImageSemaphore = new SemaphoreSlim(1, 1);
         private readonly Queue<QueuedDisplayMessage> tweetImageQueue = new Queue<QueuedDisplayMessage>();
         private string previousTweetImage = String.Empty;
@@ -34,6 +35,7 @@ namespace uk.JohnCook.dotnet.StreamController
         private const int maximumTweetDisplayPeriods = 4;
         private volatile int tweetDisplayPeriodsRemaining;
         private bool disposedValue;
+        private readonly SemaphoreSlim speechSemaphore = new SemaphoreSlim(1, 1);
         private readonly Windows.Media.SpeechSynthesis.SpeechSynthesizer speechSynthesizer = new Windows.Media.SpeechSynthesis.SpeechSynthesizer();
         private WaveOut waveOut;
         WaveFileReader waveFileReader;
@@ -51,12 +53,15 @@ namespace uk.JohnCook.dotnet.StreamController
                 { "hash-tag-mentalhealth", "hash-tag-mental-health" },
                 { "hash-tag-domesticabuse", "hash-tag-domestic-abuse" },
                 { "hash-tag-worldhealthday", "hash-tag-world-health-day" },
+                { "hash-tag-helpushelpyou", "hash-tag-help-us-help-you" },
                 { "NHS", "-N H S-" },
                 { "FRS", "-F R S-" },
                 { "coronavirus", "corona virus" },
                 { "999", "nine-nine-nine" },
                 { "101", "one-oh-one" },
+                { "119", "one-one-nine" },
                 { "555 111", "triple-five triple-one" },
+                { "111", "one-one-one" },
                 { "herts", "hearts" },
                 { "carers", "-carers-" },
                 { "lockdownuk", "lockdown-UK" },
@@ -107,9 +112,13 @@ namespace uk.JohnCook.dotnet.StreamController
         private void RefreshFileStats(object sender, DateTime e)
         {
             if (e.Second % 2 == 0 || logChangeCheckSemaphore.CurrentCount == 0) { return; }
-            string today = DateTime.Now.ToString("yyyyMM", CultureInfo.InvariantCulture) + ((DateTime.Now.Day / 7) + 1).ToString("00", CultureInfo.InvariantCulture);
+            string today = DateTime.Now.ToString("yyyyMM", CultureInfo.InvariantCulture) + Math.Max(DateTime.Now.Day / 7 * 7, 1).ToString("00", CultureInfo.InvariantCulture);
             DirectoryInfo dirInfo = new DirectoryInfo(@"G:\Program Files (x86)\mIRC\logs\");
             FileInfo[] fileNames = dirInfo.GetFiles($"#UK-Emergency-Advice.DALnet.{today}.log");
+            if (fileNames.Length == 0)
+            {
+                return;
+            }
             using FileStream fileStream = File.Open(fileNames[0].FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             fileStream.Seek(0, SeekOrigin.End);
             if (fileStream.Position > Thread.VolatileRead(ref logFileSize))
@@ -130,22 +139,50 @@ namespace uk.JohnCook.dotnet.StreamController
                 return;
             }
             await logChangeCheckSemaphore.WaitAsync().ConfigureAwait(false);
-            string today = DateTime.Now.ToString("yyyyMM", CultureInfo.InvariantCulture) + ((DateTime.Now.Day / 7) + 1).ToString("00", CultureInfo.InvariantCulture);
+            string today = DateTime.Now.ToString("yyyyMM", CultureInfo.InvariantCulture) + Math.Max(DateTime.Now.Day / 7 * 7, 1).ToString("00", CultureInfo.InvariantCulture);
+            long tmpPreviousLogFileLength = Thread.VolatileRead(ref logFileSize);
             DirectoryInfo dirInfo = new DirectoryInfo(@"G:\Program Files (x86)\mIRC\logs\");
             FileInfo[] fileNames = dirInfo.GetFiles($"#UK-Emergency-Advice.DALnet.{today}.log");
-            if (e.Name == fileNames[0].Name && Thread.VolatileRead(ref logFileSize) > 0)
+            // Cope with logfile rollovers
+            if (fileNames.Length == 0 || (tmpPreviousLogFileLength > -1 && e.Name != fileNames[0].Name && !String.IsNullOrEmpty(e.Name)))
             {
-                using FileStream fileStream = File.Open(fileNames[0].FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                fileStream.Seek(Thread.VolatileRead(ref logFileSize), SeekOrigin.Begin);
-                using StreamReader streamReader = new StreamReader(fileStream);
-                while (streamReader.Peek() >= 0)
+                fileNames = dirInfo.GetFiles(e.Name);
+                if (fileNames.Length == 0)
                 {
-                    string currentLine = streamReader.ReadLine();
-                    ParseMessageFromIrcLog(currentLine).ConfigureAwait(false).GetAwaiter();
+                    Trace.WriteLine("Unable to find mIRC log file.");
+                    logChangeCheckSemaphore.Release();
+                    return;
                 }
-                Thread.VolatileWrite(ref logFileSize, fileNames[0].Length);
             }
-            else
+            // Log file exists and we have a previous position to start reading from
+            if (fileNames.Length > 0 && e.Name == fileNames[0].Name && tmpPreviousLogFileLength >= 0)
+            {
+                try
+                {
+                    using FileStream fileStream = File.Open(fileNames[0].FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    Thread.VolatileWrite(ref logFileSize, fileNames[0].Length);
+                    if (Thread.VolatileRead(ref logFileSize) < tmpPreviousLogFileLength)
+                    {
+                        tmpPreviousLogFileLength = 0;
+                    }
+                    fileStream.Seek(tmpPreviousLogFileLength, SeekOrigin.Begin);
+                    using StreamReader streamReader = new StreamReader(fileStream);
+                    while (streamReader.Peek() >= 0)
+                    {
+                        string currentLine = streamReader.ReadLine();
+                        ParseMessageFromIrcLog(currentLine).ConfigureAwait(false).GetAwaiter();
+                    }
+                }
+                catch (Exception ex) when (ex is FileNotFoundException || ex is PathTooLongException || ex is DirectoryNotFoundException)
+                {
+                    Thread.VolatileWrite(ref logFileSize, 0);
+                    logChangeCheckSemaphore.Release();
+                    Debug.Assert(fileNames.Length == 0, "File not found despite file existing?");
+                    return;
+                }
+            }
+            // Log file exists but this is our first run - set seek position
+            else if (fileNames.Length > 0 && tmpPreviousLogFileLength == -1)
             {
                 Thread.VolatileWrite(ref logFileSize, fileNames[0].Length);
             }
@@ -235,7 +272,7 @@ namespace uk.JohnCook.dotnet.StreamController
         /// <returns>A Task</returns>
         private async Task ParseMessageFromIrcLog(string message)
         {
-            System.Text.RegularExpressions.Match match = ircLogTweetRegex.Match(message);
+            Match match = ircLogTweetRegex.Match(message);
 
             string relayTime = match.Groups[1].Value;
             string ircUser = match.Groups[2].Value;
@@ -473,12 +510,33 @@ namespace uk.JohnCook.dotnet.StreamController
                     IncludeWordBoundaryMetadata = true,
                     AudioPitch = 1.0,
                     AudioVolume = 1.0,
-                    SpeakingRate = 1.0
+                    SpeakingRate = 1.1
                 }
             };
-            if (tweetImageQueue.Count > 5)
+            if (tweetImageQueue.Count > 8)
             {
-                speechSynth.Options.SpeakingRate = 1.4;
+                speechSynth.Options.SpeakingRate = 1.35;
+            }
+            else if (tweetImageQueue.Count > 5)
+            {
+                speechSynth.Options.SpeakingRate = 1.3;
+            }
+            else if (tweetImageQueue.Count > 2)
+            {
+                speechSynth.Options.SpeakingRate = 1.2;
+            }
+            else if (tweetImageQueue.Count == 0)
+            {
+                speechSynth.Options.SpeakingRate = 1.0;
+            }
+
+            // Rudimentary Welsh language detection. No Welsh TTS language so avoid butchering it.
+            if ((displayMessage.SpeechPrepend.Contains("wales", StringComparison.OrdinalIgnoreCase) && displayMessage.SpeechText.Contains(" yn", StringComparison.Ordinal)) ||
+                displayMessage.SpeechText.Contains("gwnewch", StringComparison.OrdinalIgnoreCase) || // gwnewch = do
+                Regex.Matches(displayMessage.SpeechText, " yn", RegexOptions.None).Count > 1 // yn is the Welsh language equivalent of using English suffix -ly to create adverbs from adjectives
+                )
+            {
+                displayMessage.SpeechText = " Something in Welsh.";
             }
 
             string parsedSpeechString = displayMessage.SpeechPrepend + displayMessage.SpeechText;
@@ -488,8 +546,10 @@ namespace uk.JohnCook.dotnet.StreamController
                 parsedSpeechString = parsedSpeechString.Replace(keyValuePair.Key, keyValuePair.Value, StringComparison.InvariantCultureIgnoreCase);
             }
 
-            parsedSpeechString = System.Text.RegularExpressions.Regex.Replace(parsedSpeechString, @"https?://[^ ]*", ", Earl. ", System.Text.RegularExpressions.RegexOptions.None, TimeSpan.FromSeconds(2));
+            parsedSpeechString = Regex.Replace(parsedSpeechString, @"https?://[^ ]*", ", Earl. ", RegexOptions.None, TimeSpan.FromSeconds(2));
+            await speechSemaphore.WaitAsync().ConfigureAwait(true);
             Windows.Media.SpeechSynthesis.SpeechSynthesisStream speechStream = await speechSynth.SynthesizeTextToStreamAsync(parsedSpeechString);
+            speechSemaphore.Release();
 
             // TODO: Add configuration option for TTS output interface name
             AudioInterface audioInterface = AudioInterfaceCollection.ActiveDevices.Where(x => x.FriendlyName.Contains("CABLE", StringComparison.Ordinal) && x.DataFlow == NAudio.CoreAudioApi.DataFlow.Render).FirstOrDefault();
@@ -529,6 +589,7 @@ namespace uk.JohnCook.dotnet.StreamController
                     fileSystemWatcher.Dispose();
                     createMessageImageSemaphore.Dispose();
                     speechSynthesizer.Dispose();
+                    speechSemaphore.Dispose();
                     waveFileReader.Dispose();
                     waveOut.Dispose();
                 }
