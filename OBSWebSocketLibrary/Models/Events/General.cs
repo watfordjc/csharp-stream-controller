@@ -17,19 +17,19 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsEvents
         [JsonPropertyName("streaming")]
         public bool Streaming { get; set; }
         [JsonPropertyName("total-stream-time")]
-        public int TotalStreamTime { get; set; }
+        public Decimal TotalStreamTime { get; set; }
         [JsonPropertyName("total-stream-bytes")]
-        public int TotalStreamBytes { get; set; }
+        public Decimal TotalStreamBytes { get; set; }
         [JsonPropertyName("total-stream-frames")]
-        public int TotalStreamFrames { get; set; }
+        public Decimal TotalStreamFrames { get; set; }
         [JsonPropertyName("recording")]
         public bool Recording { get; set; }
         [JsonPropertyName("total-record-time")]
-        public int TotalRecordTime { get; set; }
+        public Decimal TotalRecordTime { get; set; }
         [JsonPropertyName("total-record-bytes")]
-        public int TotalRecordBytes { get; set; }
+        public Decimal TotalRecordBytes { get; set; }
         [JsonPropertyName("total-record-frames")]
-        public int TotalRecordFrames { get; set; }
+        public Decimal TotalRecordFrames { get; set; }
         [JsonPropertyName("stats")]
         public TypeDefs.ObsStats Stats { get; set; }
     }

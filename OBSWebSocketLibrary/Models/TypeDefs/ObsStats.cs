@@ -10,13 +10,13 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.TypeDefs
         [JsonPropertyName("fps")]
         public double Fps { get; set; }
         [JsonPropertyName("render-total-frames")]
-        public int RenderTotalFrames { get; set; }
+        public Decimal RenderTotalFrames { get; set; }
         [JsonPropertyName("render-missed-frames")]
-        public int RenderMissedFrames { get; set; }
+        public Decimal RenderMissedFrames { get; set; }
         [JsonPropertyName("output-total-frames")]
-        public int OutputTotalFrames { get; set; }
+        public Decimal OutputTotalFrames { get; set; }
         [JsonPropertyName("output-skipped-frames")]
-        public int OutputSkippedFrames { get; set; }
+        public Decimal OutputSkippedFrames { get; set; }
         [JsonPropertyName("average-frame-time")]
         public double AverageFrameTime { get; set; }
         [JsonPropertyName("cpu-usage")]
