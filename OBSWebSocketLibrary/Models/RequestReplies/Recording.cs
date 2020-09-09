@@ -5,6 +5,16 @@ using System.Text.Json.Serialization;
 
 namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequestReplies
 {
+    public class GetRecordingStatusReply : ReplyBase
+    {
+        [JsonPropertyName("isRecording")]
+        public bool IsRecording { get; set; }
+        [JsonPropertyName("isRecordingPaused")]
+        public bool IsRecordingPaused { get; set; }
+        [JsonPropertyName("recordTimecode")]
+        public string RecordTimeCode { get; set; }
+    }
+
     public class StartStopRecordingReply : ReplyBase
     {
     }

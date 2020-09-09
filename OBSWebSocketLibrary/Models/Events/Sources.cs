@@ -45,6 +45,18 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsEvents
         public bool Muted { get; set; }
     }
 
+    public class SourceAudioDeactivatedObsEvent : EventBase
+    {
+        [JsonPropertyName("sourceName")]
+        public string SourceName { get; set; }
+    }
+
+    public class SourceAudioActivatedObsEvent : EventBase
+    {
+        [JsonPropertyName("sourceName")]
+        public string SourceName { get; set; }
+    }
+
     public class SourceAudioSyncOffsetChangedObsEvent : EventBase
     {
         [JsonPropertyName("sourceName")]

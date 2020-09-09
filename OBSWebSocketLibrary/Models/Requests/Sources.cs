@@ -6,6 +6,10 @@ using System.Text.Json.Serialization;
 
 namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequests
 {
+    public class GetMediaSourcesListRequest : RequestBase
+    {
+    }
+
     public class GetSourcesListRequest : RequestBase
     {
     }
@@ -50,6 +54,12 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequests
     {
         [JsonPropertyName("source")]
         public string Source { get; set; }
+    }
+
+    public class GetAudioActiveRequest : RequestBase
+    {
+        [JsonPropertyName("sourceName")]
+        public string SourceName { get; set; }
     }
 
     public class SetSourceNameRequest : RequestBase

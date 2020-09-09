@@ -6,6 +6,12 @@ using System.Text.Json.Serialization;
 
 namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequests
 {
+    public class GetSceneItemListRequest : RequestBase
+    {
+        [JsonPropertyName("sceneName")]
+        public string SceneName { get; set; }
+    }
+
     public class GetSceneItemPropertiesRequest : RequestBase
     {
         [JsonPropertyName("scene-name")]
@@ -106,6 +112,16 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequests
         public string Scene { get; set; }
         [JsonPropertyName("item")]
         public TypeDefs.ObsWsItemObject ItemObj { get; set; }
+    }
+
+    public class AddSceneItemRequest : RequestBase
+    {
+        [JsonPropertyName("sceneName")]
+        public string SceneName { get; set; }
+        [JsonPropertyName("sourceName")]
+        public string SourceName { get; set; }
+        [JsonPropertyName("setVisible")]
+        public bool SetVisible { get; set; }
     }
 
     public class DuplicateSceneItemRequest : RequestBase

@@ -27,6 +27,10 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.TypeDefs
         public int Width { get; set; }
     }
 
+    public class ColorSourceV3 : ColorSourceV2
+    {
+    }
+
     public class Slideshow : BaseType
     {
         [JsonPropertyName("files")]

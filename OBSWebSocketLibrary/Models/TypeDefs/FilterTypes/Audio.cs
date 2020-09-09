@@ -17,6 +17,10 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.TypeDefs
         public int SuppressLevel { get; set; }
     }
 
+    public class NoiseSupressFilterV2 : NoiseSupressFilter
+    {
+    }
+
     public class InvertPolarityFilter : BaseFilter
     {
     }

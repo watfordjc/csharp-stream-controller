@@ -1,9 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequests
 {
+    public class GetReplayBufferStatusRequest : RequestBase
+    {
+    }
+
     public class StartStopReplayBufferRequest : RequestBase
     {
     }

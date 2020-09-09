@@ -5,6 +5,10 @@ using System.Text.Json.Serialization;
 
 namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequests
 {
+    public class GetRecordingStatusRequest : RequestBase
+    {
+    }
+
     public class StartStopRecordingRequest : RequestBase
     {
     }

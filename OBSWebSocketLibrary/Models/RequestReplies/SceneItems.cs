@@ -5,6 +5,14 @@ using System.Text.Json.Serialization;
 
 namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequestReplies
 {
+    public class GetSceneItemListReply : ReplyBase
+    {
+        [JsonPropertyName("sceneItems")]
+#pragma warning disable CA2227 // Collection properties should be read only
+        public IList<TypeDefs.ObsWsSceneItemListItem> SceneItems { get; set; }
+#pragma warning restore CA2227 // Collection properties should be read only
+    }
+
     public class GetSceneItemPropertiesReply : ReplyBase
     {
         [JsonPropertyName("name")]
@@ -71,6 +79,12 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequestReplies
 
     public class DeleteSceneItemReply : ReplyBase
     {
+    }
+
+    public class AddSceneItemReply : ReplyBase
+    {
+        [JsonPropertyName("itemId")]
+        public int ItemId { get; set; }
     }
 
     public class DuplicateSceneItemReply : ReplyBase

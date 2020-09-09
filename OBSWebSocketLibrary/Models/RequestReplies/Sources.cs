@@ -6,6 +6,14 @@ using System.Text.Json.Serialization;
 
 namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequestReplies
 {
+    public class GetMediaSourcesListReply : ReplyBase
+    {
+        [JsonPropertyName("mediaSources")]
+#pragma warning disable CA2227 // Collection properties should be read only
+        public IList<TypeDefs.ObsWsReplyMediaSource> MediaSources { get; set; }
+#pragma warning restore CA2227 // Collection properties should be read only
+    }
+
     public class GetSourcesListReply : ReplyBase
     {
         [JsonPropertyName("sources")]
@@ -50,6 +58,12 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.ObsRequestReplies
 
     public class ToggleMuteReply : ReplyBase
     {
+    }
+
+    public class GetAudioActiveReply : ReplyBase
+    {
+        [JsonPropertyName("audioActive")]
+        public bool AudioActive { get; set; }
     }
 
     public class SetSourceNameReply : ReplyBase

@@ -203,6 +203,16 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.TypeDefs
         public double Congestion { get; set; }
     }
 
+    public class ObsWsReplyMediaSource
+    {
+        [JsonPropertyName("sourceName")]
+        public string Name { get; set; }
+        [JsonPropertyName("sourceKind")]
+        public string SourceKind { get; set; }
+        [JsonPropertyName("mediaState")]
+        public string MediaState { get; set; }
+    }
+
     public class ObsWsReplySource
     {
         [JsonPropertyName("name")]
@@ -211,6 +221,19 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.TypeDefs
         public string TypeId { get; set; }
         [JsonPropertyName("type")]
         public string Type { get; set; }
+    }
+
+    public class ObsWsSceneItemListItem
+    {
+        [JsonPropertyName("itemId")]
+        public int ItemId { get; set; }
+        [JsonPropertyName("sourceKind")]
+        public string SourceKind { get; set; }
+        [JsonPropertyName("sourceName")]
+        public string SourceName { get; set; }
+        [JsonPropertyName("sourceType")]
+        public string SourceType { get; set; }
+
     }
 
     public class ObsWsSceneItem
