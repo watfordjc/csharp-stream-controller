@@ -40,7 +40,7 @@ namespace uk.JohnCook.dotnet.StreamController
             verticalMessagePanel.CreateSolidColorBrush("textBrush", 0xFFFFFFFF);
         }
 
-        private void InitialiseMessagePanel()
+        private void InitialiseMessagePanel(bool noWait = false)
         {
             #region Set strings for header
             verticalMessagePanel.Header = "UK Tweets";
@@ -126,7 +126,7 @@ namespace uk.JohnCook.dotnet.StreamController
             #region Draw canvas with header
 
             #region Start drawing to canvas
-            verticalMessagePanel.BeginDraw();
+            verticalMessagePanel.BeginDraw(noWait);
             #endregion
 
             #region Create brushes
@@ -180,7 +180,7 @@ namespace uk.JohnCook.dotnet.StreamController
             #endregion
 
             #region Finish drawing to canvas
-            verticalMessagePanel.EndDraw();
+            verticalMessagePanel.EndDraw(noWait);
             #endregion
 
             #region Set Tweet area relative to canvas
@@ -236,7 +236,7 @@ namespace uk.JohnCook.dotnet.StreamController
             #endregion
         }
 
-        public string DrawVerticalTweet(string profileImageFilename, string displayName, string username, string text, string time, string retweeterDisplayName = null, string retweeterUsername = null)
+        public string DrawVerticalTweet(string profileImageFilename, string displayName, string username, string text, string time, string retweeterDisplayName = null, string retweeterUsername = null, bool noWait = false)
         {
             try
             {
@@ -248,11 +248,11 @@ namespace uk.JohnCook.dotnet.StreamController
                 Trace.WriteLine("Releasing resources from old render target, releasing old render target, and recreating Direct2DCanvas...");
                 verticalMessagePanel.RecreateDirect2DCanvas();
                 Trace.WriteLine("Initialising replacement panel...");
-                InitialiseMessagePanel();
+                InitialiseMessagePanel(true);
                 Trace.WriteLine("Creating replacement blank panel image...");
                 blankPanel = SaveImage();
                 Trace.WriteLine($"Recursion: calling {nameof(DrawVerticalTweet)} with same parameters...");
-                return DrawVerticalTweet(profileImageFilename, displayName, username, text, time, retweeterDisplayName, retweeterUsername);
+                return DrawVerticalTweet(profileImageFilename, displayName, username, text, time, retweeterDisplayName, retweeterUsername, true);
             }
 
             #region Profile image
@@ -271,7 +271,7 @@ namespace uk.JohnCook.dotnet.StreamController
             #endregion
 
             #region Start drawing to canvas
-            verticalMessagePanel.BeginDraw();
+            verticalMessagePanel.BeginDraw(noWait);
             #endregion
 
             #region Display name and username
@@ -418,7 +418,7 @@ namespace uk.JohnCook.dotnet.StreamController
             #region Finish drawing to canvas
             try
             {
-                verticalMessagePanel.EndDraw();
+                verticalMessagePanel.EndDraw(noWait);
             }
             catch (COMException)
             {
@@ -426,11 +426,11 @@ namespace uk.JohnCook.dotnet.StreamController
                 Trace.WriteLine("Releasing resources from old render target, releasing old render target, and recreating Direct2DCanvas...");
                 verticalMessagePanel.RecreateDirect2DCanvas();
                 Trace.WriteLine("Initialising replacement panel...");
-                InitialiseMessagePanel();
+                InitialiseMessagePanel(true);
                 Trace.WriteLine("Creating replacement blank panel image...");
                 blankPanel = SaveImage();
                 Trace.WriteLine($"Recursion: calling {nameof(DrawVerticalTweet)} with same parameters...");
-                return DrawVerticalTweet(profileImageFilename, displayName, username, text, time, retweeterDisplayName, retweeterUsername);
+                return DrawVerticalTweet(profileImageFilename, displayName, username, text, time, retweeterDisplayName, retweeterUsername, true);
             }
             #endregion
 
