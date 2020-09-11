@@ -58,8 +58,8 @@ namespace uk.JohnCook.dotnet.StreamController
         public Dictionary<string, object> ObsSourceDictionary { get; } = new Dictionary<string, object>();
         private Dictionary<int, ObsScene> ObsSceneItemSceneDictionary { get; } = new Dictionary<int, ObsScene>();
 
-        private readonly TweetProcessing tweetProcessing;
         private readonly WeatherProcessing weatherProcessing;
+        private readonly TweetProcessing tweetProcessing;
 
         public static readonly Brush PrimaryBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(0xFF, 0xE2, 0xC1, 0xEA));
         public static readonly Brush SecondaryBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(0xFF, 0xC5, 0xC0, 0xEB));
@@ -463,7 +463,20 @@ namespace uk.JohnCook.dotnet.StreamController
                     GetSourceSettingsReply sourceSettings = (GetSourceSettingsReply)replyObject.MessageObject;
                     BaseType newSource = (BaseType)sourceSettings.SourceSettingsObj;
                     newSource.Name = sourceSettings.SourceName;
-                    Debug.Assert(SourceTypes.Types.Any(x => x.TypeId == sourceSettings.SourceType), $"Source type {sourceSettings.SourceType} isn't in list from server.");
+                    // Default OBS build options do not include obs-browser
+                    if (!SourceTypes.Types.Any(x => x.TypeId == sourceSettings.SourceType) && sourceSettings.SourceType == "browser_source")
+                    {
+                        Trace.WriteLine($"Source {newSource.Name} is of source type {sourceSettings.SourceType} but OBS does not have that source type installed. {newSource.Name} will not work in OBS as a result.\n Installed source types: {String.Join(", ", SourceTypes.Types.Select(x => x.TypeId).ToList())}");
+                        newSource.Type = new ObsWsReplyType()
+                        {
+                            DisplayName = "Browser Source",
+                            TypeId = "browser_source"
+                        };
+                        ObsSourceDictionary[newSource.Name] = newSource;
+                        return;
+                    }
+                    // All other source types received must be on the list of valid source types received
+                    Debug.Assert(SourceTypes.Types.Any(x => x.TypeId == sourceSettings.SourceType), $"Source type {sourceSettings.SourceType} isn't in list from server.\n{String.Join(", ", SourceTypes.Types.Select(x => x.TypeId).ToList())}");
                     newSource.Type = SourceTypes.Types.First(x => x.TypeId == sourceSettings.SourceType);
                     ObsSourceDictionary[newSource.Name] = newSource;
                     if (newSource.Name == Preferences.Default.obs_local_clock_source_name)

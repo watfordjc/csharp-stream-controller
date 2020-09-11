@@ -215,11 +215,25 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary
                         case ObsRequestType.GetSourceSettings:
                         case ObsRequestType.SetSourceSettings:
                             root.TryGetProperty("sourceType", out sourceType);
-                            obsReply.SourceType = ObsTypes.ObsTypeNameDictionary[sourceType.ToString()];
+                            if (!String.IsNullOrEmpty(sourceType.ToString()))
+                            {
+                                obsReply.SourceType = ObsTypes.ObsTypeNameDictionary[sourceType.ToString()];
+                            }
+                            else
+                            {
+                                Trace.WriteLine($"Unable to determine source type.");
+                            }
                             break;
                         case ObsRequestType.GetSourceFilterInfo:
                             root.TryGetProperty("type", out sourceType);
-                            obsReply.SourceType = ObsTypes.ObsTypeNameDictionary[sourceType.ToString()];
+                            if (!String.IsNullOrEmpty(sourceType.ToString()))
+                            {
+                                obsReply.SourceType = ObsTypes.ObsTypeNameDictionary[sourceType.ToString()];
+                            }
+                            else
+                            {
+                                Trace.WriteLine($"Unable to determine source type.");
+                            }
                             break;
                         default:
                             break;
@@ -324,6 +338,11 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary
                     case ObsRequestType.GetSourceTypesList:
                         foreach (ObsWsReplyType type in (obsReply.MessageObject as GetSourceTypesListReply).Types)
                         {
+                            if (!ObsTypes.ObsTypeNameDictionary.ContainsKey(type.TypeId))
+                            {
+                                Trace.WriteLine($"Unknown source type: {type.DisplayName} ({type.TypeId}) is not defined but the server supports it.");
+                                continue;
+                            }
                             if (!CanDeserializeSourceType(ObsTypes.ObsTypeNameDictionary[type.TypeId], type.DefaultSettings.GetRawText().AsMemory(), out settingsObject))
                             {
                                 Trace.WriteLine($"Unknown source type: {type.DisplayName} ({type.TypeId}) is not defined but the server supports it.");
@@ -388,6 +407,13 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary
         private async Task ParseEvent(MemoryStream message, ObsEventObject obsEvent)
         {
             message.Seek(0, SeekOrigin.Begin);
+            if (obsEvent.EventType == ObsEventType.Unknown)
+            {
+                Trace.WriteLine($"EventType is Unknown, printing JSON...");
+                using StreamReader sr = new StreamReader(message);
+                Trace.WriteLine(sr.ReadToEnd());
+                Debugger.Break();
+            }
             obsEvent.MessageObject = await JsonSerializer.DeserializeAsync(message, ObsWsEvent.GetType(obsEvent.EventType)).ConfigureAwait(false);
 
             object settingsObject;
