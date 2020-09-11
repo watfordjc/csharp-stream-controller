@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.Permissions;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -37,6 +38,7 @@ namespace uk.JohnCook.dotnet.StreamController
         private bool disposedValue;
         private readonly SemaphoreSlim speechSemaphore = new SemaphoreSlim(1, 1);
         private readonly Windows.Media.SpeechSynthesis.SpeechSynthesizer speechSynthesizer = new Windows.Media.SpeechSynthesis.SpeechSynthesizer();
+        private Stream speechStream;
         private WaveOut waveOut;
         WaveFileReader waveFileReader;
         private volatile int countdownTimerValue;
@@ -300,11 +302,23 @@ namespace uk.JohnCook.dotnet.StreamController
             string profileImageFile = FetchProfileImage(username);
 
             await createMessageImageSemaphore.WaitAsync().ConfigureAwait(false);
-            string createdImage = verticalMessagePanel.DrawVerticalTweet(profileImageFile, displayName, username, tweetText, time, retweeterDisplayName, retweeterUsername);
+            string createdImage;
+            try
+            {
+                createdImage = verticalMessagePanel.DrawVerticalTweet(profileImageFile, displayName, username, tweetText, time, retweeterDisplayName, retweeterUsername);
+            }
+            catch (COMException ce)
+            {
+                Trace.WriteLine($"Error creating image: {ce.Message} - {ce.HResult} - {ce.InnerException?.Message}");
+                createMessageImageSemaphore.Release();
+                await Task.FromException(ce).ConfigureAwait(true);
+                Debugger.Break();
+                return;
+            }
             Trace.WriteLine($"Tweet image saved to {createdImage}.");
             createMessageImageSemaphore.Release();
 
-            if (createdImage != null)
+            if (!String.IsNullOrEmpty(createdImage))
             {
                 QueuedDisplayMessage displayMessage = new QueuedDisplayMessage()
                 {
@@ -382,10 +396,12 @@ namespace uk.JohnCook.dotnet.StreamController
             }
 
             // Previous Tweet hasn't reached end of minimum display time yet, or
-            // Previous Tweet hasn't reached maximum display time yet - there are no more Tweets in the queue
+            // Previous Tweet hasn't reached maximum display time yet - there are no more Tweets in the queue, or
+            // TTS hasn't finished speaking yet
             if (!String.IsNullOrEmpty(previousTweetImage) && (
                 (tweetDisplayPeriodsRemaining > 0) ||
-                (tweetImageQueue.Count == 0 && tweetDisplayPeriodsRemaining > finalTweetDisplayPeriod)
+                (tweetImageQueue.Count == 0 && tweetDisplayPeriodsRemaining > finalTweetDisplayPeriod) ||
+                speechSemaphore.CurrentCount == 0
                 ))
             {
                 return;
@@ -406,7 +422,7 @@ namespace uk.JohnCook.dotnet.StreamController
             {
                 tweetDisplayPeriodsRemaining = minimumTweetDisplayPeriods;
                 QueuedDisplayMessage displayMessage = tweetImageQueue.Dequeue();
-                Trace.WriteLine($"Dequeue at {e.Hour}:{e.Minute}:{e.Second} - {displayMessage.Filename}");
+                Trace.WriteLine($"Dequeue at {e.Hour.ToString("00", CultureInfo.InvariantCulture)}:{e.Minute.ToString("00", CultureInfo.InvariantCulture)}:{e.Second.ToString("00", CultureInfo.InvariantCulture)} - {displayMessage.Filename}");
                 // Unable to display next Tweet
                 if (ObsWebsocketConnection.Instance.Client != null && (!(ObsWebsocketConnection.Instance.Client.CanSend) || String.IsNullOrEmpty(displayMessage.Filename)))
                 {
@@ -414,6 +430,16 @@ namespace uk.JohnCook.dotnet.StreamController
                     countdownTimerValue = 0;
                     UpdateCountdownDisplay();
                     await ClearTweet().ConfigureAwait(false);
+                    if (File.Exists(displayMessage.Filename))
+                    {
+                        File.Delete(displayMessage.Filename);
+                    }
+                    return;
+                }
+                else if (ObsWebsocketConnection.Instance.Client == null)
+                {
+                    tweetDisplayPeriodsRemaining = 0;
+                    countdownTimerValue = 0;
                     if (File.Exists(displayMessage.Filename))
                     {
                         File.Delete(displayMessage.Filename);
@@ -519,8 +545,8 @@ namespace uk.JohnCook.dotnet.StreamController
 
             parsedSpeechString = Regex.Replace(parsedSpeechString, @"https?://[^ ]*", ", Earl. ", RegexOptions.None, TimeSpan.FromSeconds(2));
             await speechSemaphore.WaitAsync().ConfigureAwait(true);
-            Windows.Media.SpeechSynthesis.SpeechSynthesisStream speechStream = await speechSynth.SynthesizeTextToStreamAsync(parsedSpeechString);
-            speechSemaphore.Release();
+            Windows.Media.SpeechSynthesis.SpeechSynthesisStream asyncSpeechStream = await speechSynth.SynthesizeTextToStreamAsync(parsedSpeechString);
+            speechStream = asyncSpeechStream.AsStream();
 
             // TODO: Add configuration option for TTS output interface name
             AudioInterface audioInterface = AudioInterfaceCollection.ActiveDevices.Where(x => x.FriendlyName.Contains("CABLE", StringComparison.Ordinal) && x.DataFlow == NAudio.CoreAudioApi.DataFlow.Render).FirstOrDefault();
@@ -531,8 +557,9 @@ namespace uk.JohnCook.dotnet.StreamController
             {
                 DeviceNumber = useDefaultRender ? -1 : AudioWorkarounds.GetWaveOutDeviceNumber(audioInterface)
             };
+            waveOut.PlaybackStopped += WaveOut_PlaybackStopped;
 
-            waveFileReader = new WaveFileReader(speechStream.AsStream());
+            waveFileReader = new WaveFileReader(speechStream);
             waveOut.Init(waveFileReader);
 
             // Add additional Tweet display time if necessary
@@ -542,6 +569,24 @@ namespace uk.JohnCook.dotnet.StreamController
             UpdateCountdownDisplay();
 
             waveOut.Play();
+        }
+
+        private void WaveOut_PlaybackStopped(object sender, StoppedEventArgs e)
+        {
+            waveOut.PlaybackStopped -= WaveOut_PlaybackStopped;
+            Trace.WriteLine("Playback stopped.");
+            ClearSpeech();
+            waveOut.Dispose();
+            speechSemaphore.Release();
+        }
+
+        private void ClearSpeech()
+        {
+            if (speechStream != null)
+            {
+                speechStream.Dispose();
+                speechStream = null;
+            }
         }
 
         #endregion
@@ -559,10 +604,11 @@ namespace uk.JohnCook.dotnet.StreamController
                     logChangeCheckSemaphore.Dispose();
                     fileSystemWatcher.Dispose();
                     createMessageImageSemaphore.Dispose();
+                    waveOut.Dispose();
+                    waveFileReader.Dispose();
+                    speechStream.Dispose();
                     speechSynthesizer.Dispose();
                     speechSemaphore.Dispose();
-                    waveFileReader.Dispose();
-                    waveOut.Dispose();
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override finalizer
