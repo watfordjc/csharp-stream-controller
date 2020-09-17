@@ -509,7 +509,7 @@ namespace uk.JohnCook.dotnet.StreamController
                     }
                     else if (newSource.Name == "TextFormatterOutput")
                     {
-                        await tweetProcessing.ClearTweet().ConfigureAwait(true);
+                        tweetProcessing.ClearTweet();
                     }
                     await Obs_Get(ObsRequestType.GetSourceFilters, sourceSettings.SourceName).ConfigureAwait(true);
                     break;

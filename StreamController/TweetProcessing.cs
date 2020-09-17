@@ -27,11 +27,14 @@ namespace uk.JohnCook.dotnet.StreamController
         private readonly VerticalMessagePanel verticalMessagePanel = new VerticalMessagePanel();
         private readonly FileSystemWatcher fileSystemWatcher;
         private readonly SemaphoreSlim logChangeCheckSemaphore = new SemaphoreSlim(1, 1);
+        private volatile bool newDay;
+        private long previousLogFileSize = -1;
         private long logFileSize = -1;
         private static readonly Regex ircLogTweetRegex = new Regex(@"^\[(.....)\] \<(.*)\>( \u0002\u000309,01 (.*) \u0003\u0002 \(\u0002(.*)\u0002\) (.*) )?.*\u0002\u000311,01 (.*) \u0003\u0002 \(\u0002(.*)\u0002\).?(.*)?:\u000305 (.*) \u0003\| (.*)$");
         private readonly SemaphoreSlim createMessageImageSemaphore = new SemaphoreSlim(1, 1);
         private readonly Queue<QueuedDisplayMessage> tweetImageQueue = new Queue<QueuedDisplayMessage>();
-        private string previousTweetImage = String.Empty;
+        private volatile string lastRenderedTweet = String.Empty;
+        private bool previousTweet;
         private const int minimumTweetDisplayPeriods = 2;
         private const int maximumTweetDisplayPeriods = 4;
         private volatile int tweetDisplayPeriodsRemaining;
@@ -79,7 +82,16 @@ namespace uk.JohnCook.dotnet.StreamController
 
         private class QueuedDisplayMessage
         {
-            public string Filename { get; set; }
+            public DateTime RelayTime { get; set; }
+            public bool IsTweet { get; set; }
+            public bool IsRetweet { get; set; }
+            public string DisplayName { get; set; }
+            public string Username { get; set; }
+            public string RetweeterDisplayName { get; set; }
+            public string RetweeterUsername { get; set; }
+            public string MessageText { get; set; }
+            public string MessageId { get; set; }
+            public string ProfileImageFile { get; set; }
             public string SpeechPrepend { get; set; }
             public string SpeechText { get; set; }
         }
@@ -118,6 +130,10 @@ namespace uk.JohnCook.dotnet.StreamController
         /// <param name="e">DateTime from a ChronoTimer</param>
         private void RefreshFileStats(object sender, DateTime e)
         {
+            if (e.Hour == 0 && e.Minute == 0 && e.Second == 0)
+            {
+                newDay = true;
+            }
             if (e.Second % 2 == 0 || logChangeCheckSemaphore.CurrentCount == 0) { return; }
             string today = DateTime.Now.ToString("yyyyMM", CultureInfo.InvariantCulture) + Math.Max(DateTime.Now.Day / 7 * 7, 1).ToString("00", CultureInfo.InvariantCulture);
             DirectoryInfo dirInfo = new DirectoryInfo(@"G:\Program Files (x86)\mIRC\logs\");
@@ -128,10 +144,10 @@ namespace uk.JohnCook.dotnet.StreamController
             }
             using FileStream fileStream = File.Open(fileNames[0].FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             fileStream.Seek(0, SeekOrigin.End);
-            if (fileStream.Position > Thread.VolatileRead(ref logFileSize))
-            {
-                FileSystemWatcher_Changed(this, new FileSystemEventArgs(WatcherChangeTypes.Changed, "", ""));
-            }
+            //if (fileStream.Position > Thread.VolatileRead(ref logFileSize))
+            //{
+            //    FileSystemWatcher_Changed(this, new FileSystemEventArgs(WatcherChangeTypes.Changed, "", ""));
+            //}
         }
 
         /// <summary>
@@ -141,57 +157,97 @@ namespace uk.JohnCook.dotnet.StreamController
         /// <param name="e">FileSystemEventArgs from a FileSystemWatcher</param>
         private async void FileSystemWatcher_Changed(object sender, FileSystemEventArgs e)
         {
-            if (logChangeCheckSemaphore.CurrentCount == 0)
+            if (logChangeCheckSemaphore.CurrentCount == 0 || String.IsNullOrEmpty(e.Name))
             {
                 return;
             }
             await logChangeCheckSemaphore.WaitAsync().ConfigureAwait(false);
             string today = DateTime.Now.ToString("yyyyMM", CultureInfo.InvariantCulture) + Math.Max(DateTime.Now.Day / 7 * 7, 1).ToString("00", CultureInfo.InvariantCulture);
-            long tmpPreviousLogFileLength = Thread.VolatileRead(ref logFileSize);
-            DirectoryInfo dirInfo = new DirectoryInfo(@"G:\Program Files (x86)\mIRC\logs\");
-            FileInfo[] fileNames = dirInfo.GetFiles($"#UK-Emergency-Advice.DALnet.{today}.log");
+            string todayFile = $"#UK-Emergency-Advice.DALnet.{today}.log";
+            string yesterday = DateTime.Now.Subtract(TimeSpan.FromDays(1)).ToString("yyyyMM", CultureInfo.InvariantCulture) + Math.Max(DateTime.Now.Day / 7 * 7, 1).ToString("00", CultureInfo.InvariantCulture);
+            string yesterdayFile = $"#UK-Emergency-Advice.DALnet.{yesterday}.log";
             // Cope with logfile rollovers
-            if (fileNames.Length == 0 || (tmpPreviousLogFileLength > -1 && e.Name != fileNames[0].Name && !String.IsNullOrEmpty(e.Name)))
+            if (newDay)
             {
-                fileNames = dirInfo.GetFiles(e.Name);
-                if (fileNames.Length == 0)
-                {
-                    Trace.WriteLine("Unable to find mIRC log file.");
-                    logChangeCheckSemaphore.Release();
-                    return;
-                }
-            }
-            // Log file exists and we have a previous position to start reading from
-            if (fileNames.Length > 0 && e.Name == fileNames[0].Name && tmpPreviousLogFileLength >= 0)
-            {
-                try
-                {
-                    using FileStream fileStream = File.Open(fileNames[0].FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                    Thread.VolatileWrite(ref logFileSize, fileNames[0].Length);
-                    if (Thread.VolatileRead(ref logFileSize) < tmpPreviousLogFileLength)
-                    {
-                        tmpPreviousLogFileLength = 0;
-                    }
-                    fileStream.Seek(tmpPreviousLogFileLength, SeekOrigin.Begin);
-                    using StreamReader streamReader = new StreamReader(fileStream);
-                    while (streamReader.Peek() >= 0)
-                    {
-                        string currentLine = streamReader.ReadLine();
-                        ParseMessageFromIrcLog(currentLine).ConfigureAwait(false).GetAwaiter();
-                    }
-                }
-                catch (Exception ex) when (ex is FileNotFoundException || ex is PathTooLongException || ex is DirectoryNotFoundException)
+                Thread.VolatileWrite(ref previousLogFileSize, Thread.VolatileRead(ref logFileSize));
+                if (today != yesterday)
                 {
                     Thread.VolatileWrite(ref logFileSize, 0);
-                    logChangeCheckSemaphore.Release();
-                    Debug.Assert(fileNames.Length == 0, "File not found despite file existing?");
-                    return;
                 }
+                newDay = false;
+            }
+            long tmpPreviousLogFileLength;
+            DirectoryInfo dirInfo = new DirectoryInfo(@"G:\Program Files (x86)\mIRC\logs\");
+            FileInfo[] fileNames;
+            // Tweet is from yesterday
+            if (today != yesterday && e.Name == yesterdayFile)
+            {
+                fileNames = dirInfo.GetFiles(yesterdayFile);
+                tmpPreviousLogFileLength = Thread.VolatileRead(ref previousLogFileSize);
+            }
+            // Tweet is from today
+            else
+            {
+                fileNames = dirInfo.GetFiles(todayFile);
+                tmpPreviousLogFileLength = Thread.VolatileRead(ref logFileSize);
             }
             // Log file exists but this is our first run - set seek position
-            else if (fileNames.Length > 0 && tmpPreviousLogFileLength == -1)
+            if (fileNames.Length > 0 && tmpPreviousLogFileLength == -1 && e.Name == todayFile)
             {
                 Thread.VolatileWrite(ref logFileSize, fileNames[0].Length);
+                logChangeCheckSemaphore.Release();
+                return;
+            }
+            // Log file doesn't exist
+            else if (fileNames.Length == 0)
+            {
+                Trace.WriteLine("Unable to find mIRC log file.");
+                logChangeCheckSemaphore.Release();
+                return;
+            }
+            // Parse end of log file
+            try
+            {
+                using FileStream fileStream = File.Open(fileNames[0].FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                long tmpNewLogFileLength = fileNames[0].Length;
+                fileStream.Seek(tmpPreviousLogFileLength, SeekOrigin.Begin);
+                using StreamReader streamReader = new StreamReader(fileStream);
+                while (streamReader.Peek() >= 0)
+                {
+                    string currentLine = streamReader.ReadLine();
+                    ParseMessageFromIrcLog(currentLine);
+                }
+                if (fileNames[0].Name == yesterdayFile && today != yesterday)
+                {
+                    // Update previous log file's read to state if Tweet is from yesterday and there has been a log file rollover
+                    Thread.VolatileWrite(ref previousLogFileSize, streamReader.BaseStream.Position);
+                }
+                else
+                {
+                    // Update current log file's read to state if Tweet is from today
+                    Thread.VolatileWrite(ref logFileSize, streamReader.BaseStream.Position);
+                }
+            }
+            catch (Exception ex) when (ex is FileNotFoundException || ex is PathTooLongException || ex is DirectoryNotFoundException)
+            {
+                if (e.Name == todayFile)
+                {
+                    // Update current log file's read to state to start of file if file doesn't exist
+                    Thread.VolatileWrite(ref logFileSize, 0);
+                }
+                logChangeCheckSemaphore.Release();
+                Debug.Assert(fileNames.Length == 0, "File not found despite file existing?");
+                return;
+            }
+            catch (IOException)
+            {
+                if (e.Name == todayFile)
+                {
+                    Thread.VolatileWrite(ref logFileSize, -1);
+                }
+                Thread.VolatileWrite(ref previousLogFileSize, -1);
+                logChangeCheckSemaphore.Release();
+                return;
             }
             logChangeCheckSemaphore.Release();
         }
@@ -277,59 +333,86 @@ namespace uk.JohnCook.dotnet.StreamController
         /// </summary>
         /// <param name="message">A single line from a mIRC log file</param>
         /// <returns>A Task</returns>
-        private async Task ParseMessageFromIrcLog(string message)
+        private void ParseMessageFromIrcLog(string message)
         {
+            DateTime today = DateTime.Now;
             Match match = ircLogTweetRegex.Match(message);
 
-            string relayTime = match.Groups[1].Value;
-            string ircUser = match.Groups[2].Value;
             bool isTweet = match.Groups[9].Value == "Tweeted";
             bool isRetweet = match.Groups[6].Value == "Retweeted";
-            if ((!isTweet && !isRetweet) || ircUser != "UKEM-Bot")
+
+            if ((!isTweet && !isRetweet) || match.Groups[2].Value != "UKEM-Bot")
             {
                 return;
             }
-            string displayName = match.Groups[7].Value;
-            string username = match.Groups[8].Value;
-            string retweeterDisplayName = isRetweet ? match.Groups[4].Value : null;
-            string retweeterUsername = isRetweet ? match.Groups[5].Value : null;
-            string tweetText = match.Groups[10].Value;
-            string tweetId = match.Groups[11].Value;
 
-            //Trace.WriteLine($"time: {relayTime}, luser: {ircUser}, isRetweet: {isRetweet} ({retweeterDisplayName}({retweeterUsername})), {displayName} ({username}) Tweeted ({tweetId}) {tweetText}");
+            int year;
+            int month;
+            int day;
+            int hour = int.Parse(match.Groups[1].Value.Substring(0, 2), CultureInfo.InvariantCulture);
+            int minute = int.Parse(match.Groups[1].Value.Substring(3, 2), CultureInfo.InvariantCulture);
+            if (today.Hour == 0 && today.Minute == 0 && hour == 23)
+            {
+                year = today.Subtract(TimeSpan.FromDays(1)).Year;
+                month = today.Subtract(TimeSpan.FromDays(1)).Month;
+                day = today.Subtract(TimeSpan.FromDays(1)).Day;
+            }
+            else
+            {
+                year = today.Year;
+                month = today.Month;
+                day = today.Day;
+            }
 
-            string time = isRetweet ? $"Retweeted Today" : $"Today, {relayTime} UTC+1";
-            string profileImageFile = FetchProfileImage(username);
+            QueuedDisplayMessage displayMessage = new QueuedDisplayMessage()
+            {
+                RelayTime = new DateTime(year, month, day, hour, minute, 0, 0, DateTimeKind.Local),
+                IsTweet = isTweet,
+                IsRetweet = isRetweet,
+                DisplayName = match.Groups[7].Value,
+                Username = match.Groups[8].Value,
+                RetweeterDisplayName = isRetweet ? match.Groups[4].Value : null,
+                RetweeterUsername = isRetweet ? match.Groups[5].Value : null,
+                MessageText = match.Groups[10].Value,
+                MessageId = match.Groups[11].Value,
+                SpeechText = match.Groups[10].Value
+            };
 
-            await createMessageImageSemaphore.WaitAsync().ConfigureAwait(false);
-            string createdImage;
+            displayMessage.ProfileImageFile = FetchProfileImage(displayMessage.Username);
+            displayMessage.SpeechPrepend = isRetweet ? $"{displayMessage.RetweeterDisplayName} Retweeted {displayMessage.DisplayName}: " : $"{displayMessage.DisplayName} Tweeted: ";
+
+            tweetImageQueue.Enqueue(displayMessage);
+        }
+
+        #endregion
+
+        #region Display a Tweet
+        /// <summary>
+        /// Parses a QueuedDisplayMessage and sends it for image creation and TTS treatment
+        /// </summary>
+        /// <param name="message">A QueuedDisplayMessage to display</param>
+        /// <returns>A Task</returns>
+        private bool DisplayTweet(QueuedDisplayMessage message)
+        {
+            bool imageCreated;
             try
             {
-                createdImage = verticalMessagePanel.DrawVerticalTweet(profileImageFile, displayName, username, tweetText, time, retweeterDisplayName, retweeterUsername);
+                imageCreated = verticalMessagePanel.UpdateImage();
+                Trace.WriteLine($"Current thread: {Thread.CurrentThread.ManagedThreadId}");
+                _Context.Send(
+                    async x => await Speak(message).ConfigureAwait(false), null
+                    );
             }
             catch (COMException ce)
             {
                 Trace.WriteLine($"Error creating image: {ce.Message} - {ce.HResult} - {ce.InnerException?.Message}");
                 createMessageImageSemaphore.Release();
-                await Task.FromException(ce).ConfigureAwait(true);
                 Debugger.Break();
-                return;
+                return false;
             }
-            Trace.WriteLine($"Tweet image saved to {createdImage}.");
-            createMessageImageSemaphore.Release();
-
-            if (!String.IsNullOrEmpty(createdImage))
-            {
-                QueuedDisplayMessage displayMessage = new QueuedDisplayMessage()
-                {
-                    Filename = createdImage,
-                    SpeechPrepend = isRetweet ? $"{retweeterDisplayName} Retweeted {displayName}: " : $"{displayName} Tweeted: ",
-                    SpeechText = tweetText
-                };
-                tweetImageQueue.Enqueue(displayMessage);
-            }
+            Trace.WriteLine($"Tweet image {(imageCreated ? "" : "not ")} displayed.");
+            return true;
         }
-
         #endregion
 
         #region Tweet display
@@ -338,23 +421,16 @@ namespace uk.JohnCook.dotnet.StreamController
         /// Replaces currently displayed Tweet with the blank panel image
         /// </summary>
         /// <returns>A Task</returns>
-        public async Task ClearTweet()
+        public void ClearTweet()
         {
-            if (!string.IsNullOrEmpty(previousTweetImage))
+            if (previousTweet)
             {
-                File.Delete(previousTweetImage);
-                previousTweetImage = String.Empty;
+                if (verticalMessagePanel.ClearVerticalTweet())
+                {
+                    previousTweet = false;
+                    lastRenderedTweet = String.Empty;
+                }
             }
-            OBSWebSocketLibrary.TypeDefs.ImageSource imageSource = new OBSWebSocketLibrary.TypeDefs.ImageSource()
-            {
-                File = verticalMessagePanel.blankPanel
-            };
-            SetSourceSettingsRequest request = new SetSourceSettingsRequest()
-            {
-                SourceName = "TextFormatterOutput",
-                SourceSettings = imageSource
-            };
-            await ObsWebsocketConnection.Instance.Client.ObsSend(request).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -364,7 +440,7 @@ namespace uk.JohnCook.dotnet.StreamController
         /// <param name="e">DateTime from a ChronoTimer</param>
         private async void ShowNextTweet(object sender, DateTime e)
         {
-            if (!string.IsNullOrEmpty(previousTweetImage))
+            if (previousTweet)
             {
                 countdownTimerValue--;
                 UpdateCountdownDisplay();
@@ -385,12 +461,35 @@ namespace uk.JohnCook.dotnet.StreamController
             {
                 // Previous Tweet hasn't reached end of minimum display time yet, or
                 // Previous Tweet hasn't reached maximum display time yet - there are no more Tweets in the queue
-                if (!String.IsNullOrEmpty(previousTweetImage) && (
+                if (previousTweet && (
                     (tweetDisplayPeriodsRemaining > 0) ||
                     (tweetImageQueue.Count == 0 && tweetDisplayPeriodsRemaining > finalTweetDisplayPeriod)
                     ))
                 {
                     tweetDisplayPeriodsRemaining--;
+                }
+                // Prepare display of next Tweet in queue
+                if (tweetDisplayPeriodsRemaining == 0 && tweetImageQueue.Count > 0 || (tweetDisplayPeriodsRemaining < 0 && tweetImageQueue.Count > 0 && lastRenderedTweet != tweetImageQueue.Peek().MessageId))
+                {
+                    QueuedDisplayMessage message = tweetImageQueue.Peek();
+                    DateTime today = e.AddSeconds(1);
+                    // Display of a Tweet might straddle both sides of midnight
+                    bool possiblyYesterday = today.Hour == 23 && today.Minute == 59;
+                    // First minute of the day, queue might have Tweets from yesterday
+                    bool fromYesterday = today.Hour == 0 && today.Minute == 0 && message.RelayTime.Hour == 23;
+
+                    string day = fromYesterday ? "Yesterday" : "Today";
+                    string time = message.IsRetweet ?
+                        $"Retweeted {(possiblyYesterday ? message.RelayTime.Hour + ":" + message.RelayTime.Minute + " UTC+1" : day)}" :
+                        $"{(possiblyYesterday ? "Before Midnight, " : $"{day}, ")}{message.RelayTime.Hour}:{message.RelayTime.Minute} UTC+1";
+                    await createMessageImageSemaphore.WaitAsync().ConfigureAwait(false);
+                    Trace.WriteLine($"Current thread: {Thread.CurrentThread.ManagedThreadId}");
+                    bool tweetRendered = verticalMessagePanel.DrawVerticalTweet(message.ProfileImageFile, message.DisplayName, message.Username, message.MessageText, time, message.RetweeterDisplayName, message.RetweeterUsername);
+                    if (tweetRendered)
+                    {
+                        lastRenderedTweet = message.MessageId;
+                    }
+                    createMessageImageSemaphore.Release();
                 }
                 return;
             }
@@ -398,7 +497,7 @@ namespace uk.JohnCook.dotnet.StreamController
             // Previous Tweet hasn't reached end of minimum display time yet, or
             // Previous Tweet hasn't reached maximum display time yet - there are no more Tweets in the queue, or
             // TTS hasn't finished speaking yet
-            if (!String.IsNullOrEmpty(previousTweetImage) && (
+            if (previousTweet && (
                 (tweetDisplayPeriodsRemaining > 0) ||
                 (tweetImageQueue.Count == 0 && tweetDisplayPeriodsRemaining > finalTweetDisplayPeriod) ||
                 speechSemaphore.CurrentCount == 0
@@ -408,62 +507,40 @@ namespace uk.JohnCook.dotnet.StreamController
             }
 
             // Previous Tweet has reached maximum display time - there are no more Tweets in the queue
-            else if (!String.IsNullOrEmpty(previousTweetImage) && tweetImageQueue.Count == 0)
+            else if (previousTweet && tweetImageQueue.Count == 0)
             {
                 tweetDisplayPeriodsRemaining = 0;
-                await ClearTweet().ConfigureAwait(false);
+                ClearTweet();
                 countdownTimerValue = 0;
                 UpdateCountdownDisplay();
                 return;
             }
 
             // There are more Tweets in the queue and we're ready to show the next one
-            else if (tweetImageQueue.Count > 0)
+            else if (tweetImageQueue.Count > 0 && speechSemaphore.CurrentCount > 0 && tweetImageQueue.Peek().MessageId == lastRenderedTweet)
             {
                 tweetDisplayPeriodsRemaining = minimumTweetDisplayPeriods;
                 QueuedDisplayMessage displayMessage = tweetImageQueue.Dequeue();
-                Trace.WriteLine($"Dequeue at {e.Hour.ToString("00", CultureInfo.InvariantCulture)}:{e.Minute.ToString("00", CultureInfo.InvariantCulture)}:{e.Second.ToString("00", CultureInfo.InvariantCulture)} - {displayMessage.Filename}");
+                Trace.WriteLine($"Dequeue at {e.Hour.ToString("00", CultureInfo.InvariantCulture)}:{e.Minute.ToString("00", CultureInfo.InvariantCulture)}:{e.Second.ToString("00", CultureInfo.InvariantCulture)} - {displayMessage.MessageId}");
+                Trace.WriteLine($"Current thread: {Thread.CurrentThread.ManagedThreadId}");
+                verticalMessagePanel.UpdateImage();
+                bool imageCreated = DisplayTweet(displayMessage);
                 // Unable to display next Tweet
-                if (ObsWebsocketConnection.Instance.Client != null && (!(ObsWebsocketConnection.Instance.Client.CanSend) || String.IsNullOrEmpty(displayMessage.Filename)))
+                if (ObsWebsocketConnection.Instance.Client != null && !ObsWebsocketConnection.Instance.Client.CanSend)
                 {
                     tweetDisplayPeriodsRemaining = 0;
                     countdownTimerValue = 0;
                     UpdateCountdownDisplay();
-                    await ClearTweet().ConfigureAwait(false);
-                    if (File.Exists(displayMessage.Filename))
-                    {
-                        File.Delete(displayMessage.Filename);
-                    }
+                    ClearTweet();
                     return;
                 }
-                else if (ObsWebsocketConnection.Instance.Client == null)
+                else if (ObsWebsocketConnection.Instance.Client == null || !imageCreated)
                 {
                     tweetDisplayPeriodsRemaining = 0;
                     countdownTimerValue = 0;
-                    if (File.Exists(displayMessage.Filename))
-                    {
-                        File.Delete(displayMessage.Filename);
-                    }
                     return;
                 }
-                OBSWebSocketLibrary.TypeDefs.ImageSource imageSource = new OBSWebSocketLibrary.TypeDefs.ImageSource()
-                {
-                    File = displayMessage.Filename
-                };
-                SetSourceSettingsRequest request = new SetSourceSettingsRequest()
-                {
-                    SourceName = "TextFormatterOutput",
-                    SourceSettings = imageSource
-                };
-                await ObsWebsocketConnection.Instance.Client.ObsSend(request).ConfigureAwait(false);
-                _Context.Send(
-                    async x => await Speak(displayMessage).ConfigureAwait(true), null
-                    );
-                if (!string.IsNullOrEmpty(previousTweetImage))
-                {
-                    File.Delete(previousTweetImage);
-                }
-                previousTweetImage = displayMessage.Filename;
+                previousTweet = true;
             }
         }
 
@@ -484,8 +561,8 @@ namespace uk.JohnCook.dotnet.StreamController
                 Source = "Tweet Countdown 2",
                 Text = countdownTimerValue.ToString(CultureInfo.InvariantCulture)
             };
-            await ObsWebsocketConnection.Instance.Client.ObsSend(request).ConfigureAwait(true);
-            await ObsWebsocketConnection.Instance.Client.ObsSend(request2).ConfigureAwait(true);
+            await ObsWebsocketConnection.Instance.Client.ObsSend(request).ConfigureAwait(false);
+            await ObsWebsocketConnection.Instance.Client.ObsSend(request2).ConfigureAwait(false);
         }
 
         #endregion
@@ -544,7 +621,7 @@ namespace uk.JohnCook.dotnet.StreamController
             }
 
             parsedSpeechString = Regex.Replace(parsedSpeechString, @"https?://[^ ]*", ", Earl. ", RegexOptions.None, TimeSpan.FromSeconds(2));
-            await speechSemaphore.WaitAsync().ConfigureAwait(true);
+            await speechSemaphore.WaitAsync().ConfigureAwait(false);
             Windows.Media.SpeechSynthesis.SpeechSynthesisStream asyncSpeechStream = await speechSynth.SynthesizeTextToStreamAsync(parsedSpeechString);
             speechStream = asyncSpeechStream.AsStream();
 

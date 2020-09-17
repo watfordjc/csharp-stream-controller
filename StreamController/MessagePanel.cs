@@ -21,13 +21,12 @@ namespace uk.JohnCook.dotnet.StreamController
         private readonly MessagePanel verticalMessagePanel;
         private PointF messageBlankingAreaOriginPoint;
         private RectF messageBlankingArea;
-        public string blankPanel = String.Empty;
 
         public VerticalMessagePanel()
         {
             verticalMessagePanel = direct2DWrapper.CreateMessagePanel(panelSize, panelBackgroundColor);
             InitialiseMessagePanel();
-            blankPanel = SaveImage();
+            UpdateImage();
             //blankPanel = DrawVerticalTweet(@"G:\Program Files (x86)\mIRC\twimg\tmp\HighwaysNWEST.jpg", "Highways England", "@HighwaysNWEST", "@CheshireFire @OfficialTfGM @NWAmbulance @NWmwaypolice Incident Update:  A lane has been re-opened past the scene of the vehicle fire so if you are stuck in traffic on the A556 you will be moving again very soon.  There is still no access yet to the A556 from the #M6 #J19 #Tabley @CheshireFire @OfficialTfGM @NWAmbulance @NWmwaypolice", "Today, 15:00 UTC+1", "Cheshire Fire and Rescue Service", "@CheshireFire");
         }
 
@@ -38,6 +37,9 @@ namespace uk.JohnCook.dotnet.StreamController
             verticalMessagePanel.CreateSolidColorBrush("disablePixelBrush", 0xFF00FFFF);
             verticalMessagePanel.CreateSolidColorBrush("enablePixelBrush", 0xFF00FF00);
             verticalMessagePanel.CreateSolidColorBrush("textBrush", 0xFFFFFFFF);
+            verticalMessagePanel.CreateSolidColorBrush("debugBrush1", (uint)System.Drawing.Color.HotPink.ToArgb());
+            verticalMessagePanel.CreateSolidColorBrush("debugBrush2", (uint)System.Drawing.Color.Lime.ToArgb());
+            verticalMessagePanel.CreateSolidColorBrush("debugBrush3", (uint)System.Drawing.Color.DarkKhaki.ToArgb());
         }
 
         private void InitialiseMessagePanel(bool noWait = false)
@@ -236,7 +238,28 @@ namespace uk.JohnCook.dotnet.StreamController
             #endregion
         }
 
-        public string DrawVerticalTweet(string profileImageFilename, string displayName, string username, string text, string time, string retweeterDisplayName = null, string retweeterUsername = null, bool noWait = false)
+        public bool ClearVerticalTweet()
+        {
+            try
+            {
+                verticalMessagePanel.ClearArea(messageBlankingAreaOriginPoint, messageBlankingArea, verticalMessagePanel.Brushes["backgroundBrush"], true, true);
+                UpdateImage();
+                return true;
+            }
+            catch (COMException)
+            {
+                Trace.WriteLine("Error in clear area. We need to start over as we've probably lost the render target...");
+                Trace.WriteLine("Releasing resources from old render target, releasing old render target, and recreating Direct2DCanvas...");
+                verticalMessagePanel.RecreateDirect2DCanvas();
+                Trace.WriteLine("Initialising replacement panel...");
+                InitialiseMessagePanel(true);
+                UpdateImage();
+                Trace.WriteLine($"Recursion: calling {nameof(ClearVerticalTweet)} with same parameters...");
+                return ClearVerticalTweet();
+            }
+        }
+
+        public bool DrawVerticalTweet(string profileImageFilename, string displayName, string username, string text, string time, string retweeterDisplayName = null, string retweeterUsername = null, bool noWait = false)
         {
             try
             {
@@ -249,8 +272,6 @@ namespace uk.JohnCook.dotnet.StreamController
                 verticalMessagePanel.RecreateDirect2DCanvas();
                 Trace.WriteLine("Initialising replacement panel...");
                 InitialiseMessagePanel(true);
-                Trace.WriteLine("Creating replacement blank panel image...");
-                blankPanel = SaveImage();
                 Trace.WriteLine($"Recursion: calling {nameof(DrawVerticalTweet)} with same parameters...");
                 return DrawVerticalTweet(profileImageFilename, displayName, username, text, time, retweeterDisplayName, retweeterUsername, true);
             }
@@ -264,7 +285,7 @@ namespace uk.JohnCook.dotnet.StreamController
                 240.0f
                 );
 
-            // TODO: Create and draw round profile image
+            // Create and draw round profile image
             verticalMessagePanel.PushCircleLayer(CanvasElement.PROFILE_IMAGE, verticalMessagePanel.Brushes["enablePixelBrush"]);
             verticalMessagePanel.DrawImage(CanvasElement.PROFILE_IMAGE);
             verticalMessagePanel.PopLayer();
@@ -275,7 +296,7 @@ namespace uk.JohnCook.dotnet.StreamController
             #endregion
 
             #region Display name and username
-            // TODO: Get DisplayName and set DisplayNameRectangle
+            // Get DisplayName and set DisplayNameRectangle
             verticalMessagePanel.DisplayName = displayName;
             verticalMessagePanel.CreateTextLayout(CanvasElement.DISPLAY_NAME, new RectF()
             {
@@ -286,7 +307,7 @@ namespace uk.JohnCook.dotnet.StreamController
             });
             verticalMessagePanel.DrawTextLayout(CanvasElement.SUBHEADER, verticalMessagePanel.Brushes["textBrush"]);
 
-            // TODO: Get Username and set UsernameRectangle
+            // Get Username and set UsernameRectangle
             verticalMessagePanel.Username = username;
             verticalMessagePanel.CreateTextLayout(CanvasElement.USERNAME, new RectF()
             {
@@ -296,7 +317,7 @@ namespace uk.JohnCook.dotnet.StreamController
                 Bottom = verticalMessagePanel.ProfileImageRectangle.Bottom / 2
             });
 
-            // TODO: Calculate and set DisplayNameOriginPoint and UsernameOriginPoint
+            // Calculate and set DisplayNameOriginPoint and UsernameOriginPoint
             if (verticalMessagePanel.ProfileImageRectangle.Bottom / 2 >= verticalMessagePanel.DisplayNameRectangle.Bottom)
             {
                 verticalMessagePanel.UsernameOriginPoint = new PointF()
@@ -318,7 +339,7 @@ namespace uk.JohnCook.dotnet.StreamController
             #endregion
 
             #region Tweet text
-            // TODO: Get TweetText and set TweetTextRectangle
+            // Get TweetText and set TweetTextRectangle
             verticalMessagePanel.MessageText = text;
             verticalMessagePanel.CreateTextLayout(CanvasElement.TEXT, new RectF()
             {
@@ -327,7 +348,7 @@ namespace uk.JohnCook.dotnet.StreamController
                 Right = verticalMessagePanel.MessageRectangle.Right,
                 Bottom = verticalMessagePanel.MessageRectangle.Bottom - verticalMessagePanel.UsernameRectangle.Bottom
             });
-            // TODO: Calculate and set TweetTextOriginPoint
+            // Calculate and set TweetTextOriginPoint
             verticalMessagePanel.MessageTextOriginPoint = new PointF()
             {
                 X = verticalMessagePanel.MessageOriginPoint.X,
@@ -337,7 +358,7 @@ namespace uk.JohnCook.dotnet.StreamController
             #endregion
 
             #region Twitter logo and time
-            // TODO: Calculate and set TwitterLogoOriginPoint
+            // Calculate and set TwitterLogoOriginPoint
             verticalMessagePanel.NetworkLogoOriginPoint = new PointF()
             {
                 X = verticalMessagePanel.MessageOriginPoint.X,
@@ -345,7 +366,7 @@ namespace uk.JohnCook.dotnet.StreamController
             };
             verticalMessagePanel.DrawImage(CanvasElement.NETWORK_LOGO);
 
-            // TODO: Get TweetTime and set TweetTimeRectangle
+            // Get TweetTime and set TweetTimeRectangle
             verticalMessagePanel.Time = time;
             verticalMessagePanel.CreateTextLayout(CanvasElement.TIME, new RectF()
             {
@@ -355,7 +376,7 @@ namespace uk.JohnCook.dotnet.StreamController
                 Bottom = verticalMessagePanel.NetworkLogoRectangle.Bottom
             });
 
-            // TODO: Calculate and set TweetTimeOriginPoint
+            // Calculate and set TweetTimeOriginPoint
             verticalMessagePanel.TimeOriginPoint = new PointF()
             {
                 X = verticalMessagePanel.MessageOriginPoint.X + verticalMessagePanel.NetworkLogoRectangle.Right,
@@ -369,7 +390,7 @@ namespace uk.JohnCook.dotnet.StreamController
             #region Retweet logo and Retweeter display name & username
             if (retweeterDisplayName != null && retweeterUsername != null)
             {
-                // TODO: Calculate and set RetweetLogoOriginPoint
+                // Calculate and set RetweetLogoOriginPoint
                 verticalMessagePanel.ShareLogoOriginPoint = new PointF()
                 {
                     X = verticalMessagePanel.MessageOriginPoint.X + 50.0f,
@@ -377,7 +398,7 @@ namespace uk.JohnCook.dotnet.StreamController
                 };
                 verticalMessagePanel.DrawImage(CanvasElement.SHARE_LOGO);
 
-                // TODO: Get RetweeterDisplayName and set RetweeterDisplayNameRectangle
+                // Get RetweeterDisplayName and set RetweeterDisplayNameRectangle
                 verticalMessagePanel.SharerDisplayName = retweeterDisplayName;
                 verticalMessagePanel.CreateTextLayout(CanvasElement.SHARER_DISPLAY_NAME, new RectF()
                 {
@@ -386,7 +407,7 @@ namespace uk.JohnCook.dotnet.StreamController
                     Right = verticalMessagePanel.MessageRectangle.Right - verticalMessagePanel.ShareLogoRectangle.Right - 100.0f,
                     Bottom = verticalMessagePanel.ShareLogoRectangle.Bottom
                 });
-                // TODO: Calculate and set RetweeterDisplayNameOriginPoint
+                // Calculate and set RetweeterDisplayNameOriginPoint
                 verticalMessagePanel.SharerDisplayNameOriginPoint = new PointF()
                 {
                     X = verticalMessagePanel.MessageOriginPoint.X + verticalMessagePanel.ShareLogoRectangle.Right + 100.0f,
@@ -395,7 +416,7 @@ namespace uk.JohnCook.dotnet.StreamController
                     : verticalMessagePanel.ShareLogoOriginPoint.Y
                 };
 
-                // TODO: Get RetweeterUsername and set RetweeterUsernameRectangle
+                // Get RetweeterUsername and set RetweeterUsernameRectangle
                 verticalMessagePanel.SharerUsername = $"({retweeterUsername})";
                 verticalMessagePanel.CreateTextLayout(CanvasElement.SHARER_USERNAME, new RectF()
                 {
@@ -404,7 +425,7 @@ namespace uk.JohnCook.dotnet.StreamController
                     Right = verticalMessagePanel.MessageRectangle.Right - verticalMessagePanel.ShareLogoRectangle.Right,
                     Bottom = verticalMessagePanel.ShareLogoRectangle.Bottom
                 });
-                // TODO: Calculate and set RetweeterUsernameOriginPoint
+                // Calculate and set RetweeterUsernameOriginPoint
                 verticalMessagePanel.SharerUsernameOriginPoint = new PointF()
                 {
                     X = verticalMessagePanel.SharerDisplayNameOriginPoint.X,
@@ -427,47 +448,27 @@ namespace uk.JohnCook.dotnet.StreamController
                 verticalMessagePanel.RecreateDirect2DCanvas();
                 Trace.WriteLine("Initialising replacement panel...");
                 InitialiseMessagePanel(true);
-                Trace.WriteLine("Creating replacement blank panel image...");
-                blankPanel = SaveImage();
                 Trace.WriteLine($"Recursion: calling {nameof(DrawVerticalTweet)} with same parameters...");
                 return DrawVerticalTweet(profileImageFilename, displayName, username, text, time, retweeterDisplayName, retweeterUsername, true);
             }
             #endregion
 
-            return SaveImage();
+            return true;
         }
 
-        private string SaveImage()
+        #region Update Image
+        public bool UpdateImage()
         {
-            #region Save Image
-            // Date/Time format to append to file name. Custom format because filenames cannot contain colons.
-            DateTimeFormat dateTimeFormat = new DateTimeFormat("yyyy-MM-ddTHHmmss.fffffffZ");
-            // Set file name to a deterministic but unlikely to be duplicated name using executable name and datetime, e.g. TextFormatter_2020-08-27T181638.7742753Z.PNG
-            string fileName = Assembly.GetEntryAssembly().GetName().Name + "_" + DateTime.UtcNow.ToString(dateTimeFormat.FormatString, CultureInfo.InvariantCulture) + ".PNG";
-            // Set save location to %TEMP%
-            string saveLocation = System.IO.Path.Combine(System.IO.Path.GetTempPath(), fileName);
-            try
-            {
-                verticalMessagePanel.SaveImage(saveLocation);
-                Trace.WriteLine($"Image successfully saved to {saveLocation}");
-                // Open file explorer with the saved file selected
-                //string selectFileArgument = $"/select, \"{saveLocation}\"";
-                //Process.Start("explorer.exe", selectFileArgument);
-                return saveLocation;
-            }
-            catch (FileNotFoundException e)
-            {
-                Trace.WriteLine($"Error saving to file {saveLocation}: {e.Message} - {e.InnerException?.Message}");
-                return null;
-            }
-            #endregion
+            verticalMessagePanel.UpdateImage();
+            Trace.WriteLine($"Image updated.");
+            return true;
         }
+        #endregion
 
         public void Dispose()
         {
             verticalMessagePanel.Dispose();
             direct2DWrapper.Dispose();
-            File.Delete(blankPanel);
         }
     }
 }
