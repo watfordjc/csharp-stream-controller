@@ -8,6 +8,7 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.Data
     {
         public static readonly Dictionary<string, ObsSourceType> ObsTypeNameDictionary = new Dictionary<string, ObsSourceType>()
         {
+            { "unknown", ObsSourceType.Unknown },
             { "scene", ObsSourceType.Scene },
             { "group", ObsSourceType.Group },
             { "audio_line", ObsSourceType.AudioLine },
@@ -118,6 +119,7 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary.Data
     {
         private static readonly Dictionary<ObsSourceType, Type> sourceTypeSettingsDictionary = new Dictionary<ObsSourceType, Type>()
         {
+            { ObsSourceType.Unknown, typeof(TypeDefs.BaseType) },
             { ObsSourceType.Scene, typeof(TypeDefs.Scene) },
             { ObsSourceType.Group, typeof(TypeDefs.Group) },
             { ObsSourceType.AudioLine, typeof(TypeDefs.AudioLine) },

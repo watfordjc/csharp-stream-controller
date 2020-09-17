@@ -627,6 +627,10 @@ namespace uk.JohnCook.dotnet.StreamController
 
         private static void GetDeviceIdForSource(BaseType source)
         {
+            if (!ObsTypes.ObsTypeNameDictionary.ContainsKey(source.Type.TypeId))
+            {
+                return;
+            }
             switch (ObsTypes.ObsTypeNameDictionary[source.Type.TypeId])
             {
                 case ObsSourceType.WasapiOutputCapture:
@@ -738,7 +742,7 @@ namespace uk.JohnCook.dotnet.StreamController
             {
                 chronoTimer.MinuteChanged -= weatherProcessing.UpdateLocalClock;
             }
-            if (ObsTypes.ObsTypeNameDictionary[messageObject.SourceKind] == ObsSourceType.Scene)
+            if (ObsTypes.ObsTypeNameDictionary.ContainsKey(messageObject.SourceKind) && ObsTypes.ObsTypeNameDictionary[messageObject.SourceKind] == ObsSourceType.Scene)
             {
                 ObsScene scene = SceneList.FirstOrDefault(x => x.Name == messageObject.SourceName);
                 if (scene != default)

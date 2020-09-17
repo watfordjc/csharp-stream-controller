@@ -215,7 +215,7 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary
                         case ObsRequestType.GetSourceSettings:
                         case ObsRequestType.SetSourceSettings:
                             root.TryGetProperty("sourceType", out sourceType);
-                            if (!String.IsNullOrEmpty(sourceType.ToString()))
+                            if (!String.IsNullOrEmpty(sourceType.ToString()) && ObsTypes.ObsTypeNameDictionary.ContainsKey(sourceType.ToString()))
                             {
                                 obsReply.SourceType = ObsTypes.ObsTypeNameDictionary[sourceType.ToString()];
                             }
@@ -259,11 +259,17 @@ namespace uk.JohnCook.dotnet.OBSWebSocketLibrary
                 {
                     case ObsEventType.SourceCreated:
                         root.TryGetProperty("sourceKind", out sourceType);
-                        obsEvent.SourceType = ObsTypes.ObsTypeNameDictionary[sourceType.ToString()];
+                        if (ObsTypes.ObsTypeNameDictionary.ContainsKey(sourceType.ToString()))
+                        {
+                            obsEvent.SourceType = ObsTypes.ObsTypeNameDictionary[sourceType.ToString()];
+                        }
                         break;
                     case ObsEventType.SourceFilterAdded:
                         root.TryGetProperty("filterType", out sourceType);
-                        obsEvent.SourceType = ObsTypes.ObsTypeNameDictionary[sourceType.ToString()];
+                        if (ObsTypes.ObsTypeNameDictionary.ContainsKey(sourceType.ToString()))
+                        {
+                            obsEvent.SourceType = ObsTypes.ObsTypeNameDictionary[sourceType.ToString()];
+                        }
                         break;
                     default:
                         break;
