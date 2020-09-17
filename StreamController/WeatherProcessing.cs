@@ -29,6 +29,8 @@ namespace uk.JohnCook.dotnet.StreamController
         private bool FirstWeatherCycle { get; set; } = true;
         private readonly HttpClient httpClient = new HttpClient();
         private Models.WeatherData WeatherDataCollection { get; set; }
+        public bool ClockUpdatesEnabled { get; set; }
+        public bool WeatherUpdatesEnabled { get; set; }
         private bool disposedValue;
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -44,6 +46,9 @@ namespace uk.JohnCook.dotnet.StreamController
         {
             UpdateTimezoneString();
             chronoTimer.MinuteChanged += FetchWeatherData;
+            chronoTimer.MinuteChanged += UpdateLocalClock;
+            chronoTimer.MinuteChanged += UpdateLocalWeather;
+            chronoTimer.SecondChanged += UpdateLocalWeather;
             FetchWeatherData(this, DateTime.UtcNow);
         }
 
@@ -64,9 +69,6 @@ namespace uk.JohnCook.dotnet.StreamController
                 NotifyPropertyChanged(nameof(PreviousLocalClockWeatherAttrib2));
                 return;
             }
-            chronoTimer.MinuteChanged -= UpdateLocalClock;
-            chronoTimer.MinuteChanged -= UpdateLocalWeather;
-            chronoTimer.SecondChanged -= UpdateLocalWeather;
         }
 
         #endregion
@@ -107,7 +109,7 @@ namespace uk.JohnCook.dotnet.StreamController
 
         public async void UpdateLocalClock(object sender, DateTime e)
         {
-            if (ObsWebsocketConnection.Instance.Client == null || !ObsWebsocketConnection.Instance.Client.CanSend)
+            if (!ClockUpdatesEnabled || ObsWebsocketConnection.Instance.Client == null || !ObsWebsocketConnection.Instance.Client.CanSend)
             {
                 return;
             }
@@ -175,7 +177,8 @@ namespace uk.JohnCook.dotnet.StreamController
         public async void UpdateLocalWeather(object sender, DateTime e)
         {
             // Return early if not connected, no weather data, or nothing to change this second
-            if (ObsWebsocketConnection.Instance.Client == null ||
+            if (!WeatherUpdatesEnabled ||
+                ObsWebsocketConnection.Instance.Client == null ||
                 !ObsWebsocketConnection.Instance.Client.CanSend ||
                 WeatherDataCollection == null ||
                 WeatherDataCollection.Items.Count == 0 ||
@@ -314,6 +317,10 @@ namespace uk.JohnCook.dotnet.StreamController
                 {
                     // TODO: dispose managed state (managed objects)
                     httpClient.Dispose();
+                    chronoTimer.MinuteChanged -= FetchWeatherData;
+                    chronoTimer.MinuteChanged -= UpdateLocalClock;
+                    chronoTimer.MinuteChanged -= UpdateLocalWeather;
+                    chronoTimer.SecondChanged -= UpdateLocalWeather;
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override finalizer

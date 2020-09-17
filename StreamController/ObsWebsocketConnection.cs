@@ -60,6 +60,7 @@ namespace uk.JohnCook.dotnet.StreamController
 
         private readonly WeatherProcessing weatherProcessing;
         private readonly TweetProcessing tweetProcessing;
+        private bool SlideShowEnabled { get; set; }
 
         public static readonly Brush PrimaryBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(0xFF, 0xE2, 0xC1, 0xEA));
         public static readonly Brush SecondaryBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(0xFF, 0xC5, 0xC0, 0xEB));
@@ -93,6 +94,8 @@ namespace uk.JohnCook.dotnet.StreamController
                 AudioDevicesEnumerated(this, EventArgs.Empty);
             }
             weatherProcessing = new WeatherProcessing();
+            chronoTimer.MinuteChanged += SlideShowNextSlide;
+            chronoTimer.SecondChanged += SlideShowNextSlide;
             tweetProcessing = new TweetProcessing();
         }
 
@@ -283,8 +286,7 @@ namespace uk.JohnCook.dotnet.StreamController
         private void ResetScenes()
         {
             weatherProcessing.ResetWeatherCycle();
-            chronoTimer.MinuteChanged -= SlideShowNextSlide;
-            chronoTimer.SecondChanged -= SlideShowNextSlide;
+            SlideShowEnabled = false;
             _Context.Send(
                 x => SceneList.Clear(),
                 null);
@@ -482,16 +484,12 @@ namespace uk.JohnCook.dotnet.StreamController
                     if (newSource.Name == Preferences.Default.obs_local_clock_source_name)
                     {
                         weatherProcessing.UpdateLocalClock(this, DateTime.UtcNow);
-                        chronoTimer.MinuteChanged -= weatherProcessing.UpdateLocalClock;
-                        chronoTimer.MinuteChanged += weatherProcessing.UpdateLocalClock;
+                        weatherProcessing.ClockUpdatesEnabled = true;
                     }
                     else if (newSource.Name == Preferences.Default.obs_local_clock_weather_symbol_source_name)
                     {
                         ClearObsGdi2PlusText(newSource.Name);
-                        chronoTimer.MinuteChanged -= weatherProcessing.UpdateLocalWeather;
-                        chronoTimer.MinuteChanged += weatherProcessing.UpdateLocalWeather;
-                        chronoTimer.SecondChanged -= weatherProcessing.UpdateLocalWeather;
-                        chronoTimer.SecondChanged += weatherProcessing.UpdateLocalWeather;
+                        weatherProcessing.WeatherUpdatesEnabled = true;
                     }
                     else if (newSource.Name == Preferences.Default.obs_local_clock_weather_temp_source_name ||
                        newSource.Name == Preferences.Default.obs_local_clock_location_source_name ||
@@ -502,10 +500,7 @@ namespace uk.JohnCook.dotnet.StreamController
                     }
                     else if (newSource.Name == Preferences.Default.obs_slideshow_source_name)
                     {
-                        chronoTimer.MinuteChanged -= SlideShowNextSlide;
-                        chronoTimer.MinuteChanged += SlideShowNextSlide;
-                        chronoTimer.SecondChanged -= SlideShowNextSlide;
-                        chronoTimer.SecondChanged += SlideShowNextSlide;
+                        SlideShowEnabled = true;
                     }
                     else if (newSource.Name == "TextFormatterOutput")
                     {
@@ -543,6 +538,10 @@ namespace uk.JohnCook.dotnet.StreamController
 
         private static void SlideShowNextSlide(object sender, DateTime e)
         {
+            if (!Instance.SlideShowEnabled)
+            {
+                return;
+            }
 
             const UInt32 WM_KEYDOWN = 0x0100;
             Int32 VK_F20 = KeyInterop.VirtualKeyFromKey(Key.F20);
@@ -674,14 +673,12 @@ namespace uk.JohnCook.dotnet.StreamController
         {
             if (SceneList.Any(x => x.Name == messageObject.SceneName))
             {
-                chronoTimer.MinuteChanged -= SlideShowNextSlide;
-                chronoTimer.SecondChanged -= SlideShowNextSlide;
+                SlideShowEnabled = false;
                 CurrentScene = SceneList.First(x => x.Name == messageObject.SceneName);
                 NotifyPropertyChanged(nameof(CurrentScene));
                 if (CurrentScene.Sources.Where(x => x.Name == Preferences.Default.obs_slideshow_source_name).Any())
                 {
-                    chronoTimer.MinuteChanged += SlideShowNextSlide;
-                    chronoTimer.SecondChanged += SlideShowNextSlide;
+                    SlideShowEnabled = true;
                 }
             }
         }
@@ -740,7 +737,7 @@ namespace uk.JohnCook.dotnet.StreamController
             ObsSourceDictionary.Remove(messageObject.SourceName);
             if (messageObject.SourceName == Preferences.Default.obs_local_clock_source_name)
             {
-                chronoTimer.MinuteChanged -= weatherProcessing.UpdateLocalClock;
+                weatherProcessing.ClockUpdatesEnabled = false;
             }
             if (ObsTypes.ObsTypeNameDictionary.ContainsKey(messageObject.SourceKind) && ObsTypes.ObsTypeNameDictionary[messageObject.SourceKind] == ObsSourceType.Scene)
             {
