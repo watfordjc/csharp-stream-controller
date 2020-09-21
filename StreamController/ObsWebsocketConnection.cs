@@ -710,6 +710,10 @@ namespace uk.JohnCook.dotnet.StreamController
 
         private void SourceCreated_Event(SourceCreatedObsEvent messageObject)
         {
+            if (!ObsTypes.ObsTypeNameDictionary.ContainsKey(messageObject.SourceKind))
+            {
+                return;
+            }
             ObsSourceType sourceType = ObsTypes.ObsTypeNameDictionary[messageObject.SourceKind];
             object createdSource = messageObject.SourceSettingsObj;
             ObsWsReplyType replyType = SourceTypes.Types.FirstOrDefault(x => x.TypeId == messageObject.SourceKind);
