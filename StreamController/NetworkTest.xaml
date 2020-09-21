@@ -9,106 +9,187 @@
         xmlns:props="clr-namespace:uk.JohnCook.dotnet.StreamController.Properties"
         mc:Ignorable="d"
         Title="{x:Static props:Resources.window_network_test_title}"
-        MinHeight="450" MinWidth="800">
-    <Grid Margin="16">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="0">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Border Name="textBorder" Margin="8 0 8 4" BorderThickness="2" Grid.ColumnSpan="2">
-                    <Border.Style>
-                        <Style TargetType="Border">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding ConnectivityLevel2, Mode=OneWay}" Value="{x:Static connectivityLevel:NetworkConnectivityLevel2.None}">
-                                    <Setter Property="BorderBrush" Value="{DynamicResource NetworkTest.NetworkState.None.Border}" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding ConnectivityLevel2, Mode=OneWay}" Value="{x:Static connectivityLevel:NetworkConnectivityLevel2.LocalAccess}">
-                                    <Setter Property="BorderBrush" Value="{DynamicResource NetworkTest.NetworkState.LocalAccess.Border}" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding ConnectivityLevel2, Mode=OneWay}" Value="{x:Static connectivityLevel:NetworkConnectivityLevel2.ConstrainedInternetAccess}">
-                                    <Setter Property="BorderBrush" Value="{DynamicResource NetworkTest.NetworkState.ConstrainedInternetAccess.Border}" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding ConnectivityLevel2, Mode=OneWay}" Value="{x:Static connectivityLevel:NetworkConnectivityLevel2.InternetAccess}">
-                                    <Setter Property="BorderBrush" Value="{DynamicResource NetworkTest.NetworkState.InternetAccess.Border}" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Border.Style>
-                    <TextBlock x:Name="internetState" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Padding="4" TextAlignment="Center" FontWeight="Bold">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
+        SizeToContent="WidthAndHeight"
+        MinHeight="240" MinWidth="360">
+    <DockPanel>
+        <Menu DockPanel.Dock="Top"
+              ItemsSource="{StaticResource ResourceKey=MenuItems}"
+              AutomationProperties.Name="Application"
+              KeyboardNavigation.TabNavigation="None" />
+        <Grid Margin="16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <StackPanel Orientation="Vertical"
+                        Grid.Row="0"
+                        Grid.Column="0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Border Name="textBorder"
+                            Margin="8 0 8 4"
+                            BorderThickness="2"
+                            Grid.ColumnSpan="2">
+                        <Border.Style>
+                            <Style TargetType="Border">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ConnectivityLevel2, Mode=OneWay}" Value="{x:Static connectivityLevel:NetworkConnectivityLevel2.None}">
-                                        <Setter Property="Background" Value="{DynamicResource NetworkTest.NetworkState.None.Background}" />
-                                        <Setter Property="Foreground" Value="{DynamicResource NetworkTest.NetworkState.None.Foreground}" />
-                                        <Setter Property="Text" Value="{x:Static props:Resources.window_network_test_status_None}" />
+                                    <DataTrigger Binding="{Binding ConnectivityLevel2, Mode=OneWay}"
+                                                 Value="{x:Static connectivityLevel:NetworkConnectivityLevel2.None}">
+                                        <Setter Property="BorderBrush"
+                                                Value="{DynamicResource NetworkTest.NetworkState.None.Border}" />
                                     </DataTrigger>
-                                    <DataTrigger Binding="{Binding ConnectivityLevel2, Mode=OneWay}" Value="{x:Static connectivityLevel:NetworkConnectivityLevel2.LocalAccess}">
-                                        <Setter Property="Background" Value="{DynamicResource NetworkTest.NetworkState.LocalAccess.Background}" />
-                                        <Setter Property="Foreground" Value="{DynamicResource NetworkTest.NetworkState.LocalAccess.Foreground}" />
-                                        <Setter Property="Text" Value="{x:Static props:Resources.window_network_test_status_LocalAccess}" />
+                                    <DataTrigger Binding="{Binding ConnectivityLevel2, Mode=OneWay}"
+                                                 Value="{x:Static connectivityLevel:NetworkConnectivityLevel2.LocalAccess}">
+                                        <Setter Property="BorderBrush"
+                                                Value="{DynamicResource NetworkTest.NetworkState.LocalAccess.Border}" />
                                     </DataTrigger>
-                                    <DataTrigger Binding="{Binding ConnectivityLevel2, Mode=OneWay}" Value="{x:Static connectivityLevel:NetworkConnectivityLevel2.ConstrainedInternetAccess}">
-                                        <Setter Property="Background" Value="{DynamicResource NetworkTest.NetworkState.ConstrainedInternetAccess.Background}" />
-                                        <Setter Property="Foreground" Value="{DynamicResource NetworkTest.NetworkState.ConstrainedInternetAccess.Foreground}" />
-                                        <Setter Property="Text" Value="{x:Static props:Resources.window_network_test_status_ConstrainedInternetAccess}" />
+                                    <DataTrigger Binding="{Binding ConnectivityLevel2, Mode=OneWay}"
+                                                 Value="{x:Static connectivityLevel:NetworkConnectivityLevel2.ConstrainedInternetAccess}">
+                                        <Setter Property="BorderBrush"
+                                                Value="{DynamicResource NetworkTest.NetworkState.ConstrainedInternetAccess.Border}" />
                                     </DataTrigger>
-                                    <DataTrigger Binding="{Binding ConnectivityLevel2, Mode=OneWay}" Value="{x:Static connectivityLevel:NetworkConnectivityLevel2.InternetAccess}">
-                                        <Setter Property="Background" Value="{DynamicResource NetworkTest.NetworkState.InternetAccess.Background}" />
-                                        <Setter Property="Foreground" Value="{DynamicResource NetworkTest.NetworkState.InternetAccess.Foreground}" />
-                                        <Setter Property="Text" Value="{x:Static props:Resources.window_network_test_status_InternetAccess}" />
+                                    <DataTrigger Binding="{Binding ConnectivityLevel2, Mode=OneWay}"
+                                                 Value="{x:Static connectivityLevel:NetworkConnectivityLevel2.InternetAccess}">
+                                        <Setter Property="BorderBrush"
+                                                Value="{DynamicResource NetworkTest.NetworkState.InternetAccess.Border}" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-                </Border>
-                <TextBlock Text="{x:Static props:Resources.window_network_test_connection_type_label}" Margin="0 0 4 0" Padding="4" Grid.Row="1" Grid.Column="0" />
-                <TextBlock Text="{Binding ConnectionType, Mode=OneWay}" Padding="4" Grid.Row="1" Grid.Column="1" />
-                <Label x:Name="cbMeteredConnection_label" Content="{x:Static props:Resources.window_network_test_metered_label}" Target="{Binding ElementName=cbMeteredConnection}" Margin="0 0 4 0" Padding="4" Grid.Row="2" Grid.Column="0" />
-                <CheckBox x:Name="cbMeteredConnection" AutomationProperties.LabeledBy="{Binding ElementName=cbMeteredConnection_label}" Padding="4" VerticalAlignment="Center" IsChecked="{Binding IsInternetOnMeteredConnection, Mode=OneWay}" Focusable="False" IsHitTestVisible="False" Grid.Row="2" Grid.Column="1">
-                    <CheckBox.Style>
-                        <Style TargetType="CheckBox">
-                            <Style.Triggers>
-                                <Trigger Property="IsChecked" Value="True">
-                                    <Setter Property="Background" Value="{DynamicResource NetworkTest.Metered.IsChecked.Foreground}" />
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </CheckBox.Style>
-                </CheckBox>
-                <Label x:Name="cbInternetConnectivity_label" Content="{x:Static props:Resources.window_network_test_connectivity_label}" Target="{Binding ElementName=cbInternetConnectivity}" Margin="0 0 4 0" Padding="4" Grid.Row="3" Grid.Column="0" />
-                <CheckBox x:Name="cbInternetConnectivity" AutomationProperties.LabeledBy="{Binding ElementName=cbInternetConnectivity_label}" Padding="4" VerticalAlignment="Center" IsChecked="{Binding IsInternetAvailable, Mode=OneWay}" Focusable="False" IsHitTestVisible="False" Grid.Row="3" Grid.Column="1">
-                    <CheckBox.Style>
-                        <Style TargetType="CheckBox">
-                            <Style.Triggers>
-                                <Trigger Property="IsChecked" Value="True">
-                                    <Setter Property="Background" Value="{DynamicResource NetworkTest.InternetConnectivity.IsChecked.Foreground}" />
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </CheckBox.Style>
-                </CheckBox>
-            </Grid>
-        </StackPanel>
-    </Grid>
+                        </Border.Style>
+                        <TextBlock x:Name="internetState"
+                                   Grid.Row="0"
+                                   Grid.Column="0"
+                                   Grid.ColumnSpan="2"
+                                   Padding="4"
+                                   TextAlignment="Center"
+                                   FontWeight="Bold">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ConnectivityLevel2, Mode=OneWay}"
+                                                     Value="{x:Static connectivityLevel:NetworkConnectivityLevel2.None}">
+                                            <Setter Property="Background"
+                                                    Value="{DynamicResource NetworkTest.NetworkState.None.Background}" />
+                                            <Setter Property="Foreground"
+                                                    Value="{DynamicResource NetworkTest.NetworkState.None.Foreground}" />
+                                            <Setter Property="Text"
+                                                    Value="{x:Static props:Resources.window_network_test_status_None}" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding ConnectivityLevel2, Mode=OneWay}"
+                                                     Value="{x:Static connectivityLevel:NetworkConnectivityLevel2.LocalAccess}">
+                                            <Setter Property="Background"
+                                                    Value="{DynamicResource NetworkTest.NetworkState.LocalAccess.Background}" />
+                                            <Setter Property="Foreground"
+                                                    Value="{DynamicResource NetworkTest.NetworkState.LocalAccess.Foreground}" />
+                                            <Setter Property="Text"
+                                                    Value="{x:Static props:Resources.window_network_test_status_LocalAccess}" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding ConnectivityLevel2, Mode=OneWay}"
+                                                     Value="{x:Static connectivityLevel:NetworkConnectivityLevel2.ConstrainedInternetAccess}">
+                                            <Setter Property="Background"
+                                                    Value="{DynamicResource NetworkTest.NetworkState.ConstrainedInternetAccess.Background}" />
+                                            <Setter Property="Foreground"
+                                                    Value="{DynamicResource NetworkTest.NetworkState.ConstrainedInternetAccess.Foreground}" />
+                                            <Setter Property="Text"
+                                                    Value="{x:Static props:Resources.window_network_test_status_ConstrainedInternetAccess}" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding ConnectivityLevel2, Mode=OneWay}"
+                                                     Value="{x:Static connectivityLevel:NetworkConnectivityLevel2.InternetAccess}">
+                                            <Setter Property="Background"
+                                                    Value="{DynamicResource NetworkTest.NetworkState.InternetAccess.Background}" />
+                                            <Setter Property="Foreground"
+                                                    Value="{DynamicResource NetworkTest.NetworkState.InternetAccess.Foreground}" />
+                                            <Setter Property="Text"
+                                                    Value="{x:Static props:Resources.window_network_test_status_InternetAccess}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Border>
+                    <TextBlock Text="{x:Static props:Resources.window_network_test_connection_type_label}"
+                               Margin="0 0 4 0"
+                               Padding="4"
+                               Grid.Row="1"
+                               Grid.Column="0" />
+                    <TextBlock Text="{Binding ConnectionType, Mode=OneWay}"
+                               Padding="4"
+                               Grid.Row="1"
+                               Grid.Column="1" />
+                    <Label x:Name="cbMeteredConnection_label"
+                           Content="{x:Static props:Resources.window_network_test_metered_label}"
+                           Target="{Binding ElementName=cbMeteredConnection}"
+                           Margin="0 0 4 0"
+                           Padding="4"
+                           Grid.Row="2"
+                           Grid.Column="0" />
+                    <CheckBox x:Name="cbMeteredConnection"
+                              AutomationProperties.LabeledBy="{Binding ElementName=cbMeteredConnection_label}"
+                              Padding="4"
+                              VerticalAlignment="Center"
+                              IsChecked="{Binding IsInternetOnMeteredConnection, Mode=OneWay}"
+                              Focusable="False"
+                              IsHitTestVisible="False"
+                              Grid.Row="2"
+                              Grid.Column="1">
+                        <CheckBox.Style>
+                            <Style TargetType="CheckBox">
+                                <Style.Triggers>
+                                    <Trigger Property="IsChecked"
+                                             Value="True">
+                                        <Setter Property="Background"
+                                                Value="{DynamicResource NetworkTest.Metered.IsChecked.Foreground}" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </CheckBox.Style>
+                    </CheckBox>
+                    <Label x:Name="cbInternetConnectivity_label"
+                           Content="{x:Static props:Resources.window_network_test_connectivity_label}"
+                           Target="{Binding ElementName=cbInternetConnectivity}"
+                           Margin="0 0 4 0"
+                           Padding="4"
+                           Grid.Row="3"
+                           Grid.Column="0" />
+                    <CheckBox x:Name="cbInternetConnectivity"
+                              AutomationProperties.LabeledBy="{Binding ElementName=cbInternetConnectivity_label}"
+                              Padding="4"
+                              VerticalAlignment="Center"
+                              IsChecked="{Binding IsInternetAvailable, Mode=OneWay}"
+                              Focusable="False"
+                              IsHitTestVisible="False"
+                              Grid.Row="3"
+                              Grid.Column="1">
+                        <CheckBox.Style>
+                            <Style TargetType="CheckBox">
+                                <Style.Triggers>
+                                    <Trigger Property="IsChecked"
+                                             Value="True">
+                                        <Setter Property="Background"
+                                                Value="{DynamicResource NetworkTest.InternetConnectivity.IsChecked.Foreground}" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </CheckBox.Style>
+                    </CheckBox>
+                </Grid>
+            </StackPanel>
+        </Grid>
+    </DockPanel>
 </controls:StyledWindow>

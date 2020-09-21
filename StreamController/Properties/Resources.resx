@@ -280,6 +280,10 @@
     <value>_Audio Interfaces</value>
     <comment>Menu Bar -&gt; Window -&gt; Audio Interfaces</comment>
   </data>
+  <data name="menu_window_network-test" xml:space="preserve">
+    <value>_Network Test</value>
+    <comment>Menu Bar -&gt; Window -&gt; Network Test</comment>
+  </data>
   <data name="menu_window_obs" xml:space="preserve">
     <value>_OBS</value>
     <comment>Menu Bar -&gt; Window -&gt; OBS</comment>

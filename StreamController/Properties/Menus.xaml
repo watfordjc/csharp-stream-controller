@@ -50,6 +50,9 @@
             <MenuItem Header="{x:Static props:Resources.menu_window_obs}"
                       Command="{x:Static local:MenuItemCollection.routedWindowMenuCommand}"
                       x:Name="WebSocketTest" />
+            <MenuItem Header="{x:Static props:Resources.menu_window_network_test}"
+                      Command="{x:Static local:MenuItemCollection.routedWindowMenuCommand}"
+                      x:Name="NetworkTest" />
             <MenuItem.CommandBindings>
                 <CommandBinding Command="{x:Static local:MenuItemCollection.routedWindowMenuCommand}"
                             CanExecute="WindowMenuItemCommand_CanExecute"

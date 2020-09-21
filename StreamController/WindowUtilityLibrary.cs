@@ -31,7 +31,8 @@ namespace uk.JohnCook.dotnet.StreamController
             PreferencesWindow = 1,
             WebSocketTest = 2,
             Audiocheck = 3,
-            SystemTrayIcon = 4
+            SystemTrayIcon = 4,
+            NetworkTest = 5
         }
 
         /// <summary>
@@ -43,7 +44,8 @@ namespace uk.JohnCook.dotnet.StreamController
             { typeof(PreferencesWindow), WindowType.PreferencesWindow },
             { typeof(WebSocketTest), WindowType.WebSocketTest },
             { typeof(AudioCheck), WindowType.Audiocheck },
-            { typeof(SystemTrayIcon), WindowType.SystemTrayIcon }
+            { typeof(SystemTrayIcon), WindowType.SystemTrayIcon },
+            { typeof(NetworkTest), WindowType.NetworkTest }
         };
 
         /// <summary>
@@ -76,6 +78,7 @@ namespace uk.JohnCook.dotnet.StreamController
                 WindowType.PreferencesWindow => Application.Current.Windows.OfType<PreferencesWindow>(),
                 WindowType.WebSocketTest => Application.Current.Windows.OfType<WebSocketTest>(),
                 WindowType.Audiocheck => Application.Current.Windows.OfType<AudioCheck>(),
+                WindowType.NetworkTest => Application.Current.Windows.OfType<NetworkTest>(),
                 _ => null,
             };
             return (windows != null && windows.Any()) ? windows.First() : GetNewWindow(windowType);
@@ -95,6 +98,7 @@ namespace uk.JohnCook.dotnet.StreamController
                 WindowType.PreferencesWindow => new PreferencesWindow(),
                 WindowType.WebSocketTest => new WebSocketTest(),
                 WindowType.Audiocheck => new AudioCheck(),
+                WindowType.NetworkTest => new NetworkTest(),
                 _ => null,
             };
         }

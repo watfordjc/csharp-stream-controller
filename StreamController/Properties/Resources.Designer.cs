@@ -445,6 +445,15 @@ namespace uk.JohnCook.dotnet.StreamController.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to _Network Test.
+        /// </summary>
+        public static string menu_window_network_test {
+            get {
+                return ResourceManager.GetString("menu_window_network-test", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to _OBS.
         /// </summary>
         public static string menu_window_obs {
