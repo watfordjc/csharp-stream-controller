@@ -34,6 +34,7 @@ namespace uk.JohnCook.dotnet.StreamController
         private readonly SemaphoreSlim createMessageImageSemaphore = new SemaphoreSlim(1, 1);
         private readonly Queue<QueuedDisplayMessage> tweetImageQueue = new Queue<QueuedDisplayMessage>();
         private volatile string lastRenderedTweet = String.Empty;
+        private QueuedDisplayMessage currentDisplayedTweet;
         private bool previousTweet;
         private const int minimumTweetDisplayPeriods = 2;
         private const int maximumTweetDisplayPeriods = 4;
@@ -82,18 +83,23 @@ namespace uk.JohnCook.dotnet.StreamController
 
         private class QueuedDisplayMessage
         {
-            public DateTime RelayTime { get; set; }
             public bool IsTweet { get; set; }
             public bool IsRetweet { get; set; }
-            public string DisplayName { get; set; }
-            public string Username { get; set; }
-            public string RetweeterDisplayName { get; set; }
-            public string RetweeterUsername { get; set; }
+            public TwitterUser Tweeter { get; set; }
+            public TwitterUser CurrentRetweeter { get; set; }
+            public Queue<TwitterUser> Retweeters { get; set; } = new Queue<TwitterUser>();
             public string MessageText { get; set; }
             public string MessageId { get; set; }
-            public string ProfileImageFile { get; set; }
             public string SpeechPrepend { get; set; }
             public string SpeechText { get; set; }
+        }
+
+        private class TwitterUser
+        {
+            public DateTime RelayTime { get; set; }
+            public string DisplayName { get; set; }
+            public string Username { get; set; }
+            public string ProfileImageFile { get; set; }
         }
 
         #endregion
@@ -364,24 +370,55 @@ namespace uk.JohnCook.dotnet.StreamController
                 day = today.Day;
             }
 
-            QueuedDisplayMessage displayMessage = new QueuedDisplayMessage()
+            TwitterUser retweeter = null;
+            if (isRetweet)
             {
-                RelayTime = new DateTime(year, month, day, hour, minute, 0, 0, DateTimeKind.Local),
-                IsTweet = isTweet,
-                IsRetweet = isRetweet,
-                DisplayName = match.Groups[7].Value,
-                Username = match.Groups[8].Value,
-                RetweeterDisplayName = isRetweet ? match.Groups[4].Value : null,
-                RetweeterUsername = isRetweet ? match.Groups[5].Value : null,
-                MessageText = match.Groups[10].Value,
-                MessageId = match.Groups[11].Value,
-                SpeechText = match.Groups[10].Value
-            };
+                retweeter = new TwitterUser()
+                {
+                    RelayTime = new DateTime(year, month, day, hour, minute, 0, 0, DateTimeKind.Local),
+                    ProfileImageFile = String.Empty,
+                    DisplayName = match.Groups[4].Value,
+                    Username = match.Groups[5].Value
+                };
+            }
 
-            displayMessage.ProfileImageFile = FetchProfileImage(displayMessage.Username);
-            displayMessage.SpeechPrepend = isRetweet ? $"{displayMessage.RetweeterDisplayName} Retweeted {displayMessage.DisplayName}: " : $"{displayMessage.DisplayName} Tweeted: ";
-
-            tweetImageQueue.Enqueue(displayMessage);
+            QueuedDisplayMessage displayMessage =
+                currentDisplayedTweet?.MessageId == match.Groups[11].Value ?
+                currentDisplayedTweet :
+                tweetImageQueue.Where(x => x.MessageId == match.Groups[11].Value).FirstOrDefault();
+            if (displayMessage == default)
+            {
+                displayMessage = new QueuedDisplayMessage()
+                {
+                    IsTweet = isTweet,
+                    IsRetweet = isRetweet,
+                    Tweeter = new TwitterUser()
+                    {
+                        RelayTime = new DateTime(year, month, day, hour, minute, 0, 0, DateTimeKind.Local),
+                        DisplayName = match.Groups[7].Value,
+                        Username = match.Groups[8].Value,
+                        ProfileImageFile = FetchProfileImage(match.Groups[8].Value),
+                    },
+                    MessageText = match.Groups[10].Value,
+                    MessageId = match.Groups[11].Value,
+                    SpeechText = match.Groups[10].Value,
+                };
+                if (isRetweet)
+                {
+                    displayMessage.Retweeters.Enqueue(retweeter);
+                    displayMessage.SpeechPrepend = $"{retweeter.DisplayName} Retweeted {displayMessage.Tweeter.DisplayName}: ";
+                }
+                else if (isTweet)
+                {
+                    displayMessage.SpeechPrepend = $"{displayMessage.Tweeter.DisplayName} Tweeted: ";
+                }
+                tweetImageQueue.Enqueue(displayMessage);
+            }
+            else
+            {
+                displayMessage.Retweeters.Enqueue(retweeter);
+            }
+            
         }
 
         #endregion
@@ -392,16 +429,18 @@ namespace uk.JohnCook.dotnet.StreamController
         /// </summary>
         /// <param name="message">A QueuedDisplayMessage to display</param>
         /// <returns>A Task</returns>
-        private bool DisplayTweet(QueuedDisplayMessage message)
+        private bool DisplayTweet(QueuedDisplayMessage message, bool useTTS)
         {
             bool imageCreated;
             try
             {
                 imageCreated = verticalMessagePanel.UpdateImage();
-                Trace.WriteLine($"Current thread: {Thread.CurrentThread.ManagedThreadId}");
-                _Context.Send(
-                    async x => await Speak(message).ConfigureAwait(false), null
-                    );
+                if (useTTS)
+                {
+                    _Context.Send(
+                        async x => await Speak(message).ConfigureAwait(false), null
+                        );
+                }
             }
             catch (COMException ce)
             {
@@ -410,7 +449,7 @@ namespace uk.JohnCook.dotnet.StreamController
                 Debugger.Break();
                 return false;
             }
-            Trace.WriteLine($"Tweet image {(imageCreated ? "" : "not ")} displayed.");
+            Trace.WriteLine($"Tweet image{(imageCreated ? "" : " not")} displayed.");
             return true;
         }
         #endregion
@@ -428,6 +467,7 @@ namespace uk.JohnCook.dotnet.StreamController
                 if (verticalMessagePanel.ClearVerticalTweet())
                 {
                     previousTweet = false;
+                    currentDisplayedTweet = null;
                     lastRenderedTweet = String.Empty;
                 }
             }
@@ -469,24 +509,35 @@ namespace uk.JohnCook.dotnet.StreamController
                     tweetDisplayPeriodsRemaining--;
                 }
                 // Prepare display of next Tweet in queue
-                if (tweetDisplayPeriodsRemaining == 0 && tweetImageQueue.Count > 0 || (tweetDisplayPeriodsRemaining < 0 && tweetImageQueue.Count > 0 && lastRenderedTweet != tweetImageQueue.Peek().MessageId))
+                if (tweetDisplayPeriodsRemaining == 0 && // We can prepare the next Tweet/Retweet
+                    (tweetImageQueue.Count > 0 || currentDisplayedTweet?.Retweeters.Count > 0) || // There is a Tweet or Retweet to be displayed
+                    (tweetDisplayPeriodsRemaining < 0 && // Sometimes we're late downloading a profile image
+                    tweetImageQueue.Count > 0 && lastRenderedTweet != tweetImageQueue.Peek().MessageId // We haven't already processed the Tweet
+                    ))
                 {
-                    QueuedDisplayMessage message = tweetImageQueue.Peek();
+                    QueuedDisplayMessage message = currentDisplayedTweet?.Retweeters.Count > 0 ? currentDisplayedTweet : tweetImageQueue.Peek();
+                    TwitterUser tweeter = message.Tweeter;
+                    TwitterUser retweeter = message.IsRetweet ? message.Retweeters.Peek() : null;
+                    if (retweeter == null && message == currentDisplayedTweet && message.Retweeters.Count > 0)
+                    {
+                        retweeter = message.Retweeters.Peek();
+                    }
+
                     DateTime today = e.AddSeconds(1);
                     // Display of a Tweet might straddle both sides of midnight
                     bool possiblyYesterday = today.Hour == 23 && today.Minute == 59;
                     // First minute of the day, queue might have Tweets from yesterday
-                    bool fromYesterday = today.Hour == 0 && today.Minute == 0 && message.RelayTime.Hour == 23;
+                    bool fromYesterday = today.Hour == 0 && today.Minute == 0 && (tweeter.RelayTime.Hour == 23 || retweeter?.RelayTime.Hour == 23);
 
                     string day = fromYesterday ? "Yesterday" : "Today";
                     string time = message.IsRetweet ?
-                        $"Retweeted {(possiblyYesterday ? message.RelayTime.Hour + ":" + message.RelayTime.Minute + " UTC+1" : day)}" :
-                        $"{(possiblyYesterday ? "Before Midnight, " : $"{day}, ")}{message.RelayTime.Hour}:{message.RelayTime.Minute} UTC+1";
+                        $"Retweeted {(possiblyYesterday ? retweeter.RelayTime.Hour.ToString("00", CultureInfo.InvariantCulture) + ":" + retweeter.RelayTime.Minute.ToString("00", CultureInfo.InvariantCulture) + " UTC+1" : day)}" :
+                        $"{(possiblyYesterday ? "Before Midnight, " : $"{day}, ")}{tweeter.RelayTime.Hour.ToString("00", CultureInfo.InvariantCulture)}:{tweeter.RelayTime.Minute.ToString("00", CultureInfo.InvariantCulture)} UTC+1";
                     await createMessageImageSemaphore.WaitAsync().ConfigureAwait(false);
-                    Trace.WriteLine($"Current thread: {Thread.CurrentThread.ManagedThreadId}");
-                    bool tweetRendered = verticalMessagePanel.DrawVerticalTweet(message.ProfileImageFile, message.DisplayName, message.Username, message.MessageText, time, message.RetweeterDisplayName, message.RetweeterUsername);
+                    bool tweetRendered = verticalMessagePanel.DrawVerticalTweet(tweeter.ProfileImageFile, tweeter.DisplayName, tweeter.Username, message.MessageText, time, retweeter?.DisplayName, retweeter?.Username);
                     if (tweetRendered)
                     {
+                        message.CurrentRetweeter = retweeter;
                         lastRenderedTweet = message.MessageId;
                     }
                     createMessageImageSemaphore.Release();
@@ -517,14 +568,29 @@ namespace uk.JohnCook.dotnet.StreamController
             }
 
             // There are more Tweets in the queue and we're ready to show the next one
-            else if (tweetImageQueue.Count > 0 && speechSemaphore.CurrentCount > 0 && tweetImageQueue.Peek().MessageId == lastRenderedTweet)
+            else if (tweetImageQueue.Count > 0 && speechSemaphore.CurrentCount > 0 && (currentDisplayedTweet?.Retweeters.Count > 0 || tweetImageQueue.Peek().MessageId == lastRenderedTweet))
             {
                 tweetDisplayPeriodsRemaining = minimumTweetDisplayPeriods;
-                QueuedDisplayMessage displayMessage = tweetImageQueue.Dequeue();
-                Trace.WriteLine($"Dequeue at {e.Hour.ToString("00", CultureInfo.InvariantCulture)}:{e.Minute.ToString("00", CultureInfo.InvariantCulture)}:{e.Second.ToString("00", CultureInfo.InvariantCulture)} - {displayMessage.MessageId}");
-                Trace.WriteLine($"Current thread: {Thread.CurrentThread.ManagedThreadId}");
+                bool useTTS = true;
+                if (tweetImageQueue.Peek().MessageId == lastRenderedTweet)
+                {
+                    currentDisplayedTweet = tweetImageQueue.Dequeue();
+                }
+                else if (currentDisplayedTweet?.Retweeters.Count > 0)
+                {
+                    currentDisplayedTweet.Retweeters.Dequeue();
+                    tweetDisplayPeriodsRemaining = 1;
+                    useTTS = false;
+                }
+                else
+                {
+                    return;
+                }
+                //QueuedDisplayMessage displayMessage = currentDisplayedTweet.Retweeters.Count > 0 ? currentDisplayedTweet : tweetImageQueue.Dequeue();
+
+                Trace.WriteLine($"Dequeue at {e.Hour.ToString("00", CultureInfo.InvariantCulture)}:{e.Minute.ToString("00", CultureInfo.InvariantCulture)}:{e.Second.ToString("00", CultureInfo.InvariantCulture)} - Tweet ID: {currentDisplayedTweet.MessageId}");
                 verticalMessagePanel.UpdateImage();
-                bool imageCreated = DisplayTweet(displayMessage);
+                bool imageCreated = DisplayTweet(currentDisplayedTweet, useTTS);
                 // Unable to display next Tweet
                 if (ObsWebsocketConnection.Instance.Client != null && !ObsWebsocketConnection.Instance.Client.CanSend)
                 {
@@ -641,7 +707,7 @@ namespace uk.JohnCook.dotnet.StreamController
 
             // Add additional Tweet display time if necessary
             tweetDisplayPeriodsRemaining += Math.Max((int)Math.Ceiling(waveFileReader.TotalTime.TotalSeconds / Preferences.Default.obs_local_clock_cycle_delay) - minimumTweetDisplayPeriods, 0);
-            Trace.WriteLine($"Expected playback length: {waveFileReader.TotalTime}. Number of Tweet display periods: {tweetDisplayPeriodsRemaining}.");
+            Trace.WriteLine($"Expected TTS playback length: {waveFileReader.TotalTime}. Number of Tweet display periods: {tweetDisplayPeriodsRemaining}.");
             countdownTimerValue = tweetDisplayPeriodsRemaining * Preferences.Default.obs_local_clock_cycle_delay;
             UpdateCountdownDisplay();
 
